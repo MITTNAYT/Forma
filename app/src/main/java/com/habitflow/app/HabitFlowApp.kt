@@ -3,14 +3,14 @@ package com.habitflow.app.ui
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.habitflow.app.core.designsystem.NotionTheme
@@ -35,19 +35,24 @@ fun HabitFlowApp(
                 onAnimationFinished = { isSplashFinished = true }
             )
         } else {
-            Scaffold(
-                bottomBar = {
-                    HabitFlowBottomBar(navController = navController)
-                },
-                containerColor = NotionTheme.colors.background,
+            // True Edge-to-Edge Full Screen Container
+            Box(
                 modifier = modifier
                     .fillMaxSize()
                     .background(NotionTheme.colors.background)
-            ) { innerPadding ->
+            ) {
+                // Navigation Screen Host (fills the full display)
                 HabitFlowNavGraph(
                     navController = navController,
-                    modifier = Modifier.padding(innerPadding)
+                    modifier = Modifier.fillMaxSize()
                 )
+
+                // Floating Navigation Dock (pinned gracefully at the bottom)
+                Box(
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                ) {
+                    HabitFlowBottomBar(navController = navController)
+                }
             }
         }
     }

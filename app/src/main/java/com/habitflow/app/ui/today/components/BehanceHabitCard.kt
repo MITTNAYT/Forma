@@ -188,7 +188,9 @@ fun BehanceHabitCard(
                         fontWeight = FontWeight.Bold,
                         color = if (isDone) colors.textSecondary else colors.textPrimary,
                         fontSize = 16.sp,
-                        letterSpacing = (-0.2).sp
+                        letterSpacing = (-0.2).sp,
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                     )
 
                     Spacer(modifier = Modifier.height(3.dp))
@@ -197,7 +199,9 @@ fun BehanceHabitCard(
                         text = subtitle,
                         style = NotionTheme.typography.bodySmall,
                         color = colors.textSecondary,
-                        fontSize = 13.sp
+                        fontSize = 13.sp,
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                     )
                 }
             }

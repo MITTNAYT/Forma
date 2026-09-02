@@ -1,5 +1,17 @@
 package com.habitflow.app.ui.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -22,7 +34,21 @@ fun HabitFlowNavGraph(
     NavHost(
         navController = navController,
         startDestination = Screen.Home.route,
-        modifier = modifier
+        modifier = modifier,
+        enterTransition = {
+            fadeIn(animationSpec = tween(220, easing = LinearOutSlowInEasing)) +
+            scaleIn(initialScale = 0.985f, animationSpec = tween(220, easing = FastOutSlowInEasing))
+        },
+        exitTransition = {
+            fadeOut(animationSpec = tween(160, easing = FastOutSlowInEasing))
+        },
+        popEnterTransition = {
+            fadeIn(animationSpec = tween(220, easing = LinearOutSlowInEasing)) +
+            scaleIn(initialScale = 0.985f, animationSpec = tween(220, easing = FastOutSlowInEasing))
+        },
+        popExitTransition = {
+            fadeOut(animationSpec = tween(160, easing = FastOutSlowInEasing))
+        }
     ) {
         // Tab 1: Home (Behance Minimal Habit Dashboard)
         composable(Screen.Home.route) {
@@ -52,8 +78,22 @@ fun HabitFlowNavGraph(
             StatsScreen()
         }
 
-        // Tab 4: Add Item (Creation Modal)
-        composable(Screen.AddItem.route) {
+        // Tab 4: Add Item (Creation Modal with Butter-Smooth Spring Elevation)
+        composable(
+            route = Screen.AddItem.route,
+            enterTransition = {
+                slideInVertically(
+                    initialOffsetY = { it / 4 },
+                    animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessMediumLow)
+                ) + fadeIn(animationSpec = tween(200))
+            },
+            exitTransition = {
+                slideOutVertically(
+                    targetOffsetY = { it / 4 },
+                    animationSpec = tween(180, easing = FastOutSlowInEasing)
+                ) + fadeOut(animationSpec = tween(160))
+            }
+        ) {
             AddEditTimelineItemScreen(
                 onNavigateBack = {
                     navController.popBackStack()
@@ -91,7 +131,19 @@ fun HabitFlowNavGraph(
                     type = NavType.BoolType
                     defaultValue = false
                 }
-            )
+            ),
+            enterTransition = {
+                slideInVertically(
+                    initialOffsetY = { it / 4 },
+                    animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessMediumLow)
+                ) + fadeIn(animationSpec = tween(200))
+            },
+            exitTransition = {
+                slideOutVertically(
+                    targetOffsetY = { it / 4 },
+                    animationSpec = tween(180, easing = FastOutSlowInEasing)
+                ) + fadeOut(animationSpec = tween(160))
+            }
         ) {
             AddEditTimelineItemScreen(
                 onNavigateBack = {
@@ -117,7 +169,15 @@ fun HabitFlowNavGraph(
                     type = NavType.StringType
                     defaultValue = "false"
                 }
-            )
+            ),
+            enterTransition = {
+                fadeIn(animationSpec = tween(240, easing = LinearOutSlowInEasing)) +
+                scaleIn(initialScale = 0.96f, animationSpec = tween(240, easing = FastOutSlowInEasing))
+            },
+            exitTransition = {
+                fadeOut(animationSpec = tween(180, easing = FastOutSlowInEasing)) +
+                scaleOut(targetScale = 0.96f, animationSpec = tween(180, easing = FastOutSlowInEasing))
+            }
         ) {
             FocusTimerScreen(
                 onNavigateBack = {
