@@ -183,15 +183,14 @@ fun TodayScreen(
                     }
                 }
 
-                // 2. Horizontal 7-Day Date Carousel
+                // 2. Responsive 7-Day Week Buttons (Fits Whole Screen - Zero Scrolling)
                 item {
-                    val scrollState = rememberScrollState()
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .horizontalScroll(scrollState)
-                            .padding(horizontal = 20.dp, vertical = 6.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            .padding(horizontal = 16.dp, vertical = 6.dp),
+                        horizontalArrangement = Arrangement.spacedBy(5.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         weekDays.forEach { date ->
                             val isSelected = date == selectedDate
@@ -219,13 +218,13 @@ fun TodayScreen(
 
                             Box(
                                 modifier = Modifier
-                                    .width(52.dp)
-                                    .height(72.dp)
-                                    .clip(RoundedCornerShape(18.dp))
+                                    .weight(1f)
+                                    .height(68.dp)
+                                    .clip(RoundedCornerShape(16.dp))
                                     .background(itemBg)
-                                    .border(1.dp, borderColor, RoundedCornerShape(18.dp))
+                                    .border(1.dp, borderColor, RoundedCornerShape(16.dp))
                                     .clickable { viewModel.selectDate(date) }
-                                    .padding(vertical = 8.dp),
+                                    .padding(vertical = 7.dp),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Column(
@@ -237,7 +236,8 @@ fun TodayScreen(
                                         style = NotionTheme.typography.labelSmall,
                                         fontWeight = FontWeight.Bold,
                                         color = subTextColor,
-                                        fontSize = 11.sp
+                                        fontSize = 10.5.sp,
+                                        maxLines = 1
                                     )
 
                                     Text(
@@ -245,7 +245,8 @@ fun TodayScreen(
                                         style = NotionTheme.typography.titleMedium,
                                         fontWeight = FontWeight.Bold,
                                         color = textColor,
-                                        fontSize = 17.sp
+                                        fontSize = 16.sp,
+                                        maxLines = 1
                                     )
 
                                     if (isToday) {

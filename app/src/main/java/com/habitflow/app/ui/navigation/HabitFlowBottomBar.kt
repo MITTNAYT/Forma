@@ -11,20 +11,20 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -34,10 +34,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -60,30 +57,28 @@ fun HabitFlowBottomBar(
         modifier = modifier
             .fillMaxWidth()
             .navigationBarsPadding()
-            .padding(horizontal = 14.dp, vertical = 6.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         contentAlignment = Alignment.Center
     ) {
-        val isNarrow = maxWidth < 360.dp
-
-        // Floating Island Dock for 5 Navigation Elements
+        // Floating Island Dock: Fixed, Symmetrical & Never Shifts
         Box(
             modifier = Modifier
-                .widthIn(max = 440.dp)
+                .widthIn(max = 420.dp)
                 .fillMaxWidth()
                 .shadow(
-                    elevation = 12.dp,
-                    shape = RoundedCornerShape(32.dp),
-                    ambientColor = colors.textPrimary.copy(alpha = 0.08f),
+                    elevation = 14.dp,
+                    shape = RoundedCornerShape(28.dp),
+                    ambientColor = colors.textPrimary.copy(alpha = 0.07f),
                     spotColor = colors.textPrimary.copy(alpha = 0.12f)
                 )
-                .clip(RoundedCornerShape(32.dp))
+                .clip(RoundedCornerShape(28.dp))
                 .background(colors.surface)
-                .border(1.dp, colors.border.copy(alpha = 0.65f), RoundedCornerShape(32.dp))
-                .padding(horizontal = if (isNarrow) 4.dp else 8.dp, vertical = 6.dp)
+                .border(1.dp, colors.border.copy(alpha = 0.65f), RoundedCornerShape(28.dp))
+                .padding(horizontal = 8.dp, vertical = 6.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 navItems.forEach { screen ->
@@ -91,15 +86,15 @@ fun HabitFlowBottomBar(
                     val isAddButton = screen == Screen.AddItem
 
                     if (isAddButton) {
-                        // Dedicated Central Add (+) Action Orb
+                        // Central Tactile Add (+) Button
                         Box(
                             modifier = Modifier
-                                .size(if (isNarrow) 38.dp else 42.dp)
+                                .size(44.dp)
                                 .shadow(
                                     elevation = 6.dp,
                                     shape = CircleShape,
-                                    ambientColor = colors.accent.copy(alpha = 0.25f),
-                                    spotColor = colors.accent.copy(alpha = 0.35f)
+                                    ambientColor = colors.accent.copy(alpha = 0.3f),
+                                    spotColor = colors.accent.copy(alpha = 0.4f)
                                 )
                                 .clip(CircleShape)
                                 .background(colors.accent)
@@ -115,15 +110,15 @@ fun HabitFlowBottomBar(
                                 imageVector = Icons.Rounded.Add,
                                 contentDescription = "Add New Intention",
                                 tint = colors.onAccent,
-                                modifier = Modifier.size(if (isNarrow) 20.dp else 22.dp)
+                                modifier = Modifier.size(22.dp)
                             )
                         }
                     } else {
-                        // Navigation Tab Capsules
-                        val pillScale by animateFloatAsState(
-                            targetValue = if (selected) 1.03f else 1f,
+                        // Symmetrical Tab Pill (Fixed footprint: never pushes adjacent items)
+                        val iconScale by animateFloatAsState(
+                            targetValue = if (selected) 1.15f else 1f,
                             animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium),
-                            label = "tab_scale"
+                            label = "tab_icon_scale"
                         )
 
                         val pillBg by animateColorAsState(
@@ -138,8 +133,8 @@ fun HabitFlowBottomBar(
 
                         Box(
                             modifier = Modifier
-                                .scale(pillScale)
-                                .clip(RoundedCornerShape(18.dp))
+                                .size(44.dp)
+                                .clip(RoundedCornerShape(14.dp))
                                 .background(pillBg)
                                 .clickable(
                                     interactionSource = remember { MutableInteractionSource() },
@@ -154,33 +149,31 @@ fun HabitFlowBottomBar(
                                             restoreState = true
                                         }
                                     }
-                                }
-                                .padding(
-                                    horizontal = if (selected) (if (isNarrow) 8.dp else 12.dp) else (if (isNarrow) 4.dp else 8.dp),
-                                    vertical = 6.dp
-                                ),
+                                },
                             contentAlignment = Alignment.Center
                         ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
                                 screen.icon?.let { icon ->
                                     Icon(
                                         imageVector = icon,
                                         contentDescription = screen.title,
                                         tint = contentColor,
-                                        modifier = Modifier.size(if (isNarrow) 18.dp else 20.dp)
+                                        modifier = Modifier
+                                            .size(21.dp)
+                                            .scale(iconScale)
                                     )
                                 }
 
-                                if (selected && !isNarrow) {
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(
-                                        text = screen.title,
-                                        style = NotionTheme.typography.labelSmall,
-                                        fontWeight = FontWeight.Bold,
-                                        color = contentColor,
-                                        fontSize = 11.sp,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
+                                if (selected) {
+                                    Spacer(modifier = Modifier.height(3.dp))
+                                    Box(
+                                        modifier = Modifier
+                                            .size(3.5.dp)
+                                            .clip(CircleShape)
+                                            .background(colors.accent)
                                     )
                                 }
                             }
