@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Notion Monochrome Palette -->
+    <color name="notion_white">#FFFFFF</color>
+    <color name="notion_light_bg">#FAFAFA</color>
+    <color name="notion_dark_bg">#191919</color>
+    <color name="notion_dark_surface">#222222</color>
+    <color name="notion_dark_border">#333333</color>
+    <color name="notion_light_border">#E5E5E5</color>
+    <color name="notion_text_primary_light">#191919</color>
+    <color name="notion_text_secondary_light">#757575</color>
+    <color name="notion_text_primary_dark">#FFFFFF</color>
+    <color name="notion_text_secondary_dark">#9E9E9E</color>
+    <color name="notion_accent">#EB5757</color>
+</resources>

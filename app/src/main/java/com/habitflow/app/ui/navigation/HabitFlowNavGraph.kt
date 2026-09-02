@@ -1,0 +1,129 @@
+package com.habitflow.app.ui.navigation
+
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import com.habitflow.app.ui.focus.FocusTimerScreen
+import com.habitflow.app.ui.pomodoro.PomodoroScreen
+import com.habitflow.app.ui.settings.SettingsScreen
+import com.habitflow.app.ui.stats.StatsScreen
+import com.habitflow.app.ui.timeline.AddEditTimelineItemScreen
+import com.habitflow.app.ui.today.TodayScreen
+
+@Composable
+fun HabitFlowNavGraph(
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
+    NavHost(
+        navController = navController,
+        startDestination = Screen.Home.route,
+        modifier = modifier
+    ) {
+        // Tab 1: Home (Behance Minimal Habit Dashboard)
+        composable(Screen.Home.route) {
+            TodayScreen(
+                onNavigateToAddTask = { dateStr ->
+                    navController.navigate(Screen.AddEditTimelineItem.createRoute(selectedDate = dateStr))
+                },
+                onNavigateToEditTask = { itemId ->
+                    navController.navigate(Screen.AddEditTimelineItem.createRoute(itemId = itemId))
+                },
+                onNavigateToHabits = {
+                    navController.navigate(Screen.Analysis.route)
+                },
+                onNavigateToFocusTimer = { itemId, title, durationMinutes, isHabit ->
+                    navController.navigate(Screen.FocusTimer.createRoute(itemId, title, durationMinutes, isHabit))
+                }
+            )
+        }
+
+        // Tab 2: Pomodoro (Dedicated Mindful Focus & Flow Clock Section)
+        composable(Screen.Pomodoro.route) {
+            PomodoroScreen()
+        }
+
+        // Tab 3: Analysis (Behance Streaks & Monthly Consistency Grid)
+        composable(Screen.Analysis.route) {
+            StatsScreen()
+        }
+
+        // Tab 4: Add Item (Creation Modal)
+        composable(Screen.AddItem.route) {
+            AddEditTimelineItemScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        // Tab 5: Settings (Behance Account, Preferences & Settings)
+        composable(Screen.Settings.route) {
+            SettingsScreen(
+                onNavigateToHabits = {
+                    navController.navigate(Screen.Analysis.route)
+                },
+                onNavigateToStats = {
+                    navController.navigate(Screen.Analysis.route)
+                }
+            )
+        }
+
+        // Modal / Sub-screen: Add / Edit Task or Habit
+        composable(
+            route = Screen.AddEditTimelineItem.route,
+            arguments = listOf(
+                navArgument("itemId") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                },
+                navArgument("selectedDate") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                },
+                navArgument("isInbox") {
+                    type = NavType.BoolType
+                    defaultValue = false
+                }
+            )
+        ) {
+            AddEditTimelineItemScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        // Modal / Sub-screen: Pomodoro Focus Clock Screen for a specific task
+        composable(
+            route = Screen.FocusTimer.route,
+            arguments = listOf(
+                navArgument("itemId") { type = NavType.StringType },
+                navArgument("title") {
+                    type = NavType.StringType
+                    defaultValue = "Mindful Focus"
+                },
+                navArgument("duration") {
+                    type = NavType.StringType
+                    defaultValue = "25"
+                },
+                navArgument("isHabit") {
+                    type = NavType.StringType
+                    defaultValue = "false"
+                }
+            )
+        ) {
+            FocusTimerScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+    }
+}
