@@ -62,7 +62,7 @@ class NotificationHelper @Inject constructor(
         )
 
         val notification = NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_HABITS_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.ic_stat_leaf)
             .setContentTitle(habitName)
             .setContentText("Time for your scheduled habit!")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -89,7 +89,7 @@ class NotificationHelper @Inject constructor(
         )
 
         val notification = NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_TASKS_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.ic_stat_leaf)
             .setContentTitle("Upcoming: $taskTitle")
             .setContentText("Starts at $timeText")
             .setPriority(NotificationCompat.PRIORITY_HIGH)

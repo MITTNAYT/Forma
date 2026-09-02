@@ -23,14 +23,14 @@ class StatsViewModel @Inject constructor(
 ) : ViewModel() {
 
     val userName: StateFlow<String> = preferencesRepository.userName
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "Mojammel")
+        .stateIn(viewModelScope, SharingStarted.Eagerly, "Alex")
 
     val stats: StateFlow<OverallHabitStats?> = getHabitStatsUseCase()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     val focusStats: StateFlow<FocusTimeStats?> = focusTrackerRepository.getFocusTimeStats()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     val isPro: StateFlow<Boolean> = billingRepository.isPro
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 }

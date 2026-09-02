@@ -56,7 +56,9 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -70,6 +72,7 @@ fun PomodoroScreen(
 ) {
     val colors = NotionTheme.colors
     val context = LocalContext.current
+    val haptic = LocalHapticFeedback.current
 
     val selectedMode by viewModel.selectedMode.collectAsState()
     val timeRemaining by viewModel.timeRemainingSeconds.collectAsState()
@@ -115,6 +118,7 @@ fun PomodoroScreen(
                     Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
                 }
                 is PomodoroUiEvent.SessionFinished -> {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                     Toast.makeText(context, "Flow session complete! Mindful time recorded.", Toast.LENGTH_LONG).show()
                 }
             }
@@ -412,7 +416,10 @@ fun PomodoroScreen(
                             .size(46.dp)
                             .clip(CircleShape)
                             .background(colors.surfaceVariant)
-                            .clickable { viewModel.resetTimer() },
+                            .clickable {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                viewModel.resetTimer()
+                            },
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
@@ -435,7 +442,10 @@ fun PomodoroScreen(
                             )
                             .clip(CircleShape)
                             .background(colors.accent)
-                            .clickable { viewModel.togglePlayPause() },
+                            .clickable {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                viewModel.togglePlayPause()
+                            },
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
@@ -452,7 +462,10 @@ fun PomodoroScreen(
                             .height(46.dp)
                             .clip(RoundedCornerShape(23.dp))
                             .background(colors.surfaceVariant)
-                            .clickable { viewModel.addFiveMinutes() }
+                            .clickable {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                viewModel.addFiveMinutes()
+                            }
                             .padding(horizontal = 14.dp),
                         contentAlignment = Alignment.Center
                     ) {

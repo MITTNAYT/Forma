@@ -1,5 +1,6 @@
 package com.habitflow.app.ui.settings
 
+import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -56,6 +57,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -72,6 +74,7 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val colors = NotionTheme.colors
+    val context = LocalContext.current
 
     val paletteFamily by viewModel.paletteFamily.collectAsState()
     val darkModeOption by viewModel.darkModeOption.collectAsState()
@@ -456,6 +459,34 @@ fun SettingsScreen(
                                         uncheckedTrackColor = colors.surfaceVariant
                                     )
                                 )
+                            }
+
+                            if (notificationsEnabled) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 32.dp),
+                                    horizontalArrangement = Arrangement.Start
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .background(colors.accentSoft)
+                                            .clickable {
+                                                viewModel.sendTestNotification()
+                                                Toast.makeText(context, "Mindful reminder sent to status bar!", Toast.LENGTH_SHORT).show()
+                                            }
+                                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                                    ) {
+                                        Text(
+                                            text = "Send Test Mindful Reminder",
+                                            style = NotionTheme.typography.labelSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = colors.accent,
+                                            fontSize = 11.sp
+                                        )
+                                    }
+                                }
                             }
 
                             // Tactile Micro-Haptics

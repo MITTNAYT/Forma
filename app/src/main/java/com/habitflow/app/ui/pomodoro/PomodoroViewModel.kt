@@ -60,7 +60,7 @@ class PomodoroViewModel @Inject constructor(
     val selectedItem: StateFlow<TodayScheduleItem?> = _selectedItem.asStateFlow()
 
     val todaySchedule = getTodayTimelineUseCase(DateUtils.today())
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     val totalFocusSecondsToday: StateFlow<Int> = focusTrackerRepository
         .getTotalFocusTimeForDate(DateUtils.formatDateIso(DateUtils.today()))

@@ -121,7 +121,8 @@ fun AddEditTimelineItemScreen(
                     .fillMaxWidth()
                     .background(colors.background)
                     .navigationBarsPadding()
-                    .padding(horizontal = 20.dp, vertical = 14.dp)
+                    .imePadding()
+                    .padding(horizontal = 20.dp, vertical = 12.dp)
             ) {
                 Box(
                     modifier = Modifier
@@ -129,7 +130,9 @@ fun AddEditTimelineItemScreen(
                         .height(54.dp)
                         .clip(RoundedCornerShape(22.dp))
                         .background(if (uiState.title.isNotBlank()) colors.accent else colors.accent.copy(alpha = 0.4f))
-                        .clickable(enabled = uiState.title.isNotBlank()) { viewModel.save() },
+                        .clickable(enabled = uiState.title.isNotBlank()) {
+                            viewModel.save()
+                        },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
