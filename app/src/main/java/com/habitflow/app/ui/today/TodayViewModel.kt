@@ -46,7 +46,7 @@ class TodayViewModel @Inject constructor(
     val selectedDate: StateFlow<LocalDate> = _selectedDate.asStateFlow()
 
     val userName: StateFlow<String> = preferencesRepository.userName
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "Mojammel")
+        .stateIn(viewModelScope, SharingStarted.Eagerly, "Alex")
 
     private val _isAiPlanning = MutableStateFlow(false)
     val isAiPlanning: StateFlow<Boolean> = _isAiPlanning.asStateFlow()
@@ -55,12 +55,12 @@ class TodayViewModel @Inject constructor(
     val eventFlow: SharedFlow<TodayUiEvent> = _eventFlow.asSharedFlow()
 
     val isPro: StateFlow<Boolean> = billingRepository.isPro
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val daySchedule: StateFlow<DaySchedule?> = _selectedDate
         .flatMapLatest { date -> getTodayTimelineUseCase(date) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     fun selectDate(date: LocalDate) {
         _selectedDate.value = date

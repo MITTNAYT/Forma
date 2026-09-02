@@ -2,9 +2,13 @@ package com.habitflow.app.ui.today
 
 import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -96,6 +100,26 @@ fun TodayScreen(
     var selectedDetailItem by remember { mutableStateOf<TodayScheduleItem?>(null) }
     var celebrationInfo by remember { mutableStateOf<Pair<String, Int>?>(null) }
 
+    // Silky Smooth Staggered Entrance Animation
+    val contentAlpha = remember { Animatable(0f) }
+    val contentOffsetY = remember { Animatable(18f) }
+
+    LaunchedEffect(Unit) {
+        contentAlpha.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+        )
+    }
+    LaunchedEffect(Unit) {
+        contentOffsetY.animateTo(
+            targetValue = 0f,
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioLowBouncy,
+                stiffness = Spring.StiffnessMediumLow
+            )
+        )
+    }
+
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collect { event ->
             when (event) {
@@ -127,7 +151,12 @@ fun TodayScreen(
                 .padding(paddingValues)
         ) {
             LazyColumn(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .graphicsLayer {
+                        alpha = contentAlpha.value
+                        translationY = contentOffsetY.value.dp.toPx()
+                    },
                 contentPadding = PaddingValues(bottom = 96.dp)
             ) {
                 // 1. Personalized Header
@@ -271,7 +300,7 @@ fun TodayScreen(
                 val scheduleItems = daySchedule?.items ?: emptyList()
                 val completedCount = scheduleItems.count { it.isCompleted }
 
-                if (scheduleItems.isNotEmpty()) {
+                if (daySchedule != null && scheduleItems.isNotEmpty()) {
                     item {
                         BehanceHeroBanner(
                             completedCount = completedCount,
@@ -299,13 +328,14 @@ fun TodayScreen(
                 }
 
                 // 5. Mindful Habits & Tasks List
-                if (scheduleItems.isEmpty()) {
-                    item {
-                        EmptyPeacefulState(
-                            onAddTask = { onNavigateToAddTask(DateUtils.formatDateIso(selectedDate)) }
-                        )
-                    }
-                } else {
+                if (daySchedule != null) {
+                    if (scheduleItems.isEmpty()) {
+                        item {
+                            EmptyPeacefulState(
+                                onAddTask = { onNavigateToAddTask(DateUtils.formatDateIso(selectedDate)) }
+                            )
+                        }
+                    } else {
                     items(scheduleItems, key = { it.id }) { scheduleItem ->
                         BehanceHabitCard(
                             item = scheduleItem,
@@ -356,6 +386,7 @@ fun TodayScreen(
                     }
                 }
             }
+        }
 
             // Top Floating Dynamic Streak Island
             DynamicStreakIsland(

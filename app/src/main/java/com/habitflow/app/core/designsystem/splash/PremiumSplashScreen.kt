@@ -55,41 +55,37 @@ fun PremiumSplashScreen(
     var showSubtitle by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        // Phase 1: Precision Fade In & Leaf Emblem Spring (0 -> 700ms)
+        // Phase 1: Precision Fade In & Leaf Emblem Spring (0 -> 450ms)
         mainAlpha.animateTo(
             targetValue = 1f,
-            animationSpec = tween(durationMillis = 600, easing = LinearOutSlowInEasing)
+            animationSpec = tween(durationMillis = 350, easing = LinearOutSlowInEasing)
         )
         coreScale.animateTo(
             targetValue = 1f,
             animationSpec = spring(
                 dampingRatio = Spring.DampingRatioMediumBouncy,
-                stiffness = Spring.StiffnessMediumLow
+                stiffness = Spring.StiffnessMedium
             )
         )
 
-        // Phase 2: Organic Blossom Ripple Expansion (700ms -> 1800ms)
+        // Phase 2: Organic Blossom Ripple Expansion
         rippleScale.animateTo(
-            targetValue = 1.35f,
+            targetValue = 1.28f,
             animationSpec = spring(
                 dampingRatio = Spring.DampingRatioLowBouncy,
                 stiffness = Spring.StiffnessLow
             )
         )
         rippleAlpha.animateTo(
-            targetValue = 0.35f,
-            animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing)
+            targetValue = 0.4f,
+            animationSpec = tween(durationMillis = 450, easing = FastOutSlowInEasing)
         )
 
         showSubtitle = true
-        // Keep logo and tagline displayed so total duration >= 3.2s
-        delay(1400)
+        // Mindful breathing pause for elegant presence
+        delay(600)
 
-        // Phase 3: Butter-Soft Velvet Fade Out (2600ms -> 3200ms)
-        mainAlpha.animateTo(
-            targetValue = 0f,
-            animationSpec = tween(durationMillis = 600, easing = FastOutSlowInEasing)
-        )
+        // Seamless handoff to App Crossfade (no blank black/white flash)
         onAnimationFinished()
     }
 
