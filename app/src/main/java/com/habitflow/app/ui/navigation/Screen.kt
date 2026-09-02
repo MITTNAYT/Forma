@@ -38,14 +38,10 @@ sealed class Screen(
         }
     }
 
-    // Aliases
-    val Flow get() = Home
-    val Focus get() = Pomodoro
-    val Progress get() = Analysis
-    val User get() = Settings
-
     companion object {
         // Strict order: Home -> Pomodoro -> AddItem (+) -> Analysis -> Settings
-        val bottomNavItems = listOf(Home, Pomodoro, AddItem, Analysis, Settings)
+        // Using dynamic getter prevents classloader circular initialization NPE
+        val bottomNavItems: List<Screen>
+            get() = listOf(Home, Pomodoro, AddItem, Analysis, Settings)
     }
 }

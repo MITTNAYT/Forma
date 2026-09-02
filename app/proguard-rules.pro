@@ -1,6 +1,20 @@
-# HabitFlow ProGuard Rules
--keepattributes *Annotation*
+# HabitFlow ProGuard Rules - Safe Tree Shaking without Obfuscation
+-dontobfuscate
+
+-keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod
 -dontwarn javax.annotation.**
+
+# Keep all HabitFlow App code completely intact
+-keep class com.habitflow.app.** { *; }
+-keep interface com.habitflow.app.** { *; }
+
+# Navigation Compose (prevent route & argument stripping)
+-keep class androidx.navigation.** { *; }
+-keep interface androidx.navigation.** { *; }
+
+# Compose Runtime, UI & Animations
+-keep class androidx.compose.** { *; }
+-keep interface androidx.compose.** { *; }
 
 # Room Database & Entities
 -keepclassmembers class * {
@@ -12,7 +26,9 @@
 -keep class com.habitflow.app.domain.model.** { *; }
 -dontwarn androidx.room.paging.**
 
-# Kotlin Coroutines
+# Kotlin Coroutines & Reflection
+-keep class kotlin.** { *; }
+-keep class kotlinx.coroutines.** { *; }
 -keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
 -keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
 
@@ -20,3 +36,4 @@
 -keep class * extends android.app.Application
 -keep class * extends android.app.Activity
 -keep class * extends androidx.lifecycle.ViewModel
+-keep class com.habitflow.app.core.di.** { *; }

@@ -52,7 +52,8 @@ fun HabitFlowBottomBar(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    val shouldShow = Screen.bottomNavItems.any { it.route == currentRoute }
+    val navItems = remember { Screen.bottomNavItems }
+    val shouldShow = navItems.any { it.route == currentRoute }
     if (!shouldShow) return
 
     BoxWithConstraints(
@@ -85,7 +86,7 @@ fun HabitFlowBottomBar(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Screen.bottomNavItems.forEach { screen ->
+                navItems.forEach { screen ->
                     val selected = currentRoute == screen.route
                     val isAddButton = screen == Screen.AddItem
 
