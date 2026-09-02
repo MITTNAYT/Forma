@@ -18,6 +18,7 @@ class CalculateStreakUseCaseTest {
         calculateStreakUseCase = CalculateStreakUseCase()
     }
 
+
     @Test
     fun `consecutive daily completions calculate active streak correctly`() {
         val referenceDate = LocalDate.of(2026, 9, 2)

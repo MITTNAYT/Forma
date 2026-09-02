@@ -5,33 +5,37 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- 1. Soft Blossom Glow Outer Disc -->
+    <!-- 1. Outer Ambient Blossom Ripple -->
     <path
-        android:fillColor="#E3ECE0"
-        android:pathData="M54,54m-30,0a30,30 0 1,0 60,0a30,30 0 1,0 -60,0" />
+        android:fillColor="#E8EFE5"
+        android:pathData="M54,54m-35,0a35,35 0 1,0 70,0a35,35 0 1,0 -70,0" />
 
-    <!-- 2. Inner Solid Matcha Core Disc -->
+    <!-- 2. Secondary Soft Glow Ring -->
+    <path
+        android:fillColor="#D8E4D3"
+        android:pathData="M54,54m-29,0a29,29 0 1,0 58,0a29,29 0 1,0 -58,0" />
+
+    <!-- 3. Inner Solid Matcha Core Disc -->
     <path
         android:fillColor="#637852"
-        android:pathData="M54,54m-22,0a22,22 0 1,0 44,0a22,22 0 1,0 -44,0" />
+        android:pathData="M54,54m-23.5,0a23.5,23.5 0 1,0 47,0a23.5,23.5 0 1,0 -47,0" />
 
-    <!-- 3. Satellite Flow Accent Dot -->
+    <!-- 4. Satellite Flow Accent Dot -->
     <path
-        android:fillColor="#8FA87D"
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="1.5"
-        android:pathData="M73,35m-4.5,0a4.5,4.5 0 1,0 9,0a4.5,4.5 0 1,0 -9,0" />
+        android:fillColor="#637852"
+        android:strokeColor="#F6F5F0"
+        android:strokeWidth="1.8"
+        android:pathData="M69,38m-4,0a4,4 0 1,0 8,0a4,4 0 1,0 -8,0" />
 
-    <!-- 4. Crisp Botanical Leaf Vector Geometry -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M65.5,42.5 C60.2,37.2 52.8,37.8 46.5,44.1 C41.2,49.4 40.5,57.5 45.0,63.0 C45.8,64.0 47.2,64.0 48.0,63.2 L63.2,48.0 C64.0,47.2 64.0,45.8 63.0,45.0 C60.5,43.0 57.5,42.8 55.2,44.2 L47.5,51.9 C46.8,52.6 45.7,52.6 45.0,51.9 C44.3,51.2 44.3,50.1 45.0,49.4 L52.7,41.7 C56.5,37.9 62.5,38.0 66.5,42.0 C67.1,42.6 66.1,43.6 65.5,42.5 Z" />
-
-    <!-- 5. Central Vein Flow -->
-    <path
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="2"
-        android:strokeLineCap="round"
-        android:pathData="M46,62 C52,56 58,50 64,44" />
+    <!-- 5. Exact Official EnergySavingsLeaf Vector (matches splash screen) -->
+    <group
+        android:scaleX="0.038"
+        android:scaleY="0.038"
+        android:translateX="35.76"
+        android:translateY="72.24">
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M480,-240q100,0 169,-70t71,-170v-240H480q-100,2 -170,71t-70,169q0,100 70,170t170,70Zm-47,-67 184,-164q9,-8 5,-19t-16,-13l-144,-14 86,-119q3,-5 3.5,-9.5T548,-654q-4,-5 -10,-4.5t-11,4.5L344,-490q-9,8 -5,19t16,13l144,14 -87,119q-3,5 -3,9.5t4,8.5q4,4 9.5,4t10.5,-4Zm47,147q-56,0 -105.5,-17.5T284,-227l-55,55q-6,6 -13.5,9t-15.5,3q-17,0 -28.5,-11.5T160,-200q0,-8 3,-15.5t9,-13.5l55,-55q-32,-41 -49.5,-90.5T160,-480q0,-134 93,-227t227,-93h240q33,0 56.5,23.5T800,-720v240q0,134 -93,227t-227,93Zm0,-320Z" />
+    </group>
 
 </vector>
