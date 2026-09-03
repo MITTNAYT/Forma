@@ -1,7 +1,9 @@
 package com.habitflow.app.ui.settings
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.habitflow.app.core.backup.DataExportManager
 import com.habitflow.app.core.notification.NotificationHelper
 import com.habitflow.app.domain.repository.BillingRepository
 import com.habitflow.app.domain.repository.DarkModeOption
@@ -19,7 +21,8 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val preferencesRepository: UserPreferencesRepository,
     private val billingRepository: BillingRepository,
-    private val notificationHelper: NotificationHelper
+    private val notificationHelper: NotificationHelper,
+    private val dataExportManager: DataExportManager
 ) : ViewModel() {
 
     val userName: StateFlow<String> = preferencesRepository.userName
@@ -49,6 +52,30 @@ class SettingsViewModel @Inject constructor(
             habitName = "Morning Sunlight & Breath",
             habitIcon = "wb_sunny"
         )
+    }
+
+    fun exportJson(activityContext: Context) {
+        viewModelScope.launch {
+            val json = dataExportManager.generateJsonExport()
+            dataExportManager.shareContent(
+                activityContext = activityContext,
+                title = "HabitFlow-Backup.json",
+                content = json,
+                mimeType = "application/json"
+            )
+        }
+    }
+
+    fun exportMarkdown(activityContext: Context) {
+        viewModelScope.launch {
+            val md = dataExportManager.generateMarkdownJournal()
+            dataExportManager.shareContent(
+                activityContext = activityContext,
+                title = "HabitFlow-Journal.md",
+                content = md,
+                mimeType = "text/markdown"
+            )
+        }
     }
 
     fun setUserName(name: String) {

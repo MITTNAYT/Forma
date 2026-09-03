@@ -98,14 +98,14 @@ class TodayViewModel @Inject constructor(
         }
     }
 
-    fun requestAiDayPlan() {
+    fun requestAiDayPlan(preset: com.habitflow.app.domain.repository.AiPlanPreset = com.habitflow.app.domain.repository.AiPlanPreset.DEEP_WORK) {
         viewModelScope.launch {
             _isAiPlanning.value = true
             val dateIso = DateUtils.formatDateIso(_selectedDate.value)
-            when (val result = planDayWithAiUseCase(dateIso)) {
+            when (val result = planDayWithAiUseCase(dateIso, preset)) {
                 is PlanDayWithAiUseCase.Result.Success -> {
                     _isAiPlanning.value = false
-                    _eventFlow.emit(TodayUiEvent.ShowToast("AI added ${result.generatedItems.size} optimized time blocks!"))
+                    _eventFlow.emit(TodayUiEvent.ShowToast("AI added ${result.generatedItems.size} optimized time blocks for ${preset.title}!"))
                 }
                 is PlanDayWithAiUseCase.Result.RequiresPro -> {
                     _isAiPlanning.value = false

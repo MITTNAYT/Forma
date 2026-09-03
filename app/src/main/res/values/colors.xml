@@ -12,4 +12,10 @@
     <color name="notion_text_primary_dark">#FFFFFF</color>
     <color name="notion_text_secondary_dark">#9E9E9E</color>
     <color name="notion_accent">#EB5757</color>
+    <!-- Matcha Palette -->
+    <color name="matcha_dark">#1F2B1C</color>
+    <color name="matcha_accent">#637852</color>
+    <color name="matcha_soft">#EAEFE8</color>
+    <color name="matcha_surface">#F7F8F6</color>
+    <color name="matcha_border">#D6DFD3</color>
 </resources>

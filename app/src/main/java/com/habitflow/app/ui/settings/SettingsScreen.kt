@@ -38,6 +38,8 @@ import androidx.compose.material.icons.rounded.PhoneAndroid
 import androidx.compose.material.icons.rounded.Spa
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.Vibration
+import androidx.compose.material.icons.rounded.Share
+import androidx.compose.material.icons.rounded.Article
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -541,7 +543,125 @@ fun SettingsScreen(
 
             item { Spacer(modifier = Modifier.height(20.dp)) }
 
-            // 5. Pro Membership Card
+            // 5. Data & Mindful Journal Export
+            item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
+                ) {
+                    Text(
+                        text = "DATA & MINDFUL JOURNAL",
+                        style = NotionTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = colors.textTertiary,
+                        letterSpacing = 1.2.sp,
+                        fontSize = 11.sp,
+                        modifier = Modifier.padding(bottom = 10.dp)
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(26.dp))
+                            .background(colors.surface)
+                            .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(26.dp))
+                            .padding(18.dp)
+                    ) {
+                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                            // Markdown Journal Export
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { viewModel.exportMarkdown(context) },
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Article,
+                                        contentDescription = null,
+                                        tint = colors.accent,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Column {
+                                        Text(
+                                            text = "Export Markdown Journal",
+                                            style = NotionTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = colors.textPrimary,
+                                            fontSize = 14.sp
+                                        )
+                                        Text(
+                                            text = "Formatted for Notion, Obsidian & notes apps",
+                                            style = NotionTheme.typography.bodySmall,
+                                            color = colors.textSecondary,
+                                            fontSize = 11.sp
+                                        )
+                                    }
+                                }
+                                Icon(
+                                    imageVector = Icons.Rounded.Share,
+                                    contentDescription = "Share",
+                                    tint = colors.accent,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+
+                            // JSON Backup Export
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { viewModel.exportJson(context) },
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Share,
+                                        contentDescription = null,
+                                        tint = colors.accent,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Column {
+                                        Text(
+                                            text = "Export JSON Backup",
+                                            style = NotionTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = colors.textPrimary,
+                                            fontSize = 14.sp
+                                        )
+                                        Text(
+                                            text = "Full offline backup of rituals, logs & stats",
+                                            style = NotionTheme.typography.bodySmall,
+                                            color = colors.textSecondary,
+                                            fontSize = 11.sp
+                                        )
+                                    }
+                                }
+                                Icon(
+                                    imageVector = Icons.Rounded.ChevronRight,
+                                    contentDescription = "Export",
+                                    tint = colors.textTertiary,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            item { Spacer(modifier = Modifier.height(20.dp)) }
+
+            // 6. Pro Membership Card
             if (!isPro) {
                 item {
                     Box(

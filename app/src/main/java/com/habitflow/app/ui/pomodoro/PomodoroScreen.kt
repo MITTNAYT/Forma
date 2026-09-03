@@ -63,11 +63,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.habitflow.app.core.audio.AmbientSound
 import com.habitflow.app.core.designsystem.NotionTheme
 import com.habitflow.app.domain.model.TodayScheduleItem
 
 @Composable
 fun PomodoroScreen(
+    onNavigateBack: () -> Unit = {},
     viewModel: PomodoroViewModel = hiltViewModel()
 ) {
     val colors = NotionTheme.colors
@@ -75,8 +77,9 @@ fun PomodoroScreen(
     val haptic = LocalHapticFeedback.current
 
     val selectedMode by viewModel.selectedMode.collectAsState()
-    val timeRemaining by viewModel.timeRemainingSeconds.collectAsState()
+    val selectedSound by viewModel.selectedSound.collectAsState()
     val totalDuration by viewModel.totalDurationSeconds.collectAsState()
+    val timeRemaining by viewModel.timeRemainingSeconds.collectAsState()
     val isRunning by viewModel.isRunning.collectAsState()
     val secondsElapsed by viewModel.secondsElapsedThisSession.collectAsState()
     val totalFocusToday by viewModel.totalFocusSecondsToday.collectAsState()
@@ -489,9 +492,67 @@ fun PomodoroScreen(
                 }
             }
 
-            item { Spacer(modifier = Modifier.height(24.dp)) }
+            item { Spacer(modifier = Modifier.height(20.dp)) }
 
-            // 6. Daily Telemetry Status Card
+            // 6. Ambient Soundscapes
+            item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
+                ) {
+                    Text(
+                        text = "FOCUS SOUNDSCAPES",
+                        style = NotionTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = colors.textTertiary,
+                        letterSpacing = 1.2.sp,
+                        fontSize = 11.sp,
+                        modifier = Modifier.padding(bottom = 10.dp)
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        AmbientSound.values().forEach { sound ->
+                            val isSelected = selectedSound == sound
+                            val chipBg by animateColorAsState(
+                                targetValue = if (isSelected) colors.accentSoft else colors.surface,
+                                label = "sound_bg_${sound.name}"
+                            )
+                            val chipBorder = if (isSelected) colors.accent else colors.border.copy(alpha = 0.5f)
+
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(14.dp))
+                                    .background(chipBg)
+                                    .border(1.dp, chipBorder, RoundedCornerShape(14.dp))
+                                    .clickable {
+                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                        viewModel.setAmbientSound(sound)
+                                    }
+                                    .padding(vertical = 10.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = sound.displayName,
+                                    style = NotionTheme.typography.labelSmall,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                    color = if (isSelected) colors.accent else colors.textPrimary,
+                                    fontSize = 11.sp,
+                                    maxLines = 1
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            item { Spacer(modifier = Modifier.height(20.dp)) }
+
+            // 7. Daily Telemetry Status Card
             item {
                 Box(
                     modifier = Modifier

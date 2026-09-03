@@ -1,6 +1,7 @@
 package com.habitflow.app.domain.usecase
 
 import com.habitflow.app.domain.model.TimelineItem
+import com.habitflow.app.domain.repository.AiPlanPreset
 import com.habitflow.app.domain.repository.AiPlannerRepository
 import com.habitflow.app.domain.repository.BillingRepository
 import com.habitflow.app.domain.repository.HabitRepository
@@ -20,7 +21,7 @@ class PlanDayWithAiUseCase @Inject constructor(
         data class Error(val message: String) : Result
     }
 
-    suspend operator fun invoke(date: String): Result {
+    suspend operator fun invoke(date: String, preset: AiPlanPreset = AiPlanPreset.DEEP_WORK): Result {
         val isPro = billingRepository.isPro.first()
         if (!isPro) {
             return Result.RequiresPro
@@ -30,7 +31,7 @@ class PlanDayWithAiUseCase @Inject constructor(
             val habits = habitRepository.getAllHabits(includeArchived = false).first()
             val existingItems = timelineRepository.getTimelineItemsForDate(date).first()
 
-            val aiResult = aiPlannerRepository.suggestDayPlan(date, habits, existingItems)
+            val aiResult = aiPlannerRepository.suggestDayPlan(date, habits, existingItems, preset)
             if (aiResult.isSuccess) {
                 val proposedItems = aiResult.getOrThrow()
                 // Save newly proposed items

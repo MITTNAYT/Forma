@@ -2,6 +2,8 @@ package com.habitflow.app.ui.pomodoro
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.habitflow.app.core.audio.AmbientSound
+import com.habitflow.app.core.audio.AmbientSoundManager
 import com.habitflow.app.core.util.DateUtils
 import com.habitflow.app.domain.model.TodayScheduleItem
 import com.habitflow.app.domain.repository.FocusTrackerRepository
@@ -38,11 +40,15 @@ class PomodoroViewModel @Inject constructor(
     private val focusTrackerRepository: FocusTrackerRepository,
     private val getTodayTimelineUseCase: GetTodayTimelineUseCase,
     private val toggleHabitCompletionUseCase: ToggleHabitCompletionUseCase,
-    private val timelineRepository: TimelineRepository
+    private val timelineRepository: TimelineRepository,
+    private val ambientSoundManager: AmbientSoundManager
 ) : ViewModel() {
 
     private val _selectedMode = MutableStateFlow(PomodoroMode.FOCUS)
     val selectedMode: StateFlow<PomodoroMode> = _selectedMode.asStateFlow()
+
+    private val _selectedSound = MutableStateFlow(AmbientSound.OFF)
+    val selectedSound: StateFlow<AmbientSound> = _selectedSound.asStateFlow()
 
     private val _totalDurationSeconds = MutableStateFlow(25 * 60)
     val totalDurationSeconds: StateFlow<Int> = _totalDurationSeconds.asStateFlow()
@@ -91,9 +97,22 @@ class PomodoroViewModel @Inject constructor(
         }
     }
 
+    fun setAmbientSound(sound: AmbientSound) {
+        _selectedSound.value = sound
+        if (_isRunning.value) {
+            ambientSoundManager.play(sound)
+        } else if (sound == AmbientSound.OFF) {
+            ambientSoundManager.stop()
+        }
+    }
+
     fun startTimer() {
         if (_isRunning.value) return
         _isRunning.value = true
+
+        if (_selectedSound.value != AmbientSound.OFF) {
+            ambientSoundManager.play(_selectedSound.value)
+        }
 
         timerJob?.cancel()
         timerJob = viewModelScope.launch {
@@ -115,6 +134,7 @@ class PomodoroViewModel @Inject constructor(
     fun pauseTimer() {
         _isRunning.value = false
         timerJob?.cancel()
+        ambientSoundManager.stop()
     }
 
     fun resetTimer() {
@@ -129,6 +149,7 @@ class PomodoroViewModel @Inject constructor(
     }
 
     private suspend fun onTimerFinished() {
+        ambientSoundManager.stop()
         saveAndLogSession()
         _eventFlow.emit(PomodoroUiEvent.ShowToast("Flow session complete! Great focus."))
         _eventFlow.emit(PomodoroUiEvent.SessionFinished)
@@ -179,5 +200,6 @@ class PomodoroViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         timerJob?.cancel()
+        ambientSoundManager.stop()
     }
 }

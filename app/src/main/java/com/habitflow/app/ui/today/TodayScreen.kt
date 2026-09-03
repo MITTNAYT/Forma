@@ -34,15 +34,25 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.AutoAwesome
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Spa
+import androidx.compose.material.icons.rounded.Timer
+import androidx.compose.material.icons.rounded.LocalFireDepartment
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import com.habitflow.app.domain.repository.AiPlanPreset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -97,8 +107,10 @@ fun TodayScreen(
 
     var showPaywall by remember { mutableStateOf(false) }
     var showDatePickerDialog by remember { mutableStateOf(false) }
+    var showAiPresetSheet by remember { mutableStateOf(false) }
     var selectedDetailItem by remember { mutableStateOf<TodayScheduleItem?>(null) }
     var celebrationInfo by remember { mutableStateOf<Pair<String, Int>?>(null) }
+    val haptic = LocalHapticFeedback.current
 
     // Silky Smooth Staggered Entrance Animation
     val contentAlpha = remember { Animatable(0f) }
@@ -191,22 +203,56 @@ fun TodayScreen(
                                 letterSpacing = (-0.5).sp
                             )
 
-                            // Calendar Icon
-                            Box(
-                                modifier = Modifier
-                                    .size(38.dp)
-                                    .clip(CircleShape)
-                                    .background(colors.surface)
-                                    .border(1.dp, colors.border.copy(alpha = 0.6f), CircleShape)
-                                    .clickable { showDatePickerDialog = true },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Rounded.CalendarMonth,
-                                    contentDescription = "Pick Date",
-                                    tint = colors.textPrimary,
-                                    modifier = Modifier.size(18.dp)
-                                )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                // AI Plan Pill Button
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(colors.accentSoft)
+                                        .border(1.dp, colors.accent.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
+                                        .clickable {
+                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                            showAiPresetSheet = true
+                                        }
+                                        .padding(horizontal = 10.dp, vertical = 7.dp)
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.AutoAwesome,
+                                            contentDescription = "AI Plan",
+                                            tint = colors.accent,
+                                            modifier = Modifier.size(13.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(5.dp))
+                                        Text(
+                                            text = "AI Plan",
+                                            style = NotionTheme.typography.labelSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = colors.accent,
+                                            fontSize = 11.sp
+                                        )
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.width(8.dp))
+
+                                // Calendar Icon
+                                Box(
+                                    modifier = Modifier
+                                        .size(38.dp)
+                                        .clip(CircleShape)
+                                        .background(colors.surface)
+                                        .border(1.dp, colors.border.copy(alpha = 0.6f), CircleShape)
+                                        .clickable { showDatePickerDialog = true },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.CalendarMonth,
+                                        contentDescription = "Pick Date",
+                                        tint = colors.textPrimary,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
                             }
                         }
                     }
@@ -490,6 +536,126 @@ fun TodayScreen(
 
     if (showPaywall) {
         ProPaywallBottomSheet(onDismiss = { showPaywall = false })
+    }
+
+    if (showAiPresetSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showAiPresetSheet = false },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            containerColor = colors.surface,
+            dragHandle = null
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 20.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Rounded.AutoAwesome,
+                            contentDescription = null,
+                            tint = colors.accent,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "PLAN DAY WITH AI",
+                            style = NotionTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = colors.accent,
+                            letterSpacing = 1.2.sp,
+                            fontSize = 11.sp
+                        )
+                    }
+                    IconButton(
+                        onClick = { showAiPresetSheet = false },
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Close,
+                            contentDescription = "Close",
+                            tint = colors.textSecondary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                Text(
+                    text = "Select an Architectural Rhythm",
+                    style = NotionTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = colors.textPrimary,
+                    fontSize = 16.sp
+                )
+                Text(
+                    text = "HabitFlow AI will generate energy-balanced time blocks based on your goal.",
+                    style = NotionTheme.typography.bodySmall,
+                    color = colors.textSecondary,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(top = 2.dp, bottom = 16.dp)
+                )
+
+                AiPlanPreset.values().forEach { preset ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(18.dp))
+                            .background(colors.surfaceVariant)
+                            .clickable {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                viewModel.requestAiDayPlan(preset)
+                                showAiPresetSheet = false
+                            }
+                            .padding(16.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(colors.accentSoft),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = when (preset) {
+                                        AiPlanPreset.DEEP_WORK -> Icons.Rounded.Timer
+                                        AiPlanPreset.HEALTH_BALANCE -> Icons.Rounded.Spa
+                                        AiPlanPreset.EXAM_STUDY -> Icons.Rounded.LocalFireDepartment
+                                    },
+                                    contentDescription = null,
+                                    tint = colors.accent,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(14.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = preset.title,
+                                    style = NotionTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = colors.textPrimary,
+                                    fontSize = 14.sp
+                                )
+                                Text(
+                                    text = preset.subtitle,
+                                    style = NotionTheme.typography.bodySmall,
+                                    color = colors.textSecondary,
+                                    fontSize = 11.sp
+                                )
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+            }
+        }
     }
 }
 
