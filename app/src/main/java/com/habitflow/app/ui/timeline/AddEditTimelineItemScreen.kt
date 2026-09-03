@@ -30,6 +30,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
@@ -66,7 +67,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -453,6 +457,140 @@ fun AddEditTimelineItemScreen(
                             }
                         }
 
+                        // Specific Scheduled Time Picker (7:00 AM, etc.)
+                        Spacer(modifier = Modifier.height(18.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "SCHEDULE SPECIFIC TIME",
+                                style = NotionTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = colors.textTertiary,
+                                letterSpacing = 1.2.sp,
+                                fontSize = 11.sp
+                            )
+
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(if (uiState.hasTime) colors.accentSoft else colors.surfaceVariant)
+                                    .clickable { viewModel.setHasTime(!uiState.hasTime) }
+                                    .padding(horizontal = 10.dp, vertical = 4.dp)
+                            ) {
+                                Text(
+                                    text = if (uiState.hasTime) "Set" else "Anytime",
+                                    style = NotionTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (uiState.hasTime) colors.accent else colors.textTertiary,
+                                    fontSize = 11.sp
+                                )
+                            }
+                        }
+
+                        if (uiState.hasTime) {
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            // Interactive Time Box - Opens Native TimePickerDialog on click
+                            val formattedTime = formatTime12h(uiState.startTime)
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(colors.surfaceVariant.copy(alpha = 0.45f))
+                                    .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(16.dp))
+                                    .clickable {
+                                        val (curH, curM) = parseHourMinute(uiState.startTime)
+                                        android.app.TimePickerDialog(
+                                            context,
+                                            { _, hourOfDay, minute ->
+                                                val newTime = String.format(java.util.Locale.US, "%02d:%02d", hourOfDay, minute)
+                                                viewModel.setStartTime(newTime)
+                                            },
+                                            curH,
+                                            curM,
+                                            false
+                                        ).show()
+                                    }
+                                    .padding(horizontal = 16.dp, vertical = 13.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.Schedule,
+                                            contentDescription = "Select Time",
+                                            tint = colors.accent,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(10.dp))
+                                        Text(
+                                            text = formattedTime,
+                                            style = NotionTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = colors.textPrimary,
+                                            fontSize = 16.sp
+                                        )
+                                    }
+
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(colors.accentSoft)
+                                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                                    ) {
+                                        Text(
+                                            text = "Tap to Pick",
+                                            style = NotionTheme.typography.labelSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = colors.accent,
+                                            fontSize = 10.sp
+                                        )
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            // Quick Time Preset Chips (7:00 AM, 9:00 AM, 12:00 PM, 6:00 PM, 9:00 PM)
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                listOf(
+                                    "07:00" to "7:00 AM",
+                                    "09:00" to "9:00 AM",
+                                    "12:00" to "12:00 PM",
+                                    "18:00" to "6:00 PM",
+                                    "21:00" to "9:00 PM"
+                                ).forEach { (timeVal, timeLabel) ->
+                                    val isSelected = uiState.startTime == timeVal
+                                    Box(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .clip(RoundedCornerShape(10.dp))
+                                            .background(if (isSelected) colors.accent else colors.surfaceVariant)
+                                            .clickable { viewModel.setStartTime(timeVal) }
+                                            .padding(vertical = 7.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = timeLabel,
+                                            style = NotionTheme.typography.labelSmall,
+                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                            color = if (isSelected) colors.onAccent else colors.textSecondary,
+                                            fontSize = 9.5.sp
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
                         // For Habits: Repeat Days Selector
                         if (uiState.creationType == CreationType.HABIT) {
                             Spacer(modifier = Modifier.height(18.dp))
@@ -657,6 +795,7 @@ fun AddEditTimelineItemScreen(
 
             // 6. Notes & Mindful Intentions Field
             item {
+                val notesFocusRequester = remember { FocusRequester() }
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -664,36 +803,70 @@ fun AddEditTimelineItemScreen(
                         .clip(RoundedCornerShape(24.dp))
                         .background(colors.surface)
                         .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(24.dp))
+                        .clickable(
+                            indication = null,
+                            interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+                        ) {
+                            notesFocusRequester.requestFocus()
+                        }
                         .padding(18.dp)
                 ) {
                     Column {
-                        Text(
-                            text = "NOTES & REFLECTION",
-                            style = NotionTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = colors.textTertiary,
-                            letterSpacing = 1.2.sp,
-                            fontSize = 11.sp
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "NOTES & REFLECTION",
+                                style = NotionTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = colors.textTertiary,
+                                letterSpacing = 1.2.sp,
+                                fontSize = 11.sp
+                            )
+                            if (uiState.notes.isNotBlank()) {
+                                Text(
+                                    text = "${uiState.notes.length} chars",
+                                    style = NotionTheme.typography.labelSmall,
+                                    color = colors.textTertiary,
+                                    fontSize = 10.sp
+                                )
+                            }
+                        }
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
 
-                        TextField(
+                        BasicTextField(
                             value = uiState.notes,
                             onValueChange = { viewModel.setNotes(it) },
-                            placeholder = { Text("Add any mindful context or why this ritual matters...", color = colors.textTertiary, fontSize = 13.sp) },
-                            minLines = 3,
-                            maxLines = 5,
-                            colors = TextFieldDefaults.colors(
-                                focusedContainerColor = Color.Transparent,
-                                unfocusedContainerColor = Color.Transparent,
-                                focusedIndicatorColor = Color.Transparent,
-                                unfocusedIndicatorColor = Color.Transparent,
-                                focusedTextColor = colors.textPrimary,
-                                unfocusedTextColor = colors.textPrimary
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .focusRequester(notesFocusRequester),
+                            textStyle = NotionTheme.typography.bodyMedium.copy(
+                                color = colors.textPrimary,
+                                fontSize = 14.sp,
+                                lineHeight = 21.sp
                             ),
-                            textStyle = NotionTheme.typography.bodyMedium.copy(fontSize = 13.sp),
-                            modifier = Modifier.fillMaxWidth()
+                            cursorBrush = SolidColor(colors.accent),
+                            decorationBox = { innerTextField ->
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 4.dp)
+                                ) {
+                                    if (uiState.notes.isEmpty()) {
+                                        Text(
+                                            text = "Add context, thoughts, or reflections on why this matters...",
+                                            style = NotionTheme.typography.bodyMedium,
+                                            color = colors.textTertiary,
+                                            fontSize = 14.sp,
+                                            lineHeight = 21.sp
+                                        )
+                                    }
+                                    innerTextField()
+                                }
+                            }
                         )
                     }
                 }
@@ -712,3 +885,30 @@ fun AddEditTimelineItemScreen(
         )
     }
 }
+
+private fun formatTime12h(time24: String): String {
+    return try {
+        val parts = time24.split(":")
+        val h = parts[0].toInt()
+        val m = parts[1].toInt()
+        val ampm = if (h >= 12) "PM" else "AM"
+        val h12 = when {
+            h == 0 -> 12
+            h > 12 -> h - 12
+            else -> h
+        }
+        String.format(java.util.Locale.US, "%d:%02d %s", h12, m, ampm)
+    } catch (e: Exception) {
+        time24
+    }
+}
+
+private fun parseHourMinute(time24: String): Pair<Int, Int> {
+    return try {
+        val parts = time24.split(":")
+        Pair(parts[0].toInt(), parts[1].toInt())
+    } catch (e: Exception) {
+        Pair(7, 0)
+    }
+}
+

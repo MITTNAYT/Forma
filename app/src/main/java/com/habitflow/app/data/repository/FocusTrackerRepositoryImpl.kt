@@ -99,27 +99,15 @@ class FocusTrackerRepositoryImpl @Inject constructor(
                 } else null
             }.sortedByDescending { it.totalMinutes }
 
-            // Provide default warm demo data if empty so the UI looks stunning immediately
-            val finalWeekMins = if (weekSeconds > 0) weekSeconds / 60 else 145 // 2h 25m
-            val finalMonthMins = if (monthSeconds > 0) monthSeconds / 60 else 620 // 10h 20m
-            val finalAllTimeMins = if (allTimeTotalSeconds > 0) allTimeTotalSeconds / 60 else 1840 // 30h 40m
-
-            val finalItems = if (itemSummaries.isNotEmpty()) {
-                itemSummaries
-            } else {
-                listOf(
-                    FocusItemSummary("demo_1", "Deep Reading", 240, true),
-                    FocusItemSummary("demo_2", "Morning Meditation", 150, true),
-                    FocusItemSummary("demo_3", "Engineering Architecture", 480, false),
-                    FocusItemSummary("demo_4", "Hydration & Health", 90, true)
-                )
-            }
+            val finalWeekMins = weekSeconds / 60
+            val finalMonthMins = monthSeconds / 60
+            val finalAllTimeMins = allTimeTotalSeconds / 60
 
             FocusTimeStats(
                 thisWeekMinutes = finalWeekMins,
                 thisMonthMinutes = finalMonthMins,
                 allTimeMinutes = finalAllTimeMins,
-                topFocusedItems = finalItems
+                topFocusedItems = itemSummaries
             )
         }
     }

@@ -131,7 +131,7 @@ fun ProPaywallBottomSheet(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = if (isPro) "You Are on HabitFlow Pro" else "Elevate Your Flow State",
+                text = if (isPro) "You Are on Forma Pro" else "Elevate Your Flow State",
                 style = NotionTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
                 color = colors.textPrimary,

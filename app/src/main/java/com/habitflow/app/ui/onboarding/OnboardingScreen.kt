@@ -43,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import com.habitflow.app.core.designsystem.component.FormaEmblem
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -122,22 +123,11 @@ private fun WelcomeStep(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Zen Glowing Emblem
-        Box(
-            modifier = Modifier
-                .size(96.dp)
-                .clip(CircleShape)
-                .background(colors.accentSoft)
-                .border(2.dp, colors.accent.copy(alpha = 0.4f), CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.Spa,
-                contentDescription = null,
-                tint = colors.accent,
-                modifier = Modifier.size(48.dp)
-            )
-        }
+        // Forma Architectural Emblem
+        FormaEmblem(
+            size = 104.dp,
+            animated = true
+        )
 
         Spacer(modifier = Modifier.height(28.dp))
 
@@ -149,7 +139,7 @@ private fun WelcomeStep(
                 .padding(horizontal = 14.dp, vertical = 6.dp)
         ) {
             Text(
-                text = "WELCOME TO HABITFLOW",
+                text = "WELCOME TO FORMA",
                 style = NotionTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
                 color = colors.accent,
@@ -161,7 +151,7 @@ private fun WelcomeStep(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Cultivate Calm.\nBuild lasting rhythms.",
+            text = "Give Form to Your Days.\nCultivate lasting rhythm.",
             style = NotionTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             color = colors.textPrimary,
@@ -173,7 +163,7 @@ private fun WelcomeStep(
         Spacer(modifier = Modifier.height(14.dp))
 
         Text(
-            text = "An intentional daily routine sanctuary crafted for cognitive clarity. Completely offline, zero tracking, and pure focus.",
+            text = "Forma is Latin for form and shape. An architectural routine and focus sanctuary crafted for intentional living. Completely offline, zero tracking, and pure focus.",
             style = NotionTheme.typography.bodyMedium,
             color = colors.textSecondary,
             fontSize = 14.sp,
@@ -361,7 +351,7 @@ private fun GreetingStep(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Welcome, $displayName! 🌱",
+            text = "Welcome to Forma, $displayName! ✨",
             style = NotionTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             color = colors.textPrimary,
@@ -372,7 +362,7 @@ private fun GreetingStep(
         Spacer(modifier = Modifier.height(10.dp))
 
         Text(
-            text = "Your sanctuary is ready. We've prepared a 100% clean slate so you can build habits and rhythms that truly matter to you.",
+            text = "Your personal sanctuary is ready. We've prepared a 100% clean slate so you can give form to habits and focus that truly matter to you.",
             style = NotionTheme.typography.bodyMedium,
             color = colors.textSecondary,
             fontSize = 14.sp,
@@ -394,8 +384,8 @@ private fun GreetingStep(
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 BulletRow(text = "Pure Clean Slate — 0 pre-populated clutter")
-                BulletRow(text = "Offline Sanctuary — no ads, no trackers")
-                BulletRow(text = "Tactile Focus Clock with Forest Rain soundscapes")
+                BulletRow(text = "Private Offline Sanctuary — no ads, no trackers")
+                BulletRow(text = "Forma Rhythm Matrix & Tactile Focus Timer")
             }
         }
 

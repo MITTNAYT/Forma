@@ -101,7 +101,7 @@ fun AiPlannerScreen(
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = "HabitFlow Intelligence",
+                    text = "Forma Intelligence",
                     style = NotionTheme.typography.labelSmall,
                     color = colors.textPrimary,
                     fontWeight = FontWeight.SemiBold

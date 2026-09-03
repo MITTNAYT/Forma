@@ -702,7 +702,7 @@ fun SettingsScreen(
 
                                 Column {
                                     Text(
-                                        text = "HabitFlow Pro Lifetime",
+                                        text = "Forma Pro Lifetime",
                                         style = NotionTheme.typography.titleMedium,
                                         fontWeight = FontWeight.Bold,
                                         color = colors.textPrimary,

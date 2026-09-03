@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">HabitFlow</string>
-    <string name="tagline">Structured timeline &amp; habits, never paywalled.</string>
+    <string name="app_name">Forma</string>
+    <string name="tagline">Give form to your rituals and days.</string>
     <string name="nav_today">Today</string>
     <string name="nav_habits">Habits</string>
     <string name="nav_stats">Stats</string>

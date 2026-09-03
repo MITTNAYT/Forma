@@ -226,9 +226,9 @@ fun StatsScreen(
                 // 3. Bento Grid: Hero Focus Velocity Chart Card
                 item {
                     val totalMinutesForPeriod = when (selectedTimeTab) {
-                        FocusTimeTab.WEEK -> focusStats?.thisWeekMinutes ?: 255
-                        FocusTimeTab.MONTH -> focusStats?.thisMonthMinutes ?: 780
-                        FocusTimeTab.ALL_TIME -> focusStats?.allTimeMinutes ?: 2340
+                        FocusTimeTab.WEEK -> focusStats?.thisWeekMinutes ?: 0
+                        FocusTimeTab.MONTH -> focusStats?.thisMonthMinutes ?: 0
+                        FocusTimeTab.ALL_TIME -> focusStats?.allTimeMinutes ?: 0
                     }
                     val hours = totalMinutesForPeriod / 60
                     val mins = totalMinutesForPeriod % 60
@@ -444,176 +444,9 @@ fun StatsScreen(
                     }
                 }
 
-                item { Spacer(modifier = Modifier.height(14.dp)) }
+                item { Spacer(modifier = Modifier.height(20.dp)) }
 
-                // 4. Bento Split Dual Metrics (Flow Index & Streak Status)
-                item {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 20.dp),
-                        horizontalArrangement = Arrangement.spacedBy(14.dp)
-                    ) {
-                        // Split Card 1: Completion Flow Index
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .clip(RoundedCornerShape(24.dp))
-                                .background(colors.surface)
-                                .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(24.dp))
-                                .padding(18.dp)
-                        ) {
-                            Column {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = "FLOW INDEX",
-                                        style = NotionTheme.typography.labelSmall,
-                                        fontWeight = FontWeight.Bold,
-                                        color = colors.textTertiary,
-                                        letterSpacing = 1.1.sp,
-                                        fontSize = 10.sp
-                                    )
-                                    Box(
-                                        modifier = Modifier
-                                            .size(24.dp)
-                                            .clip(CircleShape)
-                                            .background(colors.accentSoft),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Rounded.AutoGraph,
-                                            contentDescription = null,
-                                            tint = colors.accent,
-                                            modifier = Modifier.size(13.dp)
-                                        )
-                                    }
-                                }
-
-                                Spacer(modifier = Modifier.height(14.dp))
-
-                                Text(
-                                    text = "$completionRate%",
-                                    style = NotionTheme.typography.headlineLarge,
-                                    fontWeight = FontWeight.Bold,
-                                    color = colors.textPrimary,
-                                    fontSize = 28.sp
-                                )
-
-                                Spacer(modifier = Modifier.height(4.dp))
-
-                                Text(
-                                    text = "Flawless consistency rate",
-                                    style = NotionTheme.typography.bodySmall,
-                                    color = colors.textSecondary,
-                                    fontSize = 11.sp
-                                )
-
-                                Spacer(modifier = Modifier.height(10.dp))
-
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(5.dp)
-                                        .clip(RoundedCornerShape(2.5.dp))
-                                        .background(colors.surfaceVariant)
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth(flowProgress)
-                                            .fillMaxHeight()
-                                            .clip(RoundedCornerShape(2.5.dp))
-                                            .background(colors.accent)
-                                    )
-                                }
-                            }
-                        }
-
-                        // Split Card 2: Momentum Streak
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .clip(RoundedCornerShape(24.dp))
-                                .background(colors.surface)
-                                .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(24.dp))
-                                .padding(18.dp)
-                        ) {
-                            Column {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = "BEST STREAK",
-                                        style = NotionTheme.typography.labelSmall,
-                                        fontWeight = FontWeight.Bold,
-                                        color = colors.textTertiary,
-                                        letterSpacing = 1.1.sp,
-                                        fontSize = 10.sp
-                                    )
-                                    Box(
-                                        modifier = Modifier
-                                            .size(24.dp)
-                                            .clip(CircleShape)
-                                            .background(colors.accentSoft),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Rounded.LocalFireDepartment,
-                                            contentDescription = null,
-                                            tint = colors.accent,
-                                            modifier = Modifier.size(14.dp)
-                                        )
-                                    }
-                                }
-
-                                Spacer(modifier = Modifier.height(14.dp))
-
-                                Text(
-                                    text = "${currentStats.bestCurrentStreak}d",
-                                    style = NotionTheme.typography.headlineLarge,
-                                    fontWeight = FontWeight.Bold,
-                                    color = colors.textPrimary,
-                                    fontSize = 28.sp
-                                )
-
-                                Spacer(modifier = Modifier.height(4.dp))
-
-                                Text(
-                                    text = if (currentStats.bestCurrentStreak >= 7) "Diamond Flow Tier" else "Building Rhythm",
-                                    style = NotionTheme.typography.bodySmall,
-                                    color = colors.textSecondary,
-                                    fontSize = 11.sp
-                                )
-
-                                Spacer(modifier = Modifier.height(10.dp))
-
-                                Box(
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .background(colors.accentSoft)
-                                        .padding(horizontal = 8.dp, vertical = 3.dp)
-                                ) {
-                                    Text(
-                                        text = if (currentStats.bestCurrentStreak >= 7) "Consistent Flow" else "Day 1 Journey",
-                                        style = NotionTheme.typography.labelSmall,
-                                        fontWeight = FontWeight.Bold,
-                                        color = colors.accent,
-                                        fontSize = 10.sp
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-
-                item { Spacer(modifier = Modifier.height(24.dp)) }
-
-                // 5. Section: Ranked Focus Commitments
+                // 4. Section: Ranked Focus Commitments (Clean & Empty until User Starts Committing)
                 item {
                     Column(
                         modifier = Modifier
@@ -637,23 +470,40 @@ fun StatsScreen(
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .clip(RoundedCornerShape(20.dp))
+                                    .clip(RoundedCornerShape(22.dp))
                                     .background(colors.surface)
-                                    .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(20.dp))
+                                    .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(22.dp))
                                     .padding(24.dp),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text(
-                                    text = "No focus sessions logged yet.\nComplete focus sessions in the Pomodoro clock to see your rankings.",
-                                    style = NotionTheme.typography.bodySmall,
-                                    color = colors.textSecondary,
-                                    textAlign = TextAlign.Center,
-                                    fontSize = 13.sp
-                                )
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Spa,
+                                        contentDescription = null,
+                                        tint = colors.accent.copy(alpha = 0.7f),
+                                        modifier = Modifier.size(28.dp)
+                                    )
+                                    Spacer(modifier = Modifier.height(10.dp))
+                                    Text(
+                                        text = "No focus sessions logged yet.",
+                                        style = NotionTheme.typography.titleSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = colors.textPrimary,
+                                        fontSize = 14.sp
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = "Complete focus sessions in the Pomodoro clock to see your rankings and depth.",
+                                        style = NotionTheme.typography.bodySmall,
+                                        color = colors.textSecondary,
+                                        textAlign = TextAlign.Center,
+                                        fontSize = 12.sp
+                                    )
+                                }
                             }
                         } else {
                             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                                topItems.take(4).forEachIndexed { idx, itemSummary ->
+                                topItems.take(5).forEachIndexed { idx, itemSummary ->
                                     val rankStr = "0${idx + 1}"
                                     val hrs = itemSummary.totalMinutes / 60
                                     val mins = itemSummary.totalMinutes % 60
@@ -730,9 +580,9 @@ fun StatsScreen(
                     }
                 }
 
-                item { Spacer(modifier = Modifier.height(24.dp)) }
+                item { Spacer(modifier = Modifier.height(20.dp)) }
 
-                // 6. Section: Dynamic Month-Matched Consistency Matrix Heatmap
+                // 5. Section: Dynamic Month-Matched Consistency Matrix Heatmap
                 item {
                     Column(
                         modifier = Modifier
@@ -883,142 +733,6 @@ fun StatsScreen(
                                     textAlign = TextAlign.Center,
                                     modifier = Modifier.fillMaxWidth()
                                 )
-                            }
-                        }
-                    }
-                }
-
-                item { Spacer(modifier = Modifier.height(24.dp)) }
-
-                // 7. Section: Habit Momentum Telemetry
-                item {
-                    Text(
-                        text = "HABIT MOMENTUM & HEALTH",
-                        style = NotionTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = colors.textTertiary,
-                        letterSpacing = 1.2.sp,
-                        fontSize = 11.sp,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 20.dp, end = 20.dp, bottom = 12.dp)
-                    )
-                }
-
-                if (currentStats.perHabitStats.isEmpty()) {
-                    item {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 20.dp)
-                                .clip(RoundedCornerShape(22.dp))
-                                .background(colors.surface)
-                                .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(22.dp))
-                                .padding(24.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "No habits created yet.\nTap + on the navigation bar to cultivate your first ritual.",
-                                style = NotionTheme.typography.bodySmall,
-                                color = colors.textSecondary,
-                                textAlign = TextAlign.Center,
-                                fontSize = 13.sp
-                            )
-                        }
-                    }
-                } else {
-                    items(currentStats.perHabitStats, key = { it.habitId }) { streakInfo ->
-                        val habitRate = streakInfo.completionRatePercentage
-                        val habitProgress = (habitRate.toFloat() / 100f).coerceIn(0f, 1f)
-
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 20.dp, vertical = 5.dp)
-                                .clip(RoundedCornerShape(22.dp))
-                                .background(colors.surface)
-                                .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(22.dp))
-                                .clickable { viewModel.openHabitStreakDetail(streakInfo) }
-                                .padding(16.dp)
-                        ) {
-                            Column {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Row(
-                                        modifier = Modifier.weight(1f),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Box(
-                                            modifier = Modifier
-                                                .size(44.dp)
-                                                .clip(RoundedCornerShape(14.dp))
-                                                .background(colors.accentSoft),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            HabitFlowIcon(
-                                                iconKey = streakInfo.habitIcon,
-                                                contentDescription = streakInfo.habitName,
-                                                tint = colors.accent,
-                                                modifier = Modifier.size(22.dp)
-                                            )
-                                        }
-
-                                        Spacer(modifier = Modifier.width(14.dp))
-
-                                        Column {
-                                            Text(
-                                                text = streakInfo.habitName,
-                                                style = NotionTheme.typography.titleMedium,
-                                                fontWeight = FontWeight.Bold,
-                                                color = colors.textPrimary,
-                                                fontSize = 15.sp
-                                            )
-                                            Text(
-                                                text = "${streakInfo.currentStreak}d streak • Best: ${streakInfo.longestStreak}d",
-                                                style = NotionTheme.typography.bodySmall,
-                                                color = colors.textSecondary,
-                                                fontSize = 12.sp
-                                            )
-                                        }
-                                    }
-
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(RoundedCornerShape(10.dp))
-                                            .background(colors.accentSoft)
-                                            .padding(horizontal = 10.dp, vertical = 4.dp)
-                                    ) {
-                                        Text(
-                                            text = "$habitRate%",
-                                            style = NotionTheme.typography.labelSmall,
-                                            fontWeight = FontWeight.Bold,
-                                            color = colors.accent,
-                                            fontSize = 12.sp
-                                        )
-                                    }
-                                }
-
-                                Spacer(modifier = Modifier.height(12.dp))
-
-                                // Smooth Linear Progress Bar
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(6.dp)
-                                        .clip(RoundedCornerShape(3.dp))
-                                        .background(colors.surfaceVariant)
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth(habitProgress)
-                                            .fillMaxHeight()
-                                            .clip(RoundedCornerShape(3.dp))
-                                            .background(colors.accent)
-                                    )
-                                }
                             }
                         }
                     }

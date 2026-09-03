@@ -5,37 +5,31 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- 1. Outer Ambient Blossom Ripple -->
+    <!-- 1. Ambient Soft Breathing Aura Glow -->
     <path
         android:fillColor="#E8EFE5"
-        android:pathData="M54,54m-35,0a35,35 0 1,0 70,0a35,35 0 1,0 -70,0" />
+        android:pathData="M54,16 A38,38 0 1,1 53.99,16 Z" />
 
-    <!-- 2. Secondary Soft Glow Ring -->
-    <path
-        android:fillColor="#D8E4D3"
-        android:pathData="M54,54m-29,0a29,29 0 1,0 58,0a29,29 0 1,0 -58,0" />
-
-    <!-- 3. Inner Solid Matcha Core Disc -->
+    <!-- 2. Top Horizon Beam (Forma F Top Arm) -->
     <path
         android:fillColor="#637852"
-        android:pathData="M54,54m-23.5,0a23.5,23.5 0 1,0 47,0a23.5,23.5 0 1,0 -47,0" />
+        android:pathData="M40,26 L72,26 A8,8 0 0,1 80,34 A8,8 0 0,1 72,42 L40,42 A8,8 0 0,1 32,34 A8,8 0 0,1 40,26 Z" />
 
-    <!-- 4. Satellite Flow Accent Dot -->
+    <!-- 3. Vertical Foundation Pillar (Forma F Spine) -->
     <path
         android:fillColor="#637852"
-        android:strokeColor="#F6F5F0"
-        android:strokeWidth="1.8"
-        android:pathData="M69,38m-4,0a4,4 0 1,0 8,0a4,4 0 1,0 -8,0" />
+        android:pathData="M40,26 L40,26 A8,8 0 0,1 48,34 L48,74 A8,8 0 0,1 40,82 A8,8 0 0,1 32,74 L32,34 A8,8 0 0,1 40,26 Z" />
 
-    <!-- 5. Exact Official EnergySavingsLeaf Vector (matches splash screen) -->
-    <group
-        android:scaleX="0.038"
-        android:scaleY="0.038"
-        android:translateX="35.76"
-        android:translateY="72.24">
-        <path
-            android:fillColor="#FFFFFF"
-            android:pathData="M480,-240q100,0 169,-70t71,-170v-240H480q-100,2 -170,71t-70,169q0,100 70,170t170,70Zm-47,-67 184,-164q9,-8 5,-19t-16,-13l-144,-14 86,-119q3,-5 3.5,-9.5T548,-654q-4,-5 -10,-4.5t-11,4.5L344,-490q-9,8 -5,19t16,13l144,14 -87,119q-3,5 -3,9.5t4,8.5q4,4 9.5,4t10.5,-4Zm47,147q-56,0 -105.5,-17.5T284,-227l-55,55q-6,6 -13.5,9t-15.5,3q-17,0 -28.5,-11.5T160,-200q0,-8 3,-15.5t9,-13.5l55,-55q-32,-41 -49.5,-90.5T160,-480q0,-134 93,-227t227,-93h240q33,0 56.5,23.5T800,-720v240q0,134 -93,227t-227,93Zm0,-320Z" />
-    </group>
+    <!-- 4. Middle Crossbar Beam (Golden Ratio Proportion) -->
+    <path
+        android:fillColor="#637852"
+        android:pathData="M39,47 L61,47 A7,7 0 0,1 68,54 A7,7 0 0,1 61,61 L39,61 A7,7 0 0,1 32,54 A7,7 0 0,1 39,47 Z" />
+
+    <!-- 5. Radiant Focal Accent Pearl (Top-Right Aperture) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#637852"
+        android:strokeWidth="1.2"
+        android:pathData="M72,34m-3.5,0a3.5,3.5 0 1,0 7,0a3.5,3.5 0 1,0 -7,0" />
 
 </vector>

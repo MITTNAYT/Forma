@@ -256,7 +256,7 @@ fun EmptyHabitsState(
         Spacer(modifier = Modifier.height(6.dp))
 
         Text(
-            text = if (isArchivedView) "Archived habits will appear here." else "HabitFlow gives you unlimited recurring habits, streaks, and analytics for free.",
+            text = if (isArchivedView) "Archived habits will appear here." else "Forma gives you unlimited recurring habits, streaks, and analytics for free.",
             style = NotionTheme.typography.bodyMedium,
             color = colors.textSecondary,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center

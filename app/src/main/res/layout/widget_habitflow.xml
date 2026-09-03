@@ -18,7 +18,7 @@
             android:id="@+id/widget_logo"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:contentDescription="HabitFlow"
+            android:contentDescription="Forma"
             android:src="@drawable/ic_stat_leaf" />
 
         <TextView
@@ -29,7 +29,7 @@
             android:layout_weight="1"
             android:fontFamily="sans-serif-medium"
             android:letterSpacing="0.08"
-            android:text="HABITFLOW"
+            android:text="FORMA"
             android:textColor="@color/matcha_dark"
             android:textSize="12sp"
             android:textStyle="bold" />

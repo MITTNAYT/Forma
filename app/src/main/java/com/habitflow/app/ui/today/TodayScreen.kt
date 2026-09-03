@@ -595,7 +595,7 @@ fun TodayScreen(
                     fontSize = 16.sp
                 )
                 Text(
-                    text = "HabitFlow AI will generate energy-balanced time blocks based on your goal.",
+                    text = "Forma AI will generate energy-balanced time blocks based on your goal.",
                     style = NotionTheme.typography.bodySmall,
                     color = colors.textSecondary,
                     fontSize = 12.sp,

@@ -53,23 +53,33 @@ fun HabitFlowBottomBar(
     val shouldShow = navItems.any { it.route == currentRoute }
     if (!shouldShow) return
 
-    BoxWithConstraints(
+    Column(
         modifier = modifier
             .fillMaxWidth()
+            .background(
+                androidx.compose.ui.graphics.Brush.verticalGradient(
+                    0.0f to Color.Transparent,
+                    0.25f to colors.background.copy(alpha = 0.85f),
+                    0.45f to colors.background,
+                    1.0f to colors.background
+                )
+            )
+            .padding(top = 18.dp)
             .navigationBarsPadding()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        contentAlignment = Alignment.Center
+            .padding(bottom = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Floating Island Dock: Fixed, Symmetrical & Never Shifts
+        // Floating Island Dock: Fixed, Symmetrical & Protected
         Box(
             modifier = Modifier
                 .widthIn(max = 420.dp)
                 .fillMaxWidth()
+                .padding(horizontal = 16.dp)
                 .shadow(
-                    elevation = 14.dp,
+                    elevation = 12.dp,
                     shape = RoundedCornerShape(28.dp),
-                    ambientColor = colors.textPrimary.copy(alpha = 0.07f),
-                    spotColor = colors.textPrimary.copy(alpha = 0.12f)
+                    ambientColor = colors.textPrimary.copy(alpha = 0.05f),
+                    spotColor = colors.textPrimary.copy(alpha = 0.10f)
                 )
                 .clip(RoundedCornerShape(28.dp))
                 .background(colors.surface)
