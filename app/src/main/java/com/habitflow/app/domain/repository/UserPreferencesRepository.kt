@@ -39,6 +39,7 @@ interface UserPreferencesRepository {
     val darkModeOption: Flow<DarkModeOption>
     val notificationsEnabled: Flow<Boolean>
     val dailySummaryTimeMinutes: Flow<Int>
+    val isOnboardingCompleted: Flow<Boolean>
 
     suspend fun setUserName(name: String)
     suspend fun setUserHeadline(headline: String)
@@ -47,4 +48,5 @@ interface UserPreferencesRepository {
     suspend fun setDarkModeOption(option: DarkModeOption)
     suspend fun setNotificationsEnabled(enabled: Boolean)
     suspend fun setDailySummaryTimeMinutes(minutes: Int)
+    suspend fun setOnboardingCompleted(completed: Boolean)
 }

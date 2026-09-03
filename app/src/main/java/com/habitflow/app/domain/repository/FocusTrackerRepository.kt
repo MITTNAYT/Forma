@@ -19,6 +19,7 @@ data class FocusTimeStats(
 interface FocusTrackerRepository {
     fun getFocusTimeForTask(itemId: String): Flow<Int>
     fun getTotalFocusTimeForDate(date: String): Flow<Int>
+    fun getDailyFocusSecondsForDates(dates: List<String>): Flow<Map<String, Int>>
     fun getFocusTimeStats(): Flow<FocusTimeStats>
     suspend fun recordFocusSession(itemId: String, itemTitle: String, secondsSpent: Int, isHabit: Boolean, date: String)
 }

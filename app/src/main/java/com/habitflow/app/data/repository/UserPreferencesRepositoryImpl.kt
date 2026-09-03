@@ -34,10 +34,15 @@ class UserPreferencesRepositoryImpl @Inject constructor(
         val DARK_MODE_OPTION = stringPreferencesKey("dark_mode_option")
         val NOTIFICATIONS_ENABLED = booleanPreferencesKey("notifications_enabled")
         val DAILY_SUMMARY_TIME = intPreferencesKey("daily_summary_time")
+        val IS_ONBOARDING_COMPLETED = booleanPreferencesKey("is_onboarding_completed")
+    }
+
+    override val isOnboardingCompleted: Flow<Boolean> = context.dataStore.data.map { preferences ->
+        preferences[PreferencesKeys.IS_ONBOARDING_COMPLETED] ?: false
     }
 
     override val userName: Flow<String> = context.dataStore.data.map { preferences ->
-        preferences[PreferencesKeys.USER_NAME] ?: "Alex"
+        preferences[PreferencesKeys.USER_NAME] ?: ""
     }
 
     override val userHeadline: Flow<String> = context.dataStore.data.map { preferences ->
@@ -118,6 +123,12 @@ class UserPreferencesRepositoryImpl @Inject constructor(
     override suspend fun setDailySummaryTimeMinutes(minutes: Int) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.DAILY_SUMMARY_TIME] = minutes
+        }
+    }
+
+    override suspend fun setOnboardingCompleted(completed: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.IS_ONBOARDING_COMPLETED] = completed
         }
     }
 }

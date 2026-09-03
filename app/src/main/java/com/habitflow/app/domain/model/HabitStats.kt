@@ -15,7 +15,8 @@ data class DayCompletionRate(
     val date: String, // YYYY-MM-DD
     val totalScheduled: Int,
     val completedCount: Int,
-    val intensity: Float // 0.0f to 1.0f for grayscale heatmap
+    val intensity: Float, // 0.0f to 1.0f for grayscale heatmap
+    val dayOfMonth: Int = 1
 )
 
 data class OverallHabitStats(
@@ -24,5 +25,9 @@ data class OverallHabitStats(
     val bestCurrentStreak: Int,
     val bestAllTimeStreak: Int,
     val heatmapDays: List<DayCompletionRate>,
-    val perHabitStats: List<HabitStreakInfo>
+    val perHabitStats: List<HabitStreakInfo>,
+    val monthName: String = "",
+    val daysInMonth: Int = 30,
+    val monthHeatmapDays: List<DayCompletionRate> = emptyList(),
+    val firstDayOfWeekOffset: Int = 0 // 0 = Mon, 1 = Tue, ..., 6 = Sun
 )

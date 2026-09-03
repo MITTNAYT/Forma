@@ -18,21 +18,32 @@ import com.habitflow.app.core.designsystem.splash.PremiumSplashScreen
 import com.habitflow.app.ui.navigation.HabitFlowBottomBar
 import com.habitflow.app.ui.navigation.HabitFlowNavGraph
 
+import androidx.compose.runtime.collectAsState
+import com.habitflow.app.domain.repository.UserPreferencesRepository
+import com.habitflow.app.ui.onboarding.OnboardingScreen
+
 @Composable
 fun HabitFlowApp(
+    preferencesRepository: UserPreferencesRepository? = null,
     modifier: Modifier = Modifier
 ) {
     val navController = rememberNavController()
     var isSplashFinished by remember { mutableStateOf(false) }
+    val isOnboardingCompleted by (preferencesRepository?.isOnboardingCompleted?.collectAsState(initial = false)
+        ?: remember { mutableStateOf(true) })
 
     Crossfade(
-        targetState = isSplashFinished,
+        targetState = isSplashFinished to isOnboardingCompleted,
         animationSpec = tween(400),
-        label = "splash_crossfade"
-    ) { finished ->
-        if (!finished) {
+        label = "app_state_crossfade"
+    ) { (finishedSplash, onboardingDone) ->
+        if (!finishedSplash) {
             PremiumSplashScreen(
                 onAnimationFinished = { isSplashFinished = true }
+            )
+        } else if (!onboardingDone) {
+            OnboardingScreen(
+                onOnboardingFinished = { /* StateFlow updates automatically */ }
             )
         } else {
             // True Edge-to-Edge Full Screen Container

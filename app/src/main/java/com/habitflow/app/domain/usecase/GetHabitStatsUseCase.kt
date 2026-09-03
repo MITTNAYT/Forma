@@ -54,7 +54,43 @@ class GetHabitStatsUseCase @Inject constructor(
                     date = dateIso,
                     totalScheduled = totalScheduled,
                     completedCount = completedOnDate,
-                    intensity = intensity
+                    intensity = intensity,
+                    dayOfMonth = date.dayOfMonth
+                )
+            }
+
+            // Calculate current month's exact days (e.g. 30 in September, 31 in August, 28/29 in Feb)
+            val currentYearMonth = java.time.YearMonth.from(today)
+            val daysInCurrentMonth = currentYearMonth.lengthOfMonth()
+            val monthName = currentYearMonth.month.name
+            val firstDayOfMonth = currentYearMonth.atDay(1)
+            // Monday is 1, Sunday is 7 -> offset is 0 for Mon, 6 for Sun
+            val firstDayOfWeekOffset = firstDayOfMonth.dayOfWeek.value - 1
+
+            val monthHeatmapDays: List<DayCompletionRate> = (1..daysInCurrentMonth).map { dayNum ->
+                val date = currentYearMonth.atDay(dayNum)
+                val dateIso = DateUtils.formatDateIso(date)
+                val dayOfWeek = DateUtils.getDayOfWeekInt(date)
+
+                val scheduledForDate = habits.filter {
+                    it.repeatDays.isEmpty() || it.repeatDays.contains(dayOfWeek)
+                }
+
+                val completedOnDate = completionsByDate[dateIso]?.size ?: 0
+                val totalScheduled = scheduledForDate.size
+
+                val intensity = if (totalScheduled > 0) {
+                    (completedOnDate.toFloat() / totalScheduled.toFloat()).coerceIn(0f, 1f)
+                } else {
+                    if (completedOnDate > 0) 1f else 0f
+                }
+
+                DayCompletionRate(
+                    date = dateIso,
+                    totalScheduled = totalScheduled,
+                    completedCount = completedOnDate,
+                    intensity = intensity,
+                    dayOfMonth = dayNum
                 )
             }
 
@@ -76,7 +112,11 @@ class GetHabitStatsUseCase @Inject constructor(
                 bestCurrentStreak = bestCurrentStreak,
                 bestAllTimeStreak = bestAllTimeStreak,
                 heatmapDays = heatmapDays,
-                perHabitStats = perHabitStats
+                perHabitStats = perHabitStats,
+                monthName = monthName,
+                daysInMonth = daysInCurrentMonth,
+                monthHeatmapDays = monthHeatmapDays,
+                firstDayOfWeekOffset = firstDayOfWeekOffset
             )
         }
     }

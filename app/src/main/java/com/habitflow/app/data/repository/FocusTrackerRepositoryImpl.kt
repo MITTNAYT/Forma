@@ -42,6 +42,15 @@ class FocusTrackerRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun getDailyFocusSecondsForDates(dates: List<String>): Flow<Map<String, Int>> {
+        return context.focusDataStore.data.map { preferences ->
+            dates.associateWith { date ->
+                val key = intPreferencesKey("focus_date_$date")
+                preferences[key] ?: 0
+            }
+        }
+    }
+
     override fun getFocusTimeStats(): Flow<FocusTimeStats> {
         return context.focusDataStore.data.map { preferences ->
             val today = LocalDate.now()

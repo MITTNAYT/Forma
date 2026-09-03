@@ -32,7 +32,7 @@ class MainActivity : ComponentActivity() {
                 paletteFamily = paletteFamily,
                 darkModeOption = darkModeOption
             ) {
-                HabitFlowApp()
+                HabitFlowApp(preferencesRepository = preferencesRepository)
             }
         }
     }
