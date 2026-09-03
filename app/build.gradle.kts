@@ -32,6 +32,20 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            val keystoreFile = rootProject.file("habitflow-release.jks")
+            if (keystoreFile.exists()) {
+                storeFile = keystoreFile
+                storePassword = "habitflow2026"
+                keyAlias = "habitflow"
+                keyPassword = "habitflow2026"
+            } else {
+                initWith(getByName("debug"))
+            }
+        }
+    }
+
     buildTypes {
         debug {
             isMinifyEnabled = true
@@ -48,7 +62,7 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
             ndk {
                 abiFilters.clear()
                 abiFilters.add("armeabi-v7a")
