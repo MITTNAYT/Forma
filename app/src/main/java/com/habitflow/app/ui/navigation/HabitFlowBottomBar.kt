@@ -2,8 +2,10 @@ package com.habitflow.app.ui.navigation
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -27,18 +29,22 @@ import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.motion.formaPressEffect
 
 @Composable
 fun HabitFlowBottomBar(
@@ -46,12 +52,17 @@ fun HabitFlowBottomBar(
     modifier: Modifier = Modifier
 ) {
     val colors = NotionTheme.colors
+    val haptic = LocalHapticFeedback.current
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
     val navItems = remember { Screen.bottomNavItems }
     val shouldShow = navItems.any { it.route == currentRoute }
     if (!shouldShow) return
+
+    // Track which tab index is active (excluding AddItem)
+    val tabItems = remember { navItems.filter { it != Screen.AddItem } }
+    val activeTabIndex = tabItems.indexOfFirst { it.route == currentRoute }.coerceAtLeast(0)
 
     Column(
         modifier = modifier
@@ -69,7 +80,6 @@ fun HabitFlowBottomBar(
             .padding(bottom = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Floating Island Dock: Fixed, Symmetrical & Protected
         Box(
             modifier = Modifier
                 .widthIn(max = 420.dp)
@@ -96,22 +106,20 @@ fun HabitFlowBottomBar(
                     val isAddButton = screen == Screen.AddItem
 
                     if (isAddButton) {
-                        // Central Tactile Add (+) Button
+                        // Central Tactile Add (+) Button with Emil Kowalski press physics
                         Box(
                             modifier = Modifier
-                                .size(44.dp)
+                                .size(46.dp)
                                 .shadow(
-                                    elevation = 6.dp,
+                                    elevation = 8.dp,
                                     shape = CircleShape,
-                                    ambientColor = colors.accent.copy(alpha = 0.3f),
-                                    spotColor = colors.accent.copy(alpha = 0.4f)
+                                    ambientColor = colors.accent.copy(alpha = 0.25f),
+                                    spotColor = colors.accent.copy(alpha = 0.35f)
                                 )
                                 .clip(CircleShape)
                                 .background(colors.accent)
-                                .clickable(
-                                    interactionSource = remember { MutableInteractionSource() },
-                                    indication = null
-                                ) {
+                                .formaPressEffect(targetScale = 0.90f) {
+                                    haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
                                     navController.navigate(Screen.AddEditTimelineItem.createRoute())
                                 },
                             contentAlignment = Alignment.Center
@@ -120,37 +128,55 @@ fun HabitFlowBottomBar(
                                 imageVector = Icons.Rounded.Add,
                                 contentDescription = "Add New Intention",
                                 tint = colors.onAccent,
-                                modifier = Modifier.size(22.dp)
+                                modifier = Modifier.size(24.dp)
                             )
                         }
                     } else {
-                        // Symmetrical Tab Pill (Fixed footprint: never pushes adjacent items)
+                        // Spring-animated tab with Apple-style fluid response
                         val iconScale by animateFloatAsState(
-                            targetValue = if (selected) 1.15f else 1f,
-                            animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium),
+                            targetValue = if (selected) 1.12f else 1f,
+                            animationSpec = spring(
+                                dampingRatio = 0.78f,
+                                stiffness = 450f
+                            ),
                             label = "tab_icon_scale"
                         )
 
                         val pillBg by animateColorAsState(
                             targetValue = if (selected) colors.accentSoft else Color.Transparent,
+                            animationSpec = tween(durationMillis = 180),
                             label = "tab_pill_bg"
                         )
 
                         val contentColor by animateColorAsState(
                             targetValue = if (selected) colors.accent else colors.textTertiary,
+                            animationSpec = tween(durationMillis = 180),
                             label = "tab_content_color"
+                        )
+
+                        // Emil Kowalski rule: Never animate from scale(0)
+                        val dotScale by animateFloatAsState(
+                            targetValue = if (selected) 1f else 0.4f,
+                            animationSpec = spring(
+                                dampingRatio = 0.75f,
+                                stiffness = 500f
+                            ),
+                            label = "dot_scale"
+                        )
+                        val dotAlpha by animateFloatAsState(
+                            targetValue = if (selected) 1f else 0f,
+                            animationSpec = tween(durationMillis = 160),
+                            label = "dot_alpha"
                         )
 
                         Box(
                             modifier = Modifier
-                                .size(44.dp)
-                                .clip(RoundedCornerShape(14.dp))
+                                .size(46.dp)
+                                .clip(RoundedCornerShape(16.dp))
                                 .background(pillBg)
-                                .clickable(
-                                    interactionSource = remember { MutableInteractionSource() },
-                                    indication = null
-                                ) {
+                                .formaPressEffect(targetScale = 0.92f) {
                                     if (currentRoute != screen.route) {
+                                        haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
                                         navController.navigate(screen.route) {
                                             popUpTo(navController.graph.findStartDestination().id) {
                                                 saveState = true
@@ -172,7 +198,7 @@ fun HabitFlowBottomBar(
                                         contentDescription = screen.title,
                                         tint = contentColor,
                                         modifier = Modifier
-                                            .size(21.dp)
+                                            .size(22.dp)
                                             .scale(iconScale)
                                     )
                                 }
@@ -181,9 +207,10 @@ fun HabitFlowBottomBar(
                                     Spacer(modifier = Modifier.height(3.dp))
                                     Box(
                                         modifier = Modifier
-                                            .size(3.5.dp)
+                                            .size(4.dp)
+                                            .scale(dotScale)
                                             .clip(CircleShape)
-                                            .background(colors.accent)
+                                            .background(colors.accent.copy(alpha = dotAlpha))
                                     )
                                 }
                             }

@@ -36,6 +36,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import com.habitflow.app.core.designsystem.motion.formaPressEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -61,6 +64,7 @@ fun HabitTaskDetailBottomSheet(
     onToggleSubtask: (subtaskId: String) -> Unit = {}
 ) {
     val colors = NotionTheme.colors
+    val haptic = LocalHapticFeedback.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val (title, iconKey, subtitle, isDone, repeatLabel, subtasks, notes, streakCount) = when (item) {
@@ -196,7 +200,10 @@ fun HabitTaskDetailBottomSheet(
                         .size(36.dp)
                         .clip(CircleShape)
                         .background(if (isDone) colors.accent else colors.surfaceVariant)
-                        .clickable { onToggleComplete() },
+                        .formaPressEffect(targetScale = 0.88f) {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onToggleComplete()
+                        },
                     contentAlignment = Alignment.Center
                 ) {
                     if (isDone) {
@@ -342,7 +349,10 @@ fun HabitTaskDetailBottomSheet(
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(colors.surfaceVariant.copy(alpha = 0.4f))
-                                .clickable { onToggleSubtask(subtask.id) }
+                                .formaPressEffect(targetScale = 0.97f) {
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    onToggleSubtask(subtask.id)
+                                }
                                 .padding(horizontal = 12.dp, vertical = 10.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -419,7 +429,7 @@ fun HabitTaskDetailBottomSheet(
                         .clip(RoundedCornerShape(20.dp))
                         .background(colors.surfaceVariant)
                         .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(20.dp))
-                        .clickable {
+                        .formaPressEffect(targetScale = 0.94f) {
                             onDismiss()
                             onEdit()
                         },
@@ -450,7 +460,7 @@ fun HabitTaskDetailBottomSheet(
                         .height(48.dp)
                         .clip(RoundedCornerShape(20.dp))
                         .background(colors.accent)
-                        .clickable {
+                        .formaPressEffect(targetScale = 0.95f) {
                             onDismiss()
                             onStartFocus()
                         },

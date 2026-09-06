@@ -78,7 +78,7 @@ fun CyberPrecisionHeader(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "HABITFLOW // SYS.FLOW.01",
+                    text = "FORMA // SYS.FLOW.01",
                     fontFamily = FontFamily.Monospace,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,

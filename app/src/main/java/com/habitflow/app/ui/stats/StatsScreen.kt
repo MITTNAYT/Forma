@@ -33,6 +33,7 @@ import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.LocalFireDepartment
 import androidx.compose.material.icons.rounded.NorthEast
 import androidx.compose.material.icons.rounded.Spa
+import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -59,8 +60,10 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.habitflow.app.core.designsystem.NotionTheme
 import com.habitflow.app.core.designsystem.icon.HabitFlowIcon
+import com.habitflow.app.core.designsystem.motion.formaPressEffect
 import com.habitflow.app.domain.model.DayCompletionRate
 import com.habitflow.app.domain.model.HabitStreakInfo
+import com.habitflow.app.domain.model.OverallHabitStats
 import com.habitflow.app.domain.repository.FocusItemSummary
 import com.habitflow.app.ui.settings.components.ProPaywallBottomSheet
 import com.habitflow.app.ui.stats.components.CommitmentDetailSheet
@@ -94,82 +97,216 @@ fun StatsScreen(
 
     val userInitial = userName.trim().take(1).uppercase().ifBlank { "A" }
 
+    val currentStats = stats ?: OverallHabitStats(
+        totalActiveHabits = 0,
+        overallCompletionRate = 0,
+        bestCurrentStreak = 0,
+        bestAllTimeStreak = 0,
+        heatmapDays = emptyList<DayCompletionRate>(),
+        perHabitStats = emptyList<HabitStreakInfo>(),
+        monthName = java.time.LocalDate.now().month.name.lowercase().replaceFirstChar { it.uppercase() },
+        daysInMonth = java.time.LocalDate.now().lengthOfMonth(),
+        monthHeatmapDays = emptyList<DayCompletionRate>(),
+        firstDayOfWeekOffset = 0
+    )
+    val completionRate = currentStats.overallCompletionRate
+    val flowProgress = (completionRate.toFloat() / 100f).coerceIn(0f, 1f)
+
     Scaffold(
         containerColor = colors.background
     ) { paddingValues ->
-        if (stats == null) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = colors.accent, strokeWidth = 2.5.dp)
-            }
-        } else {
-            val currentStats = stats!!
-            val completionRate = currentStats.overallCompletionRate
-            val flowProgress = (completionRate.toFloat() / 100f).coerceIn(0f, 1f)
-
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentPadding = PaddingValues(top = 16.dp, bottom = 120.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // 1. Editorial Minimalist Header
-                item {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 24.dp)
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            contentPadding = PaddingValues(top = 16.dp, bottom = 120.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // 1. Editorial Minimalist Header
+            item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp)
+                ) {
+                    Text(
+                        text = "RHYTHM & ANALYSIS",
+                        style = NotionTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = colors.textTertiary,
+                        letterSpacing = 1.5.sp,
+                        fontSize = 11.sp
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                        Text(
+                            text = "Mindful Metrics",
+                            style = NotionTheme.typography.headlineLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = colors.textPrimary,
+                            fontSize = 28.sp,
+                            letterSpacing = (-0.6).sp
+                        )
+
+                        Box(
+                            modifier = Modifier
+                                .size(44.dp)
+                                .clip(CircleShape)
+                                .background(colors.surface)
+                                .border(1.5.dp, colors.accent, CircleShape),
+                            contentAlignment = Alignment.Center
                         ) {
-                            Column {
+                            Text(
+                                text = userInitial,
+                                style = NotionTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = colors.accent,
+                                fontSize = 17.sp
+                            )
+                        }
+                    }
+                }
+            }
+
+            item { Spacer(modifier = Modifier.height(18.dp)) }
+
+            // 1b. Hero Zen Consistency Ring Card
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
+                        .clip(RoundedCornerShape(26.dp))
+                        .background(colors.surface)
+                        .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(26.dp))
+                        .padding(20.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        // Circular Zen Meter
+                        Box(
+                            modifier = Modifier.size(96.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            androidx.compose.foundation.Canvas(modifier = Modifier.size(96.dp)) {
+                                val stroke = 8.dp.toPx()
+                                // Background subtle track
+                                drawArc(
+                                    color = colors.accentSoft.copy(alpha = 0.6f),
+                                    startAngle = 140f,
+                                    sweepAngle = 260f,
+                                    useCenter = false,
+                                    style = androidx.compose.ui.graphics.drawscope.Stroke(
+                                        width = stroke,
+                                        cap = androidx.compose.ui.graphics.StrokeCap.Round
+                                    )
+                                )
+                                // Active Zen progress arc
+                                val activeSweep = 260f * flowProgress
+                                if (activeSweep > 0f) {
+                                    drawArc(
+                                        color = colors.accent,
+                                        startAngle = 140f,
+                                        sweepAngle = activeSweep,
+                                        useCenter = false,
+                                        style = androidx.compose.ui.graphics.drawscope.Stroke(
+                                            width = stroke,
+                                            cap = androidx.compose.ui.graphics.StrokeCap.Round
+                                        )
+                                    )
+                                }
+                            }
+
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
-                                    text = "ANALYTICS & FLOW DYNAMICS",
+                                    text = "$completionRate%",
+                                    style = NotionTheme.typography.titleLarge,
+                                    fontWeight = FontWeight.Bold,
+                                    color = colors.textPrimary,
+                                    fontSize = 20.sp
+                                )
+                                Text(
+                                    text = "RHYTHM",
                                     style = NotionTheme.typography.labelSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = colors.accent,
-                                    letterSpacing = 1.4.sp,
-                                    fontSize = 11.sp
+                                    fontSize = 9.sp,
+                                    letterSpacing = 1.sp
                                 )
-                                Spacer(modifier = Modifier.height(4.dp))
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.width(16.dp))
+
+                        // Stats Summary Column
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(Icons.Rounded.LocalFireDepartment, contentDescription = null, tint = colors.accent, modifier = Modifier.size(16.dp))
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(text = "Current Streak", style = NotionTheme.typography.bodySmall, color = colors.textSecondary, fontSize = 12.sp)
+                                }
                                 Text(
-                                    text = "Mindful Metrics",
-                                    style = NotionTheme.typography.headlineLarge,
+                                    text = "${currentStats.bestCurrentStreak} days",
                                     fontWeight = FontWeight.Bold,
                                     color = colors.textPrimary,
-                                    fontSize = 28.sp,
-                                    letterSpacing = (-0.6).sp
+                                    fontSize = 13.sp
                                 )
                             }
 
-                            // Profile Monogram with Active Flow Flame Ring
-                            Box(
-                                modifier = Modifier
-                                    .size(46.dp)
-                                    .clip(CircleShape)
-                                    .background(colors.surface)
-                                    .border(1.5.dp, colors.accent, CircleShape),
-                                contentAlignment = Alignment.Center
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(Icons.Rounded.Spa, contentDescription = null, tint = colors.accent, modifier = Modifier.size(16.dp))
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(text = "Active Rituals", style = NotionTheme.typography.bodySmall, color = colors.textSecondary, fontSize = 12.sp)
+                                }
                                 Text(
-                                    text = userInitial,
-                                    style = NotionTheme.typography.titleMedium,
+                                    text = "${currentStats.totalActiveHabits}",
                                     fontWeight = FontWeight.Bold,
-                                    color = colors.accent,
-                                    fontSize = 18.sp
+                                    color = colors.textPrimary,
+                                    fontSize = 13.sp
+                                )
+                            }
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(Icons.Rounded.Star, contentDescription = null, tint = colors.accent, modifier = Modifier.size(16.dp))
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(text = "Best Record", style = NotionTheme.typography.bodySmall, color = colors.textSecondary, fontSize = 12.sp)
+                                }
+                                Text(
+                                    text = "${currentStats.bestAllTimeStreak} days",
+                                    fontWeight = FontWeight.Bold,
+                                    color = colors.textPrimary,
+                                    fontSize = 13.sp
                                 )
                             }
                         }
                     }
                 }
+            }
 
                 item { Spacer(modifier = Modifier.height(18.dp)) }
 
@@ -258,7 +395,7 @@ fun StatsScreen(
                                         letterSpacing = 1.2.sp,
                                         fontSize = 11.sp
                                     )
-                                    Spacer(modifier = Modifier.height(6.dp))
+                                    Spacer(modifier = Modifier.height(4.dp))
                                     Row(verticalAlignment = Alignment.Bottom) {
                                         Text(
                                             text = decimalHours,
@@ -352,7 +489,9 @@ fun StatsScreen(
                                         horizontalAlignment = Alignment.CenterHorizontally,
                                         modifier = Modifier
                                             .weight(1f)
-                                            .clickable { viewModel.selectFocusDay(dayFocus) }
+                                            .formaPressEffect(targetScale = 0.90f) {
+                                                viewModel.selectFocusDay(dayFocus)
+                                            }
                                     ) {
                                         Box(
                                             modifier = Modifier
@@ -395,49 +534,30 @@ fun StatsScreen(
                                 }
                             }
 
-                            // Selected Day Focus Details Banner
                             selectedFocusDay?.let { selDay ->
                                 Spacer(modifier = Modifier.height(14.dp))
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clip(RoundedCornerShape(16.dp))
-                                        .background(colors.accentSoft)
-                                        .padding(horizontal = 16.dp, vertical = 10.dp)
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Column {
-                                            Text(
-                                                text = "DAY FOCUS (${selDay.dayLetter} • ${selDay.dateIso})",
-                                                style = NotionTheme.typography.labelSmall,
-                                                fontWeight = FontWeight.Bold,
-                                                color = colors.accent,
-                                                fontSize = 10.sp
-                                            )
-                                            val hrs = selDay.focusMinutes / 60
-                                            val mins = selDay.focusMinutes % 60
-                                            val timeStr = if (hrs > 0) "${hrs}h ${mins}m logged" else "${mins}m logged"
-                                            Text(
-                                                text = timeStr,
-                                                style = NotionTheme.typography.bodyMedium,
-                                                fontWeight = FontWeight.Bold,
-                                                color = colors.textPrimary,
-                                                fontSize = 13.sp
-                                            )
-                                        }
-
-                                        Text(
-                                            text = if (selDay.focusMinutes > 0) "Flow Active" else "Zero Flow",
-                                            style = NotionTheme.typography.labelSmall,
-                                            fontWeight = FontWeight.Bold,
-                                            color = colors.accent,
-                                            fontSize = 11.sp
-                                        )
-                                    }
+                                    Text(
+                                        text = "${selDay.dayLetter} • ${selDay.dateIso}",
+                                        style = NotionTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = colors.textTertiary,
+                                        fontSize = 12.sp
+                                    )
+                                    val hrs = selDay.focusMinutes / 60
+                                    val mins = selDay.focusMinutes % 60
+                                    val timeStr = if (hrs > 0) "${hrs}h ${mins}m" else "${mins}m"
+                                    Text(
+                                        text = timeStr,
+                                        style = NotionTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = colors.accent,
+                                        fontSize = 14.sp
+                                    )
                                 }
                             }
                         }
@@ -477,27 +597,11 @@ fun StatsScreen(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Spa,
-                                        contentDescription = null,
-                                        tint = colors.accent.copy(alpha = 0.7f),
-                                        modifier = Modifier.size(28.dp)
-                                    )
-                                    Spacer(modifier = Modifier.height(10.dp))
                                     Text(
-                                        text = "No focus sessions logged yet.",
-                                        style = NotionTheme.typography.titleSmall,
-                                        fontWeight = FontWeight.Bold,
-                                        color = colors.textPrimary,
-                                        fontSize = 14.sp
-                                    )
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    Text(
-                                        text = "Complete focus sessions in the Pomodoro clock to see your rankings and depth.",
-                                        style = NotionTheme.typography.bodySmall,
+                                        text = "You haven't committed to anything yet.",
+                                        style = NotionTheme.typography.bodyMedium,
                                         color = colors.textSecondary,
-                                        textAlign = TextAlign.Center,
-                                        fontSize = 12.sp
+                                        fontSize = 13.sp
                                     )
                                 }
                             }
@@ -666,7 +770,9 @@ fun StatsScreen(
                                                             .clip(RoundedCornerShape(10.dp))
                                                             .background(cellBg)
                                                             .border(1.dp, colors.background.copy(alpha = 0.2f), RoundedCornerShape(10.dp))
-                                                            .clickable { viewModel.inspectMatrixDay(dayRate.date) },
+                                                            .formaPressEffect(targetScale = 0.88f) {
+                                                                viewModel.inspectMatrixDay(dayRate.date)
+                                                            },
                                                         contentAlignment = Alignment.Center
                                                     ) {
                                                         Text(
@@ -739,7 +845,6 @@ fun StatsScreen(
                 }
             }
         }
-    }
 
     if (showPaywall) {
         ProPaywallBottomSheet(onDismiss = { showPaywall = false })

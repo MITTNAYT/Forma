@@ -17,4 +17,7 @@ app/build/
 .idea/
 
 *.apk
+*.aab
 .kotlin/
+*.log
+*.png

@@ -4,31 +4,33 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 
 // ========================================================
-// 1. COFFEE & CREAM (REFINED RICH COFFEE BROWN)
+// 1. ESPRESSO & CHAMPAGNE (PREMIUM DARK ROAST + GOLDEN)
 // ========================================================
-val CoffeeLightBg = Color(0xFFF9F6F0)
-val CoffeeLightSurface = Color(0xFFFFFFFF)
-val CoffeeLightSurfaceVariant = Color(0xFFF2ECE4)
-val CoffeeLightBorder = Color(0xFFE8DDD1)
-val CoffeeLightAccent = Color(0xFF4A2810) // Rich dark roast espresso bean
-val CoffeeLightAccentMuted = Color(0xFFC7A280)
-val CoffeeLightAccentSoft = Color(0xFFF3E8DC)
-val CoffeeLightTextPrimary = Color(0xFF261408)
-val CoffeeLightTextSecondary = Color(0xFF6E5544)
-val CoffeeLightTextTertiary = Color(0xFF9E8878)
-val CoffeeLightOnAccent = Color(0xFFFFFFFF)
+// Light (Champagne) Mode – warm ivory base, espresso ink accents
+val CoffeeLightBg = Color(0xFFFAF8F4)             // champagne paper ivory
+val CoffeeLightSurface = Color(0xFFFFFFFF)         // pure white card
+val CoffeeLightSurfaceVariant = Color(0xFFF3EFE7)  // warm champagne tint
+val CoffeeLightBorder = Color(0xFFE8E2D8)          // warm parchment border
+val CoffeeLightAccent = Color(0xFF1A0E06)           // deepest espresso black
+val CoffeeLightAccentMuted = Color(0xFFA89070)     // warm taupe
+val CoffeeLightAccentSoft = Color(0xFFEDE8DE)      // champagne blush
+val CoffeeLightTextPrimary = Color(0xFF0D0804)     // richest espresso ink
+val CoffeeLightTextSecondary = Color(0xFF6B5E52)   // medium warm grey-brown
+val CoffeeLightTextTertiary = Color(0xFF9C9088)    // soft warm grey
+val CoffeeLightOnAccent = Color(0xFFFDF9F2)        // champagne on dark button
 
-val CoffeeDarkBg = Color(0xFF120904) // Dark espresso base
-val CoffeeDarkSurface = Color(0xFF1D120B) // Rich roasted mocha card
-val CoffeeDarkSurfaceVariant = Color(0xFF2A1B10)
-val CoffeeDarkBorder = Color(0xFF3D291C)
-val CoffeeDarkAccent = Color(0xFFD49B6A) // Silky warm caramel crema
-val CoffeeDarkAccentMuted = Color(0xFF5A3D27)
-val CoffeeDarkAccentSoft = Color(0xFF2E1C0F)
-val CoffeeDarkTextPrimary = Color(0xFFFDF6F0) // Froth cream
-val CoffeeDarkTextSecondary = Color(0xFFB89E8C)
-val CoffeeDarkTextTertiary = Color(0xFF7E6858)
-val CoffeeDarkOnAccent = Color(0xFF120904)
+// Dark (Espresso) Mode – near-black espresso base, champagne gold accents
+val CoffeeDarkBg = Color(0xFF080604)               // pure espresso – near OLED black
+val CoffeeDarkSurface = Color(0xFF120E0A)          // deep roast card surface
+val CoffeeDarkSurfaceVariant = Color(0xFF1C1610)   // elevated roast
+val CoffeeDarkBorder = Color(0xFF2E2418)           // very dark warm border
+val CoffeeDarkAccent = Color(0xFFC8A84B)           // true champagne gold
+val CoffeeDarkAccentMuted = Color(0xFF4A3820)      // dark muted amber
+val CoffeeDarkAccentSoft = Color(0xFF1E180C)       // very dark amber hint
+val CoffeeDarkTextPrimary = Color(0xFFFDF8EF)      // warm champagne white
+val CoffeeDarkTextSecondary = Color(0xFFBCA88E)    // warm champagne secondary
+val CoffeeDarkTextTertiary = Color(0xFF7A6A5A)     // muted warm tertiary
+val CoffeeDarkOnAccent = Color(0xFF080604)         // espresso on champagne gold
 
 // ========================================================
 // 2. MONOCHROME MINIMALIST (BLACK & WHITE)

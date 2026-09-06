@@ -90,7 +90,7 @@ fun StructuredWeekStrip(
 
                 Column {
                     Text(
-                        text = "HABITFLOW",
+                        text = "FORMA",
                         style = NotionTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = colors.textPrimary,

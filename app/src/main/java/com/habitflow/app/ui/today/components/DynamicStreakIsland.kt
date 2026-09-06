@@ -17,6 +17,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import com.habitflow.app.core.designsystem.motion.formaPressEffect
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -88,8 +89,8 @@ fun DynamicStreakIsland(
         ) + fadeIn(animationSpec = tween(200)),
         exit = slideOutVertically(
             targetOffsetY = { -it - 50 },
-            animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing)
-        ) + fadeOut(animationSpec = tween(200)),
+            animationSpec = tween(durationMillis = 180, easing = FastOutSlowInEasing)
+        ) + fadeOut(animationSpec = tween(150)),
         modifier = modifier
     ) {
         Box(
@@ -109,7 +110,7 @@ fun DynamicStreakIsland(
                     .clip(RoundedCornerShape(26.dp))
                     .background(colors.surface)
                     .border(1.2.dp, colors.accent.copy(alpha = 0.5f), RoundedCornerShape(26.dp))
-                    .clickable { onDismiss() }
+                    .formaPressEffect(targetScale = 0.96f) { onDismiss() }
                     .padding(horizontal = 16.dp, vertical = 10.dp)
             ) {
                 Row(

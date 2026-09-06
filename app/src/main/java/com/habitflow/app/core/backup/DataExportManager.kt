@@ -27,7 +27,7 @@ class DataExportManager @Inject constructor(
         val focusStats = focusTrackerRepository.getFocusTimeStats().first()
 
         val root = JSONObject()
-        root.put("appName", "HabitFlow v2")
+        root.put("appName", "Forma")
         root.put("exportDate", DateUtils.formatDateIso(DateUtils.today()))
         root.put("version", "2.0")
 
@@ -77,7 +77,7 @@ class DataExportManager @Inject constructor(
         val focusStats = focusTrackerRepository.getFocusTimeStats().first()
 
         val sb = StringBuilder()
-        sb.append("# 🌿 HabitFlow v2 — Personal Mindful Flow Journal\n\n")
+        sb.append("# 🌿 Forma — Personal Mindful Flow Journal\n\n")
         sb.append("**Exported on:** ${DateUtils.formatDateIso(DateUtils.today())}\n\n")
 
         sb.append("## 📊 Focus Velocity Summary\n")
@@ -100,7 +100,7 @@ class DataExportManager @Inject constructor(
                 sb.append("  > *${item.notes}*\n")
             }
         }
-        sb.append("\n---\n*Created with HabitFlow v2 — Serene Daily Rituals & Flow Architecture*\n")
+        sb.append("\n---\n*Created with Forma — Serene Daily Rituals & Flow Architecture*\n")
         return sb.toString()
     }
 

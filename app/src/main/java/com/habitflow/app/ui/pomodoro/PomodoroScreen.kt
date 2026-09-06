@@ -65,6 +65,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.habitflow.app.core.audio.AmbientSound
 import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.motion.formaPressEffect
 import com.habitflow.app.domain.model.TodayScheduleItem
 
 @Composable
@@ -92,7 +93,7 @@ fun PomodoroScreen(
 
     val animatedProgress by animateFloatAsState(
         targetValue = progress,
-        animationSpec = tween(durationMillis = 500),
+        animationSpec = spring(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = 300f),
         label = "pomodoro_progress"
     )
 
@@ -102,16 +103,16 @@ fun PomodoroScreen(
 
     val totalMinutesToday = (totalFocusToday + secondsElapsed) / 60
 
-    // Ambient breathing pulse when timer is running
-    val infiniteTransition = rememberInfiniteTransition(label = "pomodoro_breath")
+    // Ambient breathing pulse when active session is flowing
+    val infiniteTransition = rememberInfiniteTransition(label = "pomodoro_pulse")
     val ambientPulse by infiniteTransition.animateFloat(
-        initialValue = 0.98f,
-        targetValue = 1.03f,
+        initialValue = 1f,
+        targetValue = 1.025f,
         animationSpec = infiniteRepeatable(
-            animation = tween(2000, easing = FastOutSlowInEasing),
+            animation = tween(durationMillis = 2400, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
-        label = "breath_pulse"
+        label = "ambient_pulse"
     )
 
     LaunchedEffect(Unit) {
@@ -138,25 +139,24 @@ fun PomodoroScreen(
             contentPadding = PaddingValues(top = 16.dp, bottom = 120.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // 1. Editorial Header
+            // 1. Editorial Minimalist Header
             item {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .padding(horizontal = 24.dp)
                 ) {
                     Text(
-                        text = "FLOW SANCTUARY",
+                        text = "FOCUS & CADENCE",
                         style = NotionTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
-                        color = colors.accent,
-                        letterSpacing = 1.4.sp,
+                        color = colors.textTertiary,
+                        letterSpacing = 1.5.sp,
                         fontSize = 11.sp
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = "Deep Focus Clock",
+                        text = "Zen Focus",
                         style = NotionTheme.typography.headlineLarge,
                         fontWeight = FontWeight.Bold,
                         color = colors.textPrimary,
@@ -168,7 +168,7 @@ fun PomodoroScreen(
 
             item { Spacer(modifier = Modifier.height(18.dp)) }
 
-            // 2. Segmented Mode Switcher (Deep Focus, Short Rest, Long Rest)
+            // 2. Mode Selector Pill Bar
             item {
                 Box(
                     modifier = Modifier
@@ -176,7 +176,7 @@ fun PomodoroScreen(
                         .padding(horizontal = 20.dp)
                         .clip(RoundedCornerShape(20.dp))
                         .background(colors.surface)
-                        .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(20.dp))
+                        .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(20.dp))
                         .padding(4.dp)
                 ) {
                     Row(
@@ -187,10 +187,12 @@ fun PomodoroScreen(
                             val isSelected = selectedMode == mode
                             val bg by animateColorAsState(
                                 targetValue = if (isSelected) colors.accent else Color.Transparent,
+                                animationSpec = tween(durationMillis = 180),
                                 label = "mode_bg"
                             )
                             val textColor by animateColorAsState(
                                 targetValue = if (isSelected) colors.onAccent else colors.textSecondary,
+                                animationSpec = tween(durationMillis = 180),
                                 label = "mode_text"
                             )
 
@@ -200,7 +202,10 @@ fun PomodoroScreen(
                                     .height(38.dp)
                                     .clip(RoundedCornerShape(16.dp))
                                     .background(bg)
-                                    .clickable { viewModel.selectMode(mode) },
+                                    .formaPressEffect(targetScale = 0.94f) {
+                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                        viewModel.selectMode(mode)
+                                    },
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
@@ -419,7 +424,7 @@ fun PomodoroScreen(
                             .size(46.dp)
                             .clip(CircleShape)
                             .background(colors.surfaceVariant)
-                            .clickable {
+                            .formaPressEffect(targetScale = 0.88f) {
                                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                 viewModel.resetTimer()
                             },
@@ -433,19 +438,19 @@ fun PomodoroScreen(
                         )
                     }
 
-                    // Main Central Play/Pause Orb
+                    // Main Central Play/Pause Orb with 3D tactile press feedback
                     Box(
                         modifier = Modifier
                             .size(64.dp)
                             .shadow(
-                                elevation = 10.dp,
+                                elevation = if (isRunning) 12.dp else 6.dp,
                                 shape = CircleShape,
-                                ambientColor = colors.accent.copy(alpha = 0.3f),
-                                spotColor = colors.accent.copy(alpha = 0.4f)
+                                ambientColor = colors.accent.copy(alpha = 0.35f),
+                                spotColor = colors.accent.copy(alpha = 0.45f)
                             )
                             .clip(CircleShape)
                             .background(colors.accent)
-                            .clickable {
+                            .formaPressEffect(targetScale = 0.90f) {
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                 viewModel.togglePlayPause()
                             },
@@ -465,7 +470,7 @@ fun PomodoroScreen(
                             .height(46.dp)
                             .clip(RoundedCornerShape(23.dp))
                             .background(colors.surfaceVariant)
-                            .clickable {
+                            .formaPressEffect(targetScale = 0.92f) {
                                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                 viewModel.addFiveMinutes()
                             }

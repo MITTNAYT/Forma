@@ -40,10 +40,13 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.motion.formaPressEffect
 import com.habitflow.app.core.designsystem.icon.HabitFlowIcon
 import com.habitflow.app.domain.model.TodayScheduleItem
 import kotlinx.coroutines.launch
@@ -63,6 +66,7 @@ fun BehanceHabitCard(
     modifier: Modifier = Modifier
 ) {
     val colors = NotionTheme.colors
+    val haptic = LocalHapticFeedback.current
     val scope = rememberCoroutineScope()
 
     // Extract item details
@@ -124,24 +128,29 @@ fun BehanceHabitCard(
     val sparkProgress = remember { Animatable(0f) }
 
     val handleToggleWithBurst = {
+        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
         scope.launch {
+            checkScale.snapTo(0.86f)
             checkScale.animateTo(
-                targetValue = 1.35f,
-                animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessHigh)
+                targetValue = 1.30f,
+                animationSpec = spring(dampingRatio = 0.65f, stiffness = 550f)
             )
-            checkScale.animateTo(1f, animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy))
+            checkScale.animateTo(
+                targetValue = 1f,
+                animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessMedium)
+            )
         }
         if (!isDone) {
             scope.launch {
                 sparkProgress.snapTo(0f)
-                sparkProgress.animateTo(1f, animationSpec = tween(durationMillis = 400, easing = FastOutSlowInEasing))
+                sparkProgress.animateTo(1f, animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing))
                 sparkProgress.snapTo(0f)
             }
         }
         onToggle()
     }
 
-    // Warm Clean Card
+    // Warm Clean Card with Emil Kowalski press down response
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -150,7 +159,7 @@ fun BehanceHabitCard(
             .clip(RoundedCornerShape(22.dp))
             .background(colors.surface)
             .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(22.dp))
-            .clickable { onClick() }
+            .formaPressEffect(targetScale = 0.97f) { onClick() }
             .padding(horizontal = 16.dp, vertical = 14.dp)
     ) {
         Row(

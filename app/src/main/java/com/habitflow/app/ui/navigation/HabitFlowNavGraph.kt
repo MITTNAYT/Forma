@@ -10,7 +10,9 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -31,23 +33,33 @@ fun HabitFlowNavGraph(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
+    // Tab order for directional slide calculation
+    val tabRoutes = listOf(
+        Screen.Home.route,
+        Screen.Pomodoro.route,
+        Screen.Analysis.route,
+        Screen.AddItem.route,
+        Screen.Settings.route
+    )
+
     NavHost(
         navController = navController,
         startDestination = Screen.Home.route,
         modifier = modifier,
         enterTransition = {
-            fadeIn(animationSpec = tween(220, easing = LinearOutSlowInEasing)) +
-            scaleIn(initialScale = 0.985f, animationSpec = tween(220, easing = FastOutSlowInEasing))
+            fadeIn(animationSpec = tween(300, easing = LinearOutSlowInEasing)) +
+            scaleIn(initialScale = 0.98f, animationSpec = tween(300, easing = FastOutSlowInEasing))
         },
         exitTransition = {
-            fadeOut(animationSpec = tween(160, easing = FastOutSlowInEasing))
+            fadeOut(animationSpec = tween(250, easing = FastOutSlowInEasing)) +
+            scaleOut(targetScale = 1.02f, animationSpec = tween(250, easing = FastOutSlowInEasing))
         },
         popEnterTransition = {
             fadeIn(animationSpec = tween(220, easing = LinearOutSlowInEasing)) +
-            scaleIn(initialScale = 0.985f, animationSpec = tween(220, easing = FastOutSlowInEasing))
+            scaleIn(initialScale = 0.98f, animationSpec = tween(220, easing = FastOutSlowInEasing))
         },
         popExitTransition = {
-            fadeOut(animationSpec = tween(160, easing = FastOutSlowInEasing))
+            fadeOut(animationSpec = tween(180, easing = FastOutSlowInEasing))
         }
     ) {
         // Tab 1: Home (Behance Minimal Habit Dashboard)
@@ -83,15 +95,15 @@ fun HabitFlowNavGraph(
             route = Screen.AddItem.route,
             enterTransition = {
                 slideInVertically(
-                    initialOffsetY = { it / 4 },
-                    animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessMediumLow)
-                ) + fadeIn(animationSpec = tween(200))
+                    initialOffsetY = { it / 8 },
+                    animationSpec = tween(300, easing = FastOutSlowInEasing)
+                ) + fadeIn(animationSpec = tween(250, easing = LinearOutSlowInEasing))
             },
             exitTransition = {
                 slideOutVertically(
-                    targetOffsetY = { it / 4 },
-                    animationSpec = tween(180, easing = FastOutSlowInEasing)
-                ) + fadeOut(animationSpec = tween(160))
+                    targetOffsetY = { it / 8 },
+                    animationSpec = tween(250, easing = FastOutSlowInEasing)
+                ) + fadeOut(animationSpec = tween(200, easing = FastOutSlowInEasing))
             }
         ) {
             AddEditTimelineItemScreen(
@@ -134,15 +146,15 @@ fun HabitFlowNavGraph(
             ),
             enterTransition = {
                 slideInVertically(
-                    initialOffsetY = { it / 4 },
-                    animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessMediumLow)
-                ) + fadeIn(animationSpec = tween(200))
+                    initialOffsetY = { it / 8 },
+                    animationSpec = tween(300, easing = FastOutSlowInEasing)
+                ) + fadeIn(animationSpec = tween(250, easing = LinearOutSlowInEasing))
             },
             exitTransition = {
                 slideOutVertically(
-                    targetOffsetY = { it / 4 },
-                    animationSpec = tween(180, easing = FastOutSlowInEasing)
-                ) + fadeOut(animationSpec = tween(160))
+                    targetOffsetY = { it / 8 },
+                    animationSpec = tween(250, easing = FastOutSlowInEasing)
+                ) + fadeOut(animationSpec = tween(200, easing = FastOutSlowInEasing))
             }
         ) {
             AddEditTimelineItemScreen(

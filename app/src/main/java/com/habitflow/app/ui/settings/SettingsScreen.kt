@@ -8,6 +8,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,13 +20,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Article
 import androidx.compose.material.icons.rounded.AutoAwesome
-import androidx.compose.material.icons.rounded.Brightness4
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.DarkMode
@@ -35,14 +37,11 @@ import androidx.compose.material.icons.rounded.LightMode
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.PhoneAndroid
-import androidx.compose.material.icons.rounded.Spa
-import androidx.compose.material.icons.rounded.Star
-import androidx.compose.material.icons.rounded.Vibration
 import androidx.compose.material.icons.rounded.Share
-import androidx.compose.material.icons.rounded.Article
+import androidx.compose.material.icons.rounded.Spa
+import androidx.compose.material.icons.rounded.Vibration
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -57,10 +56,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import com.habitflow.app.core.designsystem.motion.formaPressEffect
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -89,56 +96,167 @@ fun SettingsScreen(
     var hapticsEnabled by remember { mutableStateOf(true) }
 
     val userInitial = userName.trim().take(1).uppercase().ifBlank { "A" }
+    val haptic = LocalHapticFeedback.current
 
-    Scaffold(
-        containerColor = colors.background
-    ) { paddingValues ->
+    Scaffold(containerColor = colors.background) { paddingValues ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
-            contentPadding = PaddingValues(top = 16.dp, bottom = 120.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(paddingValues)
+                .statusBarsPadding(),
+            contentPadding = PaddingValues(bottom = 120.dp),
+            verticalArrangement = Arrangement.spacedBy(0.dp)
         ) {
-            // 1. Editorial Header
+
+            // ── Page Header ─────────────────────────────────────────────
             item {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp)
+                        .padding(horizontal = 24.dp, vertical = 20.dp)
                 ) {
                     Text(
-                        text = "PREFERENCES & ENVIRONMENT",
-                        style = NotionTheme.typography.labelSmall,
+                        text = "SETTINGS",
                         fontWeight = FontWeight.Bold,
-                        color = colors.accent,
-                        letterSpacing = 1.4.sp,
-                        fontSize = 11.sp
+                        color = colors.textTertiary,
+                        letterSpacing = 1.5.sp,
+                        fontSize = 10.sp
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = "App Settings",
-                        style = NotionTheme.typography.headlineLarge,
+                        text = "Your Space",
                         fontWeight = FontWeight.Bold,
                         color = colors.textPrimary,
                         fontSize = 28.sp,
-                        letterSpacing = (-0.6).sp
+                        letterSpacing = (-0.8).sp
                     )
                 }
             }
 
-            item { Spacer(modifier = Modifier.height(18.dp)) }
-
-            // 2. Profile Card
+            // ── Profile Card ────────────────────────────────────────────
             item {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp)
-                        .clip(RoundedCornerShape(26.dp))
+                        .clip(RoundedCornerShape(24.dp))
                         .background(colors.surface)
-                        .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(26.dp))
-                        .padding(20.dp)
+                        .formaPressEffect(targetScale = 0.98f) { showEditProfileDialog = true }
+                        .padding(horizontal = 18.dp, vertical = 20.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            // Avatar with gradient ring
+                            Box(modifier = Modifier.size(56.dp)) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .clip(CircleShape)
+                                        .background(
+                                            Brush.linearGradient(
+                                                colors = listOf(
+                                                    colors.accent,
+                                                    colors.accentMuted
+                                                )
+                                            )
+                                        )
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .size(50.dp)
+                                        .align(Alignment.Center)
+                                        .clip(CircleShape)
+                                        .background(colors.accentSoft),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = userInitial,
+                                        fontWeight = FontWeight.Bold,
+                                        color = colors.accent,
+                                        fontSize = 22.sp
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.width(14.dp))
+
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = userName.ifBlank { "Tap to set your name" },
+                                    fontWeight = FontWeight.Bold,
+                                    color = colors.textPrimary,
+                                    fontSize = 17.sp,
+                                    letterSpacing = (-0.2).sp
+                                )
+                                Spacer(modifier = Modifier.height(3.dp))
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(6.dp))
+                                            .background(
+                                                if (isPro) colors.accent else colors.accentSoft
+                                            )
+                                            .padding(horizontal = 7.dp, vertical = 2.dp)
+                                    ) {
+                                        Text(
+                                            text = if (isPro) "PRO" else "FREE",
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (isPro) colors.onAccent else colors.accent,
+                                            fontSize = 9.sp,
+                                            letterSpacing = 0.8.sp
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(
+                                        text = "Forma member",
+                                        color = colors.textTertiary,
+                                        fontSize = 11.sp
+                                    )
+                                }
+                            }
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .size(34.dp)
+                                .clip(CircleShape)
+                                .background(colors.accentSoft),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Edit,
+                                contentDescription = "Edit Name",
+                                tint = colors.accent,
+                                modifier = Modifier.size(15.dp)
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(14.dp))
+            }
+
+            // ── Forma Pro Sanctuary Card (Organic placement below Profile) ──
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
+                        .clip(RoundedCornerShape(24.dp))
+                        .background(colors.surface)
+                        .border(1.2.dp, colors.accent.copy(alpha = 0.35f), RoundedCornerShape(24.dp))
+                        .formaPressEffect(targetScale = 0.97f) {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            showPaywall = true
+                        }
+                        .padding(18.dp)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -151,602 +269,364 @@ fun SettingsScreen(
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .size(54.dp)
-                                    .clip(CircleShape)
-                                    .background(colors.accentSoft)
-                                    .border(2.dp, colors.accent, CircleShape),
+                                    .size(46.dp)
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(colors.accentSoft),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text(
-                                    text = userInitial,
-                                    style = NotionTheme.typography.headlineMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = colors.accent,
-                                    fontSize = 22.sp
+                                Icon(
+                                    imageVector = Icons.Rounded.Spa,
+                                    contentDescription = null,
+                                    tint = colors.accent,
+                                    modifier = Modifier.size(22.dp)
                                 )
                             }
 
-                            Spacer(modifier = Modifier.width(16.dp))
+                            Spacer(modifier = Modifier.width(14.dp))
 
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = userName.ifBlank { "Alex" },
-                                    style = NotionTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.Bold,
-                                    color = colors.textPrimary,
-                                    fontSize = 18.sp
-                                )
-
-                                Spacer(modifier = Modifier.height(4.dp))
-
+                            Column {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        text = "Forma Pro",
+                                        fontWeight = FontWeight.Bold,
+                                        color = colors.textPrimary,
+                                        fontSize = 16.sp
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
                                     Box(
                                         modifier = Modifier
-                                            .clip(RoundedCornerShape(8.dp))
-                                            .background(colors.accentSoft)
-                                            .padding(horizontal = 8.dp, vertical = 2.dp)
+                                            .clip(RoundedCornerShape(6.dp))
+                                            .background(colors.accent.copy(alpha = 0.14f))
+                                            .padding(horizontal = 6.dp, vertical = 2.dp)
                                     ) {
                                         Text(
-                                            text = if (isPro) "PRO LIFETIME" else "FREE TIER",
-                                            style = NotionTheme.typography.labelSmall,
+                                            text = if (isPro) "LIFETIME ACTIVE" else "UPGRADE",
                                             fontWeight = FontWeight.Bold,
                                             color = colors.accent,
-                                            fontSize = 9.sp
+                                            fontSize = 9.5.sp,
+                                            letterSpacing = 0.6.sp
                                         )
                                     }
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Text(
-                                        text = "Zen Master",
-                                        style = NotionTheme.typography.bodySmall,
-                                        color = colors.textSecondary,
-                                        fontSize = 11.sp
-                                    )
                                 }
+                                Spacer(modifier = Modifier.height(3.dp))
+                                Text(
+                                    text = if (isPro) "Full sanctuary unlocked · AI synthesis & deep metrics"
+                                    else "AI day synthesis · Deep analytics · Custom themes",
+                                    color = colors.textSecondary,
+                                    fontSize = 11.5.sp,
+                                    lineHeight = 16.sp
+                                )
                             }
                         }
 
-                        Box(
-                            modifier = Modifier
-                                .size(38.dp)
-                                .clip(CircleShape)
-                                .background(colors.accentSoft)
-                                .clickable { showEditProfileDialog = true },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Rounded.Edit,
-                                contentDescription = "Edit Name",
-                                tint = colors.accent,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        }
+                        Icon(
+                            imageVector = Icons.Rounded.ChevronRight,
+                            contentDescription = null,
+                            tint = colors.accent,
+                            modifier = Modifier.size(20.dp)
+                        )
                     }
                 }
+
+                Spacer(modifier = Modifier.height(24.dp))
             }
 
-            item { Spacer(modifier = Modifier.height(20.dp)) }
-
-            // 3. Theme & Appearance Studio
+            // ── Section: Appearance ──────────────────────────────────────
             item {
-                Column(
+                SettingsSectionHeader(label = "APPEARANCE", modifier = Modifier.padding(horizontal = 24.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            item {
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(colors.surface)
+                        .border(1.dp, colors.border.copy(alpha = 0.4f), RoundedCornerShape(20.dp))
+                        .padding(16.dp)
                 ) {
-                    Text(
-                        text = "THEME & VISUAL HARMONY",
-                        style = NotionTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = colors.textTertiary,
-                        letterSpacing = 1.2.sp,
-                        fontSize = 11.sp,
-                        modifier = Modifier.padding(bottom = 10.dp)
-                    )
-
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(26.dp))
-                            .background(colors.surface)
-                            .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(26.dp))
-                            .padding(18.dp)
-                    ) {
-                        Column {
-                            // Dark Mode Segmented Switcher
-                            Text(
-                                text = "DISPLAY MODE",
-                                style = NotionTheme.typography.labelSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = colors.textTertiary,
-                                fontSize = 10.sp
-                            )
-
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(16.dp))
-                                    .background(colors.surfaceVariant)
-                                    .padding(4.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                listOf(
-                                    Triple(DarkModeOption.LIGHT, "Light", Icons.Rounded.LightMode),
-                                    Triple(DarkModeOption.DARK, "Dark", Icons.Rounded.DarkMode),
-                                    Triple(DarkModeOption.SYSTEM, "System", Icons.Rounded.PhoneAndroid)
-                                ).forEach { (option, label, icon) ->
-                                    val isSelected = darkModeOption == option
-                                    val bg by animateColorAsState(
-                                        targetValue = if (isSelected) colors.accent else Color.Transparent,
-                                        label = "mode_bg"
-                                    )
-                                    val textColor by animateColorAsState(
-                                        targetValue = if (isSelected) colors.onAccent else colors.textSecondary,
-                                        label = "mode_text"
-                                    )
-
-                                    Box(
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .height(36.dp)
-                                            .clip(RoundedCornerShape(12.dp))
-                                            .background(bg)
-                                            .clickable { viewModel.setDarkModeOption(option) },
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Icon(
-                                                imageVector = icon,
-                                                contentDescription = null,
-                                                tint = textColor,
-                                                modifier = Modifier.size(14.dp)
-                                            )
-                                            Spacer(modifier = Modifier.width(6.dp))
-                                            Text(
-                                                text = label,
-                                                style = NotionTheme.typography.labelSmall,
-                                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                                color = textColor,
-                                                fontSize = 11.sp
-                                            )
-                                        }
+                    Column {
+                        // Display mode
+                        Text(
+                            text = "Display Mode",
+                            fontWeight = FontWeight.SemiBold,
+                            color = colors.textPrimary,
+                            fontSize = 13.sp
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(colors.surfaceVariant)
+                                .padding(3.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            listOf(
+                                Triple(DarkModeOption.LIGHT, "Light", Icons.Rounded.LightMode),
+                                Triple(DarkModeOption.DARK, "Dark", Icons.Rounded.DarkMode),
+                                Triple(DarkModeOption.SYSTEM, "Auto", Icons.Rounded.PhoneAndroid)
+                            ).forEach { (option, label, icon) ->
+                                val isSelected = darkModeOption == option
+                                val bg by animateColorAsState(
+                                    targetValue = if (isSelected) colors.accent else Color.Transparent,
+                                    label = "mode_bg"
+                                )
+                                val fg by animateColorAsState(
+                                    targetValue = if (isSelected) colors.onAccent else colors.textSecondary,
+                                    label = "mode_fg"
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(34.dp)
+                                        .clip(RoundedCornerShape(9.dp))
+                                        .background(bg)
+                                        .formaPressEffect(targetScale = 0.94f) {
+                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                            viewModel.setDarkModeOption(option)
+                                        },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            imageVector = icon,
+                                            contentDescription = null,
+                                            tint = fg,
+                                            modifier = Modifier.size(13.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(5.dp))
+                                        Text(
+                                            text = label,
+                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                            color = fg,
+                                            fontSize = 11.sp
+                                        )
                                     }
                                 }
                             }
+                        }
 
-                            Spacer(modifier = Modifier.height(18.dp))
+                        Spacer(modifier = Modifier.height(18.dp))
 
-                            // Color Palettes
-                            Text(
-                                text = "COLOR PALETTE",
-                                style = NotionTheme.typography.labelSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = colors.textTertiary,
-                                fontSize = 10.sp
-                            )
+                        // Color palette
+                        Text(
+                            text = "Colour Palette",
+                            fontWeight = FontWeight.SemiBold,
+                            color = colors.textPrimary,
+                            fontSize = 13.sp
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
 
-                            Spacer(modifier = Modifier.height(10.dp))
+                        val paletteMeta = listOf(
+                            Triple(PaletteFamily.MATCHA_OAT, "Matcha & Oat (Default)",
+                                listOf(Color(0xFF637852), Color(0xFFE5EFE1))),
+                            Triple(PaletteFamily.COFFEE_CREAM, "Espresso & Champagne",
+                                listOf(Color(0xFF080604), Color(0xFFC8A84B))),
+                            Triple(PaletteFamily.MONOCHROME, "Monochrome",
+                                listOf(Color(0xFF000000), Color(0xFFFFFFFF)))
+                        )
 
-                            listOf(
-                                Triple(PaletteFamily.MATCHA_OAT, "Matcha & Oat (Default)", Color(0xFF637852)),
-                                Triple(PaletteFamily.COFFEE_CREAM, "Warm Coffee Brown", Color(0xFF8D6E63)),
-                                Triple(PaletteFamily.MONOCHROME, "Minimal Monochrome (B&W)", Color(0xFF262626))
-                            ).forEach { (palette, name, previewColor) ->
+                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            paletteMeta.forEach { (palette, name, swatches) ->
                                 val isChosen = paletteFamily == palette
-                                val paletteBg by animateColorAsState(
+                                val rowBg by animateColorAsState(
                                     targetValue = if (isChosen) colors.accentSoft else Color.Transparent,
                                     label = "palette_bg"
                                 )
-                                val border = if (isChosen) colors.accent else colors.border.copy(alpha = 0.4f)
+                                val borderColor = if (isChosen) colors.accent else colors.border.copy(alpha = 0.3f)
 
-                                Box(
+                                Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(vertical = 4.dp)
-                                        .clip(RoundedCornerShape(16.dp))
-                                        .background(paletteBg)
-                                        .border(1.dp, border, RoundedCornerShape(16.dp))
-                                        .clickable { viewModel.setPaletteFamily(palette) }
-                                        .padding(horizontal = 14.dp, vertical = 10.dp)
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(rowBg)
+                                        .border(1.dp, borderColor, RoundedCornerShape(12.dp))
+                                        .formaPressEffect(targetScale = 0.97f) {
+                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                            viewModel.setPaletteFamily(palette)
+                                        }
+                                        .padding(horizontal = 12.dp, vertical = 10.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.SpaceBetween
-                                    ) {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        // Dual swatch (dark + light halves)
+                                        Box(
+                                            modifier = Modifier
+                                                .size(22.dp)
+                                                .clip(CircleShape)
+                                                .border(1.dp, colors.border.copy(alpha = 0.4f), CircleShape)
+                                        ) {
                                             Box(
                                                 modifier = Modifier
-                                                    .size(22.dp)
-                                                    .clip(CircleShape)
-                                                    .background(previewColor)
-                                                    .border(1.dp, colors.border, CircleShape)
+                                                    .fillMaxSize()
+                                                    .background(swatches[0])
                                             )
-                                            Spacer(modifier = Modifier.width(12.dp))
-                                            Text(
-                                                text = name,
-                                                style = NotionTheme.typography.bodyMedium,
-                                                fontWeight = if (isChosen) FontWeight.Bold else FontWeight.Medium,
-                                                color = colors.textPrimary,
-                                                fontSize = 13.sp
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(11.dp)
+                                                    .background(swatches[1])
+                                                    .align(Alignment.BottomEnd)
                                             )
                                         }
-
-                                        if (isChosen) {
-                                            Icon(
-                                                imageVector = Icons.Rounded.Check,
-                                                contentDescription = "Selected",
-                                                tint = colors.accent,
-                                                modifier = Modifier.size(18.dp)
-                                            )
-                                        }
+                                        Spacer(modifier = Modifier.width(10.dp))
+                                        Text(
+                                            text = name,
+                                            fontWeight = if (isChosen) FontWeight.Bold else FontWeight.Normal,
+                                            color = colors.textPrimary,
+                                            fontSize = 13.sp
+                                        )
+                                    }
+                                    if (isChosen) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.Check,
+                                            contentDescription = null,
+                                            tint = colors.accent,
+                                            modifier = Modifier.size(16.dp)
+                                        )
                                     }
                                 }
                             }
                         }
                     }
                 }
+                Spacer(modifier = Modifier.height(20.dp))
             }
 
-            item { Spacer(modifier = Modifier.height(20.dp)) }
-
-            // 4. Ritual Intelligence & AI
+            // ── Section: Notifications & Feel ──────────────────────────
             item {
-                Column(
+                SettingsSectionHeader(label = "NOTIFICATIONS & FEEL", modifier = Modifier.padding(horizontal = 24.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            item {
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(colors.surface)
+                        .border(1.dp, colors.border.copy(alpha = 0.4f), RoundedCornerShape(20.dp))
+                        .padding(16.dp)
                 ) {
-                    Text(
-                        text = "INTELLIGENCE & FLOW",
-                        style = NotionTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = colors.textTertiary,
-                        letterSpacing = 1.2.sp,
-                        fontSize = 11.sp,
-                        modifier = Modifier.padding(bottom = 10.dp)
-                    )
-
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(26.dp))
-                            .background(colors.surface)
-                            .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(26.dp))
-                            .padding(18.dp)
-                    ) {
-                        Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                            // Notifications
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Notifications,
-                                        contentDescription = null,
-                                        tint = colors.accent,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                    Column {
-                                        Text(
-                                            text = "Mindful Reminders",
-                                            style = NotionTheme.typography.bodyMedium,
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = colors.textPrimary,
-                                            fontSize = 14.sp
-                                        )
-                                        Text(
-                                            text = "Gentle alerts at intention start times",
-                                            style = NotionTheme.typography.bodySmall,
-                                            color = colors.textSecondary,
-                                            fontSize = 11.sp
-                                        )
-                                    }
-                                }
-
-                                Switch(
-                                    checked = notificationsEnabled,
-                                    onCheckedChange = { viewModel.setNotificationsEnabled(it) },
-                                    colors = SwitchDefaults.colors(
-                                        checkedThumbColor = colors.onAccent,
-                                        checkedTrackColor = colors.accent,
-                                        uncheckedThumbColor = colors.textTertiary,
-                                        uncheckedTrackColor = colors.surfaceVariant
-                                    )
-                                )
-                            }
-
-                            if (notificationsEnabled) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(start = 32.dp),
-                                    horizontalArrangement = Arrangement.Start
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(RoundedCornerShape(12.dp))
-                                            .background(colors.accentSoft)
-                                            .clickable {
-                                                viewModel.sendTestNotification()
-                                                Toast.makeText(context, "Mindful reminder sent to status bar!", Toast.LENGTH_SHORT).show()
-                                            }
-                                            .padding(horizontal = 12.dp, vertical = 6.dp)
-                                    ) {
-                                        Text(
-                                            text = "Send Test Mindful Reminder",
-                                            style = NotionTheme.typography.labelSmall,
-                                            fontWeight = FontWeight.Bold,
-                                            color = colors.accent,
-                                            fontSize = 11.sp
-                                        )
-                                    }
-                                }
-                            }
-
-                            // Tactile Micro-Haptics
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Vibration,
-                                        contentDescription = null,
-                                        tint = colors.accent,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                    Column {
-                                        Text(
-                                            text = "Tactile Spring Haptics",
-                                            style = NotionTheme.typography.bodyMedium,
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = colors.textPrimary,
-                                            fontSize = 14.sp
-                                        )
-                                        Text(
-                                            text = "Micro-vibrations on button taps and ticks",
-                                            style = NotionTheme.typography.bodySmall,
-                                            color = colors.textSecondary,
-                                            fontSize = 11.sp
-                                        )
-                                    }
-                                }
-
-                                Switch(
-                                    checked = hapticsEnabled,
-                                    onCheckedChange = { hapticsEnabled = it },
-                                    colors = SwitchDefaults.colors(
-                                        checkedThumbColor = colors.onAccent,
-                                        checkedTrackColor = colors.accent,
-                                        uncheckedThumbColor = colors.textTertiary,
-                                        uncheckedTrackColor = colors.surfaceVariant
-                                    )
-                                )
-                            }
-                        }
+                    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                        SettingsToggleRow(
+                            icon = Icons.Rounded.Notifications,
+                            title = "Mindful Reminders",
+                            subtitle = "Gentle alerts at your intention start times",
+                            checked = notificationsEnabled,
+                            onCheckedChange = { viewModel.setNotificationsEnabled(it) }
+                        )
+                        SettingsDivider()
+                        SettingsToggleRow(
+                            icon = Icons.Rounded.Vibration,
+                            title = "Spring Haptics",
+                            subtitle = "Micro-vibrations on button taps and habit ticks",
+                            checked = hapticsEnabled,
+                            onCheckedChange = { hapticsEnabled = it }
+                        )
                     }
                 }
+                Spacer(modifier = Modifier.height(20.dp))
             }
 
-            item { Spacer(modifier = Modifier.height(20.dp)) }
-
-            // 5. Data & Mindful Journal Export
+            // ── Section: Data & Export ──────────────────────────────────
             item {
-                Column(
+                SettingsSectionHeader(label = "DATA & EXPORT", modifier = Modifier.padding(horizontal = 24.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            item {
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(colors.surface)
+                        .padding(vertical = 4.dp)
                 ) {
-                    Text(
-                        text = "DATA & MINDFUL JOURNAL",
-                        style = NotionTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = colors.textTertiary,
-                        letterSpacing = 1.2.sp,
-                        fontSize = 11.sp,
-                        modifier = Modifier.padding(bottom = 10.dp)
-                    )
-
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(26.dp))
-                            .background(colors.surface)
-                            .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(26.dp))
-                            .padding(18.dp)
-                    ) {
-                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                            // Markdown Journal Export
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable { viewModel.exportMarkdown(context) },
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Article,
-                                        contentDescription = null,
-                                        tint = colors.accent,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                    Column {
-                                        Text(
-                                            text = "Export Markdown Journal",
-                                            style = NotionTheme.typography.bodyMedium,
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = colors.textPrimary,
-                                            fontSize = 14.sp
-                                        )
-                                        Text(
-                                            text = "Formatted for Notion, Obsidian & notes apps",
-                                            style = NotionTheme.typography.bodySmall,
-                                            color = colors.textSecondary,
-                                            fontSize = 11.sp
-                                        )
-                                    }
-                                }
-                                Icon(
-                                    imageVector = Icons.Rounded.Share,
-                                    contentDescription = "Share",
-                                    tint = colors.accent,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                            }
-
-                            // JSON Backup Export
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable { viewModel.exportJson(context) },
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Share,
-                                        contentDescription = null,
-                                        tint = colors.accent,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                    Column {
-                                        Text(
-                                            text = "Export JSON Backup",
-                                            style = NotionTheme.typography.bodyMedium,
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = colors.textPrimary,
-                                            fontSize = 14.sp
-                                        )
-                                        Text(
-                                            text = "Full offline backup of rituals, logs & stats",
-                                            style = NotionTheme.typography.bodySmall,
-                                            color = colors.textSecondary,
-                                            fontSize = 11.sp
-                                        )
-                                    }
-                                }
-                                Icon(
-                                    imageVector = Icons.Rounded.ChevronRight,
-                                    contentDescription = "Export",
-                                    tint = colors.textTertiary,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                            }
-                        }
+                    Column {
+                        SettingsTapRow(
+                            icon = Icons.Rounded.Article,
+                            title = "Export Markdown Journal",
+                            subtitle = "Notion, Obsidian & notes-app ready",
+                            onClick = { viewModel.exportMarkdown(context) }
+                        )
+                        SettingsDivider(indent = 50.dp)
+                        SettingsTapRow(
+                            icon = Icons.Rounded.Share,
+                            title = "Export JSON Backup",
+                            subtitle = "Full backup of rituals, logs & stats",
+                            onClick = { viewModel.exportJson(context) }
+                        )
                     }
                 }
+                Spacer(modifier = Modifier.height(20.dp))
             }
 
-            item { Spacer(modifier = Modifier.height(20.dp)) }
-
-            // 6. Pro Membership Card
-            if (!isPro) {
-                item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 20.dp)
-                            .clip(RoundedCornerShape(26.dp))
-                            .background(colors.accentSoft)
-                            .border(1.dp, colors.accent.copy(alpha = 0.5f), RoundedCornerShape(26.dp))
-                            .clickable { showPaywall = true }
-                            .padding(20.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(44.dp)
-                                        .clip(CircleShape)
-                                        .background(colors.accent),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.AutoAwesome,
-                                        contentDescription = null,
-                                        tint = colors.onAccent,
-                                        modifier = Modifier.size(22.dp)
-                                    )
-                                }
-
-                                Spacer(modifier = Modifier.width(14.dp))
-
-                                Column {
-                                    Text(
-                                        text = "Forma Pro Lifetime",
-                                        style = NotionTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Bold,
-                                        color = colors.textPrimary,
-                                        fontSize = 15.sp
-                                    )
-                                    Text(
-                                        text = "Unlock AI day planner & cloud analytics",
-                                        style = NotionTheme.typography.bodySmall,
-                                        color = colors.textSecondary,
-                                        fontSize = 11.sp
-                                    )
-                                }
-                            }
-
-                            Icon(
-                                imageVector = Icons.Rounded.ChevronRight,
-                                contentDescription = "Upgrade",
-                                tint = colors.accent,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
+            // ── Section: About ──────────────────────────────────────────
+            item {
+                SettingsSectionHeader(label = "ABOUT", modifier = Modifier.padding(horizontal = 24.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(colors.surface)
+                        .padding(vertical = 4.dp)
+                ) {
+                    Column {
+                        SettingsTapRow(
+                            icon = Icons.Rounded.HelpOutline,
+                            title = "Help & Support",
+                            subtitle = "FAQs, contact, and feedback",
+                            onClick = {}
+                        )
                     }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            // ── Version label ───────────────────────────────────────────
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 12.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Forma  ·  v2.0",
+                        color = colors.textTertiary,
+                        fontSize = 11.sp,
+                        letterSpacing = 1.sp
+                    )
                 }
             }
         }
     }
 
+    // ── Edit Profile Dialog ─────────────────────────────────────────
     if (showEditProfileDialog) {
         var tempName by remember { mutableStateOf(userName) }
         AlertDialog(
             onDismissRequest = { showEditProfileDialog = false },
             title = {
                 Text(
-                    text = "Edit Profile Name",
-                    style = NotionTheme.typography.titleLarge,
+                    text = "Your Name",
                     fontWeight = FontWeight.Bold,
-                    color = colors.textPrimary
+                    color = colors.textPrimary,
+                    fontSize = 18.sp
                 )
             },
             text = {
                 OutlinedTextField(
                     value = tempName,
                     onValueChange = { tempName = it },
-                    label = { Text("Your Name", color = colors.textSecondary) },
+                    label = { Text("Name", color = colors.textSecondary) },
                     singleLine = true,
                     colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = colors.accent,
@@ -759,14 +639,10 @@ fun SettingsScreen(
                 )
             },
             confirmButton = {
-                TextButton(
-                    onClick = {
-                        if (tempName.isNotBlank()) {
-                            viewModel.setUserName(tempName)
-                        }
-                        showEditProfileDialog = false
-                    }
-                ) {
+                TextButton(onClick = {
+                    if (tempName.isNotBlank()) viewModel.setUserName(tempName)
+                    showEditProfileDialog = false
+                }) {
                     Text("Save", color = colors.accent, fontWeight = FontWeight.Bold)
                 }
             },
@@ -782,5 +658,147 @@ fun SettingsScreen(
 
     if (showPaywall) {
         ProPaywallBottomSheet(onDismiss = { showPaywall = false })
+    }
+}
+
+// ── Shared small components ──────────────────────────────────────────────
+
+@Composable
+private fun SettingsSectionHeader(label: String, modifier: Modifier = Modifier) {
+    val colors = NotionTheme.colors
+    Text(
+        text = label,
+        fontWeight = FontWeight.Bold,
+        color = colors.textTertiary,
+        fontSize = 10.sp,
+        letterSpacing = 1.6.sp,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun SettingsDivider(indent: Dp = 0.dp) {
+    val colors = NotionTheme.colors
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = indent)
+            .height(0.5.dp)
+            .background(colors.border.copy(alpha = 0.35f))
+    )
+}
+
+@Composable
+private fun SettingsToggleRow(
+    icon: ImageVector,
+    title: String,
+    subtitle: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    val colors = NotionTheme.colors
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(colors.accentSoft),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = colors.accent,
+                    modifier = Modifier.size(17.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(12.dp))
+            Column {
+                Text(
+                    text = title,
+                    fontWeight = FontWeight.SemiBold,
+                    color = colors.textPrimary,
+                    fontSize = 14.sp
+                )
+                Text(
+                    text = subtitle,
+                    color = colors.textSecondary,
+                    fontSize = 11.sp,
+                    lineHeight = 15.sp
+                )
+            }
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = colors.onAccent,
+                checkedTrackColor = colors.accent,
+                uncheckedThumbColor = colors.textTertiary,
+                uncheckedTrackColor = colors.surfaceVariant
+            )
+        )
+    }
+}
+
+@Composable
+private fun SettingsTapRow(
+    icon: ImageVector,
+    title: String,
+    subtitle: String,
+    onClick: () -> Unit
+) {
+    val colors = NotionTheme.colors
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .formaPressEffect(targetScale = 0.97f) { onClick() }
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(colors.accentSoft),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = colors.accent,
+                    modifier = Modifier.size(17.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(12.dp))
+            Column {
+                Text(
+                    text = title,
+                    fontWeight = FontWeight.SemiBold,
+                    color = colors.textPrimary,
+                    fontSize = 14.sp
+                )
+                Text(
+                    text = subtitle,
+                    color = colors.textSecondary,
+                    fontSize = 11.sp,
+                    lineHeight = 15.sp
+                )
+            }
+        }
+        Icon(
+            imageVector = Icons.Rounded.ChevronRight,
+            contentDescription = null,
+            tint = colors.textTertiary,
+            modifier = Modifier.size(16.dp)
+        )
     }
 }

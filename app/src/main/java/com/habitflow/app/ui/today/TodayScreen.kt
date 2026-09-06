@@ -52,6 +52,7 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import com.habitflow.app.core.designsystem.motion.formaPressEffect
 import com.habitflow.app.domain.repository.AiPlanPreset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -210,7 +211,7 @@ fun TodayScreen(
                                         .clip(RoundedCornerShape(12.dp))
                                         .background(colors.accentSoft)
                                         .border(1.dp, colors.accent.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
-                                        .clickable {
+                                        .formaPressEffect(targetScale = 0.92f) {
                                             haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                             showAiPresetSheet = true
                                         }
@@ -243,7 +244,10 @@ fun TodayScreen(
                                         .clip(CircleShape)
                                         .background(colors.surface)
                                         .border(1.dp, colors.border.copy(alpha = 0.6f), CircleShape)
-                                        .clickable { showDatePickerDialog = true },
+                                        .formaPressEffect(targetScale = 0.90f) {
+                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                            showDatePickerDialog = true
+                                        },
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
@@ -298,7 +302,10 @@ fun TodayScreen(
                                     .clip(RoundedCornerShape(16.dp))
                                     .background(itemBg)
                                     .border(1.dp, borderColor, RoundedCornerShape(16.dp))
-                                    .clickable { viewModel.selectDate(date) }
+                                    .formaPressEffect(targetScale = 0.93f) {
+                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                        viewModel.selectDate(date)
+                                    }
                                     .padding(vertical = 7.dp),
                                 contentAlignment = Alignment.Center
                             ) {

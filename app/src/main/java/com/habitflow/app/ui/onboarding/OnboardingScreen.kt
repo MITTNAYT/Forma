@@ -403,7 +403,7 @@ private fun GreetingStep(
                 .height(56.dp)
         ) {
             Text(
-                text = "Enter HabitFlow",
+                text = "Enter Forma",
                 style = NotionTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp

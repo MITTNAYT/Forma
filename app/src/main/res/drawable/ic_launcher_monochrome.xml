@@ -5,24 +5,17 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- 1. Zen Breathing Ambient Aura (Soft Matcha) -->
+    <!-- Zen Ensō Circle Silhouette for Material You -->
     <path
-        android:fillColor="#E8EFE5"
-        android:pathData="M 54,16 A 38,38 0 1,1 53.99,16 Z" />
-
-    <!-- 2. The Zen Ensō Flow (Open Circular Brushstroke) -->
-    <path
-        android:strokeColor="#637852"
+        android:strokeColor="#000000"
         android:strokeWidth="9.6"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
         android:pathData="M 80.41,78.76 C 68.04,91.2 48.24,93.22 33.47,83.55 C 18.69,73.88 13.21,55.3 20.45,39.5 C 27.7,23.7 45.59,15.23 62.88,19.42 C 80.17,23.6 91.87,39.23 90.63,56.49" />
 
-    <!-- 3. Balanced Center Stone / Luminous Pearl Core -->
+    <!-- Balanced Zen Stone / Pearl Silhouette -->
     <path
-        android:fillColor="#FFFFFF"
-        android:strokeColor="#637852"
-        android:strokeWidth="1.8"
+        android:fillColor="#000000"
         android:pathData="M 54,49.5 A 4.5,4.5 0 1,1 53.99,49.5 Z" />
 
 </vector>

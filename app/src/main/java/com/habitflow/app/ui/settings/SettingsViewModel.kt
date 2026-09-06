@@ -59,7 +59,7 @@ class SettingsViewModel @Inject constructor(
             val json = dataExportManager.generateJsonExport()
             dataExportManager.shareContent(
                 activityContext = activityContext,
-                title = "HabitFlow-Backup.json",
+                title = "Forma-Backup.json",
                 content = json,
                 mimeType = "application/json"
             )
@@ -71,7 +71,7 @@ class SettingsViewModel @Inject constructor(
             val md = dataExportManager.generateMarkdownJournal()
             dataExportManager.shareContent(
                 activityContext = activityContext,
-                title = "HabitFlow-Journal.md",
+                title = "Forma-Journal.md",
                 content = md,
                 mimeType = "text/markdown"
             )
