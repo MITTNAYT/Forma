@@ -172,7 +172,7 @@ class StatsViewModel @Inject constructor(
             habitRepository.getAllHabits(includeArchived = false).combine(
                 habitRepository.getCompletionsForDate(dateIso)
             ) { habits, completions ->
-                val scheduled = habits.filter { it.repeatDays.isEmpty() || it.repeatDays.contains(dayOfWeek) }
+                val scheduled = habits.filter { (it.repeatDays.isEmpty() || it.repeatDays.contains(dayOfWeek)) && !it.isWintering }
                 val completedHabitIds = completions.map { it.habitId }.toSet()
 
                 val rituals = scheduled.map { habit ->

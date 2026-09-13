@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_item_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_widget_card"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="8dp">
+
+    <!-- Habit Icon or Status Dot -->
+    <TextView
+        android:id="@+id/widget_item_icon"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:gravity="center"
+        android:text="🍃"
+        android:textSize="14sp" />
+
+    <!-- Title and Subtitle -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/widget_item_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="1"
+            android:text="Habit Title"
+            android:textColor="@color/notion_text_primary_light"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/widget_item_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif"
+            android:maxLines="1"
+            android:text="Morning • 15m"
+            android:textColor="@color/notion_text_secondary_light"
+            android:textSize="10sp" />
+    </LinearLayout>
+
+    <!-- Toggle Check Button -->
+    <ImageView
+        android:id="@+id/widget_item_checkbox"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="8dp"
+        android:contentDescription="Toggle Habit"
+        android:src="@drawable/ic_launcher_foreground" />
+
+</LinearLayout>

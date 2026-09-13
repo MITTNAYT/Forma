@@ -64,4 +64,10 @@ object DatabaseModule {
     fun provideTimelineDao(database: HabitFlowDatabase): TimelineDao {
         return database.timelineDao()
     }
+
+    @Provides
+    fun provideDailyReflectionDao(database: HabitFlowDatabase): com.habitflow.app.data.local.dao.DailyReflectionDao {
+        return database.dailyReflectionDao()
+    }
 }
+

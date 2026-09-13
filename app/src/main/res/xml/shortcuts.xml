@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="shortcut_breathe"
+        android:enabled="true"
+        android:icon="@drawable/ic_launcher_foreground"
+        android:shortcutShortLabel="@string/shortcut_breathe"
+        android:shortcutLongLabel="@string/shortcut_breathe_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.habitflow.app"
+            android:targetClass="com.habitflow.app.MainActivity"
+            android:data="forma://breathe" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="shortcut_flow_mode"
+        android:enabled="true"
+        android:icon="@drawable/ic_launcher_foreground"
+        android:shortcutShortLabel="@string/shortcut_flow_mode"
+        android:shortcutLongLabel="@string/shortcut_flow_mode_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.habitflow.app"
+            android:targetClass="com.habitflow.app.MainActivity"
+            android:data="forma://flow_mode" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="shortcut_evening"
+        android:enabled="true"
+        android:icon="@drawable/ic_launcher_foreground"
+        android:shortcutShortLabel="@string/shortcut_evening"
+        android:shortcutLongLabel="@string/shortcut_evening_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.habitflow.app"
+            android:targetClass="com.habitflow.app.MainActivity"
+            android:data="forma://evening" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="shortcut_new_ritual"
+        android:enabled="true"
+        android:icon="@drawable/ic_launcher_foreground"
+        android:shortcutShortLabel="@string/shortcut_new_ritual"
+        android:shortcutLongLabel="@string/shortcut_new_ritual_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.habitflow.app"
+            android:targetClass="com.habitflow.app.MainActivity"
+            android:data="forma://add_habit" />
+    </shortcut>
+</shortcuts>

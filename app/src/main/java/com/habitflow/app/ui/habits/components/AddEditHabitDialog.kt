@@ -3,6 +3,7 @@ package com.habitflow.app.ui.habits.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,9 +17,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.habitflow.app.core.designsystem.NotionTheme
@@ -64,13 +68,22 @@ fun AddEditHabitDialog(
     val isEdit = initialHabit != null
 
     var name by remember { mutableStateOf(initialHabit?.name ?: "") }
-    var icon by remember { mutableStateOf(initialHabit?.icon ?: "⚡") }
+    var icon by remember { mutableStateOf(initialHabit?.icon ?: "target") }
+    var colorTag by remember { mutableStateOf(initialHabit?.colorTag ?: "#4E6542") }
+    var startDate by remember { mutableStateOf(initialHabit?.startDate ?: com.habitflow.app.core.util.DateUtils.formatDateIso(com.habitflow.app.core.util.DateUtils.today())) }
+    var endDate by remember { mutableStateOf(initialHabit?.endDate) }
+    var isIndefinite by remember { mutableStateOf(initialHabit?.isIndefinite ?: (initialHabit?.endDate == null)) }
     var timeOfDay by remember { mutableStateOf(initialHabit?.timeOfDay ?: TimeOfDay.MORNING) }
     var energyLevel by remember { mutableStateOf(initialHabit?.energyLevel ?: EnergyLevel.HIGH) }
     var repeatDays by remember { mutableStateOf(initialHabit?.repeatDays ?: setOf(1, 2, 3, 4, 5, 6, 7)) }
     var hasReminder by remember { mutableStateOf(initialHabit?.reminderTimeMinutes != null) }
     var reminderHour by remember { mutableIntStateOf((initialHabit?.reminderTimeMinutes ?: 480) / 60) }
     var reminderMinute by remember { mutableIntStateOf((initialHabit?.reminderTimeMinutes ?: 480) % 60) }
+    var stackedCueText by remember { mutableStateOf(initialHabit?.stackedCueText ?: "") }
+    var isWintering by remember { mutableStateOf(initialHabit?.isWintering ?: false) }
+
+    var showStartDatePicker by remember { mutableStateOf(false) }
+    var showEndDatePicker by remember { mutableStateOf(false) }
 
     val dayNames = listOf("M", "T", "W", "T", "F", "S", "S")
 
@@ -107,9 +120,13 @@ fun AddEditHabitDialog(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            val parsedColor = try {
+                Color(android.graphics.Color.parseColor(colorTag))
+            } catch (_: Exception) {
+                colors.accent
+            }
 
-            // Habit Name Input
+            // Habit Name Input with Trailing Clear Action
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
@@ -117,16 +134,55 @@ fun AddEditHabitDialog(
                 placeholder = { Text("e.g. Read 20 pages, Morning Run", color = colors.textTertiary) },
                 singleLine = true,
                 shape = NotionTheme.shapes.small,
+                trailingIcon = {
+                    androidx.compose.animation.AnimatedVisibility(
+                        visible = name.isNotBlank(),
+                        enter = androidx.compose.animation.fadeIn(),
+                        exit = androidx.compose.animation.fadeOut()
+                    ) {
+                        IconButton(onClick = { name = "" }) {
+                            Icon(
+                                imageVector = Icons.Rounded.Close,
+                                contentDescription = "Clear",
+                                tint = colors.textTertiary,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    }
+                },
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = colors.textPrimary,
+                    focusedBorderColor = parsedColor,
                     unfocusedBorderColor = colors.border,
                     focusedTextColor = colors.textPrimary,
                     unfocusedTextColor = colors.textPrimary,
                     focusedContainerColor = colors.surface,
-                    unfocusedContainerColor = colors.surface
+                    unfocusedContainerColor = colors.surface,
+                    cursorColor = parsedColor
                 ),
                 modifier = Modifier.fillMaxWidth()
             )
+
+            if (name.isNotBlank()) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = if (name.length < 30) "Mindful & concise" else "Focused ritual",
+                        style = NotionTheme.typography.labelSmall,
+                        color = parsedColor.copy(alpha = 0.8f),
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = "${name.length} chars",
+                        style = NotionTheme.typography.labelSmall,
+                        color = colors.textTertiary,
+                        fontSize = 10.sp
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -169,6 +225,165 @@ fun AddEditHabitDialog(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Color Accent Selection
+            Text(
+                text = "COLOR ACCENT",
+                style = NotionTheme.typography.labelSmall,
+                color = colors.textSecondary
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                com.habitflow.app.ui.timeline.components.ZenColorPalette.forEach { (hex, colorName) ->
+                    val c = try { Color(android.graphics.Color.parseColor(hex)) } catch (_: Exception) { colors.accent }
+                    val isSelected = hex.equals(colorTag, ignoreCase = true)
+
+                    Box(
+                        modifier = Modifier
+                            .size(34.dp)
+                            .clip(CircleShape)
+                            .background(c)
+                            .border(
+                                width = if (isSelected) 2.5.dp else 1.dp,
+                                color = if (isSelected) colors.textPrimary else c.copy(alpha = 0.4f),
+                                shape = CircleShape
+                            )
+                            .clickable { colorTag = hex },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (isSelected) {
+                            Icon(
+                                imageVector = Icons.Rounded.Check,
+                                contentDescription = colorName,
+                                tint = Color.White,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Lifecycle Horizon (Start Date & Target End Date / Infinity)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(NotionTheme.shapes.small)
+                    .background(colors.surfaceVariant.copy(alpha = 0.45f))
+                    .padding(14.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "RITUAL DURATION & HORIZON",
+                        style = NotionTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = colors.textTertiary,
+                        letterSpacing = 1.sp,
+                        fontSize = 10.sp
+                    )
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(if (isIndefinite) colors.accent.copy(alpha = 0.15f) else colors.surfaceVariant)
+                            .clickable { isIndefinite = !isIndefinite }
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = "∞",
+                            fontWeight = FontWeight.Bold,
+                            color = if (isIndefinite) colors.accent else colors.textTertiary,
+                            fontSize = 13.sp
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = if (isIndefinite) "Ongoing / Forever" else "Set Target End",
+                            style = NotionTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = if (isIndefinite) colors.accent else colors.textTertiary,
+                            fontSize = 10.5.sp
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Start Date Box
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(colors.surface)
+                            .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
+                            .clickable { showStartDatePicker = true }
+                            .padding(horizontal = 10.dp, vertical = 8.dp)
+                    ) {
+                        Column {
+                            Text(
+                                text = "START DATE",
+                                style = NotionTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = colors.textTertiary,
+                                fontSize = 9.sp
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = startDate,
+                                style = NotionTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = colors.textPrimary,
+                                fontSize = 12.5.sp
+                            )
+                        }
+                    }
+
+                    // Target End Date Box
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(if (isIndefinite) colors.surface.copy(alpha = 0.4f) else colors.surface)
+                            .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
+                            .clickable(enabled = !isIndefinite) { showEndDatePicker = true }
+                            .padding(horizontal = 10.dp, vertical = 8.dp)
+                    ) {
+                        Column {
+                            Text(
+                                text = "TARGET FINAL DATE",
+                                style = NotionTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = if (isIndefinite) colors.textTertiary.copy(alpha = 0.5f) else colors.textTertiary,
+                                fontSize = 9.sp
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = if (isIndefinite) "No End (Forever ∞)" else (endDate ?: "Tap to set"),
+                                style = NotionTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = if (isIndefinite) colors.textTertiary else colors.textPrimary,
+                                fontSize = 12.5.sp
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             // Time of Day
             Text(
                 text = "TIME OF DAY",
@@ -180,7 +395,7 @@ fun AddEditHabitDialog(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                TimeOfDay.values().forEach { tod ->
+                TimeOfDay.entries.forEach { tod ->
                     val isSelected = timeOfDay == tod
                     Box(
                         modifier = Modifier
@@ -219,7 +434,7 @@ fun AddEditHabitDialog(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                EnergyLevel.values().forEach { level ->
+                EnergyLevel.entries.forEach { level ->
                     val isSelected = energyLevel == level
                     Box(
                         modifier = Modifier
@@ -321,6 +536,81 @@ fun AddEditHabitDialog(
                 )
             }
 
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Habit Stacking (Cue Chain)
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = "HABIT STACKING (CUE CHAIN)",
+                    style = NotionTheme.typography.labelSmall,
+                    color = colors.textSecondary
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                OutlinedTextField(
+                    value = stackedCueText,
+                    onValueChange = { stackedCueText = it },
+                    label = { Text("Precursor Cue / Habit Trigger", style = NotionTheme.typography.bodySmall) },
+                    placeholder = { Text("e.g. After I brew morning tea...", color = colors.textTertiary) },
+                    singleLine = true,
+                    shape = NotionTheme.shapes.small,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = colors.textPrimary,
+                        unfocusedBorderColor = colors.border,
+                        focusedTextColor = colors.textPrimary,
+                        unfocusedTextColor = colors.textPrimary,
+                        focusedContainerColor = colors.surface,
+                        unfocusedContainerColor = colors.surface
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Text(
+                    text = "Anchor this ritual directly after an existing daily rhythm for effortless habit stacking.",
+                    style = NotionTheme.typography.bodySmall,
+                    color = colors.textTertiary,
+                    fontSize = 11.sp,
+                    modifier = Modifier.padding(top = 4.dp, start = 4.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Wintering / Seasonal Rest Switch
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(NotionTheme.shapes.small)
+                    .background(colors.surfaceVariant.copy(alpha = 0.5f))
+                    .padding(horizontal = 14.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "🍵 Seasonal Wintering Mode",
+                        style = NotionTheme.typography.titleMedium,
+                        color = colors.textPrimary,
+                        fontSize = 14.sp
+                    )
+                    Text(
+                        text = "Pause this ritual during travel, illness, or resting periods without penalty to your Consistency Index.",
+                        style = NotionTheme.typography.bodySmall,
+                        color = colors.textSecondary,
+                        fontSize = 11.sp
+                    )
+                }
+                Spacer(modifier = Modifier.width(12.dp))
+                Switch(
+                    checked = isWintering,
+                    onCheckedChange = { isWintering = it },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = Color.White,
+                        checkedTrackColor = colors.accent,
+                        uncheckedThumbColor = colors.textSecondary,
+                        uncheckedTrackColor = colors.surfaceVariant
+                    )
+                )
+            }
+
             Spacer(modifier = Modifier.height(24.dp))
             NotionDivider()
             Spacer(modifier = Modifier.height(16.dp))
@@ -354,10 +644,16 @@ fun AddEditHabitDialog(
                             val habit = (initialHabit ?: Habit(name = name)).copy(
                                 name = name.trim(),
                                 icon = icon,
+                                colorTag = colorTag,
+                                startDate = startDate,
+                                endDate = if (isIndefinite) null else endDate,
+                                isIndefinite = isIndefinite,
                                 timeOfDay = timeOfDay,
                                 energyLevel = energyLevel,
                                 repeatDays = repeatDays,
                                 reminderTimeMinutes = reminderMinutes,
+                                stackedCueText = stackedCueText.trim().takeIf { it.isNotBlank() },
+                                isWintering = isWintering,
                                 updatedAt = System.currentTimeMillis()
                             )
                             onSave(habit)
@@ -369,4 +665,71 @@ fun AddEditHabitDialog(
             }
         }
     }
+
+    if (showStartDatePicker) {
+        val startDatePickerState = androidx.compose.material3.rememberDatePickerState(
+            initialSelectedDateMillis = try {
+                java.time.LocalDate.parse(startDate).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+            } catch (_: Exception) {
+                System.currentTimeMillis()
+            }
+        )
+
+        androidx.compose.material3.DatePickerDialog(
+            onDismissRequest = { showStartDatePicker = false },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    startDatePickerState.selectedDateMillis?.let { millis ->
+                        val picked = java.time.Instant.ofEpochMilli(millis).atZone(java.time.ZoneId.systemDefault()).toLocalDate()
+                        startDate = picked.format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE)
+                    }
+                    showStartDatePicker = false
+                }) {
+                    Text("Confirm", color = colors.accent, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { showStartDatePicker = false }) {
+                    Text("Cancel", color = colors.textSecondary)
+                }
+            }
+        ) {
+            androidx.compose.material3.DatePicker(state = startDatePickerState)
+        }
+    }
+
+    if (showEndDatePicker) {
+        val currentEnd = endDate ?: startDate
+        val endDatePickerState = androidx.compose.material3.rememberDatePickerState(
+            initialSelectedDateMillis = try {
+                java.time.LocalDate.parse(currentEnd).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+            } catch (_: Exception) {
+                System.currentTimeMillis()
+            }
+        )
+
+        androidx.compose.material3.DatePickerDialog(
+            onDismissRequest = { showEndDatePicker = false },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    endDatePickerState.selectedDateMillis?.let { millis ->
+                        val picked = java.time.Instant.ofEpochMilli(millis).atZone(java.time.ZoneId.systemDefault()).toLocalDate()
+                        endDate = picked.format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE)
+                        isIndefinite = false
+                    }
+                    showEndDatePicker = false
+                }) {
+                    Text("Confirm", color = colors.accent, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { showEndDatePicker = false }) {
+                    Text("Cancel", color = colors.textSecondary)
+                }
+            }
+        ) {
+            androidx.compose.material3.DatePicker(state = endDatePickerState)
+        }
+    }
 }
+

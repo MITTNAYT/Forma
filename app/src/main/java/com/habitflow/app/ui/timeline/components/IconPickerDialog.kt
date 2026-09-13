@@ -51,7 +51,8 @@ import com.habitflow.app.core.designsystem.icon.HabitFlowIcons
  * Zen Color Palette for tasks, rituals, and icons.
  */
 val ZenColorPalette = listOf(
-    Pair("#637852", "Matcha"),
+    Pair("#4E6542", "Matcha Green"),
+    Pair("#637852", "Tea Leaf"),
     Pair("#8A9A86", "Sage"),
     Pair("#3D5A40", "Forest"),
     Pair("#D4A373", "Amber"),
@@ -67,7 +68,7 @@ val ZenColorPalette = listOf(
 @Composable
 fun IconPickerDialog(
     selectedIcon: String,
-    selectedColor: String = "#637852",
+    selectedColor: String = "#4E6542",
     onIconSelected: (String) -> Unit,
     onColorSelected: ((String) -> Unit)? = null,
     onDismiss: () -> Unit

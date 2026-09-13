@@ -70,7 +70,7 @@ fun BehanceHabitCard(
     val scope = rememberCoroutineScope()
 
     // Extract item details
-    val (title, iconKey, colorTagHex, subtitle, isDone, isPeachTile) = when (item) {
+    val cardData = when (item) {
         is TodayScheduleItem.HabitItem -> {
             val habit = item.habit
             val defaultTime = when (habit.timeOfDay) {
@@ -95,7 +95,9 @@ fun BehanceHabitCard(
                 colorTagHex = habit.colorTag,
                 subtitle = timeFormatted,
                 isDone = item.isDoneToday,
-                isPeachTile = isPeach
+                isPeachTile = isPeach,
+                cueText = habit.stackedCueText,
+                isWintering = habit.isWintering
             )
         }
         is TodayScheduleItem.TimelineBlock -> {
@@ -109,10 +111,18 @@ fun BehanceHabitCard(
                 colorTagHex = task.colorTag,
                 subtitle = timing,
                 isDone = task.completed,
-                isPeachTile = isPeach
+                isPeachTile = isPeach,
+                cueText = null,
+                isWintering = false
             )
         }
     }
+
+    val title = cardData.title
+    val iconKey = cardData.iconKey
+    val subtitle = cardData.subtitle
+    val isDone = cardData.isDone
+    val isPeachTile = cardData.isPeachTile
 
     val tileBg = if (isPeachTile) colors.accentSoft else colors.surfaceVariant
     val tileIconColor = colors.accent
@@ -191,16 +201,33 @@ fun BehanceHabitCard(
 
                 // Title and Subtitle
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = title,
-                        style = NotionTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = if (isDone) colors.textSecondary else colors.textPrimary,
-                        fontSize = 16.sp,
-                        letterSpacing = (-0.2).sp,
-                        maxLines = 1,
-                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = title,
+                            style = NotionTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = if (isDone || cardData.isWintering) colors.textSecondary else colors.textPrimary,
+                            fontSize = 16.sp,
+                            letterSpacing = (-0.2).sp,
+                            maxLines = 1,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f, fill = false)
+                        )
+
+                        if (cardData.isWintering) {
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "🍵 Wintering",
+                                style = NotionTheme.typography.labelSmall,
+                                color = colors.accent,
+                                fontSize = 10.sp,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(colors.accentSoft)
+                                    .padding(horizontal = 6.dp, vertical = 2.dp)
+                            )
+                        }
+                    }
 
                     Spacer(modifier = Modifier.height(3.dp))
 
@@ -212,6 +239,18 @@ fun BehanceHabitCard(
                         maxLines = 1,
                         overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                     )
+
+                    if (!cardData.cueText.isNullOrBlank()) {
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = "↳ ${cardData.cueText}",
+                            style = NotionTheme.typography.bodySmall,
+                            color = colors.textTertiary,
+                            fontSize = 11.sp,
+                            maxLines = 1,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                        )
+                    }
                 }
             }
 
@@ -301,7 +340,9 @@ private data class BehanceCardData(
     val colorTagHex: String,
     val subtitle: String,
     val isDone: Boolean,
-    val isPeachTile: Boolean
+    val isPeachTile: Boolean,
+    val cueText: String? = null,
+    val isWintering: Boolean = false
 )
 
 private fun formatBehanceTiming(startTimeStr: String?, endTimeStr: String?): String {

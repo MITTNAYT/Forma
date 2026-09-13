@@ -6,4 +6,13 @@
     <string name="nav_stats">Stats</string>
     <string name="nav_settings">Settings</string>
     <string name="nav_add">Add</string>
+    <string name="shortcut_new_ritual">New Ritual</string>
+    <string name="shortcut_new_ritual_long">Create a new daily habit ritual</string>
+    <string name="shortcut_flow_mode">Flow Mode</string>
+    <string name="shortcut_flow_mode_long">Start guided distraction-free routine</string>
+    <string name="shortcut_breathe">Box Breathing</string>
+    <string name="shortcut_breathe_long">60s calming breath cycle</string>
+    <string name="shortcut_evening">Evening Sanctuary</string>
+    <string name="shortcut_evening_long">Reflect and rollover today\'s tasks</string>
 </resources>
+

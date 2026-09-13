@@ -1,13 +1,20 @@
 package com.habitflow.app.data.local.entity
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.habitflow.app.core.util.SyncStatus
 import com.habitflow.app.domain.model.EnergyLevel
 import com.habitflow.app.domain.model.Habit
 import com.habitflow.app.domain.model.TimeOfDay
 
-@Entity(tableName = "habits")
+@Entity(
+    tableName = "habits",
+    indices = [
+        Index(value = ["archived"]),
+        Index(value = ["timeOfDay"])
+    ]
+)
 data class HabitEntity(
     @PrimaryKey
     val id: String,
@@ -21,7 +28,13 @@ data class HabitEntity(
     val archived: Boolean,
     val reminderTimeMinutes: Int?,
     val updatedAt: Long,
-    val syncStatus: String // PENDING, SYNCED, FAILED
+    val syncStatus: String, // PENDING, SYNCED, FAILED
+    val stackedAfterHabitId: String? = null,
+    val stackedCueText: String? = null,
+    val isWintering: Boolean = false,
+    val startDate: String? = null,
+    val endDate: String? = null,
+    val isIndefinite: Boolean = true
 ) {
     fun toDomain(): Habit {
         val days = if (repeatDays.isBlank()) emptySet() else repeatDays.split(",").mapNotNull { it.trim().toIntOrNull() }.toSet()
@@ -37,7 +50,13 @@ data class HabitEntity(
             archived = archived,
             reminderTimeMinutes = reminderTimeMinutes,
             updatedAt = updatedAt,
-            syncStatus = try { SyncStatus.valueOf(syncStatus) } catch (_: Exception) { SyncStatus.SYNCED }
+            syncStatus = try { SyncStatus.valueOf(syncStatus) } catch (_: Exception) { SyncStatus.SYNCED },
+            stackedAfterHabitId = stackedAfterHabitId,
+            stackedCueText = stackedCueText,
+            isWintering = isWintering,
+            startDate = startDate,
+            endDate = endDate,
+            isIndefinite = isIndefinite
         )
     }
 
@@ -55,8 +74,16 @@ data class HabitEntity(
                 archived = habit.archived,
                 reminderTimeMinutes = habit.reminderTimeMinutes,
                 updatedAt = habit.updatedAt,
-                syncStatus = habit.syncStatus.name
+                syncStatus = habit.syncStatus.name,
+                stackedAfterHabitId = habit.stackedAfterHabitId,
+                stackedCueText = habit.stackedCueText,
+                isWintering = habit.isWintering,
+                startDate = habit.startDate,
+                endDate = habit.endDate,
+                isIndefinite = habit.isIndefinite
             )
         }
     }
 }
+
+

@@ -24,10 +24,11 @@ class GetHabitStatsUseCase @Inject constructor(
         ) { habits, completions ->
 
             val completionsByDate = completions.groupBy { it.date }
+            val completionsByHabit = completions.groupBy { it.habitId }
 
             // Calculate per-habit stats
             val perHabitStats: List<HabitStreakInfo> = habits.map { habit ->
-                val habitCompletions = completions.filter { it.habitId == habit.id }
+                val habitCompletions = completionsByHabit[habit.id] ?: emptyList()
                 calculateStreakUseCase(habit, habitCompletions, today)
             }
 

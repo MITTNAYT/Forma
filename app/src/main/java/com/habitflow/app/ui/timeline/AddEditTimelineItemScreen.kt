@@ -1,12 +1,14 @@
 package com.habitflow.app.ui.timeline
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -99,6 +101,8 @@ fun AddEditTimelineItemScreen(
 
     var showIconPicker by remember { mutableStateOf(false) }
     var showDatePickerDialog by remember { mutableStateOf(false) }
+    var showStartDatePicker by remember { mutableStateOf(false) }
+    var showEndDatePicker by remember { mutableStateOf(false) }
     var showStartTimePicker by remember { mutableStateOf(false) }
     var showEndTimePicker by remember { mutableStateOf(false) }
     var newSubtaskText by remember { mutableStateOf("") }
@@ -292,6 +296,17 @@ fun AddEditTimelineItemScreen(
 
             // 3. Title, Icon & Zen Color Swatches Card
             item {
+                var isTitleFocused by remember { mutableStateOf(false) }
+
+                val cardBorderColor by animateColorAsState(
+                    targetValue = if (isTitleFocused) parsedColor.copy(alpha = 0.65f) else colors.border.copy(alpha = 0.6f),
+                    label = "card_border"
+                )
+                val cardBorderWidth by androidx.compose.animation.core.animateDpAsState(
+                    targetValue = if (isTitleFocused) 1.5.dp else 1.dp,
+                    label = "card_border_w"
+                )
+
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -302,7 +317,7 @@ fun AddEditTimelineItemScreen(
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(24.dp))
                             .background(colors.surface)
-                            .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(24.dp))
+                            .border(cardBorderWidth, cardBorderColor, RoundedCornerShape(24.dp))
                             .padding(18.dp)
                     ) {
                         Column {
@@ -333,7 +348,7 @@ fun AddEditTimelineItemScreen(
 
                                 Spacer(modifier = Modifier.width(14.dp))
 
-                                // Clean Minimal Title Input - Direct inline typing without extract UI
+                                // Clean Minimal Title Input with Live Typing Effects
                                 TextField(
                                     value = uiState.title,
                                     onValueChange = { viewModel.setTitle(it) },
@@ -344,6 +359,28 @@ fun AddEditTimelineItemScreen(
                                             color = colors.textTertiary,
                                             fontSize = 16.sp
                                         )
+                                    },
+                                    trailingIcon = {
+                                        androidx.compose.animation.AnimatedVisibility(
+                                            visible = uiState.title.isNotBlank(),
+                                            enter = androidx.compose.animation.fadeIn(),
+                                            exit = androidx.compose.animation.fadeOut()
+                                        ) {
+                                            IconButton(
+                                                onClick = {
+                                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                                    viewModel.setTitle("")
+                                                },
+                                                modifier = Modifier.size(28.dp)
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Rounded.Close,
+                                                    contentDescription = "Clear text",
+                                                    tint = colors.textTertiary,
+                                                    modifier = Modifier.size(16.dp)
+                                                )
+                                            }
+                                        }
                                     },
                                     singleLine = true,
                                     keyboardOptions = KeyboardOptions(
@@ -365,8 +402,94 @@ fun AddEditTimelineItemScreen(
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 17.sp
                                     ),
-                                    modifier = Modifier.weight(1f)
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .onFocusChanged {
+                                            isTitleFocused = it.isFocused
+                                        }
                                 )
+                            }
+
+                            // Live Character Counter & Zen Typing Guide
+                            if (uiState.title.isNotBlank()) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 4.dp, start = 68.dp, end = 4.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = if (uiState.title.length < 30) "Mindful & concise" else "Focused intention",
+                                        style = NotionTheme.typography.labelSmall,
+                                        color = parsedColor.copy(alpha = 0.8f),
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                    Text(
+                                        text = "${uiState.title.length} chars",
+                                        style = NotionTheme.typography.labelSmall,
+                                        color = colors.textTertiary,
+                                        fontSize = 10.sp
+                                    )
+                                }
+                            }
+
+                            // Smart Task Parser Live Detection Chip
+                            val smartParsed = remember(uiState.title) {
+                                if (uiState.title.length > 5) {
+                                    com.habitflow.app.core.util.SmartTaskParser.parse(uiState.title)
+                                } else null
+                            }
+
+                            if (smartParsed != null && (smartParsed.startTime != null || smartParsed.date != null || smartParsed.category != null)) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(14.dp))
+                                        .background(parsedColor.copy(alpha = 0.12f))
+                                        .border(1.dp, parsedColor.copy(alpha = 0.35f), RoundedCornerShape(14.dp))
+                                        .clickable {
+                                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                            viewModel.applySmartParse(smartParsed)
+                                        }
+                                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text(
+                                                text = "✨",
+                                                fontSize = 13.sp
+                                            )
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            val details = buildList {
+                                                smartParsed.startTime?.let { add("$it – ${smartParsed.endTime ?: ""}") }
+                                                smartParsed.date?.let { add(it.format(java.time.format.DateTimeFormatter.ofPattern("MMM d"))) }
+                                                smartParsed.category?.let { add("#$it") }
+                                            }.joinToString(" • ")
+
+                                            Text(
+                                                text = details,
+                                                style = NotionTheme.typography.labelSmall,
+                                                fontWeight = FontWeight.Bold,
+                                                color = parsedColor,
+                                                fontSize = 12.sp
+                                            )
+                                        }
+                                        Text(
+                                            text = "Tap to Auto-fill ➔",
+                                            style = NotionTheme.typography.labelSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = parsedColor,
+                                            fontSize = 11.sp
+                                        )
+                                    }
+                                }
                             }
 
                             Spacer(modifier = Modifier.height(14.dp))
@@ -775,8 +898,142 @@ fun AddEditTimelineItemScreen(
 
             item { Spacer(modifier = Modifier.height(18.dp)) }
 
-            // 5. Date Selector (For Tasks)
-            if (uiState.creationType == CreationType.TASK) {
+            // 5. Date Range & Horizon (For Habits) or Single Target Date (For Tasks)
+            if (uiState.creationType == CreationType.HABIT) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp)
+                            .clip(RoundedCornerShape(24.dp))
+                            .background(colors.surface)
+                            .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(24.dp))
+                            .padding(18.dp)
+                    ) {
+                        Column {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "RITUAL DURATION & HORIZON",
+                                    style = NotionTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = colors.textTertiary,
+                                    letterSpacing = 1.2.sp,
+                                    fontSize = 11.sp
+                                )
+
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(if (uiState.isIndefinite) parsedColor.copy(alpha = 0.15f) else colors.surfaceVariant)
+                                        .clickable {
+                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                            viewModel.setIsIndefinite(!uiState.isIndefinite)
+                                        }
+                                        .padding(horizontal = 10.dp, vertical = 4.dp)
+                                ) {
+                                    Text(
+                                        text = "∞",
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (uiState.isIndefinite) parsedColor else colors.textTertiary,
+                                        fontSize = 14.sp
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = if (uiState.isIndefinite) "Ongoing / Infinity" else "Fixed Target",
+                                        style = NotionTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (uiState.isIndefinite) parsedColor else colors.textTertiary,
+                                        fontSize = 11.sp
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(14.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                // Start Date Box
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .background(colors.surfaceVariant.copy(alpha = 0.45f))
+                                        .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(16.dp))
+                                        .clickable {
+                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                            showStartDatePicker = true
+                                        }
+                                        .padding(horizontal = 12.dp, vertical = 10.dp)
+                                ) {
+                                    Column {
+                                        Text(
+                                            text = "STARTING DATE",
+                                            style = NotionTheme.typography.labelSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = colors.textTertiary,
+                                            letterSpacing = 1.sp,
+                                            fontSize = 9.5.sp
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = uiState.startDate,
+                                            style = NotionTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = colors.textPrimary,
+                                            fontSize = 13.sp
+                                        )
+                                    }
+                                }
+
+                                // End Date Box
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .background(
+                                            if (uiState.isIndefinite) colors.surfaceVariant.copy(alpha = 0.2f)
+                                            else colors.surfaceVariant.copy(alpha = 0.45f)
+                                        )
+                                        .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(16.dp))
+                                        .clickable(enabled = !uiState.isIndefinite) {
+                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                            showEndDatePicker = true
+                                        }
+                                        .padding(horizontal = 12.dp, vertical = 10.dp)
+                                ) {
+                                    Column {
+                                        Text(
+                                            text = "FINAL TARGET DATE",
+                                            style = NotionTheme.typography.labelSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (uiState.isIndefinite) colors.textTertiary.copy(alpha = 0.5f) else colors.textTertiary,
+                                            letterSpacing = 1.sp,
+                                            fontSize = 9.5.sp
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = if (uiState.isIndefinite) "No End (Forever ∞)" else (uiState.endDate ?: "Tap to set date"),
+                                            style = NotionTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (uiState.isIndefinite) colors.textTertiary else colors.textPrimary,
+                                            fontSize = 13.sp
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                item { Spacer(modifier = Modifier.height(18.dp)) }
+            } else {
                 item {
                     Box(
                         modifier = Modifier
@@ -944,15 +1201,25 @@ fun AddEditTimelineItemScreen(
 
             item { Spacer(modifier = Modifier.height(18.dp)) }
 
-            // 7. Notes & Reflection Card - Direct inline typing without extract UI
+            // 7. Notes & Reflection Card - Direct inline typing with aligned cursor
             item {
+                var isNotesFocused by remember { mutableStateOf(false) }
+                val notesBorderColor by animateColorAsState(
+                    targetValue = if (isNotesFocused) parsedColor.copy(alpha = 0.65f) else colors.border.copy(alpha = 0.6f),
+                    label = "notes_border"
+                )
+                val notesBorderWidth by androidx.compose.animation.core.animateDpAsState(
+                    targetValue = if (isNotesFocused) 1.5.dp else 1.dp,
+                    label = "notes_border_w"
+                )
+
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp)
                         .clip(RoundedCornerShape(24.dp))
                         .background(colors.surface)
-                        .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(24.dp))
+                        .border(notesBorderWidth, notesBorderColor, RoundedCornerShape(24.dp))
                         .padding(18.dp)
                 ) {
                     Column {
@@ -973,8 +1240,9 @@ fun AddEditTimelineItemScreen(
                                 Text(
                                     text = "${uiState.notes.length} chars",
                                     style = NotionTheme.typography.labelSmall,
-                                    color = colors.textTertiary,
-                                    fontSize = 10.sp
+                                    color = parsedColor.copy(alpha = 0.8f),
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Medium
                                 )
                             }
                         }
@@ -986,7 +1254,10 @@ fun AddEditTimelineItemScreen(
                             onValueChange = { viewModel.setNotes(it) },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .heightIn(min = 100.dp),
+                                .heightIn(min = 100.dp)
+                                .onFocusChanged {
+                                    isNotesFocused = it.isFocused
+                                },
                             placeholder = {
                                 Text(
                                     text = "Add context, thoughts, or reflections on why this matters...",
@@ -996,6 +1267,8 @@ fun AddEditTimelineItemScreen(
                                     lineHeight = 21.sp
                                 )
                             },
+                            singleLine = false,
+                            maxLines = 8,
                             keyboardOptions = KeyboardOptions(
                                 capitalization = KeyboardCapitalization.Sentences,
                                 autoCorrectEnabled = true,
@@ -1122,7 +1395,11 @@ fun AddEditTimelineItemScreen(
 
     if (showDatePickerDialog) {
         val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = LocalDate.parse(uiState.date).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+            initialSelectedDateMillis = try {
+                LocalDate.parse(uiState.date).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+            } catch (_: Exception) {
+                System.currentTimeMillis()
+            }
         )
 
         DatePickerDialog(
@@ -1145,6 +1422,72 @@ fun AddEditTimelineItemScreen(
             }
         ) {
             DatePicker(state = datePickerState)
+        }
+    }
+
+    if (showStartDatePicker) {
+        val startDatePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = try {
+                LocalDate.parse(uiState.startDate).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+            } catch (_: Exception) {
+                System.currentTimeMillis()
+            }
+        )
+
+        DatePickerDialog(
+            onDismissRequest = { showStartDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    startDatePickerState.selectedDateMillis?.let { millis ->
+                        val picked = Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDate()
+                        viewModel.setStartDate(picked.format(DateTimeFormatter.ISO_LOCAL_DATE))
+                    }
+                    showStartDatePicker = false
+                }) {
+                    Text("Confirm", color = parsedColor, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showStartDatePicker = false }) {
+                    Text("Cancel", color = colors.textSecondary)
+                }
+            }
+        ) {
+            DatePicker(state = startDatePickerState)
+        }
+    }
+
+    if (showEndDatePicker) {
+        val currentEnd = uiState.endDate ?: uiState.startDate
+        val endDatePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = try {
+                LocalDate.parse(currentEnd).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+            } catch (_: Exception) {
+                System.currentTimeMillis()
+            }
+        )
+
+        DatePickerDialog(
+            onDismissRequest = { showEndDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    endDatePickerState.selectedDateMillis?.let { millis ->
+                        val picked = Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDate()
+                        viewModel.setEndDate(picked.format(DateTimeFormatter.ISO_LOCAL_DATE))
+                        viewModel.setIsIndefinite(false)
+                    }
+                    showEndDatePicker = false
+                }) {
+                    Text("Confirm", color = parsedColor, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showEndDatePicker = false }) {
+                    Text("Cancel", color = colors.textSecondary)
+                }
+            }
+        ) {
+            DatePicker(state = endDatePickerState)
         }
     }
 }

@@ -38,6 +38,8 @@ class TodayViewModel @Inject constructor(
     private val toggleHabitCompletionUseCase: ToggleHabitCompletionUseCase,
     private val timelineRepository: TimelineRepository,
     private val planDayWithAiUseCase: PlanDayWithAiUseCase,
+    private val rebalanceTimelineUseCase: com.habitflow.app.domain.usecase.RebalanceTimelineUseCase,
+    private val zenFeedback: com.habitflow.app.core.audio.ZenFeedbackManager,
     private val billingRepository: BillingRepository,
     private val preferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
@@ -69,6 +71,12 @@ class TodayViewModel @Inject constructor(
     fun toggleHabit(item: TodayScheduleItem.HabitItem) {
         viewModelScope.launch {
             val dateIso = DateUtils.formatDateIso(_selectedDate.value)
+            val isNowCompleted = !item.isDoneToday
+            if (isNowCompleted) {
+                zenFeedback.onHabitCompleted()
+            } else {
+                zenFeedback.onTaskToggled()
+            }
             toggleHabitCompletionUseCase(
                 habitId = item.habit.id,
                 date = dateIso,
@@ -77,8 +85,26 @@ class TodayViewModel @Inject constructor(
         }
     }
 
+    fun completeHabitById(habitId: String) {
+        viewModelScope.launch {
+            val dateIso = DateUtils.formatDateIso(_selectedDate.value)
+            zenFeedback.onHabitCompleted()
+            toggleHabitCompletionUseCase(
+                habitId = habitId,
+                date = dateIso,
+                currentlyCompleted = false
+            )
+        }
+    }
+
     fun toggleTask(item: TodayScheduleItem.TimelineBlock) {
         viewModelScope.launch {
+            val isNowCompleted = !item.item.completed
+            if (isNowCompleted) {
+                zenFeedback.onHabitCompleted()
+            } else {
+                zenFeedback.onTaskToggled()
+            }
             timelineRepository.toggleTimelineItemCompletion(
                 id = item.item.id,
                 completed = !item.item.completed
@@ -86,8 +112,22 @@ class TodayViewModel @Inject constructor(
         }
     }
 
+    fun rebalanceDayTimeline() {
+        viewModelScope.launch {
+            val dateIso = DateUtils.formatDateIso(_selectedDate.value)
+            val shifted = rebalanceTimelineUseCase(date = dateIso)
+            if (shifted > 0) {
+                zenFeedback.onMilestoneReached()
+                _eventFlow.emit(TodayUiEvent.ShowToast("Zen Rebalance: Adjusted $shifted blocks with mindful breathing buffers."))
+            } else {
+                _eventFlow.emit(TodayUiEvent.ShowToast("Schedule is already balanced and peaceful."))
+            }
+        }
+    }
+
     fun toggleSubtask(item: TimelineItem, subtaskId: String) {
         viewModelScope.launch {
+            zenFeedback.onTaskToggled()
             val updatedSubtasks = item.subtasks.map {
                 if (it.id == subtaskId) it.copy(completed = !it.completed) else it
             }

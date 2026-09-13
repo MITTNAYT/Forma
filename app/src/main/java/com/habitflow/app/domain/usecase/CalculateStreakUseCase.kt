@@ -10,25 +10,18 @@ import javax.inject.Inject
 class CalculateStreakUseCase @Inject constructor() {
 
     /**
-     * Calculates the current streak, longest streak, and completion statistics for a habit.
-     * Takes into account the habit's scheduled repeat days (e.g. if a habit repeats only Mon-Fri,
-     * weekends do not break the streak).
+     * Ultra-fast calculation of current streak without scanning entire history.
      */
-    operator fun invoke(
+    fun calculateCurrentStreak(
         habit: Habit,
-        completions: List<HabitCompletion>,
+        completedDatesSet: Set<String>,
         referenceDate: LocalDate = DateUtils.today()
-    ): HabitStreakInfo {
-        val completedDatesSet = completions.map { it.date }.toSet()
-
+    ): Int {
         val scheduledRepeatDays = if (habit.repeatDays.isEmpty()) setOf(1, 2, 3, 4, 5, 6, 7) else habit.repeatDays
 
-        // Calculate Current Streak
         var currentStreak = 0
         var checkDate = referenceDate
 
-        // If today is scheduled and completed, count today and step backwards.
-        // If today is scheduled and NOT completed, we still don't break the streak if yesterday was completed (since today is still in progress).
         val todayStr = DateUtils.formatDateIso(referenceDate)
         val isTodayScheduled = scheduledRepeatDays.contains(DateUtils.getDayOfWeekInt(referenceDate))
         val isTodayCompleted = completedDatesSet.contains(todayStr)
@@ -37,17 +30,15 @@ class CalculateStreakUseCase @Inject constructor() {
             currentStreak++
             checkDate = checkDate.minusDays(1)
         } else if (!isTodayScheduled) {
-            // Today is not a scheduled day, start checking from yesterday backwards
             checkDate = checkDate.minusDays(1)
         } else {
-            // Today is scheduled but not completed yet; start checking from yesterday backwards
             checkDate = checkDate.minusDays(1)
         }
 
-        // Iterate backwards through past days
-        val createdDate = LocalDate.ofEpochDay(habit.createdAt / (1000 * 60 * 60 * 24))
+        val createdEpochDay = habit.createdAt / (1000L * 60 * 60 * 24)
+        val createdDate = LocalDate.ofEpochDay(createdEpochDay.coerceAtLeast(0L))
         var daysBack = 0
-        val maxLookback = 365 * 2
+        val maxLookback = 365
 
         while (daysBack < maxLookback && !checkDate.isBefore(createdDate)) {
             val dayOfWeek = DateUtils.getDayOfWeekInt(checkDate)
@@ -58,13 +49,32 @@ class CalculateStreakUseCase @Inject constructor() {
                 if (completedDatesSet.contains(dateStr)) {
                     currentStreak++
                 } else {
-                    // Missed scheduled day, streak breaks
                     break
                 }
             }
             checkDate = checkDate.minusDays(1)
             daysBack++
         }
+
+        return currentStreak
+    }
+
+    /**
+     * Calculates the current streak, longest streak, and completion statistics for a habit.
+     * Takes into account the habit's scheduled repeat days (e.g. if a habit repeats only Mon-Fri,
+     * weekends do not break the streak).
+     */
+    operator fun invoke(
+        habit: Habit,
+        completions: List<HabitCompletion>,
+        referenceDate: LocalDate = DateUtils.today()
+    ): HabitStreakInfo {
+        val completedDatesSet = completions.map { it.date }.toSet()
+        val scheduledRepeatDays = if (habit.repeatDays.isEmpty()) setOf(1, 2, 3, 4, 5, 6, 7) else habit.repeatDays
+        val currentStreak = calculateCurrentStreak(habit, completedDatesSet, referenceDate)
+
+        val createdEpochDay = habit.createdAt / (1000L * 60 * 60 * 24)
+        val createdDate = LocalDate.ofEpochDay(createdEpochDay.coerceAtLeast(0L))
 
         // Calculate Longest Streak & Total completions
         var longestStreak = currentStreak

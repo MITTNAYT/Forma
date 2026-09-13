@@ -35,12 +35,15 @@ data class AddEditTimelineUiState(
     val creationType: CreationType = CreationType.TASK,
     val title: String = "",
     val date: String = DateUtils.formatDateIso(DateUtils.today()),
+    val startDate: String = DateUtils.formatDateIso(DateUtils.today()),
+    val endDate: String? = null,
+    val isIndefinite: Boolean = true,
     val hasTime: Boolean = true,
     val startTime: String = "09:15",
     val durationMinutes: Int = 60,
     val endTime: String = "10:15",
     val icon: String = "target",
-    val colorTag: String = "#5E9BFF",
+    val colorTag: String = "#4E6542",
     val notes: String = "",
     val subtasks: List<Subtask> = emptyList(),
     val timeOfDay: TimeOfDay = TimeOfDay.MORNING,
@@ -131,6 +134,9 @@ class AddEditTimelineViewModel @Inject constructor(
                         colorTag = habit.colorTag,
                         timeOfDay = habit.timeOfDay,
                         repeatDays = habit.repeatDays,
+                        startDate = habit.startDate ?: DateUtils.formatDateIso(DateUtils.today()),
+                        endDate = habit.endDate,
+                        isIndefinite = habit.isIndefinite,
                         recurrenceType = "DAILY",
                         isEditMode = true,
                         isLoading = false
@@ -148,6 +154,29 @@ class AddEditTimelineViewModel @Inject constructor(
     }
 
     fun setTitle(title: String) { _uiState.value = _uiState.value.copy(title = title) }
+
+    fun setStartDate(date: String) { _uiState.value = _uiState.value.copy(startDate = date) }
+    fun setEndDate(date: String?) { _uiState.value = _uiState.value.copy(endDate = date) }
+    fun setIsIndefinite(indefinite: Boolean) { _uiState.value = _uiState.value.copy(isIndefinite = indefinite) }
+
+    fun applySmartParse(parsed: com.habitflow.app.core.util.ParsedTaskResult) {
+        val current = _uiState.value
+        val hasTime = parsed.startTime != null
+        val start = parsed.startTime ?: current.startTime
+        val end = parsed.endTime ?: current.endTime
+        val dur = parsed.isEstimatedDurationMinutes ?: calculateDuration(start, end)
+        val dateStr = parsed.date?.let { com.habitflow.app.core.util.DateUtils.formatDateIso(it) } ?: current.date
+
+        _uiState.value = current.copy(
+            title = parsed.cleanTitle,
+            date = dateStr,
+            hasTime = hasTime || current.hasTime,
+            startTime = start,
+            endTime = end,
+            durationMinutes = dur
+        )
+    }
+
     fun setDate(date: String) { _uiState.value = _uiState.value.copy(date = date) }
     fun setHasTime(hasTime: Boolean) { _uiState.value = _uiState.value.copy(hasTime = hasTime) }
 
@@ -227,7 +256,7 @@ class AddEditTimelineViewModel @Inject constructor(
 
         viewModelScope.launch {
             if (state.creationType == CreationType.HABIT) {
-                // Save as recurring habit
+                // Save as recurring habit with start and final date / infinity support
                 val habit = Habit(
                     id = state.id,
                     name = state.title.trim(),
@@ -235,6 +264,9 @@ class AddEditTimelineViewModel @Inject constructor(
                     colorTag = state.colorTag,
                     timeOfDay = state.timeOfDay,
                     repeatDays = state.repeatDays,
+                    startDate = state.startDate,
+                    endDate = if (state.isIndefinite) null else state.endDate,
+                    isIndefinite = state.isIndefinite,
                     reminderTimeMinutes = if (state.hasTime) {
                         val parsed = try { LocalTime.parse(state.startTime) } catch (_: Exception) { LocalTime.of(8, 0) }
                         parsed.hour * 60 + parsed.minute

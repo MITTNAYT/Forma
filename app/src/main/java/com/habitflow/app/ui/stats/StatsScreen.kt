@@ -325,7 +325,7 @@ fun StatsScreen(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            FocusTimeTab.values().forEach { tab ->
+                            FocusTimeTab.entries.forEach { tab ->
                                 val isSelected = selectedTimeTab == tab
                                 val bg by animateColorAsState(
                                     targetValue = if (isSelected) colors.accent else Color.Transparent,

@@ -47,19 +47,19 @@ fun HabitFlowNavGraph(
         startDestination = Screen.Home.route,
         modifier = modifier,
         enterTransition = {
-            fadeIn(animationSpec = tween(300, easing = LinearOutSlowInEasing)) +
-            scaleIn(initialScale = 0.98f, animationSpec = tween(300, easing = FastOutSlowInEasing))
+            fadeIn(animationSpec = tween(180, easing = LinearOutSlowInEasing)) +
+            scaleIn(initialScale = 0.985f, animationSpec = tween(180, easing = FastOutSlowInEasing))
         },
         exitTransition = {
-            fadeOut(animationSpec = tween(250, easing = FastOutSlowInEasing)) +
-            scaleOut(targetScale = 1.02f, animationSpec = tween(250, easing = FastOutSlowInEasing))
+            fadeOut(animationSpec = tween(140, easing = FastOutSlowInEasing)) +
+            scaleOut(targetScale = 1.01f, animationSpec = tween(140, easing = FastOutSlowInEasing))
         },
         popEnterTransition = {
-            fadeIn(animationSpec = tween(220, easing = LinearOutSlowInEasing)) +
-            scaleIn(initialScale = 0.98f, animationSpec = tween(220, easing = FastOutSlowInEasing))
+            fadeIn(animationSpec = tween(160, easing = LinearOutSlowInEasing)) +
+            scaleIn(initialScale = 0.985f, animationSpec = tween(160, easing = FastOutSlowInEasing))
         },
         popExitTransition = {
-            fadeOut(animationSpec = tween(180, easing = FastOutSlowInEasing))
+            fadeOut(animationSpec = tween(120, easing = FastOutSlowInEasing))
         }
     ) {
         // Tab 1: Home (Behance Minimal Habit Dashboard)
@@ -96,14 +96,14 @@ fun HabitFlowNavGraph(
             enterTransition = {
                 slideInVertically(
                     initialOffsetY = { it / 8 },
-                    animationSpec = tween(300, easing = FastOutSlowInEasing)
-                ) + fadeIn(animationSpec = tween(250, easing = LinearOutSlowInEasing))
+                    animationSpec = tween(220, easing = FastOutSlowInEasing)
+                ) + fadeIn(animationSpec = tween(180, easing = LinearOutSlowInEasing))
             },
             exitTransition = {
                 slideOutVertically(
                     targetOffsetY = { it / 8 },
-                    animationSpec = tween(250, easing = FastOutSlowInEasing)
-                ) + fadeOut(animationSpec = tween(200, easing = FastOutSlowInEasing))
+                    animationSpec = tween(180, easing = FastOutSlowInEasing)
+                ) + fadeOut(animationSpec = tween(150, easing = FastOutSlowInEasing))
             }
         ) {
             AddEditTimelineItemScreen(
@@ -147,14 +147,14 @@ fun HabitFlowNavGraph(
             enterTransition = {
                 slideInVertically(
                     initialOffsetY = { it / 8 },
-                    animationSpec = tween(300, easing = FastOutSlowInEasing)
-                ) + fadeIn(animationSpec = tween(250, easing = LinearOutSlowInEasing))
+                    animationSpec = tween(220, easing = FastOutSlowInEasing)
+                ) + fadeIn(animationSpec = tween(180, easing = LinearOutSlowInEasing))
             },
             exitTransition = {
                 slideOutVertically(
                     targetOffsetY = { it / 8 },
-                    animationSpec = tween(250, easing = FastOutSlowInEasing)
-                ) + fadeOut(animationSpec = tween(200, easing = FastOutSlowInEasing))
+                    animationSpec = tween(180, easing = FastOutSlowInEasing)
+                ) + fadeOut(animationSpec = tween(150, easing = FastOutSlowInEasing))
             }
         ) {
             AddEditTimelineItemScreen(

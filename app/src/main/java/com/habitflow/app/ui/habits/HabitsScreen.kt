@@ -116,7 +116,7 @@ fun HabitsScreen(
                 )
 
                 // Time of Day chips
-                TimeOfDay.values().forEach { tod ->
+                TimeOfDay.entries.forEach { tod ->
                     FilterChip(
                         text = tod.displayName,
                         isSelected = !uiState.showArchived && uiState.selectedTimeOfDayFilter == tod,

@@ -8,6 +8,8 @@
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
     <application
         android:name=".HabitFlowApplication"
@@ -31,7 +33,48 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!-- Deep Link Filter for Shortcuts & Widgets -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="forma" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
         </activity>
+
+        <!-- Ambient Sound Background Foreground Service -->
+        <service
+            android:name=".core.audio.AmbientSoundService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
+
+        <!-- Quick Settings Tiles -->
+        <service
+            android:name=".core.tile.ZenBreatheTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_launcher_foreground"
+            android:label="Zen Breathe"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".core.tile.ZenFocusTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_launcher_foreground"
+            android:label="Zen Focus"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
 
         <receiver
             android:name=".core.notification.HabitAlarmReceiver"
@@ -39,6 +82,10 @@
 
         <receiver
             android:name=".core.notification.TaskAlarmReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".core.notification.FocusActionReceiver"
             android:exported="false" />
 
         <receiver
@@ -50,6 +97,26 @@
             </intent-filter>
         </receiver>
 
+        <!-- Interactive Habit List Widget (4x2 / 3x2) -->
+        <receiver
+            android:name=".core.widget.HabitListWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_habit_list_info" />
+        </receiver>
+
+        <service
+            android:name=".core.widget.HabitListWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <receiver
+            android:name=".core.widget.WidgetActionReceiver"
+            android:exported="false" />
+
         <!-- Home Screen App Widget -->
         <receiver
             android:name=".core.widget.HabitFlowWidgetProvider"
@@ -60,6 +127,18 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/habitflow_widget_info" />
+        </receiver>
+
+        <!-- Ensō Ring 2x2 Widget -->
+        <receiver
+            android:name=".core.widget.EnsoRingWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/enso_ring_widget_info" />
         </receiver>
 
         <!-- Disable default WorkManager initializer to use HiltWorkerFactory cleanly -->
@@ -77,3 +156,4 @@
     </application>
 
 </manifest>
+

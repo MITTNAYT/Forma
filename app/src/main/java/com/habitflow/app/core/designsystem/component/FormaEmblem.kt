@@ -140,7 +140,7 @@ fun FormaEmblem(
             val cx = w / 2f
             val cy = h / 2f
 
-            val strokeWidth = w * 0.092f
+            val strokeWidth = w * 0.098f
             val ss = settleScale.value
             val ga = glyphAlpha.value
 
@@ -161,37 +161,51 @@ fun FormaEmblem(
 
             // ── 2. Expanding Zen Water Ripple ──────────────────────────
             if (rippleAlpha.value > 0f) {
-                val rr = w * 0.52f * rippleRadius.value
+                val rr = w * 0.50f * rippleRadius.value
                 drawCircle(
-                    color = glyphColor.copy(alpha = rippleAlpha.value * 0.6f),
+                    color = glyphColor.copy(alpha = rippleAlpha.value * 0.5f),
                     radius = rr.coerceAtLeast(1f),
                     center = Offset(cx, cy),
-                    style = Stroke(width = strokeWidth * 0.18f)
-                )
-            }
-
-            // ── 3. Zen Ensō Arc Path (Open Circular Brushstroke) ────────
-            val rx = w * 0.34f
-            val ry = h * 0.33f
-
-            val ensoPath = Path().apply {
-                // Organic calligraphic sweep from ~44° clockwise around to ~14°
-                arcTo(
-                    rect = Rect(
-                        left = cx - rx,
-                        top = cy - ry,
-                        right = cx + rx,
-                        bottom = cy + ry
-                    ),
-                    startAngleDegrees = 44f,
-                    sweepAngleDegrees = 320f,
-                    forceMoveTo = true
+                    style = Stroke(width = strokeWidth * 0.16f)
                 )
             }
 
             withTransform({
                 scale(ss, ss, Offset(cx, cy))
             }) {
+                // ── 3. Inner Pale Jade Disc (Plateau) ──────────────────
+                val innerRadius = w * 0.218f
+                drawCircle(
+                    color = Color(0xFFEDF3EB).copy(alpha = ga),
+                    radius = innerRadius,
+                    center = Offset(cx, cy)
+                )
+                // Delicate Contour Ring
+                drawCircle(
+                    color = Color(0xFFA0B39A).copy(alpha = 0.85f * ga),
+                    radius = innerRadius,
+                    center = Offset(cx, cy),
+                    style = Stroke(width = strokeWidth * 0.12f)
+                )
+
+                // ── 4. Zen Ensō Arc Path (Open Circular Brushstroke) ────
+                val rx = w * 0.273f
+                val ry = h * 0.273f
+
+                val ensoPath = Path().apply {
+                    arcTo(
+                        rect = Rect(
+                            left = cx - rx,
+                            top = cy - ry,
+                            right = cx + rx,
+                            bottom = cy + ry
+                        ),
+                        startAngleDegrees = 42f,
+                        sweepAngleDegrees = 320f,
+                        forceMoveTo = true
+                    )
+                }
+
                 val pathMeasure = PathMeasure()
                 pathMeasure.setPath(ensoPath, false)
                 val totalLength = pathMeasure.length
@@ -225,26 +239,20 @@ fun FormaEmblem(
                     }
                 }
 
-                // ── 4. Balanced Center Pebble / Mindful Core ───────────
-                val pebbleRadius = (strokeWidth * 0.42f) * centerPebblePulse
-                // Soft glow
+                // ── 5. Balanced Center Target Ring ─────────────────────
+                val targetRadius = (w * 0.039f) * centerPebblePulse
+                // Fill center with oat background tone
                 drawCircle(
-                    color = auraColor.copy(alpha = 0.5f * ga),
-                    radius = pebbleRadius * 1.8f,
+                    color = Color(0xFFF7F8F4).copy(alpha = ga),
+                    radius = targetRadius,
                     center = Offset(cx, cy)
                 )
-                // Center Zen Stone / Pearl
+                // Matcha Outer Ring
                 drawCircle(
-                    color = pearlColor.copy(alpha = ga),
-                    radius = pebbleRadius,
-                    center = Offset(cx, cy)
-                )
-                // Delicate Matcha Border
-                drawCircle(
-                    color = glyphColor.copy(alpha = 0.8f * ga),
-                    radius = pebbleRadius,
+                    color = glyphColor.copy(alpha = ga),
+                    radius = targetRadius,
                     center = Offset(cx, cy),
-                    style = Stroke(width = strokeWidth * 0.12f)
+                    style = Stroke(width = strokeWidth * 0.15f)
                 )
             }
         }

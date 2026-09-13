@@ -4,8 +4,8 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Clean Minimalist Oat Backdrop matching Splash Background -->
+    <!-- Clean Zen Oat Backdrop matching uploaded icon -->
     <path
-        android:fillColor="#F6F5F0"
+        android:fillColor="#F7F8F4"
         android:pathData="M0,0h108v108h-108z" />
 </vector>

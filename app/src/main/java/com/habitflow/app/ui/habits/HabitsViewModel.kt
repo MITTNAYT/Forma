@@ -47,8 +47,9 @@ class HabitsViewModel @Inject constructor(
         _showArchived
     ) { allHabits, allCompletions, filter, showArchived ->
 
+        val completionsByHabit = allCompletions.groupBy { it.habitId }
         val streaks = allHabits.associate { habit ->
-            val completions = allCompletions.filter { it.habitId == habit.id }
+            val completions = completionsByHabit[habit.id] ?: emptyList()
             habit.id to calculateStreakUseCase(habit, completions)
         }
 

@@ -25,6 +25,9 @@ class GetTodayTimelineUseCase @Inject constructor(
             timelineRepository.getTimelineItemsForDate(dateIso)
         ) { habits, allCompletions, timelineItems ->
 
+            val completionsByHabit = allCompletions.groupBy { it.habitId }
+            val completedDatesByHabit = completionsByHabit.mapValues { (_, list) -> list.map { it.date }.toSet() }
+
             val completionsForDate = allCompletions.filter { it.date == dateIso }
             val completedHabitIds = completionsForDate.map { it.habitId }.toSet()
             val completionsMap = completionsForDate.associateBy { it.habitId }
@@ -34,16 +37,16 @@ class GetTodayTimelineUseCase @Inject constructor(
                 habit.repeatDays.isEmpty() || habit.repeatDays.contains(dayOfWeekInt)
             }
 
-            // Create habit schedule items with streak info
+            // Create habit schedule items with fast streak info
             val habitScheduleItems: List<TodayScheduleItem.HabitItem> = scheduledHabits.map { habit ->
-                val habitCompletions = allCompletions.filter { it.habitId == habit.id }
-                val streakInfo = calculateStreakUseCase(habit, habitCompletions, date)
+                val completedDates = completedDatesByHabit[habit.id] ?: emptySet()
+                val currentStreak = calculateStreakUseCase.calculateCurrentStreak(habit, completedDates, date)
                 val isDone = completedHabitIds.contains(habit.id)
 
                 TodayScheduleItem.HabitItem(
                     habit = habit,
                     isDoneToday = isDone,
-                    currentStreak = streakInfo.currentStreak,
+                    currentStreak = currentStreak,
                     completionId = completionsMap[habit.id]?.id
                 )
             }

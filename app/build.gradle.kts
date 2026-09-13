@@ -48,8 +48,8 @@ android {
 
     buildTypes {
         debug {
-            isMinifyEnabled = true
-            isShrinkResources = true
+            isMinifyEnabled = false
+            isShrinkResources = false
             ndk {
                 abiFilters.clear()
                 abiFilters.add("armeabi-v7a")

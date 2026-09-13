@@ -10,6 +10,9 @@ import com.habitflow.app.domain.repository.FocusTrackerRepository
 import com.habitflow.app.domain.repository.TimelineRepository
 import com.habitflow.app.domain.usecase.GetTodayTimelineUseCase
 import com.habitflow.app.domain.usecase.ToggleHabitCompletionUseCase
+import com.habitflow.app.core.notification.FocusActionBus
+import com.habitflow.app.core.notification.FocusActionEvent
+import com.habitflow.app.core.notification.FocusNotificationManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -41,7 +44,9 @@ class PomodoroViewModel @Inject constructor(
     private val getTodayTimelineUseCase: GetTodayTimelineUseCase,
     private val toggleHabitCompletionUseCase: ToggleHabitCompletionUseCase,
     private val timelineRepository: TimelineRepository,
-    private val ambientSoundManager: AmbientSoundManager
+    private val ambientSoundManager: AmbientSoundManager,
+    private val focusNotificationManager: FocusNotificationManager,
+    private val focusActionBus: FocusActionBus
 ) : ViewModel() {
 
     private val _selectedMode = MutableStateFlow(PomodoroMode.FOCUS)
@@ -64,6 +69,18 @@ class PomodoroViewModel @Inject constructor(
 
     private val _selectedItem = MutableStateFlow<TodayScheduleItem?>(null)
     val selectedItem: StateFlow<TodayScheduleItem?> = _selectedItem.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            focusActionBus.events.collect { event ->
+                when (event) {
+                    is FocusActionEvent.Pause -> pauseTimer()
+                    is FocusActionEvent.Resume -> startTimer()
+                    is FocusActionEvent.Complete -> finishAndLog()
+                }
+            }
+        }
+    }
 
     val todaySchedule = getTodayTimelineUseCase(DateUtils.today())
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
@@ -114,6 +131,8 @@ class PomodoroViewModel @Inject constructor(
             ambientSoundManager.play(_selectedSound.value)
         }
 
+        updateNotification()
+
         timerJob?.cancel()
         timerJob = viewModelScope.launch {
             while (_isRunning.value && _timeRemainingSeconds.value > 0) {
@@ -122,6 +141,9 @@ class PomodoroViewModel @Inject constructor(
                 if (_selectedMode.value == PomodoroMode.FOCUS) {
                     _secondsElapsedThisSession.value += 1
                 }
+
+                // Update notification every second
+                updateNotification()
 
                 if (_timeRemainingSeconds.value <= 0) {
                     _isRunning.value = false
@@ -135,21 +157,51 @@ class PomodoroViewModel @Inject constructor(
         _isRunning.value = false
         timerJob?.cancel()
         ambientSoundManager.stop()
+        if (_timeRemainingSeconds.value < _totalDurationSeconds.value && _timeRemainingSeconds.value > 0) {
+            updateNotification()
+        } else {
+            focusNotificationManager.dismissFocusNotification()
+        }
     }
 
     fun resetTimer() {
         pauseTimer()
         _timeRemainingSeconds.value = _totalDurationSeconds.value
         _secondsElapsedThisSession.value = 0
+        focusNotificationManager.dismissFocusNotification()
     }
 
     fun addFiveMinutes() {
         _totalDurationSeconds.value += 300
         _timeRemainingSeconds.value += 300
+        if (_isRunning.value) updateNotification()
+    }
+
+    fun subtractFiveMinutes() {
+        val newTotal = (_totalDurationSeconds.value - 300).coerceAtLeast(60)
+        val newRemaining = (_timeRemainingSeconds.value - 300).coerceAtLeast(1)
+        _totalDurationSeconds.value = newTotal
+        _timeRemainingSeconds.value = newRemaining
+        if (_isRunning.value) updateNotification()
+    }
+
+    private fun updateNotification() {
+        val title = when (val item = _selectedItem.value) {
+            is TodayScheduleItem.HabitItem -> item.habit.name
+            is TodayScheduleItem.TimelineBlock -> item.item.title
+            null -> _selectedMode.value.title
+        }
+        focusNotificationManager.updateFocusNotification(
+            taskTitle = title,
+            remainingSeconds = _timeRemainingSeconds.value,
+            totalSeconds = _totalDurationSeconds.value,
+            isRunning = _isRunning.value
+        )
     }
 
     private suspend fun onTimerFinished() {
         ambientSoundManager.stop()
+        focusNotificationManager.dismissFocusNotification()
         saveAndLogSession()
         _eventFlow.emit(PomodoroUiEvent.ShowToast("Flow session complete! Great focus."))
         _eventFlow.emit(PomodoroUiEvent.SessionFinished)
@@ -157,6 +209,7 @@ class PomodoroViewModel @Inject constructor(
 
     fun finishAndLog() {
         pauseTimer()
+        focusNotificationManager.dismissFocusNotification()
         viewModelScope.launch {
             saveAndLogSession()
             _eventFlow.emit(PomodoroUiEvent.ShowToast("Focus session logged successfully."))
@@ -201,5 +254,6 @@ class PomodoroViewModel @Inject constructor(
         super.onCleared()
         timerJob?.cancel()
         ambientSoundManager.stop()
+        focusNotificationManager.dismissFocusNotification()
     }
 }

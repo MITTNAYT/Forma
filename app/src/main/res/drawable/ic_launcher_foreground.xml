@@ -5,24 +5,32 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- 1. Zen Breathing Ambient Aura (Soft Matcha) -->
+    <!-- 1. Inner Jade Meditation Plateau Disc (#EDF3EB with #9FB399 border) -->
     <path
-        android:fillColor="#E8EFE5"
-        android:pathData="M 54,16 A 38,38 0 1,1 53.99,16 Z" />
+        android:fillColor="#EDF3EB"
+        android:strokeColor="#9FB399"
+        android:strokeWidth="1.2"
+        android:pathData="M 54,34.5 A 19.5,19.5 0 1,1 53.99,34.5 Z" />
 
-    <!-- 2. The Zen Ensō Flow (Open Circular Brushstroke) -->
+    <!-- 2. Subtle Concentric Aura Ring (#C4D4C0) -->
     <path
-        android:strokeColor="#637852"
-        android:strokeWidth="9.6"
+        android:strokeColor="#C4D4C0"
+        android:strokeWidth="0.9"
+        android:pathData="M 54,41.5 A 12.5,12.5 0 1,1 53.99,41.5 Z" />
+
+    <!-- 3. The Pure Zen Ensō Arc (Deep Matcha #4E6542, 4K Vector Precision) -->
+    <path
+        android:strokeColor="#4E6542"
+        android:strokeWidth="8.6"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
-        android:pathData="M 80.41,78.76 C 68.04,91.2 48.24,93.22 33.47,83.55 C 18.69,73.88 13.21,55.3 20.45,39.5 C 27.7,23.7 45.59,15.23 62.88,19.42 C 80.17,23.6 91.87,39.23 90.63,56.49" />
+        android:pathData="M 78.11,63.74 A 26,26 0 1,1 78.11,44.26" />
 
-    <!-- 3. Balanced Center Stone / Luminous Pearl Core -->
+    <!-- 4. Concentric Zen Core Ring (#4E6542 on #F7F8F4) -->
     <path
-        android:fillColor="#FFFFFF"
-        android:strokeColor="#637852"
-        android:strokeWidth="1.8"
-        android:pathData="M 54,49.5 A 4.5,4.5 0 1,1 53.99,49.5 Z" />
+        android:fillColor="#F7F8F4"
+        android:strokeColor="#4E6542"
+        android:strokeWidth="1.6"
+        android:pathData="M 54,50.4 A 3.6,3.6 0 1,1 53.99,50.4 Z" />
 
 </vector>

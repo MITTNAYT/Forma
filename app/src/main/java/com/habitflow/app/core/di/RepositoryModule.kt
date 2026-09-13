@@ -57,4 +57,11 @@ abstract class RepositoryModule {
     abstract fun bindFocusTrackerRepository(
         focusTrackerRepositoryImpl: FocusTrackerRepositoryImpl
     ): FocusTrackerRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindDailyReflectionRepository(
+        dailyReflectionRepositoryImpl: com.habitflow.app.data.repository.DailyReflectionRepositoryImpl
+    ): com.habitflow.app.domain.repository.DailyReflectionRepository
 }
+

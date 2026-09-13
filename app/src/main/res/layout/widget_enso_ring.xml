@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/enso_widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_widget_card"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <!-- Center Zen Ring & Icon -->
+    <FrameLayout
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_gravity="center">
+
+        <ImageView
+            android:id="@+id/enso_widget_icon"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="center"
+            android:contentDescription="Ensō Ring"
+            android:src="@drawable/ic_launcher_foreground" />
+    </FrameLayout>
+
+    <!-- App Name / Label -->
+    <TextView
+        android:id="@+id/enso_widget_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:fontFamily="sans-serif-medium"
+        android:letterSpacing="0.08"
+        android:text="FORMA"
+        android:textColor="@color/matcha_dark"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <!-- Subtitle / Stats -->
+    <TextView
+        android:id="@+id/enso_widget_subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:fontFamily="sans-serif"
+        android:text="Mindful Flow"
+        android:textColor="@color/notion_text_secondary_light"
+        android:textSize="10sp" />
+
+</LinearLayout>

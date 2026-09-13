@@ -5,17 +5,34 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Zen Ensō Circle Silhouette for Material You -->
-    <path
-        android:strokeColor="#000000"
-        android:strokeWidth="9.6"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round"
-        android:pathData="M 80.41,78.76 C 68.04,91.2 48.24,93.22 33.47,83.55 C 18.69,73.88 13.21,55.3 20.45,39.5 C 27.7,23.7 45.59,15.23 62.88,19.42 C 80.17,23.6 91.87,39.23 90.63,56.49" />
-
-    <!-- Balanced Zen Stone / Pearl Silhouette -->
+    <!-- 1. Inner Jade Meditation Plateau Disc -->
     <path
         android:fillColor="#000000"
-        android:pathData="M 54,49.5 A 4.5,4.5 0 1,1 53.99,49.5 Z" />
+        android:fillAlpha="0.12"
+        android:strokeColor="#000000"
+        android:strokeAlpha="0.30"
+        android:strokeWidth="1.2"
+        android:pathData="M 54,34.5 A 19.5,19.5 0 1,1 53.99,34.5 Z" />
+
+    <!-- 2. Subtle Concentric Aura Ring -->
+    <path
+        android:strokeColor="#000000"
+        android:strokeAlpha="0.20"
+        android:strokeWidth="0.9"
+        android:pathData="M 54,41.5 A 12.5,12.5 0 1,1 53.99,41.5 Z" />
+
+    <!-- 3. The Pure Zen Ensō Arc -->
+    <path
+        android:strokeColor="#000000"
+        android:strokeWidth="8.6"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M 78.11,63.74 A 26,26 0 1,1 78.11,44.26" />
+
+    <!-- 4. Concentric Zen Core Ring -->
+    <path
+        android:strokeColor="#000000"
+        android:strokeWidth="1.6"
+        android:pathData="M 54,50.4 A 3.6,3.6 0 1,1 53.99,50.4 Z" />
 
 </vector>

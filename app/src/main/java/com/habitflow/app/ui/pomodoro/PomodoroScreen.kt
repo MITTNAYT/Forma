@@ -3,7 +3,6 @@ package com.habitflow.app.ui.pomodoro
 import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
@@ -12,7 +11,6 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -34,13 +32,19 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Air
 import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.GraphicEq
 import androidx.compose.material.icons.rounded.MoreTime
+import androidx.compose.material.icons.rounded.NotificationsActive
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Spa
 import androidx.compose.material.icons.rounded.Timer
+import androidx.compose.material.icons.rounded.VolumeOff
+import androidx.compose.material.icons.rounded.WaterDrop
+import androidx.compose.material.icons.rounded.Waves
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -56,6 +60,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -103,7 +108,7 @@ fun PomodoroScreen(
 
     val totalMinutesToday = (totalFocusToday + secondsElapsed) / 60
 
-    // Ambient breathing pulse when active session is flowing
+    // Ambient breathing pulses & aura rings for deep flow state
     val infiniteTransition = rememberInfiniteTransition(label = "pomodoro_pulse")
     val ambientPulse by infiniteTransition.animateFloat(
         initialValue = 1f,
@@ -113,6 +118,24 @@ fun PomodoroScreen(
             repeatMode = RepeatMode.Reverse
         ),
         label = "ambient_pulse"
+    )
+    val auraPulse1 by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.08f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 3200, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "aura_pulse_1"
+    )
+    val auraPulse2 by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.15f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 4200, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "aura_pulse_2"
     )
 
     LaunchedEffect(Unit) {
@@ -183,7 +206,7 @@ fun PomodoroScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        PomodoroMode.values().forEach { mode ->
+                        PomodoroMode.entries.forEach { mode ->
                             val isSelected = selectedMode == mode
                             val bg by animateColorAsState(
                                 targetValue = if (isSelected) colors.accent else Color.Transparent,
@@ -326,7 +349,7 @@ fun PomodoroScreen(
 
             item { Spacer(modifier = Modifier.height(28.dp)) }
 
-            // 4. Hero Dial Clock Ring
+            // 4. Hero Dial Clock Ring with Concentric Breathing Aura
             item {
                 androidx.compose.foundation.layout.BoxWithConstraints(
                     modifier = Modifier.fillMaxWidth(),
@@ -340,14 +363,33 @@ fun PomodoroScreen(
 
                     Box(
                         modifier = Modifier
-                            .size(dialSize)
-                            .scale(if (isRunning) ambientPulse else 1f),
+                            .size(dialSize * 1.25f),
                         contentAlignment = Alignment.Center
                     ) {
-                        // Outer Soft Ambient Glow Disc
+                        // Concentric Breathing Aura Rings (When running in flow state)
+                        if (isRunning) {
+                            Box(
+                                modifier = Modifier
+                                    .size(dialSize * 1.22f)
+                                    .scale(auraPulse2)
+                                    .clip(CircleShape)
+                                    .background(colors.accent.copy(alpha = 0.05f))
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .size(dialSize * 1.10f)
+                                    .scale(auraPulse1)
+                                    .clip(CircleShape)
+                                    .background(colors.accent.copy(alpha = 0.09f))
+                                    .border(1.dp, colors.accent.copy(alpha = 0.15f), CircleShape)
+                            )
+                        }
+
+                        // Outer Soft Ambient Disc
                         Box(
                             modifier = Modifier
                                 .size(outerDiscSize)
+                                .scale(if (isRunning) ambientPulse else 1f)
                                 .clip(CircleShape)
                                 .background(colors.surface)
                                 .border(1.dp, colors.border.copy(alpha = 0.6f), CircleShape)
@@ -407,21 +449,21 @@ fun PomodoroScreen(
 
             item { Spacer(modifier = Modifier.height(32.dp)) }
 
-            // 5. Tactile Floating Control Dock
+            // 5. Tactile Floating Control Dock with -5m, Reset, Orb, +5m
             item {
                 Row(
                     modifier = Modifier
                         .clip(RoundedCornerShape(32.dp))
                         .background(colors.surface)
                         .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(32.dp))
-                        .padding(horizontal = 20.dp, vertical = 10.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        .padding(horizontal = 16.dp, vertical = 10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     // Reset Button
                     Box(
                         modifier = Modifier
-                            .size(46.dp)
+                            .size(44.dp)
                             .clip(CircleShape)
                             .background(colors.surfaceVariant)
                             .formaPressEffect(targetScale = 0.88f) {
@@ -434,16 +476,38 @@ fun PomodoroScreen(
                             imageVector = Icons.Rounded.Refresh,
                             contentDescription = "Reset Clock",
                             tint = colors.textPrimary,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(18.dp)
                         )
                     }
 
-                    // Main Central Play/Pause Orb with 3D tactile press feedback
+                    // -5 Min Quick Subtractor
+                    Box(
+                        modifier = Modifier
+                            .height(44.dp)
+                            .clip(RoundedCornerShape(22.dp))
+                            .background(colors.surfaceVariant)
+                            .formaPressEffect(targetScale = 0.92f) {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                viewModel.subtractFiveMinutes()
+                            }
+                            .padding(horizontal = 12.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "-5m",
+                            style = NotionTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = colors.textPrimary,
+                            fontSize = 12.sp
+                        )
+                    }
+
+                    // Main Central Play/Pause Orb with tactile press feedback
                     Box(
                         modifier = Modifier
                             .size(64.dp)
                             .shadow(
-                                elevation = if (isRunning) 12.dp else 6.dp,
+                                elevation = if (isRunning) 10.dp else 4.dp,
                                 shape = CircleShape,
                                 ambientColor = colors.accent.copy(alpha = 0.35f),
                                 spotColor = colors.accent.copy(alpha = 0.45f)
@@ -467,14 +531,14 @@ fun PomodoroScreen(
                     // +5 Min Quick Adder
                     Box(
                         modifier = Modifier
-                            .height(46.dp)
-                            .clip(RoundedCornerShape(23.dp))
+                            .height(44.dp)
+                            .clip(RoundedCornerShape(22.dp))
                             .background(colors.surfaceVariant)
                             .formaPressEffect(targetScale = 0.92f) {
                                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                 viewModel.addFiveMinutes()
                             }
-                            .padding(horizontal = 14.dp),
+                            .padding(horizontal = 12.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -482,9 +546,9 @@ fun PomodoroScreen(
                                 imageVector = Icons.Rounded.MoreTime,
                                 contentDescription = null,
                                 tint = colors.textPrimary,
-                                modifier = Modifier.size(16.dp)
+                                modifier = Modifier.size(15.dp)
                             )
-                            Spacer(modifier = Modifier.width(4.dp))
+                            Spacer(modifier = Modifier.width(3.dp))
                             Text(
                                 text = "+5m",
                                 style = NotionTheme.typography.labelSmall,
@@ -497,58 +561,122 @@ fun PomodoroScreen(
                 }
             }
 
-            item { Spacer(modifier = Modifier.height(20.dp)) }
+            item { Spacer(modifier = Modifier.height(24.dp)) }
 
-            // 6. Ambient Soundscapes
+            // 6. Organized Focus Soundscapes Rail
             item {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp)
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
-                        text = "FOCUS SOUNDSCAPES",
-                        style = NotionTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = colors.textTertiary,
-                        letterSpacing = 1.2.sp,
-                        fontSize = 11.sp,
-                        modifier = Modifier.padding(bottom = 10.dp)
-                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "ORGANIC FOCUS SOUNDSCAPES",
+                            style = NotionTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = colors.textTertiary,
+                            letterSpacing = 1.2.sp,
+                            fontSize = 11.sp
+                        )
+
+                        if (selectedSound != AmbientSound.OFF && isRunning) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                SoundscapeEqualizer(tint = colors.accent)
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = "Synthesizing Live",
+                                    style = NotionTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = colors.accent,
+                                    fontSize = 10.5.sp
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
 
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState())
+                            .padding(horizontal = 20.dp),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        AmbientSound.values().forEach { sound ->
+                        AmbientSound.entries.forEach { sound ->
                             val isSelected = selectedSound == sound
-                            val chipBg by animateColorAsState(
+                            val cardBg by animateColorAsState(
                                 targetValue = if (isSelected) colors.accentSoft else colors.surface,
-                                label = "sound_bg_${sound.name}"
+                                label = "sound_card_bg_${sound.name}"
                             )
-                            val chipBorder = if (isSelected) colors.accent else colors.border.copy(alpha = 0.5f)
+                            val cardBorder = if (isSelected) colors.accent else colors.border.copy(alpha = 0.5f)
+                            val icon = getSoundscapeIcon(sound)
 
                             Box(
                                 modifier = Modifier
-                                    .weight(1f)
-                                    .clip(RoundedCornerShape(14.dp))
-                                    .background(chipBg)
-                                    .border(1.dp, chipBorder, RoundedCornerShape(14.dp))
-                                    .clickable {
+                                    .width(170.dp)
+                                    .clip(RoundedCornerShape(18.dp))
+                                    .background(cardBg)
+                                    .border(1.dp, cardBorder, RoundedCornerShape(18.dp))
+                                    .formaPressEffect(targetScale = 0.95f) {
                                         haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                         viewModel.setAmbientSound(sound)
                                     }
-                                    .padding(vertical = 10.dp),
-                                contentAlignment = Alignment.Center
+                                    .padding(14.dp)
                             ) {
-                                Text(
-                                    text = sound.displayName,
-                                    style = NotionTheme.typography.labelSmall,
-                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                    color = if (isSelected) colors.accent else colors.textPrimary,
-                                    fontSize = 11.sp,
-                                    maxLines = 1
-                                )
+                                Column {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(36.dp)
+                                                .clip(RoundedCornerShape(12.dp))
+                                                .background(if (isSelected) colors.accent else colors.surfaceVariant),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(
+                                                imageVector = icon,
+                                                contentDescription = sound.displayName,
+                                                tint = if (isSelected) colors.onAccent else colors.textPrimary,
+                                                modifier = Modifier.size(18.dp)
+                                            )
+                                        }
+
+                                        if (isSelected && isRunning && sound != AmbientSound.OFF) {
+                                            SoundscapeEqualizer(tint = colors.accent)
+                                        }
+                                    }
+
+                                    Spacer(modifier = Modifier.height(10.dp))
+
+                                    Text(
+                                        text = sound.displayName,
+                                        style = NotionTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (isSelected) colors.accent else colors.textPrimary,
+                                        fontSize = 13.sp,
+                                        maxLines = 1
+                                    )
+
+                                    Spacer(modifier = Modifier.height(2.dp))
+
+                                    Text(
+                                        text = sound.description,
+                                        style = NotionTheme.typography.bodySmall,
+                                        color = colors.textSecondary,
+                                        fontSize = 10.5.sp,
+                                        lineHeight = 14.sp,
+                                        maxLines = 2
+                                    )
+                                }
                             }
                         }
                     }
@@ -631,3 +759,58 @@ fun PomodoroScreen(
         }
     }
 }
+
+@Composable
+private fun SoundscapeEqualizer(tint: Color) {
+    val infiniteTransition = rememberInfiniteTransition(label = "sound_eq")
+    val h1 by infiniteTransition.animateFloat(
+        initialValue = 4f,
+        targetValue = 14f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(450, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "eq_h1"
+    )
+    val h2 by infiniteTransition.animateFloat(
+        initialValue = 12f,
+        targetValue = 6f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(380, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "eq_h2"
+    )
+    val h3 by infiniteTransition.animateFloat(
+        initialValue = 6f,
+        targetValue = 16f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(520, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "eq_h3"
+    )
+
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(2.dp),
+        verticalAlignment = Alignment.Bottom,
+        modifier = Modifier.height(16.dp)
+    ) {
+        Box(modifier = Modifier.width(2.5.dp).height(h1.dp).clip(CircleShape).background(tint))
+        Box(modifier = Modifier.width(2.5.dp).height(h2.dp).clip(CircleShape).background(tint))
+        Box(modifier = Modifier.width(2.5.dp).height(h3.dp).clip(CircleShape).background(tint))
+    }
+}
+
+private fun getSoundscapeIcon(sound: AmbientSound): ImageVector {
+    return when (sound) {
+        AmbientSound.OFF -> Icons.Rounded.VolumeOff
+        AmbientSound.RAIN -> Icons.Rounded.WaterDrop
+        AmbientSound.KYOTO_BELL -> Icons.Rounded.NotificationsActive
+        AmbientSound.ZEN_DRONE -> Icons.Rounded.Spa
+        AmbientSound.FOREST_STREAM -> Icons.Rounded.Waves
+        AmbientSound.BROWN_NOISE -> Icons.Rounded.Air
+        AmbientSound.WHITE_NOISE -> Icons.Rounded.GraphicEq
+    }
+}
+

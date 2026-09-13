@@ -109,6 +109,10 @@ fun TodayScreen(
     var showPaywall by remember { mutableStateOf(false) }
     var showDatePickerDialog by remember { mutableStateOf(false) }
     var showAiPresetSheet by remember { mutableStateOf(false) }
+    var showMorningSheet by remember { mutableStateOf(false) }
+    var showEveningSheet by remember { mutableStateOf(false) }
+    var showBreathingSheet by remember { mutableStateOf(false) }
+    var showGuidedRoutineSheet by remember { mutableStateOf(false) }
     var selectedDetailItem by remember { mutableStateOf<TodayScheduleItem?>(null) }
     var celebrationInfo by remember { mutableStateOf<Pair<String, Int>?>(null) }
     val haptic = LocalHapticFeedback.current
@@ -205,7 +209,12 @@ fun TodayScreen(
                             )
 
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                // AI Plan Pill Button
+                                // Morning Clarity / Evening Wind-down Action Pill
+                                val currentHour = LocalTime.now().hour
+                                val isEvening = currentHour >= 18 || currentHour < 4
+                                val ritualTitle = if (isEvening) "Evening Rest" else "Morning Clarity"
+                                val ritualIcon = if (isEvening) Icons.Rounded.Spa else Icons.Rounded.AutoAwesome
+
                                 Box(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(12.dp))
@@ -213,20 +222,24 @@ fun TodayScreen(
                                         .border(1.dp, colors.accent.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
                                         .formaPressEffect(targetScale = 0.92f) {
                                             haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                            showAiPresetSheet = true
+                                            if (isEvening) {
+                                                showEveningSheet = true
+                                            } else {
+                                                showMorningSheet = true
+                                            }
                                         }
                                         .padding(horizontal = 10.dp, vertical = 7.dp)
                                 ) {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Icon(
-                                            imageVector = Icons.Rounded.AutoAwesome,
-                                            contentDescription = "AI Plan",
+                                            imageVector = ritualIcon,
+                                            contentDescription = ritualTitle,
                                             tint = colors.accent,
                                             modifier = Modifier.size(13.dp)
                                         )
                                         Spacer(modifier = Modifier.width(5.dp))
                                         Text(
-                                            text = "AI Plan",
+                                            text = ritualTitle,
                                             style = NotionTheme.typography.labelSmall,
                                             fontWeight = FontWeight.Bold,
                                             color = colors.accent,
@@ -235,12 +248,58 @@ fun TodayScreen(
                                     }
                                 }
 
-                                Spacer(modifier = Modifier.width(8.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
+
+                                // Zen Rebalance Button
+                                Box(
+                                    modifier = Modifier
+                                        .size(36.dp)
+                                        .clip(CircleShape)
+                                        .background(colors.surface)
+                                        .border(1.dp, colors.border.copy(alpha = 0.6f), CircleShape)
+                                        .formaPressEffect(targetScale = 0.90f) {
+                                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                            viewModel.rebalanceDayTimeline()
+                                        },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Spa,
+                                        contentDescription = "Zen Rebalance",
+                                        tint = colors.accent,
+                                        modifier = Modifier.size(17.dp)
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.width(6.dp))
+
+                                // AI Plan Pill Button
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(colors.surfaceVariant)
+                                        .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
+                                        .formaPressEffect(targetScale = 0.92f) {
+                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                            showAiPresetSheet = true
+                                        }
+                                        .padding(horizontal = 9.dp, vertical = 7.dp)
+                                ) {
+                                    Text(
+                                        text = "AI Plan",
+                                        style = NotionTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = colors.textPrimary,
+                                        fontSize = 11.sp
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.width(6.dp))
 
                                 // Calendar Icon
                                 Box(
                                     modifier = Modifier
-                                        .size(38.dp)
+                                        .size(36.dp)
                                         .clip(CircleShape)
                                         .background(colors.surface)
                                         .border(1.dp, colors.border.copy(alpha = 0.6f), CircleShape)
@@ -254,7 +313,7 @@ fun TodayScreen(
                                         imageVector = Icons.Rounded.CalendarMonth,
                                         contentDescription = "Pick Date",
                                         tint = colors.textPrimary,
-                                        modifier = Modifier.size(18.dp)
+                                        modifier = Modifier.size(17.dp)
                                     )
                                 }
                             }
@@ -360,9 +419,87 @@ fun TodayScreen(
                             totalCount = scheduleItems.size
                         )
                     }
-                }
 
-                item { Spacer(modifier = Modifier.height(24.dp)) }
+                    // Zen Flow Quick Action Bar
+                    item {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 20.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            // Micro-Breathing Pill
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(14.dp))
+                                    .background(colors.surface)
+                                    .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(14.dp))
+                                    .formaPressEffect(targetScale = 0.95f) {
+                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                        showBreathingSheet = true
+                                    }
+                                    .padding(vertical = 10.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Spa,
+                                        contentDescription = "Breathe",
+                                        tint = colors.accent,
+                                        modifier = Modifier.size(15.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(
+                                        text = "Breathe",
+                                        style = NotionTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = colors.textPrimary,
+                                        fontSize = 12.sp
+                                    )
+                                }
+                            }
+
+                            // Flow Sequencer Pill
+                            val habitItems = scheduleItems.filterIsInstance<TodayScheduleItem.HabitItem>()
+                            if (habitItems.isNotEmpty()) {
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .clip(RoundedCornerShape(14.dp))
+                                        .background(colors.accentSoft)
+                                        .border(1.dp, colors.accent.copy(alpha = 0.4f), RoundedCornerShape(14.dp))
+                                    .formaPressEffect(targetScale = 0.95f) {
+                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                        showGuidedRoutineSheet = true
+                                    }
+                                    .padding(vertical = 10.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.AutoAwesome,
+                                        contentDescription = "Flow Mode",
+                                        tint = colors.accent,
+                                        modifier = Modifier.size(15.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(
+                                        text = "Flow Mode",
+                                        style = NotionTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = colors.accent,
+                                        fontSize = 12.sp
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            item { Spacer(modifier = Modifier.height(20.dp)) }
 
                 // 4. Section Label: TODAY'S RITUALS & HABITS
                 item {
@@ -609,7 +746,7 @@ fun TodayScreen(
                     modifier = Modifier.padding(top = 2.dp, bottom = 16.dp)
                 )
 
-                AiPlanPreset.values().forEach { preset ->
+                AiPlanPreset.entries.forEach { preset ->
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -664,7 +801,41 @@ fun TodayScreen(
             }
         }
     }
+
+    if (showMorningSheet) {
+        val reflectionViewModel: com.habitflow.app.ui.reflection.DailyReflectionViewModel = hiltViewModel()
+        com.habitflow.app.ui.reflection.MorningAlignmentSheet(
+            viewModel = reflectionViewModel,
+            onDismiss = { showMorningSheet = false }
+        )
+    }
+
+    if (showEveningSheet) {
+        val reflectionViewModel: com.habitflow.app.ui.reflection.DailyReflectionViewModel = hiltViewModel()
+        com.habitflow.app.ui.reflection.EveningReflectionSheet(
+            viewModel = reflectionViewModel,
+            onDismiss = { showEveningSheet = false }
+        )
+    }
+
+    if (showBreathingSheet) {
+        com.habitflow.app.ui.mindfulness.BreathingExerciseSheet(
+            onDismiss = { showBreathingSheet = false }
+        )
+    }
+
+    if (showGuidedRoutineSheet) {
+        val habitItems = daySchedule?.items?.filterIsInstance<TodayScheduleItem.HabitItem>() ?: emptyList()
+        com.habitflow.app.ui.mindfulness.GuidedRoutineSheet(
+            habits = habitItems,
+            onCompleteHabit = { habitId ->
+                viewModel.completeHabitById(habitId)
+            },
+            onDismiss = { showGuidedRoutineSheet = false }
+        )
+    }
 }
+
 
 @Composable
 fun EmptyPeacefulState(
