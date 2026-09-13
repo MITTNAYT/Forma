@@ -1,124 +1,82 @@
-# HabitFlow (Android)
+# Forma (HabitFlow v2) — Native Android
 
-> **Structured's clean timeline, but habits are never paywalled.**
+> **Structured daily timeline meets mindful habit tracking. Pure Japanese Paper & Tea aesthetic.**
 
-HabitFlow is a native Android application written in Kotlin using Jetpack Compose, Material 3, Room, and Hilt. It combines a visual, time-blocked daily timeline (in the style of the Structured app) with habit-tracking features: free recurring habits, streaks, and a 5-week grayscale completion heatmap.
+Forma is a modern, responsive native Android application built with Kotlin, Jetpack Compose, Material 3, Room, and Hilt. It combines structured, time-blocked daily intention scheduling with recurring rituals, streaks, focus soundscapes, and mindfulness reflections.
 
 ---
 
-## Architecture Overview
+## ✨ Features & Capabilities
 
-HabitFlow adheres to clean **MVVM (Model-View-ViewModel)** and **Unidirectional Data Flow (UDF)**:
+- **🍵 Zen Paper & Tea Design System**:
+  - Warm oat canvas (`#F7F8F4`), matcha green (`#4E6542`), slate, and terracotta accents.
+  - Zero OLED neon spectrum; soothing paper-like textures and mindful typography.
+- **🎨 4K Zen Ensō Adaptive App Icon**:
+  - Android adaptive safe-zone compliant vector icon with concentric jade plateau discs and organic calligraphy arcs.
+- **⚡ Ultra-Responsive & Sub-Millisecond Engine**:
+  - $O(1)$ indexed hash lookup timeline computations ($<1\text{ms}$).
+  - Early-halting streak calculations and zero-allocation `.entries` loops.
+  - Snappy 180ms screen transition curves.
+- **✍️ Premium Add Habit & Intention Composer**:
+  - Live interactive focus glow animations (`animateColorAsState` & `animateDpAsState`).
+  - Animated 1-tap clear button and real-time mindful character counter.
+  - Inline keyboard presentation without modal takeovers.
+  - Habit lifecycle horizon with 1-tap **"Ongoing / Forever (∞)"** switch.
+- **⏱️ Organic Focus Pomodoro**:
+  - Circular zen progress ring with `-5m` and `+5m` adjustment pills.
+  - Built-in soothing soundscapes (*Rain on Tatami*, *Silent Flow*, *Zen Drone*, *Stream*, *Brown Flow*, *White Air*).
+- **🧘 Daily Alignment & Reflection**:
+  - Morning alignment and evening gratitude reflection sheets.
+  - 4-7-8 and box breathing exercise visualizer.
+  - Monthly Zen Summary reports and full JSON / Markdown journal export.
+- **📱 Android System Integrations**:
+  - Home screen Zen Ensō Ring & Ritual List widgets (`AppWidgetProvider`).
+  - Quick Settings Zen Focus and Zen Breathe tiles (`TileService`).
+  - Android 13+ App Shortcuts.
+
+---
+
+## 🏗️ Architecture
+
+Forma strictly adheres to **Clean Architecture** with unidirectional data flow (UDF):
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                          UI Layer                           │
 │  - Jetpack Compose + Navigation Compose                     │
-│  - Notion-inspired Minimalist Monochrome Design System      │
-│  - ViewModels (Today, Habits, AddEditTimeline, Stats, etc.) │
+│  - Emil Kowalski fluid spring physics (formaPressEffect)    │
+│  - ViewModels (Today, Habits, Timeline, Stats, Pomodoro)    │
 └──────────────────────────────┬──────────────────────────────┘
                                │
 ┌──────────────────────────────▼──────────────────────────────┐
 │                        Domain Layer                         │
-│  - Models (Habit, HabitCompletion, TimelineItem, Subtask)   │
-│  - Repository Interfaces (Habit, Timeline, Billing, AI)     │
-│  - Use Cases (GetTodayTimeline, CalculateStreak, PlanDayAi) │
+│  - Models (Habit, HabitCompletion, TimelineItem, Reflection)│
+│  - Repositories (Habit, Timeline, DailyReflection, Billing) │
+│  - UseCases (GetTodayTimeline, CalculateStreak, Stats)      │
 └──────────────────────────────┬──────────────────────────────┘
                                │
 ┌──────────────────────────────▼──────────────────────────────┐
 │                         Data Layer                          │
-│  - Room Database (Entities with UUID, updatedAt, SyncStatus)│
-│  - Database Pre-seeding (3 starter habits + 2 timeline tasks)│
-│  - DataStore Preferences (ThemeMode, Notification prefs)    │
-│  - WorkManager / AlarmManager (Reminders & Alerts)          │
+│  - Room Database v4 (Indexed Habit & Timeline Entities)     │
+│  - DataStore Preferences & WorkManager                      │
+│  - Foreground AmbientSoundService & Notification Channels   │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Design System: "Notion-Inspired Black & White"
+## 🚀 Building & Running
 
-- **Color Palette**:
-  - Light Theme: Background `#FAFAFA`, Surface `#FFFFFF`, Text Primary `#191919`, Secondary `#757575`, Hairline Border `#E5E5E5`.
-  - Dark Theme: Background `#191919`, Surface `#222222`, Text Primary `#FFFFFF`, Secondary `#9E9E9E`, Hairline Border `#333333`.
-  - Accent Color: Single warm terracotta / red `#EB5757` used exclusively for progress indicators, streaks, and primary CTAs.
-- **Structure**: 1px dividers, flat bordered cards (no heavy drop shadows), clean checkbox & ring completion toggles with smooth check animations.
-- **Heatmap**: 5-week (35-day) monochrome consistency grid with intensity levels mapped from subtle gray to deep ink / silver white.
+```bash
+# Clone the repository
+git clone https://github.com/MITTNAYT/habitflow-v2.git
 
----
+# Navigate to directory
+cd "HabitFlow v2"
 
-## Core Screens
-
-1. **Today**: Vertical Structured-style daily timeline merging time-blocked tasks and scheduled habits for any selected day. Live streak indicators, completion toggles, daily progress bar, and AI day planner action.
-2. **Habits**: Complete habit management (creation, editing, archiving, repeat schedule Mon–Sun, energy levels, time of day, and custom reminder alarms).
-3. **Add/Edit Task or Event**: Minimalist task composer with start/end time blocking, checklist subtasks, color tags, notes, and recurrence.
-4. **Stats**: Overall completion rate percentage, active streak, best all-time streak, 5-week grayscale completion heatmap, and per-habit breakdowns.
-5. **Settings & Pro Paywall**: Dynamic theme switcher (System / Light / Dark), notification permission management, and Freemium Pro paywall modal.
-
----
-
-## Freemium Model & Feature Split
-
-| Feature | Free Tier | Pro Tier |
-| :--- | :---: | :---: |
-| **Unlimited Habits & Recurrence** | ✅ Always Free | ✅ |
-| **Unlimited Timeline Tasks & Events** | ✅ Always Free | ✅ |
-| **Streaks & 5-Week Grayscale Heatmap** | ✅ Always Free | ✅ |
-| **Light & Dark Mode** | ✅ Always Free | ✅ |
-| **Scheduled Alarms & Notifications** | ✅ Always Free | ✅ |
-| **AI Day Planning** | — | ⭐️ Pro |
-| **Advanced Productivity & Energy Trends** | — | ⭐️ Pro |
-| **Curated Custom Themes (Nord, Sepia, etc.)** | — | ⭐️ Pro |
-| **Home Screen Widgets** | — | ⭐️ Pro |
-
----
-
-## Extension Points & Plugging in Real Services
-
-### 1. Future Cloud Sync
-Every entity (`HabitEntity`, `HabitCompletionEntity`, `TimelineItemEntity`) has:
-- `id`: Stable UUID string.
-- `updatedAt`: Millisecond epoch timestamp.
-- `syncStatus`: `PENDING`, `SYNCED`, or `FAILED`.
-
-To connect Firebase, Supabase, or a custom backend:
-1. Implement a `SyncWorker` or `RemoteDataSource` that queries records where `syncStatus == PENDING`.
-2. Push changed entities to the backend, update `syncStatus = SYNCED`, and pull new records from remote using `updatedAt > lastSyncTimestamp`.
-
-### 2. Google Play Billing
-The subscription gate is governed by `BillingRepository`.
-- Located at: `app/src/main/java/com/habitflow/app/data/repository/BillingRepositoryImpl.kt`
-- Replace the mock flow with the official Google Play `BillingClient`:
-  - Query in-app / subscription product details for `habitflow_pro_monthly` and `habitflow_pro_lifetime`.
-  - Handle purchase tokens in `PurchasesUpdatedListener`.
-
-### 3. AI Day Planning (LLM Integration)
-The AI scheduler is abstracted behind `AiPlannerRepository`.
-- Located at: `app/src/main/java/com/habitflow/app/data/repository/AiPlannerRepositoryImpl.kt`
-- Replace the mock response with a call to Google Gemini / OpenAI / Anthropic API passing the user's habits, energy levels, and commitments to receive optimized time blocks.
-
----
-
-## How to Build and Run
-
-### Prerequisites
-- **Android Studio Ladybug (2024.2+)** or newer.
-- **JDK 17 or 21** (bundled with Android Studio JBR).
-- **Android SDK Platform 35 / 36**.
-
-### Build via Command Line
-```powershell
-# Run unit tests
-./gradlew testDebugUnitTest
-
-# Assemble debug APK
+# Compile and assemble debug APK
 ./gradlew assembleDebug
+
+# Install on connected device via ADB
+adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
-
-The compiled APK will be located at:
-`app/build/outputs/apk/debug/app-debug.apk`
-
----
-
-## License
-MIT License. Structured timeline & habit tracking — never paywalled.
