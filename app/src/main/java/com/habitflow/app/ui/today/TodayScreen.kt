@@ -77,6 +77,11 @@ import com.habitflow.app.core.designsystem.NotionTheme
 import com.habitflow.app.core.util.DateUtils
 import com.habitflow.app.domain.model.TodayScheduleItem
 import com.habitflow.app.ui.settings.components.ProPaywallBottomSheet
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
+import com.habitflow.app.ui.today.components.InlineQuickEntryBar
 import com.habitflow.app.ui.today.components.BehanceHabitCard
 import com.habitflow.app.ui.today.components.BehanceHeroBanner
 import com.habitflow.app.ui.today.components.DynamicStreakIsland
@@ -162,13 +167,23 @@ fun TodayScreen(
     val startOfWeek = selectedDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
     val weekDays = (0..6).map { startOfWeek.plusDays(it.toLong()) }
 
+    val focusManager = LocalFocusManager.current
+
     Scaffold(
+        modifier = Modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                detectTapGestures(onTap = {
+                    focusManager.clearFocus()
+                })
+            },
         containerColor = colors.background
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .imePadding()
         ) {
             LazyColumn(
                 modifier = Modifier
@@ -574,6 +589,18 @@ fun TodayScreen(
                             .padding(bottom = 8.dp)
                     )
                 }
+
+                // 4b. Inline Quick Entry Bar (Instant In-Place Keyboard Activation)
+                item {
+                    InlineQuickEntryBar(
+                        onQuickAdd = { title, isHabit ->
+                            viewModel.quickAddInlineItem(title, isHabit)
+                        },
+                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp)
+                    )
+                }
+
+                item { Spacer(modifier = Modifier.height(8.dp)) }
 
                 // 5. Mindful Habits & Tasks List
                 if (daySchedule != null) {

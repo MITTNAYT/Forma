@@ -27,6 +27,10 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
 
+import com.habitflow.app.domain.model.Habit
+import com.habitflow.app.domain.model.TimeOfDay
+import com.habitflow.app.domain.repository.HabitRepository
+
 sealed interface TodayUiEvent {
     object ShowProPaywall : TodayUiEvent
     data class ShowToast(val message: String) : TodayUiEvent
@@ -37,6 +41,7 @@ class TodayViewModel @Inject constructor(
     private val getTodayTimelineUseCase: GetTodayTimelineUseCase,
     private val toggleHabitCompletionUseCase: ToggleHabitCompletionUseCase,
     private val timelineRepository: TimelineRepository,
+    private val habitRepository: HabitRepository,
     private val planDayWithAiUseCase: PlanDayWithAiUseCase,
     private val rebalanceTimelineUseCase: com.habitflow.app.domain.usecase.RebalanceTimelineUseCase,
     private val zenFeedback: com.habitflow.app.core.audio.ZenFeedbackManager,
@@ -174,6 +179,35 @@ class TodayViewModel @Inject constructor(
             )
             dailyReflectionRepository.saveReflection(updated)
             _eventFlow.emit(TodayUiEvent.ShowToast("Gratitude note recorded."))
+        }
+    }
+
+    fun quickAddInlineItem(title: String, isHabit: Boolean = false) {
+        if (title.isBlank()) return
+        viewModelScope.launch {
+            val dateIso = DateUtils.formatDateIso(_selectedDate.value)
+            if (isHabit) {
+                val newHabit = Habit(
+                    name = title.trim(),
+                    icon = "target",
+                    colorTag = "#4E6542",
+                    timeOfDay = TimeOfDay.ANYTIME
+                )
+                habitRepository.insertHabit(newHabit)
+                zenFeedback.onHabitCompleted()
+                _eventFlow.emit(TodayUiEvent.ShowToast("Daily ritual '${title.trim()}' created."))
+            } else {
+                val newItem = TimelineItem(
+                    title = title.trim(),
+                    date = dateIso,
+                    icon = "pin",
+                    colorTag = "#2F80ED",
+                    completed = false
+                )
+                timelineRepository.insertTimelineItem(newItem)
+                zenFeedback.onTaskToggled()
+                _eventFlow.emit(TodayUiEvent.ShowToast("Intention '${title.trim()}' added."))
+            }
         }
     }
 }

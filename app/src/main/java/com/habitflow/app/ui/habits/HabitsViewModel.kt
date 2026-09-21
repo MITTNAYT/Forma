@@ -143,6 +143,21 @@ class HabitsViewModel @Inject constructor(
         }
     }
 
+    fun quickAddHabitInline(name: String) {
+        val trimmed = name.trim()
+        if (trimmed.isNotBlank()) {
+            viewModelScope.launch {
+                val newHabit = Habit(
+                    name = trimmed,
+                    colorTag = "#4E6542",
+                    icon = "target",
+                    timeOfDay = _selectedTimeOfDayFilter.value ?: TimeOfDay.ANYTIME
+                )
+                habitRepository.insertHabit(newHabit)
+            }
+        }
+    }
+
     fun deleteHabit(habit: Habit) {
         viewModelScope.launch {
             habitRepository.deleteHabit(habit)

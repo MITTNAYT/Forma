@@ -40,6 +40,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import com.habitflow.app.core.designsystem.NotionTheme
 import com.habitflow.app.core.designsystem.component.NotionButton
 import com.habitflow.app.core.designsystem.component.NotionButtonStyle
@@ -50,6 +54,7 @@ import com.habitflow.app.domain.model.TimeOfDay
 import com.habitflow.app.ui.habits.components.AddEditHabitDialog
 import com.habitflow.app.ui.habits.components.HabitCard
 import com.habitflow.app.ui.habits.components.HabitStackSequencerSheet
+import com.habitflow.app.ui.today.components.InlineQuickEntryBar
 
 @androidx.compose.material3.ExperimentalMaterial3Api
 @Composable
@@ -57,6 +62,7 @@ fun HabitsScreen(
     viewModel: HabitsViewModel = hiltViewModel()
 ) {
     val colors = NotionTheme.colors
+    val focusManager = LocalFocusManager.current
     val uiState by viewModel.uiState.collectAsState()
 
     var showAddEditDialog by remember { mutableStateOf(false) }
@@ -110,12 +116,25 @@ fun HabitsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .imePadding()
+                .pointerInput(Unit) {
+                    detectTapGestures(onTap = { focusManager.clearFocus() })
+                }
         ) {
+            // Quick Inline Habit Creator Bar
+            InlineQuickEntryBar(
+                onQuickAdd = { name, _ ->
+                    viewModel.quickAddHabitInline(name)
+                },
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
+                placeholder = "Add new recurring habit..."
+            )
+
             // Live Search Bar
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .padding(horizontal = 16.dp, vertical = 4.dp)
                     .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
                     .background(colors.surface)
                     .border(1.dp, colors.border.copy(alpha = 0.5f), androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
