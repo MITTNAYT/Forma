@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -53,7 +54,9 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import com.habitflow.app.core.designsystem.motion.FormaMotion
 import com.habitflow.app.core.designsystem.motion.formaPressEffect
+import com.habitflow.app.core.designsystem.motion.formaStaggeredEntrance
 import com.habitflow.app.domain.repository.AiPlanPreset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -611,10 +614,15 @@ fun TodayScreen(
                             )
                         }
                     } else {
-                    items(scheduleItems, key = { it.id }) { scheduleItem ->
-                        BehanceHabitCard(
-                            item = scheduleItem,
-                            onToggle = {
+                        itemsIndexed(
+                            items = scheduleItems,
+                            key = { _, item -> item.id },
+                            contentType = { _, item -> item.javaClass.simpleName }
+                        ) { index, scheduleItem ->
+                            BehanceHabitCard(
+                                item = scheduleItem,
+                                modifier = Modifier.formaStaggeredEntrance(index),
+                                onToggle = {
                                 when (scheduleItem) {
                                     is TodayScheduleItem.HabitItem -> {
                                         if (!scheduleItem.isDoneToday) {

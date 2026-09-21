@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.motion.formaPressEffect
 
 @Composable
 fun NotionCard(
@@ -26,7 +27,7 @@ fun NotionCard(
 ) {
     Surface(
         modifier = modifier.then(
-            if (onClick != null) Modifier.clickable { onClick() } else Modifier
+            if (onClick != null) Modifier.formaPressEffect(targetScale = 0.98f, onClick = onClick) else Modifier
         ),
         shape = shape,
         color = backgroundColor,

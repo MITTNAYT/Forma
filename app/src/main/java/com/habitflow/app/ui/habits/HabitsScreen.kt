@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -48,6 +49,7 @@ import com.habitflow.app.core.designsystem.NotionTheme
 import com.habitflow.app.core.designsystem.component.NotionButton
 import com.habitflow.app.core.designsystem.component.NotionButtonStyle
 import com.habitflow.app.core.designsystem.component.NotionDivider
+import com.habitflow.app.core.designsystem.motion.formaStaggeredEntrance
 import com.habitflow.app.core.designsystem.component.NotionTopAppBar
 import com.habitflow.app.domain.model.Habit
 import com.habitflow.app.domain.model.TimeOfDay
@@ -255,10 +257,15 @@ fun HabitsScreen(
                     contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 80.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(habitList, key = { it.id }) { habit ->
+                    itemsIndexed(
+                        items = habitList,
+                        key = { _, habit -> habit.id },
+                        contentType = { _, _ -> "HabitCard" }
+                    ) { index, habit ->
                         HabitCard(
                             habit = habit,
                             streakInfo = uiState.streaksMap[habit.id],
+                            modifier = Modifier.formaStaggeredEntrance(index),
                             onEdit = {
                                 editingHabit = habit
                                 showAddEditDialog = true

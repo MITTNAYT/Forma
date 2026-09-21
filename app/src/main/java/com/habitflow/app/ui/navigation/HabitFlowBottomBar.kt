@@ -38,6 +38,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -199,7 +200,10 @@ fun HabitFlowBottomBar(
                                         tint = contentColor,
                                         modifier = Modifier
                                             .size(22.dp)
-                                            .scale(iconScale)
+                                            .graphicsLayer {
+                                                scaleX = iconScale
+                                                scaleY = iconScale
+                                            }
                                     )
                                 }
 
@@ -208,9 +212,13 @@ fun HabitFlowBottomBar(
                                     Box(
                                         modifier = Modifier
                                             .size(4.dp)
-                                            .scale(dotScale)
+                                            .graphicsLayer {
+                                                scaleX = dotScale
+                                                scaleY = dotScale
+                                                alpha = dotAlpha
+                                            }
                                             .clip(CircleShape)
-                                            .background(colors.accent.copy(alpha = dotAlpha))
+                                            .background(colors.accent)
                                     )
                                 }
                             }

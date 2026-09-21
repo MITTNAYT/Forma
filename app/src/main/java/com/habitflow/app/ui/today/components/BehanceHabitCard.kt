@@ -46,9 +46,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.motion.FormaMotion
 import com.habitflow.app.core.designsystem.motion.formaPressEffect
 import com.habitflow.app.core.designsystem.icon.HabitFlowIcon
 import com.habitflow.app.domain.model.TodayScheduleItem
+import androidx.compose.ui.graphics.graphicsLayer
 import kotlinx.coroutines.launch
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -129,7 +131,7 @@ fun BehanceHabitCard(
 
     val cardScale by animateFloatAsState(
         targetValue = if (isDone) 0.99f else 1f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium),
+        animationSpec = FormaMotion.snappyFloat,
         label = "card_scale"
     )
 
@@ -140,36 +142,39 @@ fun BehanceHabitCard(
     val handleToggleWithBurst = {
         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
         scope.launch {
-            checkScale.snapTo(0.86f)
+            checkScale.snapTo(0.85f)
             checkScale.animateTo(
-                targetValue = 1.30f,
-                animationSpec = spring(dampingRatio = 0.65f, stiffness = 550f)
+                targetValue = 1.25f,
+                animationSpec = FormaMotion.bouncyFloat
             )
             checkScale.animateTo(
                 targetValue = 1f,
-                animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessMedium)
+                animationSpec = FormaMotion.snappyFloat
             )
         }
         if (!isDone) {
             scope.launch {
                 sparkProgress.snapTo(0f)
-                sparkProgress.animateTo(1f, animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing))
+                sparkProgress.animateTo(1f, animationSpec = tween(durationMillis = 320, easing = FormaMotion.naturalDecelerate))
                 sparkProgress.snapTo(0f)
             }
         }
         onToggle()
     }
 
-    // Warm Clean Card with Emil Kowalski press down response
+    // Warm Clean Card with GPU-accelerated press and scale
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .scale(cardScale)
+            .graphicsLayer {
+                scaleX = cardScale
+                scaleY = cardScale
+            }
             .padding(horizontal = 20.dp, vertical = 6.dp)
             .clip(RoundedCornerShape(22.dp))
             .background(colors.surface)
             .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(22.dp))
-            .formaPressEffect(targetScale = 0.97f) { onClick() }
+            .formaPressEffect(targetScale = 0.975f) { onClick() }
             .padding(horizontal = 16.dp, vertical = 14.dp)
     ) {
         Row(
@@ -307,7 +312,10 @@ fun BehanceHabitCard(
                     // Checkbox Circle
                     Box(
                         modifier = Modifier
-                            .scale(checkScale.value)
+                            .graphicsLayer {
+                                scaleX = checkScale.value
+                                scaleY = checkScale.value
+                            }
                             .size(28.dp)
                             .clip(CircleShape)
                             .background(if (isDone) colors.accent else Color.Transparent)
