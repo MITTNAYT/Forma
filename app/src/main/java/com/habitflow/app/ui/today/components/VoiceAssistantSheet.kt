@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -187,6 +188,7 @@ fun VoiceAssistantSheet(
                 .fillMaxWidth()
                 .fillMaxHeight(0.85f)
                 .navigationBarsPadding()
+                .imePadding()
                 .padding(horizontal = 24.dp, vertical = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -277,6 +279,11 @@ fun VoiceAssistantSheet(
                             parsedAction = parser.parseTranscript(it, activeHabits)
                         },
                         modifier = Modifier.weight(1f),
+                        cursorBrush = androidx.compose.ui.graphics.SolidColor(colors.accent),
+                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                            capitalization = androidx.compose.ui.text.input.KeyboardCapitalization.Sentences,
+                            imeAction = androidx.compose.ui.text.input.ImeAction.Done
+                        ),
                         textStyle = NotionTheme.typography.bodyMedium.copy(
                             color = colors.textPrimary,
                             fontSize = 14.sp

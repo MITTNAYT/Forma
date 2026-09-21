@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -74,6 +76,8 @@ fun MorningAlignmentSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .navigationBarsPadding()
+                .imePadding()
                 .padding(horizontal = 24.dp)
                 .padding(bottom = 32.dp)
         ) {
@@ -291,7 +295,11 @@ private fun KeystoneInput(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         singleLine = true,
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+        keyboardOptions = KeyboardOptions(
+            capitalization = androidx.compose.ui.text.input.KeyboardCapitalization.Sentences,
+            autoCorrectEnabled = true,
+            imeAction = ImeAction.Done
+        ),
         keyboardActions = KeyboardActions(onDone = { onDone() }),
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = NotionTheme.colors.accent,
@@ -299,7 +307,8 @@ private fun KeystoneInput(
             focusedContainerColor = NotionTheme.colors.surfaceVariant.copy(alpha = 0.3f),
             unfocusedContainerColor = NotionTheme.colors.surfaceVariant.copy(alpha = 0.3f),
             focusedTextColor = NotionTheme.colors.textPrimary,
-            unfocusedTextColor = NotionTheme.colors.textPrimary
+            unfocusedTextColor = NotionTheme.colors.textPrimary,
+            cursorColor = NotionTheme.colors.accent
         )
     )
 }

@@ -132,6 +132,7 @@ fun HabitsScreen(
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
+                    val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
                     androidx.compose.foundation.text.BasicTextField(
                         value = uiState.searchQuery,
                         onValueChange = { viewModel.setSearchQuery(it) },
@@ -141,6 +142,14 @@ fun HabitsScreen(
                             fontSize = 14.sp
                         ),
                         singleLine = true,
+                        cursorBrush = androidx.compose.ui.graphics.SolidColor(colors.accent),
+                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                            imeAction = androidx.compose.ui.text.input.ImeAction.Search,
+                            autoCorrectEnabled = true
+                        ),
+                        keyboardActions = androidx.compose.foundation.text.KeyboardActions(
+                            onSearch = { focusManager.clearFocus() }
+                        ),
                         decorationBox = { innerTextField ->
                             if (uiState.searchQuery.isEmpty()) {
                                 Text(

@@ -67,10 +67,14 @@ import com.habitflow.app.domain.model.DayCompletionRate
 import com.habitflow.app.domain.model.HabitStreakInfo
 import com.habitflow.app.domain.model.OverallHabitStats
 import com.habitflow.app.domain.repository.FocusItemSummary
+import com.habitflow.app.ui.analytics.components.MindfulInsightsSheet
+import com.habitflow.app.ui.mindfulness.BinauralBreathworkSheet
 import com.habitflow.app.ui.settings.components.ProPaywallBottomSheet
 import com.habitflow.app.ui.stats.components.CommitmentDetailSheet
 import com.habitflow.app.ui.stats.components.HabitMomentumDetailSheet
 import com.habitflow.app.ui.stats.components.RhythmDayDetailSheet
+import com.habitflow.app.ui.stats.components.WeeklyZenRetroSheet
+import com.habitflow.app.ui.stats.components.YearlyParchmentHeatmap
 
 enum class FocusTimeTab(val label: String) {
     WEEK("This Week"),
@@ -95,10 +99,15 @@ fun StatsScreen(
     val selectedCommitment by viewModel.selectedCommitment.collectAsState()
     val selectedHabitStreak by viewModel.selectedHabitStreak.collectAsState()
     val mindfulInsights by viewModel.mindfulInsights.collectAsState()
+    val yearlyCompletions by viewModel.yearlyCompletions.collectAsState()
+    val correlations by viewModel.correlations.collectAsState()
+    val weeklyRetro by viewModel.weeklyRetro.collectAsState()
 
     var selectedTimeTab by remember { mutableStateOf(FocusTimeTab.WEEK) }
     var showPaywall by remember { mutableStateOf(false) }
     var showInsightsSheet by remember { mutableStateOf(false) }
+    var showWeeklyRetroSheet by remember { mutableStateOf(false) }
+    var showBreathworkSheet by remember { mutableStateOf(false) }
 
     val userInitial = userName.trim().take(1).uppercase().ifBlank { "A" }
 
@@ -157,38 +166,96 @@ fun StatsScreen(
                             letterSpacing = (-0.6).sp
                         )
 
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            // Breathwork Pacer Pill
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(14.dp))
+                                    .background(colors.accentSoft)
+                                    .border(1.dp, colors.accent.copy(alpha = 0.35f), RoundedCornerShape(14.dp))
+                                    .clickable { showBreathworkSheet = true }
+                                    .padding(horizontal = 9.dp, vertical = 6.dp)
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Spa,
+                                        contentDescription = "Breathwork",
+                                        tint = colors.accent,
+                                        modifier = Modifier.size(13.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = "Breath",
+                                        style = NotionTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = colors.accent,
+                                        fontSize = 11.sp
+                                    )
+                                }
+                            }
+
+                            // Weekly Zen Retro Pill
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(14.dp))
+                                    .background(colors.surfaceVariant)
+                                    .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(14.dp))
+                                    .clickable { showWeeklyRetroSheet = true }
+                                    .padding(horizontal = 9.dp, vertical = 6.dp)
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.AutoGraph,
+                                        contentDescription = "Retro",
+                                        tint = colors.textPrimary,
+                                        modifier = Modifier.size(13.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = "Retro",
+                                        style = NotionTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = colors.textPrimary,
+                                        fontSize = 11.sp
+                                    )
+                                }
+                            }
+
+                            // AI Insights Pill
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(14.dp))
                                     .background(colors.accentSoft)
                                     .border(1.dp, colors.accent.copy(alpha = 0.4f), RoundedCornerShape(14.dp))
                                     .clickable { showInsightsSheet = true }
-                                    .padding(horizontal = 10.dp, vertical = 7.dp)
+                                    .padding(horizontal = 9.dp, vertical = 6.dp)
                             ) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(
                                         imageVector = Icons.Rounded.AutoAwesome,
                                         contentDescription = "Insights",
                                         tint = colors.accent,
-                                        modifier = Modifier.size(14.dp)
+                                        modifier = Modifier.size(13.dp)
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text(
-                                        text = "Insights",
+                                        text = "AI",
                                         style = NotionTheme.typography.labelSmall,
                                         fontWeight = FontWeight.Bold,
                                         color = colors.accent,
-                                        fontSize = 12.sp
+                                        fontSize = 11.sp
                                     )
                                 }
                             }
 
-                            Spacer(modifier = Modifier.width(8.dp))
+                            Spacer(modifier = Modifier.width(2.dp))
 
                             Box(
                                 modifier = Modifier
-                                    .size(40.dp)
+                                    .size(36.dp)
                                     .clip(CircleShape)
                                     .background(colors.surface)
                                     .border(1.5.dp, colors.accent, CircleShape),
@@ -199,7 +266,7 @@ fun StatsScreen(
                                     style = NotionTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
                                     color = colors.accent,
-                                    fontSize = 15.sp
+                                    fontSize = 14.sp
                                 )
                             }
                         }
@@ -881,8 +948,127 @@ fun StatsScreen(
                         }
                     }
                 }
+
+            item { Spacer(modifier = Modifier.height(24.dp)) }
+
+            // 7b. 365-Day Parchment Heatmap Section
+            item {
+                YearlyParchmentHeatmap(
+                    completionsByDate = yearlyCompletions,
+                    modifier = Modifier.padding(horizontal = 20.dp)
+                )
+            }
+
+            // 7c. Habit Correlation Insights Section
+            if (correlations.isNotEmpty()) {
+                item { Spacer(modifier = Modifier.height(24.dp)) }
+
+                item {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.padding(bottom = 12.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.AutoAwesome,
+                                contentDescription = null,
+                                tint = colors.accent,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Text(
+                                text = "HABIT SYNERGY & CORRELATIONS",
+                                style = NotionTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = colors.textTertiary,
+                                letterSpacing = 1.2.sp,
+                                fontSize = 11.sp
+                            )
+                        }
+
+                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            correlations.take(4).forEach { correlation ->
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(20.dp))
+                                        .background(colors.surface)
+                                        .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(20.dp))
+                                        .padding(16.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Row(
+                                            modifier = Modifier.weight(1f),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                        ) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(42.dp)
+                                                    .clip(RoundedCornerShape(12.dp))
+                                                    .background(colors.accentSoft),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                HabitFlowIcon(
+                                                    iconKey = correlation.primaryHabitIcon,
+                                                    contentDescription = null,
+                                                    tint = colors.accent,
+                                                    modifier = Modifier.size(20.dp)
+                                                )
+                                            }
+
+                                            Column(modifier = Modifier.weight(1f)) {
+                                                Text(
+                                                    text = "${correlation.primaryHabitName} → ${correlation.correlatedFactor}",
+                                                    style = NotionTheme.typography.titleMedium,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = colors.textPrimary,
+                                                    fontSize = 14.sp
+                                                )
+                                                Spacer(modifier = Modifier.height(2.dp))
+                                                Text(
+                                                    text = correlation.insightSummary,
+                                                    style = NotionTheme.typography.bodySmall,
+                                                    color = colors.textSecondary,
+                                                    fontSize = 12.sp,
+                                                    lineHeight = 16.sp
+                                                )
+                                            }
+                                        }
+
+                                        Spacer(modifier = Modifier.width(8.dp))
+
+                                        Box(
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(10.dp))
+                                                .background(if (correlation.isPositive) colors.accentSoft else colors.surfaceVariant)
+                                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                                        ) {
+                                            Text(
+                                                text = if (correlation.impactPercentage > 0) "+${correlation.impactPercentage}%" else "${correlation.impactPercentage}%",
+                                                style = NotionTheme.typography.labelSmall,
+                                                fontWeight = FontWeight.Bold,
+                                                color = if (correlation.isPositive) colors.accent else colors.textSecondary,
+                                                fontSize = 12.sp
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
+    }
 
     if (showPaywall) {
         ProPaywallBottomSheet(onDismiss = { showPaywall = false })
@@ -915,6 +1101,19 @@ fun StatsScreen(
         MindfulInsightsSheet(
             report = mindfulInsights!!,
             onDismiss = { showInsightsSheet = false }
+        )
+    }
+
+    if (showWeeklyRetroSheet && weeklyRetro != null) {
+        WeeklyZenRetroSheet(
+            retro = weeklyRetro!!,
+            onDismiss = { showWeeklyRetroSheet = false }
+        )
+    }
+
+    if (showBreathworkSheet) {
+        BinauralBreathworkSheet(
+            onDismiss = { showBreathworkSheet = false }
         )
     }
 }

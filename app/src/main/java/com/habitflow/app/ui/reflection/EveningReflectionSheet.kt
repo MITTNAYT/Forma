@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -68,6 +70,8 @@ fun EveningReflectionSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .navigationBarsPadding()
+                .imePadding()
                 .padding(horizontal = 24.dp)
                 .padding(bottom = 32.dp)
         ) {
@@ -170,13 +174,18 @@ fun EveningReflectionSheet(
                 shape = RoundedCornerShape(14.dp),
                 singleLine = false,
                 maxLines = 4,
+                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                    capitalization = androidx.compose.ui.text.input.KeyboardCapitalization.Sentences,
+                    autoCorrectEnabled = true
+                ),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = NotionTheme.colors.accent,
                     unfocusedBorderColor = NotionTheme.colors.border,
                     focusedContainerColor = NotionTheme.colors.surfaceVariant.copy(alpha = 0.3f),
                     unfocusedContainerColor = NotionTheme.colors.surfaceVariant.copy(alpha = 0.3f),
                     focusedTextColor = NotionTheme.colors.textPrimary,
-                    unfocusedTextColor = NotionTheme.colors.textPrimary
+                    unfocusedTextColor = NotionTheme.colors.textPrimary,
+                    cursorColor = NotionTheme.colors.accent
                 )
             )
 

@@ -1,22 +1,36 @@
 package com.habitflow.app.ui.stats
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.habitflow.app.core.util.DateUtils
+import com.habitflow.app.domain.model.DailyReflection
 import com.habitflow.app.domain.model.Habit
 import com.habitflow.app.domain.model.HabitCompletion
 import com.habitflow.app.domain.model.HabitStreakInfo
 import com.habitflow.app.domain.model.OverallHabitStats
+import com.habitflow.app.domain.model.TimelineItem
 import com.habitflow.app.domain.repository.BillingRepository
+import com.habitflow.app.domain.repository.DailyReflectionRepository
 import com.habitflow.app.domain.repository.FocusItemSummary
 import com.habitflow.app.domain.repository.FocusTimeStats
 import com.habitflow.app.domain.repository.FocusTrackerRepository
 import com.habitflow.app.domain.repository.HabitRepository
+import com.habitflow.app.domain.repository.TimelineRepository
 import com.habitflow.app.domain.repository.UserPreferencesRepository
+import com.habitflow.app.domain.usecase.CalculateHabitCorrelationsUseCase
 import com.habitflow.app.domain.usecase.CalculateInsightsUseCase
+import com.habitflow.app.domain.usecase.GenerateWeeklyRetroUseCase
 import com.habitflow.app.domain.usecase.GetHabitStatsUseCase
+import com.habitflow.app.domain.usecase.HabitCorrelationInsight
 import com.habitflow.app.domain.usecase.MindfulInsightsReport
+import com.habitflow.app.domain.usecase.WeeklyZenRetro
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.temporal.TemporalAdjusters
+import java.util.Locale
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -24,14 +38,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.temporal.TemporalAdjusters
-import java.util.Locale
-import androidx.compose.runtime.Immutable
 
 @Immutable
 data class DayFocusItem(
@@ -68,7 +77,11 @@ class StatsViewModel @Inject constructor(
     preferencesRepository: UserPreferencesRepository,
     private val focusTrackerRepository: FocusTrackerRepository,
     private val habitRepository: HabitRepository,
-    calculateInsightsUseCase: CalculateInsightsUseCase
+    private val dailyReflectionRepository: DailyReflectionRepository,
+    private val timelineRepository: TimelineRepository,
+    calculateInsightsUseCase: CalculateInsightsUseCase,
+    private val calculateHabitCorrelationsUseCase: CalculateHabitCorrelationsUseCase,
+    private val generateWeeklyRetroUseCase: GenerateWeeklyRetroUseCase
 ) : ViewModel() {
 
     val userName: StateFlow<String> = preferencesRepository.userName
@@ -85,6 +98,32 @@ class StatsViewModel @Inject constructor(
 
     val isPro: StateFlow<Boolean> = billingRepository.isPro
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+    // 365-Day Parchment Heatmap Data
+    val yearlyCompletions: StateFlow<Map<String, Int>> = habitRepository.getAllCompletions()
+        .combine(MutableStateFlow(Unit)) { completions, _ ->
+            completions.groupBy { it.date }.mapValues { it.value.size }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyMap())
+
+    // Habit Correlation Insights
+    val correlations: StateFlow<List<HabitCorrelationInsight>> = combine(
+        habitRepository.getAllHabits(includeArchived = false),
+        habitRepository.getAllCompletions(),
+        dailyReflectionRepository.getRecentReflections(),
+        timelineRepository.getAllTimelineItems()
+    ) { habits: List<Habit>, completions: List<HabitCompletion>, reflections: List<DailyReflection>, timelineItems: List<TimelineItem> ->
+        calculateHabitCorrelationsUseCase(habits, completions, reflections, timelineItems)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    // Weekly Zen Retro
+    val weeklyRetro: StateFlow<WeeklyZenRetro?> = combine(
+        habitRepository.getAllHabits(includeArchived = false),
+        habitRepository.getAllCompletions(),
+        dailyReflectionRepository.getRecentReflections(),
+        timelineRepository.getAllTimelineItems()
+    ) { habits: List<Habit>, completions: List<HabitCompletion>, reflections: List<DailyReflection>, timelineItems: List<TimelineItem> ->
+        generateWeeklyRetroUseCase(habits, completions, reflections, timelineItems)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     // Week offset for Focus Investment (0 = this week, -1 = last week, etc.)
     private val _weekOffset = MutableStateFlow(0)

@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -87,6 +89,8 @@ fun AddEditHabitDialog(
 
     val dayNames = listOf("M", "T", "W", "T", "F", "S", "S")
 
+    val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
@@ -96,6 +100,8 @@ fun AddEditHabitDialog(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .navigationBarsPadding()
+                .imePadding()
                 .padding(20.dp)
                 .verticalScroll(rememberScrollState())
         ) {
@@ -134,6 +140,11 @@ fun AddEditHabitDialog(
                 placeholder = { Text("e.g. Read 20 pages, Morning Run", color = colors.textTertiary) },
                 singleLine = true,
                 shape = NotionTheme.shapes.small,
+                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                    capitalization = androidx.compose.ui.text.input.KeyboardCapitalization.Sentences,
+                    autoCorrectEnabled = true,
+                    imeAction = androidx.compose.ui.text.input.ImeAction.Next
+                ),
                 trailingIcon = {
                     androidx.compose.animation.AnimatedVisibility(
                         visible = name.isNotBlank(),
@@ -553,13 +564,22 @@ fun AddEditHabitDialog(
                     placeholder = { Text("e.g. After I brew morning tea...", color = colors.textTertiary) },
                     singleLine = true,
                     shape = NotionTheme.shapes.small,
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                        capitalization = androidx.compose.ui.text.input.KeyboardCapitalization.Sentences,
+                        autoCorrectEnabled = true,
+                        imeAction = androidx.compose.ui.text.input.ImeAction.Done
+                    ),
+                    keyboardActions = androidx.compose.foundation.text.KeyboardActions(
+                        onDone = { focusManager.clearFocus() }
+                    ),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = colors.textPrimary,
                         unfocusedBorderColor = colors.border,
                         focusedTextColor = colors.textPrimary,
                         unfocusedTextColor = colors.textPrimary,
                         focusedContainerColor = colors.surface,
-                        unfocusedContainerColor = colors.surface
+                        unfocusedContainerColor = colors.surface,
+                        cursorColor = parsedColor
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )

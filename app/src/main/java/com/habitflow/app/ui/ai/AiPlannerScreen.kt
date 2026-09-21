@@ -232,6 +232,7 @@ fun AiPlannerScreen(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
                     OutlinedTextField(
                         value = promptText,
                         onValueChange = { promptText = it },
@@ -242,13 +243,28 @@ fun AiPlannerScreen(
                                 style = NotionTheme.typography.bodyMedium
                             )
                         },
+                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                            capitalization = androidx.compose.ui.text.input.KeyboardCapitalization.Sentences,
+                            autoCorrectEnabled = true,
+                            imeAction = androidx.compose.ui.text.input.ImeAction.Send
+                        ),
+                        keyboardActions = androidx.compose.foundation.text.KeyboardActions(
+                            onSend = {
+                                if (promptText.isNotBlank()) {
+                                    focusManager.clearFocus()
+                                    todayViewModel.requestAiDayPlan()
+                                    promptText = ""
+                                }
+                            }
+                        ),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color.Transparent,
                             unfocusedBorderColor = Color.Transparent,
                             focusedTextColor = colors.textPrimary,
                             unfocusedTextColor = colors.textPrimary,
                             focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent
+                            unfocusedContainerColor = Color.Transparent,
+                            cursorColor = colors.accent
                         ),
                         modifier = Modifier.weight(1f),
                         singleLine = true
@@ -263,6 +279,7 @@ fun AiPlannerScreen(
                     } else {
                         IconButton(
                             onClick = {
+                                focusManager.clearFocus()
                                 todayViewModel.requestAiDayPlan()
                                 promptText = ""
                             }
