@@ -35,6 +35,9 @@ import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Spa
 import androidx.compose.material.icons.rounded.Timer
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
+import com.habitflow.app.core.audio.SoundscapeType
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -71,6 +74,7 @@ fun FocusTimerScreen(
     val isRunning by viewModel.isRunning.collectAsState()
     val secondsElapsed by viewModel.secondsElapsed.collectAsState()
     val totalRecordedSeconds by viewModel.totalRecordedSecondsOnItem.collectAsState()
+    val selectedSoundscape by viewModel.selectedSoundscape.collectAsState()
 
     val progress = if (totalDuration > 0) {
         (timeRemaining.toFloat() / totalDuration.toFloat()).coerceIn(0f, 1f)
@@ -360,7 +364,43 @@ fun FocusTimerScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // Ambient Zen Soundscape Bar
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                SoundscapeType.values().forEach { soundscape ->
+                    val isSelected = soundscape == selectedSoundscape
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(if (isSelected) colors.accentSoft else colors.surface)
+                            .border(
+                                1.dp,
+                                if (isSelected) colors.accent.copy(alpha = 0.5f) else colors.border.copy(alpha = 0.5f),
+                                RoundedCornerShape(14.dp)
+                            )
+                            .clickable { viewModel.selectSoundscape(soundscape) }
+                            .padding(horizontal = 12.dp, vertical = 7.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = soundscape.displayName,
+                            style = NotionTheme.typography.labelSmall,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                            color = if (isSelected) colors.accent else colors.textSecondary,
+                            fontSize = 12.sp
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
 
             // 4. Session Telemetry Pill
             Box(

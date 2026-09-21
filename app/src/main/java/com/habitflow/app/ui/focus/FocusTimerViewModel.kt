@@ -3,6 +3,8 @@ package com.habitflow.app.ui.focus
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.habitflow.app.core.audio.SoundscapeType
+import com.habitflow.app.core.audio.ZenSoundscapeEngine
 import com.habitflow.app.core.util.DateUtils
 import com.habitflow.app.domain.repository.FocusTrackerRepository
 import com.habitflow.app.domain.repository.TimelineRepository
@@ -32,7 +34,8 @@ class FocusTimerViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val focusTrackerRepository: FocusTrackerRepository,
     private val timelineRepository: TimelineRepository,
-    private val toggleHabitCompletionUseCase: ToggleHabitCompletionUseCase
+    private val toggleHabitCompletionUseCase: ToggleHabitCompletionUseCase,
+    val soundscapeEngine: ZenSoundscapeEngine
 ) : ViewModel() {
 
     val itemId: String = savedStateHandle.get<String>("itemId") ?: ""
@@ -53,6 +56,9 @@ class FocusTimerViewModel @Inject constructor(
     private val _secondsElapsed = MutableStateFlow(0)
     val secondsElapsed: StateFlow<Int> = _secondsElapsed.asStateFlow()
 
+    private val _selectedSoundscape = MutableStateFlow(SoundscapeType.NONE)
+    val selectedSoundscape: StateFlow<SoundscapeType> = _selectedSoundscape.asStateFlow()
+
     val totalRecordedSecondsOnItem: StateFlow<Int> = focusTrackerRepository.getFocusTimeForTask(itemId)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
 
@@ -64,6 +70,13 @@ class FocusTimerViewModel @Inject constructor(
     init {
         // Automatically start focus session gently
         startTimer()
+    }
+
+    fun selectSoundscape(type: SoundscapeType) {
+        _selectedSoundscape.value = type
+        if (_isRunning.value) {
+            soundscapeEngine.startSoundscape(type)
+        }
     }
 
     fun togglePlayPause() {
@@ -78,6 +91,10 @@ class FocusTimerViewModel @Inject constructor(
         if (_isRunning.value) return
         _isRunning.value = true
 
+        if (_selectedSoundscape.value != SoundscapeType.NONE) {
+            soundscapeEngine.startSoundscape(_selectedSoundscape.value)
+        }
+
         timerJob?.cancel()
         timerJob = viewModelScope.launch {
             while (_isRunning.value && _timeRemainingSeconds.value > 0) {
@@ -87,6 +104,8 @@ class FocusTimerViewModel @Inject constructor(
 
                 if (_timeRemainingSeconds.value <= 0) {
                     _isRunning.value = false
+                    soundscapeEngine.stopSoundscape()
+                    soundscapeEngine.playSingingBowlChime(4.0f)
                     onTimerCompletedNaturally()
                 }
             }
@@ -95,6 +114,7 @@ class FocusTimerViewModel @Inject constructor(
 
     fun pauseTimer() {
         _isRunning.value = false
+        soundscapeEngine.stopSoundscape()
         timerJob?.cancel()
     }
 
@@ -116,6 +136,7 @@ class FocusTimerViewModel @Inject constructor(
 
     fun finishAndSave(onDone: () -> Unit) {
         pauseTimer()
+        soundscapeEngine.playSingingBowlChime(3.0f)
         viewModelScope.launch {
             recordTimeAndMarkComplete()
             _eventFlow.emit(FocusTimerUiEvent.ShowCelebration("Focus time saved successfully."))
@@ -146,6 +167,7 @@ class FocusTimerViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
+        soundscapeEngine.stopSoundscape()
         timerJob?.cancel()
     }
 }

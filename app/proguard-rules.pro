@@ -37,3 +37,11 @@
 -keep class * extends android.app.Activity
 -keep class * extends androidx.lifecycle.ViewModel
 -keep class com.habitflow.app.core.di.** { *; }
+
+# WorkManager & Background Sync
+-keep class * extends androidx.work.ListenableWorker { *; }
+-keep class * extends androidx.work.Worker { *; }
+
+# JSON Serialization
+-keep class org.json.** { *; }
+

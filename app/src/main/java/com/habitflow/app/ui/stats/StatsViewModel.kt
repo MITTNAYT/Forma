@@ -13,7 +13,9 @@ import com.habitflow.app.domain.repository.FocusTimeStats
 import com.habitflow.app.domain.repository.FocusTrackerRepository
 import com.habitflow.app.domain.repository.HabitRepository
 import com.habitflow.app.domain.repository.UserPreferencesRepository
+import com.habitflow.app.domain.usecase.CalculateInsightsUseCase
 import com.habitflow.app.domain.usecase.GetHabitStatsUseCase
+import com.habitflow.app.domain.usecase.MindfulInsightsReport
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -65,11 +67,15 @@ class StatsViewModel @Inject constructor(
     billingRepository: BillingRepository,
     preferencesRepository: UserPreferencesRepository,
     private val focusTrackerRepository: FocusTrackerRepository,
-    private val habitRepository: HabitRepository
+    private val habitRepository: HabitRepository,
+    calculateInsightsUseCase: CalculateInsightsUseCase
 ) : ViewModel() {
 
     val userName: StateFlow<String> = preferencesRepository.userName
         .stateIn(viewModelScope, SharingStarted.Eagerly, "Alex")
+
+    val mindfulInsights: StateFlow<MindfulInsightsReport?> = calculateInsightsUseCase()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     val stats: StateFlow<OverallHabitStats?> = getHabitStatsUseCase()
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)

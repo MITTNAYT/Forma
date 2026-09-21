@@ -36,6 +36,7 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -43,6 +44,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import com.habitflow.app.core.audio.ZenSoundscapeEngine
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
@@ -107,6 +109,14 @@ fun BreathingExerciseSheet(
     var secondsInPhase by remember { mutableIntStateOf(0) }
     var completedCycles by remember { mutableIntStateOf(0) }
 
+    val soundEngine = remember { ZenSoundscapeEngine() }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            soundEngine.stopSoundscape()
+        }
+    }
+
     // Rhythms controller
     LaunchedEffect(isRunning, selectedTechnique) {
         if (!isRunning) return@LaunchedEffect
@@ -131,6 +141,7 @@ fun BreathingExerciseSheet(
 
             // Phase transition
             ZenFeedbackManager.triggerTactileTick(localContext)
+            soundEngine.playSingingBowlChime(2.0f)
 
             when (currentPhase) {
                 BreathPhase.INHALE -> {

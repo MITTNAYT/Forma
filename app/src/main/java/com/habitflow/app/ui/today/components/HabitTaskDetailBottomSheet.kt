@@ -26,6 +26,7 @@ import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.LocalFireDepartment
 import androidx.compose.material.icons.rounded.Repeat
 import androidx.compose.material.icons.rounded.Schedule
+import androidx.compose.material.icons.rounded.Sensors
 import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -307,6 +308,33 @@ fun HabitTaskDetailBottomSheet(
                                 fontWeight = FontWeight.Bold,
                                 color = colors.textPrimary,
                                 fontSize = 14.sp
+                            )
+                        }
+                    }
+
+                    // NFC Physical Cue
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Rounded.Sensors,
+                            contentDescription = null,
+                            tint = colors.accent,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Column {
+                            Text(
+                                text = "Physical Cue (NFC)",
+                                style = NotionTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Medium,
+                                color = colors.textTertiary,
+                                fontSize = 11.sp
+                            )
+                            Text(
+                                text = "habitflow://habit/${item.habit.id}",
+                                style = NotionTheme.typography.labelMedium,
+                                fontWeight = FontWeight.SemiBold,
+                                color = colors.accent,
+                                fontSize = 12.sp
                             )
                         }
                     }

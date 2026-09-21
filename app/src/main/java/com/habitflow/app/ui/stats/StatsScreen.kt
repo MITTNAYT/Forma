@@ -26,8 +26,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.AutoGraph
 import androidx.compose.material.icons.rounded.CheckCircle
+import com.habitflow.app.ui.analytics.components.MindfulInsightsSheet
 import androidx.compose.material.icons.rounded.ChevronLeft
 import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.LocalFireDepartment
@@ -76,6 +78,7 @@ enum class FocusTimeTab(val label: String) {
     ALL_TIME("All Time")
 }
 
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 fun StatsScreen(
     viewModel: StatsViewModel = hiltViewModel()
@@ -91,9 +94,11 @@ fun StatsScreen(
     val selectedMatrixDay by viewModel.selectedMatrixDay.collectAsState()
     val selectedCommitment by viewModel.selectedCommitment.collectAsState()
     val selectedHabitStreak by viewModel.selectedHabitStreak.collectAsState()
+    val mindfulInsights by viewModel.mindfulInsights.collectAsState()
 
     var selectedTimeTab by remember { mutableStateOf(FocusTimeTab.WEEK) }
     var showPaywall by remember { mutableStateOf(false) }
+    var showInsightsSheet by remember { mutableStateOf(false) }
 
     val userInitial = userName.trim().take(1).uppercase().ifBlank { "A" }
 
@@ -152,21 +157,51 @@ fun StatsScreen(
                             letterSpacing = (-0.6).sp
                         )
 
-                        Box(
-                            modifier = Modifier
-                                .size(44.dp)
-                                .clip(CircleShape)
-                                .background(colors.surface)
-                                .border(1.5.dp, colors.accent, CircleShape),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = userInitial,
-                                style = NotionTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = colors.accent,
-                                fontSize = 17.sp
-                            )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(14.dp))
+                                    .background(colors.accentSoft)
+                                    .border(1.dp, colors.accent.copy(alpha = 0.4f), RoundedCornerShape(14.dp))
+                                    .clickable { showInsightsSheet = true }
+                                    .padding(horizontal = 10.dp, vertical = 7.dp)
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.AutoAwesome,
+                                        contentDescription = "Insights",
+                                        tint = colors.accent,
+                                        modifier = Modifier.size(14.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = "Insights",
+                                        style = NotionTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = colors.accent,
+                                        fontSize = 12.sp
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Box(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(CircleShape)
+                                    .background(colors.surface)
+                                    .border(1.5.dp, colors.accent, CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = userInitial,
+                                    style = NotionTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = colors.accent,
+                                    fontSize = 15.sp
+                                )
+                            }
                         }
                     }
                 }
@@ -873,6 +908,13 @@ fun StatsScreen(
         HabitMomentumDetailSheet(
             streakInfo = habitStreak,
             onDismiss = { viewModel.closeHabitStreakDetail() }
+        )
+    }
+
+    if (showInsightsSheet && mindfulInsights != null) {
+        MindfulInsightsSheet(
+            report = mindfulInsights!!,
+            onDismiss = { showInsightsSheet = false }
         )
     }
 }
