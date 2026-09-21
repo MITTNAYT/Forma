@@ -1,5 +1,8 @@
 package com.habitflow.app.domain.model
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class DailyReflection(
     val date: String, // YYYY-MM-DD
     val keystoneIntentions: List<String> = emptyList(),

@@ -15,6 +15,7 @@ import com.habitflow.app.domain.repository.HabitRepository
 import com.habitflow.app.domain.repository.UserPreferencesRepository
 import com.habitflow.app.domain.usecase.GetHabitStatsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -28,8 +29,9 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
 import java.util.Locale
-import javax.inject.Inject
+import androidx.compose.runtime.Immutable
 
+@Immutable
 data class DayFocusItem(
     val dateIso: String,
     val dayLetter: String,
@@ -39,6 +41,7 @@ data class DayFocusItem(
     val isToday: Boolean
 )
 
+@Immutable
 data class DayRitualDetail(
     val habitId: String,
     val habitName: String,
@@ -46,6 +49,7 @@ data class DayRitualDetail(
     val isCompleted: Boolean
 )
 
+@Immutable
 data class DayDetailInfo(
     val dateIso: String,
     val formattedDate: String,

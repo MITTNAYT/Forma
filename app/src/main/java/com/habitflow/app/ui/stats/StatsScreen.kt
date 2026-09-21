@@ -227,7 +227,7 @@ fun StatsScreen(
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
                                     text = "$completionRate%",
-                                    style = NotionTheme.typography.titleLarge,
+                                    style = NotionTheme.typography.titleLarge.copy(fontFeatureSettings = "tnum"),
                                     fontWeight = FontWeight.Bold,
                                     color = colors.textPrimary,
                                     fontSize = 20.sp
@@ -262,6 +262,7 @@ fun StatsScreen(
                                 }
                                 Text(
                                     text = "${currentStats.bestCurrentStreak} days",
+                                    style = NotionTheme.typography.bodyMedium.copy(fontFeatureSettings = "tnum"),
                                     fontWeight = FontWeight.Bold,
                                     color = colors.textPrimary,
                                     fontSize = 13.sp
@@ -280,6 +281,7 @@ fun StatsScreen(
                                 }
                                 Text(
                                     text = "${currentStats.totalActiveHabits}",
+                                    style = NotionTheme.typography.bodyMedium.copy(fontFeatureSettings = "tnum"),
                                     fontWeight = FontWeight.Bold,
                                     color = colors.textPrimary,
                                     fontSize = 13.sp
@@ -298,6 +300,7 @@ fun StatsScreen(
                                 }
                                 Text(
                                     text = "${currentStats.bestAllTimeStreak} days",
+                                    style = NotionTheme.typography.bodyMedium.copy(fontFeatureSettings = "tnum"),
                                     fontWeight = FontWeight.Bold,
                                     color = colors.textPrimary,
                                     fontSize = 13.sp
@@ -399,7 +402,7 @@ fun StatsScreen(
                                     Row(verticalAlignment = Alignment.Bottom) {
                                         Text(
                                             text = decimalHours,
-                                            style = NotionTheme.typography.headlineLarge,
+                                            style = NotionTheme.typography.headlineLarge.copy(fontFeatureSettings = "tnum"),
                                             fontWeight = FontWeight.Bold,
                                             color = colors.textPrimary,
                                             fontSize = 38.sp,
@@ -553,7 +556,7 @@ fun StatsScreen(
                                     val timeStr = if (hrs > 0) "${hrs}h ${mins}m" else "${mins}m"
                                     Text(
                                         text = timeStr,
-                                        style = NotionTheme.typography.bodyMedium,
+                                        style = NotionTheme.typography.bodyMedium.copy(fontFeatureSettings = "tnum"),
                                         fontWeight = FontWeight.Bold,
                                         color = colors.accent,
                                         fontSize = 14.sp
@@ -635,7 +638,7 @@ fun StatsScreen(
                                                 ) {
                                                     Text(
                                                         text = rankStr,
-                                                        style = NotionTheme.typography.labelSmall,
+                                                        style = NotionTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
                                                         fontWeight = FontWeight.Bold,
                                                         color = colors.accent,
                                                         fontSize = 12.sp
@@ -652,7 +655,7 @@ fun StatsScreen(
 
                                                 Text(
                                                     text = timeLabel,
-                                                    style = NotionTheme.typography.labelSmall,
+                                                    style = NotionTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
                                                     fontWeight = FontWeight.Bold,
                                                     color = colors.accent,
                                                     fontSize = 13.sp

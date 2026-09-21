@@ -1,5 +1,8 @@
 package com.habitflow.app.domain.model
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class HabitStreakInfo(
     val habitId: String,
     val habitName: String,
@@ -11,6 +14,7 @@ data class HabitStreakInfo(
     val completionRatePercentage: Int
 )
 
+@Immutable
 data class DayCompletionRate(
     val date: String, // YYYY-MM-DD
     val totalScheduled: Int,
@@ -19,6 +23,7 @@ data class DayCompletionRate(
     val dayOfMonth: Int = 1
 )
 
+@Immutable
 data class OverallHabitStats(
     val totalActiveHabits: Int,
     val overallCompletionRate: Int, // 0 - 100

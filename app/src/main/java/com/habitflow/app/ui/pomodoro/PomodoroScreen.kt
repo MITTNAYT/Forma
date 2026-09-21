@@ -73,6 +73,9 @@ import com.habitflow.app.core.designsystem.NotionTheme
 import com.habitflow.app.core.designsystem.motion.formaPressEffect
 import com.habitflow.app.domain.model.TodayScheduleItem
 
+import androidx.compose.ui.graphics.graphicsLayer
+import com.habitflow.app.core.designsystem.haptics.rememberZenHaptics
+
 @Composable
 fun PomodoroScreen(
     onNavigateBack: () -> Unit = {},
@@ -80,7 +83,7 @@ fun PomodoroScreen(
 ) {
     val colors = NotionTheme.colors
     val context = LocalContext.current
-    val haptic = LocalHapticFeedback.current
+    val zenHaptics = rememberZenHaptics()
 
     val selectedMode by viewModel.selectedMode.collectAsState()
     val selectedSound by viewModel.selectedSound.collectAsState()
@@ -145,7 +148,7 @@ fun PomodoroScreen(
                     Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
                 }
                 is PomodoroUiEvent.SessionFinished -> {
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    zenHaptics.zenGongPulse()
                     Toast.makeText(context, "Flow session complete! Mindful time recorded.", Toast.LENGTH_LONG).show()
                 }
             }
@@ -226,7 +229,7 @@ fun PomodoroScreen(
                                     .clip(RoundedCornerShape(16.dp))
                                     .background(bg)
                                     .formaPressEffect(targetScale = 0.94f) {
-                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                        zenHaptics.lightTick()
                                         viewModel.selectMode(mode)
                                     },
                                 contentAlignment = Alignment.Center
@@ -282,7 +285,10 @@ fun PomodoroScreen(
                                 .clip(RoundedCornerShape(16.dp))
                                 .background(generalBg)
                                 .border(1.dp, generalBorder, RoundedCornerShape(16.dp))
-                                .clickable { viewModel.selectScheduleItem(null) }
+                                .clickable {
+                                    zenHaptics.lightTick()
+                                    viewModel.selectScheduleItem(null)
+                                }
                                 .padding(horizontal = 14.dp, vertical = 9.dp)
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -321,7 +327,10 @@ fun PomodoroScreen(
                                     .clip(RoundedCornerShape(16.dp))
                                     .background(itemBg)
                                     .border(1.dp, itemBorder, RoundedCornerShape(16.dp))
-                                    .clickable { viewModel.selectScheduleItem(item) }
+                                    .clickable {
+                                        zenHaptics.lightTick()
+                                        viewModel.selectScheduleItem(item)
+                                    }
                                     .padding(horizontal = 14.dp, vertical = 9.dp)
                             ) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -371,14 +380,20 @@ fun PomodoroScreen(
                             Box(
                                 modifier = Modifier
                                     .size(dialSize * 1.22f)
-                                    .scale(auraPulse2)
+                                    .graphicsLayer {
+                                        scaleX = auraPulse2
+                                        scaleY = auraPulse2
+                                    }
                                     .clip(CircleShape)
                                     .background(colors.accent.copy(alpha = 0.05f))
                             )
                             Box(
                                 modifier = Modifier
                                     .size(dialSize * 1.10f)
-                                    .scale(auraPulse1)
+                                    .graphicsLayer {
+                                        scaleX = auraPulse1
+                                        scaleY = auraPulse1
+                                    }
                                     .clip(CircleShape)
                                     .background(colors.accent.copy(alpha = 0.09f))
                                     .border(1.dp, colors.accent.copy(alpha = 0.15f), CircleShape)
@@ -389,7 +404,11 @@ fun PomodoroScreen(
                         Box(
                             modifier = Modifier
                                 .size(outerDiscSize)
-                                .scale(if (isRunning) ambientPulse else 1f)
+                                .graphicsLayer {
+                                    val scaleVal = if (isRunning) ambientPulse else 1f
+                                    scaleX = scaleVal
+                                    scaleY = scaleVal
+                                }
                                 .clip(CircleShape)
                                 .background(colors.surface)
                                 .border(1.dp, colors.border.copy(alpha = 0.6f), CircleShape)
@@ -412,14 +431,16 @@ fun PomodoroScreen(
                             strokeCap = StrokeCap.Round
                         )
 
-                        // Central Typography Readout
+                        // Central Typography Readout with Tabular Numerals
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {
                             Text(
                                 text = formattedTime,
-                                style = NotionTheme.typography.headlineLarge,
+                                style = NotionTheme.typography.headlineLarge.copy(
+                                    fontFeatureSettings = "tnum"
+                                ),
                                 fontWeight = FontWeight.Bold,
                                 color = colors.textPrimary,
                                 fontSize = timeFontSize,
@@ -467,7 +488,7 @@ fun PomodoroScreen(
                             .clip(CircleShape)
                             .background(colors.surfaceVariant)
                             .formaPressEffect(targetScale = 0.88f) {
-                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                zenHaptics.lightTick()
                                 viewModel.resetTimer()
                             },
                         contentAlignment = Alignment.Center
@@ -487,7 +508,7 @@ fun PomodoroScreen(
                             .clip(RoundedCornerShape(22.dp))
                             .background(colors.surfaceVariant)
                             .formaPressEffect(targetScale = 0.92f) {
-                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                zenHaptics.lightTick()
                                 viewModel.subtractFiveMinutes()
                             }
                             .padding(horizontal = 12.dp),
@@ -495,7 +516,7 @@ fun PomodoroScreen(
                     ) {
                         Text(
                             text = "-5m",
-                            style = NotionTheme.typography.labelSmall,
+                            style = NotionTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
                             fontWeight = FontWeight.Bold,
                             color = colors.textPrimary,
                             fontSize = 12.sp
@@ -515,7 +536,7 @@ fun PomodoroScreen(
                             .clip(CircleShape)
                             .background(colors.accent)
                             .formaPressEffect(targetScale = 0.90f) {
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                zenHaptics.matchaSnap()
                                 viewModel.togglePlayPause()
                             },
                         contentAlignment = Alignment.Center
@@ -535,7 +556,7 @@ fun PomodoroScreen(
                             .clip(RoundedCornerShape(22.dp))
                             .background(colors.surfaceVariant)
                             .formaPressEffect(targetScale = 0.92f) {
-                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                zenHaptics.lightTick()
                                 viewModel.addFiveMinutes()
                             }
                             .padding(horizontal = 12.dp),
@@ -551,7 +572,7 @@ fun PomodoroScreen(
                             Spacer(modifier = Modifier.width(3.dp))
                             Text(
                                 text = "+5m",
-                                style = NotionTheme.typography.labelSmall,
+                                style = NotionTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
                                 fontWeight = FontWeight.Bold,
                                 color = colors.textPrimary,
                                 fontSize = 12.sp
@@ -624,7 +645,7 @@ fun PomodoroScreen(
                                     .background(cardBg)
                                     .border(1.dp, cardBorder, RoundedCornerShape(18.dp))
                                     .formaPressEffect(targetScale = 0.95f) {
-                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                        zenHaptics.lightTick()
                                         viewModel.setAmbientSound(sound)
                                     }
                                     .padding(14.dp)
@@ -722,7 +743,7 @@ fun PomodoroScreen(
                             Column {
                                 Text(
                                     text = "$totalMinutesToday mins focused today",
-                                    style = NotionTheme.typography.titleMedium,
+                                    style = NotionTheme.typography.titleMedium.copy(fontFeatureSettings = "tnum"),
                                     fontWeight = FontWeight.Bold,
                                     color = colors.textPrimary,
                                     fontSize = 14.sp
@@ -741,7 +762,10 @@ fun PomodoroScreen(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(12.dp))
                                     .background(colors.accent)
-                                    .clickable { viewModel.finishAndLog() }
+                                    .clickable {
+                                        zenHaptics.matchaSnap()
+                                        viewModel.finishAndLog()
+                                    }
                                     .padding(horizontal = 12.dp, vertical = 6.dp)
                             ) {
                                 Text(

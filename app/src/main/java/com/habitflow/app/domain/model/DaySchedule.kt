@@ -1,10 +1,14 @@
 package com.habitflow.app.domain.model
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 sealed interface TodayScheduleItem {
     val id: String
     val sortKey: String // HH:mm or 99:xx for sorting
     val isCompleted: Boolean
 
+    @Immutable
     data class HabitItem(
         val habit: Habit,
         val isDoneToday: Boolean,
@@ -21,6 +25,7 @@ sealed interface TodayScheduleItem {
         override val isCompleted: Boolean = isDoneToday
     }
 
+    @Immutable
     data class TimelineBlock(
         val item: TimelineItem
     ) : TodayScheduleItem {
@@ -30,6 +35,7 @@ sealed interface TodayScheduleItem {
     }
 }
 
+@Immutable
 data class DaySchedule(
     val date: String,
     val items: List<TodayScheduleItem>,

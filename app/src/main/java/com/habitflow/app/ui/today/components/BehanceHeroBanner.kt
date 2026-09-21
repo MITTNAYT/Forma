@@ -104,7 +104,7 @@ fun BehanceHeroBanner(
                 ) {
                     Text(
                         text = "$percentInt% Done",
-                        style = NotionTheme.typography.labelSmall,
+                        style = NotionTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
                         fontWeight = FontWeight.Bold,
                         color = colors.accent,
                         fontSize = 11.sp
@@ -122,7 +122,7 @@ fun BehanceHeroBanner(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "$completedCount of $totalCount Rituals Flowed",
-                        style = NotionTheme.typography.titleLarge,
+                        style = NotionTheme.typography.titleLarge.copy(fontFeatureSettings = "tnum"),
                         fontWeight = FontWeight.Bold,
                         color = colors.textPrimary,
                         fontSize = 18.sp,

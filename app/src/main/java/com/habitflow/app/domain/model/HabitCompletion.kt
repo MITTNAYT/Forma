@@ -1,8 +1,10 @@
 package com.habitflow.app.domain.model
 
+import androidx.compose.runtime.Immutable
 import com.habitflow.app.core.util.SyncStatus
 import java.util.UUID
 
+@Immutable
 data class HabitCompletion(
     val id: String = UUID.randomUUID().toString(),
     val habitId: String,
