@@ -39,6 +39,7 @@ import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Spa
 import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material.icons.rounded.LocalFireDepartment
+import androidx.compose.material.icons.rounded.Mic
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -114,6 +115,7 @@ fun TodayScreen(
     var showBreathingSheet by remember { mutableStateOf(false) }
     var showGuidedRoutineSheet by remember { mutableStateOf(false) }
     var showJournalSheet by remember { mutableStateOf(false) }
+    var showVoiceAssistantSheet by remember { mutableStateOf(false) }
     var selectedDetailItem by remember { mutableStateOf<TodayScheduleItem?>(null) }
     var celebrationInfo by remember { mutableStateOf<Pair<String, Int>?>(null) }
     val haptic = LocalHapticFeedback.current
@@ -292,6 +294,29 @@ fun TodayScreen(
                                         fontWeight = FontWeight.Bold,
                                         color = colors.textPrimary,
                                         fontSize = 11.sp
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.width(6.dp))
+
+                                // Voice Assistant Mic Button
+                                Box(
+                                    modifier = Modifier
+                                        .size(36.dp)
+                                        .clip(CircleShape)
+                                        .background(colors.accentSoft)
+                                        .border(1.dp, colors.accent.copy(alpha = 0.5f), CircleShape)
+                                        .formaPressEffect(targetScale = 0.90f) {
+                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                            showVoiceAssistantSheet = true
+                                        },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Mic,
+                                        contentDescription = "Voice Assistant",
+                                        tint = colors.accent,
+                                        modifier = Modifier.size(17.dp)
                                     )
                                 }
 
@@ -873,6 +898,20 @@ fun TodayScreen(
         com.habitflow.app.ui.reflection.ReflectionJournalSheet(
             viewModel = reflectionViewModel,
             onDismiss = { showJournalSheet = false }
+        )
+    }
+
+    if (showVoiceAssistantSheet) {
+        val activeHabits = daySchedule?.items?.filterIsInstance<TodayScheduleItem.HabitItem>()?.map { it.habit } ?: emptyList()
+        com.habitflow.app.ui.today.components.VoiceAssistantSheet(
+            activeHabits = activeHabits,
+            onCompleteHabit = { habitId ->
+                viewModel.completeHabitById(habitId)
+            },
+            onSaveGratitude = { gratitude ->
+                viewModel.saveDailyGratitude(gratitude)
+            },
+            onDismiss = { showVoiceAssistantSheet = false }
         )
     }
 }

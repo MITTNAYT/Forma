@@ -49,7 +49,9 @@ import com.habitflow.app.domain.model.Habit
 import com.habitflow.app.domain.model.TimeOfDay
 import com.habitflow.app.ui.habits.components.AddEditHabitDialog
 import com.habitflow.app.ui.habits.components.HabitCard
+import com.habitflow.app.ui.habits.components.HabitStackSequencerSheet
 
+@androidx.compose.material3.ExperimentalMaterial3Api
 @Composable
 fun HabitsScreen(
     viewModel: HabitsViewModel = hiltViewModel()
@@ -59,6 +61,7 @@ fun HabitsScreen(
 
     var showAddEditDialog by remember { mutableStateOf(false) }
     var editingHabit by remember { mutableStateOf<Habit?>(null) }
+    var showStackSequencerSheet by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -66,6 +69,14 @@ fun HabitsScreen(
                 title = "Habits",
                 subtitle = "Unlimited recurring habits & streaks",
                 actions = {
+                    if (uiState.activeHabits.isNotEmpty() && !uiState.showArchived) {
+                        NotionButton(
+                            text = "▶ Flow",
+                            onClick = { showStackSequencerSheet = true },
+                            style = NotionButtonStyle.OUTLINE
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                    }
                     NotionButton(
                         text = "+ Habit",
                         onClick = {
@@ -253,6 +264,18 @@ fun HabitsScreen(
                 viewModel.deleteHabit(habit)
                 showAddEditDialog = false
                 editingHabit = null
+            }
+        )
+    }
+
+    if (showStackSequencerSheet && uiState.activeHabits.isNotEmpty()) {
+        HabitStackSequencerSheet(
+            habitStack = uiState.activeHabits,
+            onCompleteHabit = { habitId ->
+                viewModel.completeHabit(habitId)
+            },
+            onDismiss = {
+                showStackSequencerSheet = false
             }
         )
     }

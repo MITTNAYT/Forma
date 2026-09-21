@@ -41,7 +41,8 @@ class TodayViewModel @Inject constructor(
     private val rebalanceTimelineUseCase: com.habitflow.app.domain.usecase.RebalanceTimelineUseCase,
     private val zenFeedback: com.habitflow.app.core.audio.ZenFeedbackManager,
     private val billingRepository: BillingRepository,
-    private val preferencesRepository: UserPreferencesRepository
+    private val preferencesRepository: UserPreferencesRepository,
+    private val dailyReflectionRepository: com.habitflow.app.domain.repository.DailyReflectionRepository
 ) : ViewModel() {
 
     private val _selectedDate = MutableStateFlow(DateUtils.today())
@@ -156,6 +157,23 @@ class TodayViewModel @Inject constructor(
                     _eventFlow.emit(TodayUiEvent.ShowToast("Planning error: ${result.message}"))
                 }
             }
+        }
+    }
+
+    fun saveDailyGratitude(gratitude: String) {
+        viewModelScope.launch {
+            val dateIso = DateUtils.formatDateIso(_selectedDate.value)
+            val existing = dailyReflectionRepository.getReflectionDirect(dateIso)
+            val updated = existing?.copy(
+                gratitudeNote = gratitude,
+                updatedAt = System.currentTimeMillis()
+            ) ?: com.habitflow.app.domain.model.DailyReflection(
+                date = dateIso,
+                gratitudeNote = gratitude,
+                updatedAt = System.currentTimeMillis()
+            )
+            dailyReflectionRepository.saveReflection(updated)
+            _eventFlow.emit(TodayUiEvent.ShowToast("Gratitude note recorded."))
         }
     }
 }

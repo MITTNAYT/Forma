@@ -30,6 +30,7 @@ import androidx.compose.material.icons.rounded.Air
 import androidx.compose.material.icons.rounded.Article
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Bedtime
+import androidx.compose.material.icons.rounded.Bookmark
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.DarkMode
@@ -46,6 +47,7 @@ import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material.icons.rounded.Spa
 import androidx.compose.material.icons.rounded.Stop
 import androidx.compose.material.icons.rounded.Timer
+import androidx.compose.material.icons.rounded.TrackChanges
 import androidx.compose.material.icons.rounded.Vibration
 import androidx.compose.material.icons.rounded.WaterDrop
 import androidx.compose.material.icons.rounded.Waves
@@ -85,7 +87,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.habitflow.app.core.designsystem.NotionTheme
 import com.habitflow.app.domain.repository.DarkModeOption
 import com.habitflow.app.domain.repository.PaletteFamily
+import com.habitflow.app.ui.settings.components.EncryptedVaultDialog
 import com.habitflow.app.ui.settings.components.ProPaywallBottomSheet
+import com.habitflow.app.ui.settings.components.VaultDialogMode
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -107,6 +111,7 @@ fun SettingsScreen(
     var showEditProfileDialog by remember { mutableStateOf(false) }
     var showZenSummary by remember { mutableStateOf(false) }
     var showImportDialog by remember { mutableStateOf(false) }
+    var vaultDialogMode by remember { mutableStateOf<VaultDialogMode?>(null) }
     var importJsonText by remember { mutableStateOf("") }
     var hapticsEnabled by remember { mutableStateOf(true) }
     var morningReminderEnabled by remember { mutableStateOf(true) }
@@ -847,9 +852,23 @@ fun SettingsScreen(
                         )
                         SettingsDivider(indent = 50.dp)
                         SettingsTapRow(
+                            icon = Icons.Rounded.Bookmark,
+                            title = "Export Encrypted Vault (.habitvault)",
+                            subtitle = "Zero-Knowledge AES-256-GCM encrypted backup",
+                            onClick = { vaultDialogMode = VaultDialogMode.ENCRYPT_EXPORT }
+                        )
+                        SettingsDivider(indent = 50.dp)
+                        SettingsTapRow(
+                            icon = Icons.Rounded.TrackChanges,
+                            title = "Unlock & Restore Encrypted Vault",
+                            subtitle = "Decrypt and restore with your master passphrase",
+                            onClick = { vaultDialogMode = VaultDialogMode.DECRYPT_RESTORE }
+                        )
+                        SettingsDivider(indent = 50.dp)
+                        SettingsTapRow(
                             icon = Icons.Rounded.AutoAwesome,
-                            title = "Restore from JSON Backup",
-                            subtitle = "Paste and restore existing HabitFlow database",
+                            title = "Restore from Plain JSON",
+                            subtitle = "Paste and restore unencrypted HabitFlow JSON",
                             onClick = { showImportDialog = true }
                         )
                     }
@@ -1023,6 +1042,29 @@ fun SettingsScreen(
                 onDismiss = { showZenSummary = false }
             )
         }
+    }
+
+    vaultDialogMode?.let { mode ->
+        EncryptedVaultDialog(
+            mode = mode,
+            onDismiss = { vaultDialogMode = null },
+            onExportWithPassword = { passphrase ->
+                viewModel.exportEncryptedVault(context, passphrase) { success, msg ->
+                    Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+                    if (success) {
+                        vaultDialogMode = null
+                    }
+                }
+            },
+            onRestoreWithPassword = { passphrase, payload ->
+                viewModel.restoreEncryptedVault(passphrase, payload) { success, msg ->
+                    Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+                    if (success) {
+                        vaultDialogMode = null
+                    }
+                }
+            }
+        )
     }
 
     if (showPaywall) {

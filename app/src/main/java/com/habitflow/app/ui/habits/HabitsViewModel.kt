@@ -18,6 +18,10 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+import com.habitflow.app.core.util.DateUtils
+import com.habitflow.app.domain.usecase.ToggleHabitCompletionUseCase
+import java.time.LocalDate
+
 data class HabitsUiState(
     val activeHabits: List<Habit> = emptyList(),
     val archivedHabits: List<Habit> = emptyList(),
@@ -32,6 +36,7 @@ data class HabitsUiState(
 class HabitsViewModel @Inject constructor(
     private val habitRepository: HabitRepository,
     private val calculateStreakUseCase: CalculateStreakUseCase,
+    private val toggleHabitCompletionUseCase: ToggleHabitCompletionUseCase,
     private val notificationHelper: NotificationHelper
 ) : ViewModel() {
 
@@ -118,6 +123,17 @@ class HabitsViewModel @Inject constructor(
                     minutesFromMidnight = minutes
                 )
             }
+        }
+    }
+
+    fun completeHabit(habitId: String) {
+        viewModelScope.launch {
+            val dateIso = DateUtils.formatDateIso(LocalDate.now())
+            toggleHabitCompletionUseCase(
+                habitId = habitId,
+                date = dateIso,
+                currentlyCompleted = false
+            )
         }
     }
 

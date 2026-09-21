@@ -110,13 +110,36 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun importJsonBackup(jsonStr: String, onResult: (Boolean, String) -> Unit) {
+    fun exportEncryptedVault(activityContext: Context, passphrase: String, onDone: (Boolean, String) -> Unit) {
         viewModelScope.launch {
-            val result = backupManager.importDataFromJson(jsonStr)
-            result.onSuccess { count ->
-                onResult(true, "Successfully restored $count items into Forma.")
-            }.onFailure { err ->
-                onResult(false, err.message ?: "Failed to parse backup JSON.")
+            try {
+                val plainJson = exportDataUseCase()
+                val encrypted = com.habitflow.app.core.crypto.CryptoVaultManager.encrypt(plainJson, passphrase.toCharArray())
+                dataExportManager.shareContent(
+                    activityContext = activityContext,
+                    title = "HabitFlow-Secure-Backup.habitvault",
+                    content = encrypted,
+                    mimeType = "text/plain"
+                )
+                onDone(true, "Encrypted vault exported with AES-256-GCM.")
+            } catch (e: Exception) {
+                onDone(false, e.message ?: "Failed to encrypt vault.")
+            }
+        }
+    }
+
+    fun restoreEncryptedVault(passphrase: String, encryptedPayload: String, onDone: (Boolean, String) -> Unit) {
+        viewModelScope.launch {
+            val decryptedResult = com.habitflow.app.core.crypto.CryptoVaultManager.decrypt(encryptedPayload, passphrase.toCharArray())
+            decryptedResult.onSuccess { plainJson ->
+                val importResult = importDataUseCase(plainJson)
+                importResult.onSuccess { count ->
+                    onDone(true, "Successfully unlocked & restored $count records.")
+                }.onFailure { err ->
+                    onDone(false, "Decryption succeeded, but data import failed: ${err.message}")
+                }
+            }.onFailure {
+                onDone(false, "Decryption failed. Incorrect passphrase or corrupt vault envelope.")
             }
         }
     }
