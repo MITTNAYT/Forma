@@ -14,6 +14,8 @@ import com.habitflow.app.domain.repository.HabitRepository
 import com.habitflow.app.domain.repository.PaletteFamily
 import com.habitflow.app.domain.repository.ThemeMode
 import com.habitflow.app.domain.repository.UserPreferencesRepository
+import com.habitflow.app.domain.usecase.ExportDataUseCase
+import com.habitflow.app.domain.usecase.ImportDataUseCase
 import com.habitflow.app.ui.mindfulness.ZenSummaryData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -30,6 +32,8 @@ class SettingsViewModel @Inject constructor(
     private val notificationHelper: NotificationHelper,
     private val dataExportManager: DataExportManager,
     private val backupManager: BackupManager,
+    private val exportDataUseCase: ExportDataUseCase,
+    private val importDataUseCase: ImportDataUseCase,
     private val dailyReflectionRepository: DailyReflectionRepository,
     private val focusTrackerRepository: FocusTrackerRepository,
     private val habitRepository: HabitRepository
@@ -85,6 +89,24 @@ class SettingsViewModel @Inject constructor(
                 content = md,
                 mimeType = "text/markdown"
             )
+        }
+    }
+
+    fun exportFullBackup(onExportReady: (String) -> Unit) {
+        viewModelScope.launch {
+            val json = exportDataUseCase()
+            onExportReady(json)
+        }
+    }
+
+    fun restoreFullBackup(json: String, onComplete: (Boolean, String) -> Unit) {
+        viewModelScope.launch {
+            val result = importDataUseCase(json)
+            result.onSuccess { count ->
+                onComplete(true, "Restored $count records into HabitFlow.")
+            }.onFailure { err ->
+                onComplete(false, err.message ?: "Failed to parse backup JSON.")
+            }
         }
     }
 

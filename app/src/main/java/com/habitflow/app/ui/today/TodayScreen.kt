@@ -113,6 +113,7 @@ fun TodayScreen(
     var showEveningSheet by remember { mutableStateOf(false) }
     var showBreathingSheet by remember { mutableStateOf(false) }
     var showGuidedRoutineSheet by remember { mutableStateOf(false) }
+    var showJournalSheet by remember { mutableStateOf(false) }
     var selectedDetailItem by remember { mutableStateOf<TodayScheduleItem?>(null) }
     var celebrationInfo by remember { mutableStateOf<Pair<String, Int>?>(null) }
     val haptic = LocalHapticFeedback.current
@@ -461,6 +462,38 @@ fun TodayScreen(
                                 }
                             }
 
+                            // Journal Archive Pill
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(14.dp))
+                                    .background(colors.surface)
+                                    .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(14.dp))
+                                    .formaPressEffect(targetScale = 0.95f) {
+                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                        showJournalSheet = true
+                                    }
+                                    .padding(vertical = 10.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Spa,
+                                        contentDescription = "Journal",
+                                        tint = colors.accent,
+                                        modifier = Modifier.size(15.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(5.dp))
+                                    Text(
+                                        text = "Journal",
+                                        style = NotionTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = colors.textPrimary,
+                                        fontSize = 12.sp
+                                    )
+                                }
+                            }
+
                             // Flow Sequencer Pill
                             val habitItems = scheduleItems.filterIsInstance<TodayScheduleItem.HabitItem>()
                             if (habitItems.isNotEmpty()) {
@@ -470,36 +503,36 @@ fun TodayScreen(
                                         .clip(RoundedCornerShape(14.dp))
                                         .background(colors.accentSoft)
                                         .border(1.dp, colors.accent.copy(alpha = 0.4f), RoundedCornerShape(14.dp))
-                                    .formaPressEffect(targetScale = 0.95f) {
-                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                        showGuidedRoutineSheet = true
+                                        .formaPressEffect(targetScale = 0.95f) {
+                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                            showGuidedRoutineSheet = true
+                                        }
+                                        .padding(vertical = 10.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.AutoAwesome,
+                                            contentDescription = "Flow Mode",
+                                            tint = colors.accent,
+                                            modifier = Modifier.size(15.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(5.dp))
+                                        Text(
+                                            text = "Flow",
+                                            style = NotionTheme.typography.labelSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = colors.accent,
+                                            fontSize = 12.sp
+                                        )
                                     }
-                                    .padding(vertical = 10.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.AutoAwesome,
-                                        contentDescription = "Flow Mode",
-                                        tint = colors.accent,
-                                        modifier = Modifier.size(15.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Text(
-                                        text = "Flow Mode",
-                                        style = NotionTheme.typography.labelSmall,
-                                        fontWeight = FontWeight.Bold,
-                                        color = colors.accent,
-                                        fontSize = 12.sp
-                                    )
                                 }
                             }
                         }
                     }
                 }
-            }
 
-            item { Spacer(modifier = Modifier.height(20.dp)) }
+                item { Spacer(modifier = Modifier.height(20.dp)) }
 
                 // 4. Section Label: TODAY'S RITUALS & HABITS
                 item {
@@ -832,6 +865,14 @@ fun TodayScreen(
                 viewModel.completeHabitById(habitId)
             },
             onDismiss = { showGuidedRoutineSheet = false }
+        )
+    }
+
+    if (showJournalSheet) {
+        val reflectionViewModel: com.habitflow.app.ui.reflection.DailyReflectionViewModel = hiltViewModel()
+        com.habitflow.app.ui.reflection.ReflectionJournalSheet(
+            viewModel = reflectionViewModel,
+            onDismiss = { showJournalSheet = false }
         )
     }
 }

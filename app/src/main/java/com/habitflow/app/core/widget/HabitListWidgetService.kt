@@ -68,7 +68,7 @@ class HabitListRemoteViewsFactory(
                     } else {
                         habit.repeatDays.split(",").mapNotNull { it.trim().toIntOrNull() }.toSet()
                     }
-                    repeatDays.contains(dayOfWeek) && !habit.isWintering
+                    (repeatDays.isEmpty() || repeatDays.contains(dayOfWeek)) && !habit.isWintering
                 }
 
                 habitItems = scheduledHabits.map { habit ->

@@ -833,13 +833,23 @@ fun SettingsScreen(
                             icon = Icons.Rounded.Share,
                             title = "Export JSON Backup",
                             subtitle = "Full backup of rituals, reflections & timeline",
-                            onClick = { viewModel.exportJson(context) }
+                            onClick = {
+                                viewModel.exportFullBackup { json ->
+                                    val sendIntent = android.content.Intent().apply {
+                                        action = android.content.Intent.ACTION_SEND
+                                        putExtra(android.content.Intent.EXTRA_TEXT, json)
+                                        type = "application/json"
+                                    }
+                                    val shareIntent = android.content.Intent.createChooser(sendIntent, "Export HabitFlow Backup")
+                                    context.startActivity(shareIntent)
+                                }
+                            }
                         )
                         SettingsDivider(indent = 50.dp)
                         SettingsTapRow(
                             icon = Icons.Rounded.AutoAwesome,
                             title = "Restore from JSON Backup",
-                            subtitle = "Paste and restore existing Forma database",
+                            subtitle = "Paste and restore existing HabitFlow database",
                             onClick = { showImportDialog = true }
                         )
                     }
@@ -882,7 +892,7 @@ fun SettingsScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Forma  ·  v2.0",
+                        text = "HabitFlow  ·  v2.0",
                         color = colors.textTertiary,
                         fontSize = 11.sp,
                         letterSpacing = 1.sp
@@ -947,7 +957,7 @@ fun SettingsScreen(
             },
             title = {
                 Text(
-                    text = "Restore Forma Database",
+                    text = "Restore HabitFlow Database",
                     fontWeight = FontWeight.Bold,
                     color = colors.textPrimary,
                     fontSize = 18.sp
@@ -981,7 +991,7 @@ fun SettingsScreen(
             confirmButton = {
                 TextButton(onClick = {
                     if (importJsonText.isNotBlank()) {
-                        viewModel.importJsonBackup(importJsonText) { success, msg ->
+                        viewModel.restoreFullBackup(importJsonText) { success, msg ->
                             Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
                             if (success) {
                                 showImportDialog = false

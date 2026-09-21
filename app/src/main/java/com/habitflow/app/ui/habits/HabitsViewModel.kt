@@ -23,6 +23,7 @@ data class HabitsUiState(
     val archivedHabits: List<Habit> = emptyList(),
     val streaksMap: Map<String, HabitStreakInfo> = emptyMap(),
     val selectedTimeOfDayFilter: TimeOfDay? = null,
+    val searchQuery: String = "",
     val showArchived: Boolean = false,
     val isLoading: Boolean = false
 )
@@ -37,6 +38,9 @@ class HabitsViewModel @Inject constructor(
     private val _selectedTimeOfDayFilter = MutableStateFlow<TimeOfDay?>(null)
     val selectedTimeOfDayFilter: StateFlow<TimeOfDay?> = _selectedTimeOfDayFilter.asStateFlow()
 
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
     private val _showArchived = MutableStateFlow(false)
     val showArchived: StateFlow<Boolean> = _showArchived.asStateFlow()
 
@@ -44,8 +48,9 @@ class HabitsViewModel @Inject constructor(
         habitRepository.getAllHabits(includeArchived = true),
         habitRepository.getAllCompletions(),
         _selectedTimeOfDayFilter,
+        _searchQuery,
         _showArchived
-    ) { allHabits, allCompletions, filter, showArchived ->
+    ) { allHabits, allCompletions, filter, query, showArchived ->
 
         val completionsByHabit = allCompletions.groupBy { it.habitId }
         val streaks = allHabits.associate { habit ->
@@ -53,20 +58,36 @@ class HabitsViewModel @Inject constructor(
             habit.id to calculateStreakUseCase(habit, completions)
         }
 
+        val q = query.trim()
         val active = allHabits.filter { !it.archived }
             .filter { filter == null || it.timeOfDay == filter }
+            .filter {
+                q.isBlank() ||
+                it.name.contains(q, ignoreCase = true) ||
+                (it.stackedCueText?.contains(q, ignoreCase = true) == true) ||
+                it.timeOfDay.name.contains(q, ignoreCase = true)
+            }
 
         val archived = allHabits.filter { it.archived }
+            .filter {
+                q.isBlank() ||
+                it.name.contains(q, ignoreCase = true)
+            }
 
         HabitsUiState(
             activeHabits = active,
             archivedHabits = archived,
             streaksMap = streaks,
             selectedTimeOfDayFilter = filter,
+            searchQuery = query,
             showArchived = showArchived,
             isLoading = false
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), HabitsUiState(isLoading = true))
+
+    fun setSearchQuery(query: String) {
+        _searchQuery.value = query
+    }
 
     fun setTimeOfDayFilter(filter: TimeOfDay?) {
         _selectedTimeOfDayFilter.value = filter
@@ -74,6 +95,16 @@ class HabitsViewModel @Inject constructor(
 
     fun setShowArchived(show: Boolean) {
         _showArchived.value = show
+    }
+
+    fun toggleWintering(habit: Habit) {
+        viewModelScope.launch {
+            val updated = habit.copy(
+                isWintering = !habit.isWintering,
+                updatedAt = System.currentTimeMillis()
+            )
+            habitRepository.insertHabit(updated)
+        }
     }
 
     fun saveHabit(habit: Habit) {

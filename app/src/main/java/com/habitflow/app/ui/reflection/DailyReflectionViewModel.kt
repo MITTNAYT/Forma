@@ -51,6 +51,10 @@ class DailyReflectionViewModel @Inject constructor(
         .getReflectionForDate(todayStr)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
+    val recentReflections: StateFlow<List<DailyReflection>> = reflectionRepository
+        .getRecentReflections()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     private val _keystone1 = MutableStateFlow("")
     val keystone1: StateFlow<String> = _keystone1.asStateFlow()
 

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AcUnit
 import androidx.compose.material.icons.rounded.Archive
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Notifications
@@ -23,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.habitflow.app.core.designsystem.NotionTheme
@@ -38,6 +40,7 @@ fun HabitCard(
     streakInfo: HabitStreakInfo?,
     onEdit: () -> Unit,
     onArchiveToggle: () -> Unit,
+    onWinteringToggle: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val colors = NotionTheme.colors
@@ -62,13 +65,13 @@ fun HabitCard(
                         modifier = Modifier
                             .size(38.dp)
                             .clip(NotionTheme.shapes.extraSmall)
-                            .background(colors.surfaceVariant),
+                            .background(if (habit.isWintering) Color(0xFFE3EBE7) else colors.surfaceVariant),
                         contentAlignment = Alignment.Center
                     ) {
                         com.habitflow.app.core.designsystem.icon.HabitFlowIcon(
                             iconKey = habit.icon,
                             contentDescription = habit.name,
-                            tint = colors.textPrimary,
+                            tint = if (habit.isWintering) Color(0xFF6B8780) else colors.textPrimary,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -76,11 +79,39 @@ fun HabitCard(
                     Spacer(modifier = Modifier.width(12.dp))
 
                     Column {
-                        Text(
-                            text = habit.name,
-                            style = NotionTheme.typography.titleMedium,
-                            color = colors.textPrimary
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = habit.name,
+                                style = NotionTheme.typography.titleMedium,
+                                color = colors.textPrimary
+                            )
+                            if (habit.isWintering) {
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .clip(NotionTheme.shapes.extraSmall)
+                                        .background(Color(0xFFE1EAE6))
+                                        .padding(horizontal = 6.dp, vertical = 2.dp)
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.AcUnit,
+                                            contentDescription = null,
+                                            tint = Color(0xFF4A7268),
+                                            modifier = Modifier.size(10.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(3.dp))
+                                        Text(
+                                            text = "Wintering",
+                                            style = NotionTheme.typography.labelSmall,
+                                            color = Color(0xFF4A7268),
+                                            fontSize = 9.5.sp,
+                                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                                        )
+                                    }
+                                }
+                            }
+                        }
 
                         Row(
                             modifier = Modifier.padding(top = 2.dp),
@@ -111,18 +142,31 @@ fun HabitCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     streakInfo?.let {
                         StreakBadge(streakCount = it.currentStreak)
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                    }
+
+                    // Wintering Streak Freeze Toggle
+                    IconButton(
+                        onClick = onWinteringToggle,
+                        modifier = Modifier.size(30.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.AcUnit,
+                            contentDescription = if (habit.isWintering) "Resume Habit" else "Freeze / Wintering Mode",
+                            tint = if (habit.isWintering) Color(0xFF4A7268) else colors.textTertiary.copy(alpha = 0.6f),
+                            modifier = Modifier.size(16.dp)
+                        )
                     }
 
                     IconButton(
                         onClick = onArchiveToggle,
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(30.dp)
                     ) {
                         Icon(
                             imageVector = if (habit.archived) Icons.Rounded.Unarchive else Icons.Rounded.Archive,
                             contentDescription = if (habit.archived) "Unarchive" else "Archive",
                             tint = colors.textTertiary,
-                            modifier = Modifier.size(18.dp)
+                            modifier = Modifier.size(17.dp)
                         )
                     }
                 }

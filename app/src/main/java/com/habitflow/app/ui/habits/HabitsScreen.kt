@@ -15,10 +15,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -97,12 +100,70 @@ fun HabitsScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
+            // Live Search Bar
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                    .background(colors.surface)
+                    .border(1.dp, colors.border.copy(alpha = 0.5f), androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                    .padding(horizontal = 12.dp, vertical = 8.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search",
+                        tint = colors.textTertiary,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    androidx.compose.foundation.text.BasicTextField(
+                        value = uiState.searchQuery,
+                        onValueChange = { viewModel.setSearchQuery(it) },
+                        modifier = Modifier.weight(1f),
+                        textStyle = NotionTheme.typography.bodyMedium.copy(
+                            color = colors.textPrimary,
+                            fontSize = 14.sp
+                        ),
+                        singleLine = true,
+                        decorationBox = { innerTextField ->
+                            if (uiState.searchQuery.isEmpty()) {
+                                Text(
+                                    text = "Search habits, intentions, or tags...",
+                                    style = NotionTheme.typography.bodyMedium,
+                                    color = colors.textTertiary,
+                                    fontSize = 13.5.sp
+                                )
+                            }
+                            innerTextField()
+                        }
+                    )
+                    if (uiState.searchQuery.isNotEmpty()) {
+                        androidx.compose.material3.IconButton(
+                            onClick = { viewModel.setSearchQuery("") },
+                            modifier = Modifier.size(24.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Clear",
+                                tint = colors.textSecondary,
+                                modifier = Modifier.size(14.dp)
+                            )
+                        }
+                    }
+                }
+            }
+
             // Filter Chips Bar
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .horizontalScroll(rememberScrollState())
-                    .padding(horizontal = 16.dp, vertical = 10.dp),
+                    .padding(horizontal = 16.dp, vertical = 6.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 // "All Active"
@@ -165,6 +226,9 @@ fun HabitsScreen(
                             },
                             onArchiveToggle = {
                                 viewModel.archiveHabit(habit)
+                            },
+                            onWinteringToggle = {
+                                viewModel.toggleWintering(habit)
                             }
                         )
                     }
