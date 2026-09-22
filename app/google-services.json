@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "777276382325",
+    "project_id": "gen-lang-client-0464813656",
+    "storage_bucket": "gen-lang-client-0464813656.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:777276382325:android:9d6e21181b742c95a16c3c",
+        "android_client_info": {
+          "package_name": "com.forma.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "777276382325-rlc5aoh5c54ss2q8am9v3msd1m37v29r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzkWZ6ek_mrQrwwBCuCyDymw7C8I04OIY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "777276382325-rlc5aoh5c54ss2q8am9v3msd1m37v29r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
