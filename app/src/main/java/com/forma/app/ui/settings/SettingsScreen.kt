@@ -1,4 +1,4 @@
-﻿package com.forma.app.ui.settings
+package com.forma.app.ui.settings
 
 import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
@@ -109,12 +109,16 @@ fun SettingsScreen(
     val notificationsEnabled by viewModel.notificationsEnabled.collectAsState()
     val isPro by viewModel.isPro.collectAsState()
     val userName by viewModel.userName.collectAsState()
+    val chronotype by viewModel.chronotype.collectAsState()
+    val isBiometricLockEnabled by viewModel.isBiometricLockEnabled.collectAsState()
+    val isPrivacyMaskingEnabled by viewModel.isPrivacyMaskingEnabled.collectAsState()
 
     var showPaywall by remember { mutableStateOf(false) }
     var showEditProfileDialog by remember { mutableStateOf(false) }
     var showAuthBottomSheet by remember { mutableStateOf(false) }
     var showSoundscapeSheet by remember { mutableStateOf(false) }
     var showCirclesSheet by remember { mutableStateOf(false) }
+    var showChronotypeSheet by remember { mutableStateOf(false) }
     var vaultDialogMode by remember { mutableStateOf<VaultDialogMode?>(null) }
     var hapticsEnabled by remember { mutableStateOf(true) }
     var morningReminderEnabled by remember { mutableStateOf(true) }
@@ -519,6 +523,137 @@ fun SettingsScreen(
                                 }
                             }
                         }
+                    }
+                }
+                Spacer(modifier = Modifier.height(20.dp))
+            }
+
+            // ── Section: Circadian Chronotype & Energy ─────────────────
+            item {
+                SettingsSectionHeader(label = "BIOLOGY & CIRCADIAN CHRONOTYPE", modifier = Modifier.padding(horizontal = 24.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(colors.surface)
+                        .border(1.dp, colors.border.copy(alpha = 0.4f), RoundedCornerShape(20.dp))
+                        .padding(16.dp)
+                ) {
+                    Column {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = chronotype.animalSymbol,
+                                    fontSize = 32.sp,
+                                    modifier = Modifier.padding(end = 12.dp)
+                                )
+                                Column {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text(
+                                            text = chronotype.displayName,
+                                            fontWeight = FontWeight.Bold,
+                                            color = colors.textPrimary,
+                                            fontSize = 15.sp
+                                        )
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Box(
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(6.dp))
+                                                .background(colors.accentSoft)
+                                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                                        ) {
+                                            Text(
+                                                text = "ACTIVE",
+                                                fontWeight = FontWeight.Bold,
+                                                color = colors.accent,
+                                                fontSize = 9.sp
+                                            )
+                                        }
+                                    }
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Text(
+                                        text = "Peak Focus: ${chronotype.peakFocusWindow}",
+                                        color = colors.accent,
+                                        fontWeight = FontWeight.Medium,
+                                        fontSize = 11.5.sp
+                                    )
+                                }
+                            }
+
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(colors.accentSoft)
+                                    .formaPressEffect(targetScale = 0.94f) {
+                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                        showChronotypeSheet = true
+                                    }
+                                    .padding(horizontal = 12.dp, vertical = 7.dp)
+                            ) {
+                                Text(
+                                    text = "Change",
+                                    fontWeight = FontWeight.Bold,
+                                    color = colors.accent,
+                                    fontSize = 11.sp
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Text(
+                            text = chronotype.description,
+                            color = colors.textSecondary,
+                            fontSize = 11.5.sp,
+                            lineHeight = 16.sp
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(20.dp))
+            }
+
+            // ── Section: Sanctuary Lock & Privacy ───────────────────────
+            item {
+                SettingsSectionHeader(label = "SANCTUARY LOCK & APP PRIVACY", modifier = Modifier.padding(horizontal = 24.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(colors.surface)
+                        .border(1.dp, colors.border.copy(alpha = 0.4f), RoundedCornerShape(20.dp))
+                        .padding(16.dp)
+                ) {
+                    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                        SettingsToggleRow(
+                            icon = Icons.Rounded.Spa,
+                            title = "Biometric Sanctuary Lock",
+                            subtitle = "Require fingerprint or face unlock to access private reflections",
+                            checked = isBiometricLockEnabled,
+                            onCheckedChange = { enabled ->
+                                viewModel.setBiometricLockEnabled(enabled)
+                            }
+                        )
+                        SettingsDivider()
+                        SettingsToggleRow(
+                            icon = Icons.Rounded.Bookmark,
+                            title = "App Switcher Screen Masking",
+                            subtitle = "Prevent OS app switcher snapshots from exposing journal entries",
+                            checked = isPrivacyMaskingEnabled,
+                            onCheckedChange = { enabled ->
+                                viewModel.setPrivacyMaskingEnabled(enabled)
+                            }
+                        )
                     }
                 }
                 Spacer(modifier = Modifier.height(20.dp))
@@ -968,6 +1103,19 @@ fun SettingsScreen(
                 )
             }
         }
+    }
+
+    if (showChronotypeSheet) {
+        val currentChrono by viewModel.chronotype.collectAsState()
+        com.forma.app.ui.chronotype.ChronotypeSelectorSheet(
+            currentChronotype = currentChrono,
+            alignmentReport = null,
+            onSelectChronotype = { newChrono ->
+                viewModel.setChronotype(newChrono)
+                showChronotypeSheet = false
+            },
+            onDismiss = { showChronotypeSheet = false }
+        )
     }
 
     if (showPaywall) {

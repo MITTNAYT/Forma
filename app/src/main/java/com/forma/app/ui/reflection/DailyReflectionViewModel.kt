@@ -1,4 +1,4 @@
-﻿package com.forma.app.ui.reflection
+package com.forma.app.ui.reflection
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -61,6 +61,9 @@ class DailyReflectionViewModel @Inject constructor(
     val recentReflections: StateFlow<List<DailyReflection>> = reflectionRepository
         .getRecentReflections()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val isBiometricLockEnabled: StateFlow<Boolean> = preferencesRepository.isBiometricLockEnabled
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     private val _keystone1 = MutableStateFlow("")
     val keystone1: StateFlow<String> = _keystone1.asStateFlow()

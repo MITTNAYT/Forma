@@ -1,4 +1,4 @@
-﻿package com.forma.app.domain.repository
+package com.forma.app.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 
@@ -41,6 +41,9 @@ interface UserPreferencesRepository {
     val dailySummaryTimeMinutes: Flow<Int>
     val isOnboardingCompleted: Flow<Boolean>
     val hasSeenTodayCoachMarks: Flow<Boolean>
+    val chronotype: Flow<com.forma.app.domain.model.Chronotype>
+    val isBiometricLockEnabled: Flow<Boolean>
+    val isPrivacyMaskingEnabled: Flow<Boolean>
 
     suspend fun setUserName(name: String)
     suspend fun setUserHeadline(headline: String)
@@ -51,5 +54,8 @@ interface UserPreferencesRepository {
     suspend fun setDailySummaryTimeMinutes(minutes: Int)
     suspend fun setOnboardingCompleted(completed: Boolean)
     suspend fun setHasSeenTodayCoachMarks(seen: Boolean)
+    suspend fun setChronotype(chronotype: com.forma.app.domain.model.Chronotype)
+    suspend fun setBiometricLockEnabled(enabled: Boolean)
+    suspend fun setPrivacyMaskingEnabled(enabled: Boolean)
 }
 

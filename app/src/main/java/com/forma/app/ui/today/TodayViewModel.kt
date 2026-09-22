@@ -1,4 +1,4 @@
-﻿package com.forma.app.ui.today
+package com.forma.app.ui.today
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -69,6 +69,9 @@ class TodayViewModel @Inject constructor(
     val isPro: StateFlow<Boolean> = billingRepository.isPro
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
+    val chronotype: StateFlow<com.forma.app.domain.model.Chronotype> = preferencesRepository.chronotype
+        .stateIn(viewModelScope, SharingStarted.Eagerly, com.forma.app.domain.model.Chronotype.BEAR)
+
     val hasSeenTodayCoachMarks: StateFlow<Boolean> = preferencesRepository.hasSeenTodayCoachMarks
         .stateIn(viewModelScope, SharingStarted.Eagerly, true)
 
@@ -76,6 +79,12 @@ class TodayViewModel @Inject constructor(
     val daySchedule: StateFlow<DaySchedule?> = _selectedDate
         .flatMapLatest { date -> getTodayTimelineUseCase(date) }
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
+    fun setChronotype(chronotype: com.forma.app.domain.model.Chronotype) {
+        viewModelScope.launch {
+            preferencesRepository.setChronotype(chronotype)
+        }
+    }
 
     fun dismissCoachMarks() {
         viewModelScope.launch {

@@ -1,4 +1,4 @@
-﻿package com.forma.app.ui.today
+package com.forma.app.ui.today
 
 import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
@@ -123,6 +123,7 @@ fun TodayScreen(
     val selectedDate by viewModel.selectedDate.collectAsState()
     val daySchedule by viewModel.daySchedule.collectAsState()
     val userName by viewModel.userName.collectAsState()
+    val chronotype by viewModel.chronotype.collectAsState()
     val hasSeenTodayCoachMarks by viewModel.hasSeenTodayCoachMarks.collectAsState()
 
     var weekStripBounds by remember { mutableStateOf<Rect?>(null) }
@@ -138,6 +139,7 @@ fun TodayScreen(
     var showBreathingSheet by remember { mutableStateOf(false) }
     var showGuidedRoutineSheet by remember { mutableStateOf(false) }
     var showJournalSheet by remember { mutableStateOf(false) }
+    var showChronotypeSheet by remember { mutableStateOf(false) }
     var showAiStudioSheet by remember { mutableStateOf(false) }
     var selectedDetailItem by remember { mutableStateOf<TodayScheduleItem?>(null) }
     var celebrationInfo by remember { mutableStateOf<Pair<String, Int>?>(null) }
@@ -546,7 +548,20 @@ fun TodayScreen(
                     }
                 }
 
-                item { Spacer(modifier = Modifier.height(14.dp)) }
+                item { Spacer(modifier = Modifier.height(10.dp)) }
+
+                // 2.5 Circadian Diurnal Energy Curve Wave
+                item {
+                    com.forma.app.ui.chronotype.components.CircadianEnergyWaveCard(
+                        chronotype = chronotype,
+                        onCardClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            showChronotypeSheet = true
+                        }
+                    )
+                }
+
+                item { Spacer(modifier = Modifier.height(10.dp)) }
 
                 // 3. Hero Progress Card Banner
                 val scheduleItems = daySchedule?.items ?: emptyList()
@@ -1044,6 +1059,18 @@ fun TodayScreen(
         com.forma.app.ui.today.components.AiStudioSheet(
             viewModel = viewModel,
             onDismiss = { showAiStudioSheet = false }
+        )
+    }
+
+    if (showChronotypeSheet) {
+        com.forma.app.ui.chronotype.ChronotypeSelectorSheet(
+            currentChronotype = chronotype,
+            alignmentReport = null,
+            onSelectChronotype = { newChrono ->
+                viewModel.setChronotype(newChrono)
+                showChronotypeSheet = false
+            },
+            onDismiss = { showChronotypeSheet = false }
         )
     }
 

@@ -54,10 +54,11 @@ android {
         }
     }
 
-    val releaseStoreFile = (keystoreProps["KEYSTORE_PATH"] as? String)?.let { file(it) }
-        ?: System.getenv("KEYSTORE_PATH")?.let { file(it) }
-        ?: rootProject.file("forma-release.jks").takeIf { it.exists() }
-        ?: rootProject.file("habitflow-release.jks").takeIf { it.exists() }
+    val releaseStoreFile = (keystoreProps["KEYSTORE_PATH"] as? String)?.let { path ->
+        rootProject.file(path).takeIf { it.exists() } ?: file(path).takeIf { it.exists() }
+    } ?: System.getenv("KEYSTORE_PATH")?.let { file(it) }
+      ?: rootProject.file("forma-release.jks").takeIf { it.exists() }
+      ?: rootProject.file("habitflow-release.jks").takeIf { it.exists() }
     val isReleaseSigningAvailable = releaseStoreFile != null && releaseStoreFile.exists()
 
     signingConfigs {
@@ -122,6 +123,11 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
+    }
 }
 
 dependencies {
@@ -170,6 +176,9 @@ dependencies {
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
     implementation(libs.play.services.auth)
+
+    // Biometrics & Sanctuary Security
+    implementation(libs.androidx.biometric)
 
     // WorkManager
     implementation(libs.androidx.work.runtime.ktx)

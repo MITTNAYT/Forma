@@ -1,4 +1,4 @@
-﻿package com.forma.app.ui.reflection
+package com.forma.app.ui.reflection
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -35,6 +35,9 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,6 +47,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.forma.app.core.designsystem.FormaTheme
 import com.forma.app.core.designsystem.haptics.rememberZenHaptics
+import com.forma.app.core.designsystem.motion.formaPressEffect
+import com.forma.app.core.security.BiometricLockManager
 import com.forma.app.domain.model.DailyReflection
 import com.forma.app.domain.model.EnergyLevel
 import java.time.LocalDate
@@ -60,6 +65,26 @@ fun ReflectionJournalSheet(
     val zenHaptics = rememberZenHaptics()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val reflections by viewModel.recentReflections.collectAsState()
+    val isBiometricLockEnabled by viewModel.isBiometricLockEnabled.collectAsState()
+    var isUnlocked by remember { mutableStateOf(false) }
+
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val activity = context as? androidx.fragment.app.FragmentActivity
+    val biometricManager = remember { BiometricLockManager() }
+
+    androidx.compose.runtime.LaunchedEffect(isBiometricLockEnabled) {
+        if (isBiometricLockEnabled && !isUnlocked && activity != null) {
+            biometricManager.promptAuthentication(
+                activity = activity,
+                title = "Sanctuary Lock",
+                subtitle = "Verify identity to view your mindful journal",
+                onSuccess = { isUnlocked = true },
+                onError = { /* fallback to button */ }
+            )
+        } else if (!isBiometricLockEnabled) {
+            isUnlocked = true
+        }
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -67,6 +92,79 @@ fun ReflectionJournalSheet(
         containerColor = colors.background,
         dragHandle = null
     ) {
+        if (isBiometricLockEnabled && !isUnlocked) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.60f)
+                    .padding(32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(72.dp)
+                        .clip(CircleShape)
+                        .background(colors.accentSoft),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Spa,
+                        contentDescription = "Locked",
+                        tint = colors.accent,
+                        modifier = Modifier.size(36.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Text(
+                    text = "Sanctuary Locked",
+                    style = FormaTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = colors.textPrimary,
+                    fontSize = 20.sp
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "Your private reflections, emotions, and keystones are guarded by biometric sanctuary encryption.",
+                    style = FormaTheme.typography.bodyMedium,
+                    color = colors.textSecondary,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    fontSize = 13.sp,
+                    lineHeight = 18.sp
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(colors.accent)
+                        .formaPressEffect {
+                            if (activity != null) {
+                                biometricManager.promptAuthentication(
+                                    activity = activity,
+                                    title = "Sanctuary Lock",
+                                    subtitle = "Verify identity to view your mindful journal",
+                                    onSuccess = { isUnlocked = true },
+                                    onError = { /* stay locked */ }
+                                )
+                            }
+                        }
+                        .padding(horizontal = 24.dp, vertical = 14.dp)
+                ) {
+                    Text(
+                        text = "Unlock Sanctuary",
+                        fontWeight = FontWeight.Bold,
+                        color = colors.onAccent,
+                        fontSize = 14.sp
+                    )
+                }
+            }
+        } else {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -188,6 +286,7 @@ fun ReflectionJournalSheet(
             }
         }
     }
+}
 }
 
 @Composable

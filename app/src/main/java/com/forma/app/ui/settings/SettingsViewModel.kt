@@ -1,4 +1,4 @@
-﻿package com.forma.app.ui.settings
+package com.forma.app.ui.settings
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
@@ -57,8 +57,35 @@ class SettingsViewModel @Inject constructor(
     val notificationsEnabled: StateFlow<Boolean> = preferencesRepository.notificationsEnabled
         .stateIn(viewModelScope, SharingStarted.Eagerly, true)
 
+    val chronotype: StateFlow<com.forma.app.domain.model.Chronotype> = preferencesRepository.chronotype
+        .stateIn(viewModelScope, SharingStarted.Eagerly, com.forma.app.domain.model.Chronotype.BEAR)
+
+    val isBiometricLockEnabled: StateFlow<Boolean> = preferencesRepository.isBiometricLockEnabled
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+    val isPrivacyMaskingEnabled: StateFlow<Boolean> = preferencesRepository.isPrivacyMaskingEnabled
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
     val isPro: StateFlow<Boolean> = billingRepository.isPro
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+    fun setChronotype(chronotype: com.forma.app.domain.model.Chronotype) {
+        viewModelScope.launch {
+            preferencesRepository.setChronotype(chronotype)
+        }
+    }
+
+    fun setBiometricLockEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.setBiometricLockEnabled(enabled)
+        }
+    }
+
+    fun setPrivacyMaskingEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.setPrivacyMaskingEnabled(enabled)
+        }
+    }
 
     fun sendTestNotification() {
         notificationHelper.showHabitNotification(
