@@ -79,11 +79,17 @@ import com.habitflow.app.ui.settings.components.EncryptedVaultDialog
 import com.habitflow.app.ui.settings.components.ProPaywallBottomSheet
 import androidx.compose.material.icons.rounded.CloudDone
 import androidx.compose.material.icons.rounded.CloudSync
+import androidx.compose.material.icons.rounded.GraphicEq
+import androidx.compose.material.icons.rounded.People
 import androidx.compose.material3.CircularProgressIndicator
 import com.habitflow.app.domain.model.AuthState
 import com.habitflow.app.ui.auth.AuthViewModel
 import com.habitflow.app.ui.auth.components.AuthModalBottomSheet
+import com.habitflow.app.ui.circles.CirclesScreen
+import com.habitflow.app.ui.circles.CirclesViewModel
 import com.habitflow.app.ui.settings.components.VaultDialogMode
+import com.habitflow.app.ui.soundscape.SoundscapePlayerSheet
+import com.habitflow.app.ui.soundscape.SoundscapeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -91,7 +97,9 @@ fun SettingsScreen(
     onNavigateToHabits: () -> Unit,
     onNavigateToStats: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
-    authViewModel: AuthViewModel = hiltViewModel()
+    authViewModel: AuthViewModel = hiltViewModel(),
+    soundscapeViewModel: SoundscapeViewModel = hiltViewModel(),
+    circlesViewModel: CirclesViewModel = hiltViewModel()
 ) {
     val colors = FormaTheme.colors
     val context = LocalContext.current
@@ -105,6 +113,8 @@ fun SettingsScreen(
     var showPaywall by remember { mutableStateOf(false) }
     var showEditProfileDialog by remember { mutableStateOf(false) }
     var showAuthBottomSheet by remember { mutableStateOf(false) }
+    var showSoundscapeSheet by remember { mutableStateOf(false) }
+    var showCirclesSheet by remember { mutableStateOf(false) }
     var vaultDialogMode by remember { mutableStateOf<VaultDialogMode?>(null) }
     var hapticsEnabled by remember { mutableStateOf(true) }
     var morningReminderEnabled by remember { mutableStateOf(true) }
@@ -733,6 +743,39 @@ fun SettingsScreen(
                 Spacer(modifier = Modifier.height(20.dp))
             }
 
+            // ── Section: Sound Sanctuary & Community Circles ───────────
+            item {
+                SettingsSectionHeader(label = "SOUND SANCTUARY & COMMUNITY", modifier = Modifier.padding(horizontal = 24.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(colors.surface)
+                        .padding(vertical = 4.dp)
+                ) {
+                    Column {
+                        SettingsTapRow(
+                            icon = Icons.Rounded.GraphicEq,
+                            title = "Acoustic Sound Sanctuary",
+                            subtitle = "Rain on Cedar, Tibetan Bowls & Alpine Streams",
+                            onClick = { showSoundscapeSheet = true }
+                        )
+                        SettingsDivider(indent = 50.dp)
+                        SettingsTapRow(
+                            icon = Icons.Rounded.People,
+                            title = "Intentional Circles",
+                            subtitle = "Private shared rituals & mindful accountability with friends",
+                            onClick = { showCirclesSheet = true }
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(20.dp))
+            }
+
             // ── Section: Data & Mindful Archives ───────────────────────
             item {
                 SettingsSectionHeader(label = "DATA & MINDFUL ARCHIVES", modifier = Modifier.padding(horizontal = 24.dp))
@@ -901,6 +944,30 @@ fun SettingsScreen(
             viewModel = authViewModel,
             onDismiss = { showAuthBottomSheet = false }
         )
+    }
+
+    if (showSoundscapeSheet) {
+        SoundscapePlayerSheet(
+            viewModel = soundscapeViewModel,
+            onDismiss = { showSoundscapeSheet = false }
+        )
+    }
+
+    if (showCirclesSheet) {
+        androidx.compose.ui.window.Dialog(
+            onDismissRequest = { showCirclesSheet = false },
+            properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)
+        ) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                CirclesScreen(
+                    viewModel = circlesViewModel,
+                    onNavigateToAuth = {
+                        showCirclesSheet = false
+                        showAuthBottomSheet = true
+                    }
+                )
+            }
+        }
     }
 
     if (showPaywall) {

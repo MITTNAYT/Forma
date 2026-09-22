@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/matrix_widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_widget_card"
+    android:orientation="vertical"
+    android:padding="14dp">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/matrix_widget_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="0.05"
+            android:text="FORMA • CONSISTENCY"
+            android:textColor="@color/matcha_dark"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/matrix_widget_streak"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:text="🔥 7d streak"
+            android:textColor="@color/notion_text_primary_light"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+    <!-- Subtitle -->
+    <TextView
+        android:id="@+id/matrix_widget_subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="8dp"
+        android:fontFamily="sans-serif"
+        android:text="Where intention takes form."
+        android:textColor="@color/notion_text_secondary_light"
+        android:textSize="10sp" />
+
+    <!-- Progress / Momentum Bar -->
+    <ProgressBar
+        android:id="@+id/matrix_widget_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="6dp"
+        android:layout_marginBottom="8dp"
+        android:max="100"
+        android:progress="75"
+        android:progressDrawable="@drawable/bg_progress_bar_custom" />
+
+    <!-- 4-Week Status Summary -->
+    <TextView
+        android:id="@+id/matrix_widget_history_summary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif"
+        android:text="24 rituals completed in past 7 days"
+        android:textColor="@color/matcha_dark"
+        android:textSize="10sp" />
+
+</LinearLayout>

@@ -5,7 +5,6 @@ import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioTrack
 import android.os.Build
-import android.os.CombinedVibration
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
@@ -15,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.math.PI
 import kotlin.math.sin
 
 @Singleton
@@ -35,14 +35,11 @@ class ZenFeedbackManager @Inject constructor(
 
     /**
      * Triggers a gentle mindful completion effect:
-     * 1. Soft Tibetan singing bowl acoustic chime tone.
+     * 1. Resonant Tibetan singing bowl acoustic chime tone (7-harmonic series).
      * 2. Crisp tactile haptic pulse.
      */
     fun onHabitCompleted(playChime: Boolean = true) {
-        // Haptic feedback
         performHaptic(HapticType.SUCCESS_CLICK)
-
-        // Acoustic Tibetan singing bowl resonance
         if (playChime) {
             playTibetanBowlChime()
         }
@@ -54,7 +51,7 @@ class ZenFeedbackManager @Inject constructor(
 
     fun onMilestoneReached() {
         performHaptic(HapticType.DOUBLE_PULSE)
-        playTibetanBowlChime(pitchMultiplier = 1.25)
+        playTibetanBowlChime(pitchMultiplier = 1.2)
     }
 
     private fun performHaptic(type: HapticType) {
@@ -77,32 +74,35 @@ class ZenFeedbackManager @Inject constructor(
     }
 
     /**
-     * Synthesizes a clean Tibetan Singing Bowl harmonic tone at ~576 Hz / 864 Hz with exponential decay.
+     * Synthesizes a high-definition Tibetan Singing Bowl 7-harmonic acoustic chime.
      */
     fun playTibetanBowlChime(pitchMultiplier: Double = 1.0) {
         scope.launch {
             try {
-                val sampleRate = 22050
-                val durationSeconds = 1.2
+                val sampleRate = 44100
+                val durationSeconds = 1.6
                 val numSamples = (sampleRate * durationSeconds).toInt()
                 val buffer = ShortArray(numSamples)
 
-                val freq1 = 576.0 * pitchMultiplier
-                val freq2 = 864.0 * pitchMultiplier
-                val freq3 = 1440.0 * pitchMultiplier
-                val twoPi = 2.0 * Math.PI
+                val partials = doubleArrayOf(144.0, 288.0, 432.0, 528.0, 720.0, 864.0, 1296.0).map { it * pitchMultiplier }
+                val weights = doubleArrayOf(0.35, 0.25, 0.20, 0.35, 0.15, 0.10, 0.05)
+                val phases = DoubleArray(partials.size)
+                val twoPi = 2.0 * PI
 
                 var envelope = 1.0
-                val decayRate = Math.pow(0.001, 1.0 / numSamples) // Reaches ~0.1% at end
+                val decayRate = Math.pow(0.0005, 1.0 / numSamples)
 
                 for (i in 0 until numSamples) {
-                    val t = i.toDouble() / sampleRate
-                    val s1 = sin(twoPi * freq1 * t) * 0.65
-                    val s2 = sin(twoPi * freq2 * t) * 0.25
-                    val s3 = sin(twoPi * freq3 * t) * 0.10
+                    var sampleVal = 0.0
+                    for (p in partials.indices) {
+                        val step = (twoPi * partials[p]) / sampleRate
+                        phases[p] += step
+                        if (phases[p] > twoPi) phases[p] -= twoPi
+                        sampleVal += sin(phases[p]) * weights[p]
+                    }
 
-                    val sample = (s1 + s2 + s3) * envelope * 12000.0
-                    buffer[i] = sample.toInt().coerceIn(-32768, 32767).toShort()
+                    val finalSample = (sampleVal * envelope * 14000.0).toInt().coerceIn(-32768, 32767).toShort()
+                    buffer[i] = finalSample
                     envelope *= decayRate
                 }
 
@@ -127,7 +127,6 @@ class ZenFeedbackManager @Inject constructor(
                 track.write(buffer, 0, buffer.size)
                 track.play()
 
-                // Release after playing
                 kotlinx.coroutines.delay((durationSeconds * 1000).toLong() + 200)
                 track.stop()
                 track.release()
@@ -175,27 +174,30 @@ class ZenFeedbackManager @Inject constructor(
         fun playTibetanBowl(context: Context, pitchMultiplier: Double = 1.0) {
             CoroutineScope(Dispatchers.Default).launch {
                 try {
-                    val sampleRate = 22050
-                    val durationSeconds = 1.2
+                    val sampleRate = 44100
+                    val durationSeconds = 1.6
                     val numSamples = (sampleRate * durationSeconds).toInt()
                     val buffer = ShortArray(numSamples)
 
-                    val freq1 = 576.0 * pitchMultiplier
-                    val freq2 = 864.0 * pitchMultiplier
-                    val freq3 = 1440.0 * pitchMultiplier
-                    val twoPi = 2.0 * Math.PI
+                    val partials = doubleArrayOf(144.0, 288.0, 432.0, 528.0, 720.0, 864.0, 1296.0).map { it * pitchMultiplier }
+                    val weights = doubleArrayOf(0.35, 0.25, 0.20, 0.35, 0.15, 0.10, 0.05)
+                    val phases = DoubleArray(partials.size)
+                    val twoPi = 2.0 * PI
 
                     var envelope = 1.0
-                    val decayRate = Math.pow(0.001, 1.0 / numSamples)
+                    val decayRate = Math.pow(0.0005, 1.0 / numSamples)
 
                     for (i in 0 until numSamples) {
-                        val t = i.toDouble() / sampleRate
-                        val s1 = sin(twoPi * freq1 * t) * 0.65
-                        val s2 = sin(twoPi * freq2 * t) * 0.25
-                        val s3 = sin(twoPi * freq3 * t) * 0.10
+                        var sampleVal = 0.0
+                        for (p in partials.indices) {
+                            val step = (twoPi * partials[p]) / sampleRate
+                            phases[p] += step
+                            if (phases[p] > twoPi) phases[p] -= twoPi
+                            sampleVal += sin(phases[p]) * weights[p]
+                        }
 
-                        val sample = (s1 + s2 + s3) * envelope * 12000.0
-                        buffer[i] = sample.toInt().coerceIn(-32768, 32767).toShort()
+                        val finalSample = (sampleVal * envelope * 14000.0).toInt().coerceIn(-32768, 32767).toShort()
+                        buffer[i] = finalSample
                         envelope *= decayRate
                     }
 
@@ -204,7 +206,7 @@ class ZenFeedbackManager @Inject constructor(
                             AudioAttributes.Builder()
                                 .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
                                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                                .build()
+                            .build()
                         )
                         .setAudioFormat(
                             AudioFormat.Builder()

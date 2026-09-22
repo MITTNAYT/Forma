@@ -45,11 +45,27 @@ class WidgetActionReceiver : BroadcastReceiver() {
                     toggleUseCase(habitId, date)
                     ZenFeedbackManager.playTibetanBowl(context)
 
-                    // Refresh Widget List
+                    // Refresh all widgets
                     val appWidgetManager = AppWidgetManager.getInstance(context)
-                    val componentName = ComponentName(context, HabitListWidgetProvider::class.java)
-                    val appWidgetIds = appWidgetManager.getAppWidgetIds(componentName)
-                    appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_habit_list_view)
+
+                    // 1. Habit List Widget
+                    val listComponent = ComponentName(context, HabitListWidgetProvider::class.java)
+                    val listIds = appWidgetManager.getAppWidgetIds(listComponent)
+                    appWidgetManager.notifyAppWidgetViewDataChanged(listIds, R.id.widget_habit_list_view)
+
+                    // 2. Ensō Ring Widget
+                    val ensoComponent = ComponentName(context, EnsoRingWidgetProvider::class.java)
+                    val ensoIds = appWidgetManager.getAppWidgetIds(ensoComponent)
+                    for (id in ensoIds) {
+                        EnsoRingWidgetProvider.updateAppWidget(context, appWidgetManager, id)
+                    }
+
+                    // 3. Habit Matrix Widget
+                    val matrixComponent = ComponentName(context, HabitMatrixWidgetProvider::class.java)
+                    val matrixIds = appWidgetManager.getAppWidgetIds(matrixComponent)
+                    for (id in matrixIds) {
+                        HabitMatrixWidgetProvider.updateAppWidget(context, appWidgetManager, id)
+                    }
                 } finally {
                     pendingResult.finish()
                 }

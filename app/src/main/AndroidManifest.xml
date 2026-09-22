@@ -151,6 +151,18 @@
                 android:resource="@xml/enso_ring_widget_info" />
         </receiver>
 
+        <!-- Habit Matrix 4x2 Consistency Widget -->
+        <receiver
+            android:name=".core.widget.HabitMatrixWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_habit_matrix_info" />
+        </receiver>
+
         <!-- Disable default WorkManager initializer to use HiltWorkerFactory cleanly -->
         <provider
             android:name="androidx.startup.InitializationProvider"

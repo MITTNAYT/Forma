@@ -75,5 +75,11 @@ abstract class RepositoryModule {
     abstract fun bindSyncRepository(
         syncRepositoryImpl: com.habitflow.app.data.repository.SyncRepositoryImpl
     ): com.habitflow.app.domain.repository.SyncRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindCircleRepository(
+        circleRepositoryImpl: com.habitflow.app.data.repository.CircleRepositoryImpl
+    ): com.habitflow.app.domain.repository.CircleRepository
 }
 

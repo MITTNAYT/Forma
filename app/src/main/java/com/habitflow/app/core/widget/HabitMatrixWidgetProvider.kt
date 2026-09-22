@@ -20,11 +20,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 
-class EnsoRingWidgetProvider : AppWidgetProvider() {
+class HabitMatrixWidgetProvider : AppWidgetProvider() {
 
     @EntryPoint
     @InstallIn(SingletonComponent::class)
-    interface EnsoWidgetEntryPoint {
+    interface HabitMatrixEntryPoint {
         fun habitDao(): HabitDao
         fun habitCompletionDao(): HabitCompletionDao
     }
@@ -45,62 +45,60 @@ class EnsoRingWidgetProvider : AppWidgetProvider() {
             appWidgetManager: AppWidgetManager,
             appWidgetId: Int
         ) {
-            val views = RemoteViews(context.packageName, R.layout.widget_enso_ring)
+            val views = RemoteViews(context.packageName, R.layout.widget_habit_matrix)
 
-            val todayDate = DateUtils.formatDateIso(DateUtils.today())
-            val dayOfWeek = LocalDate.now().dayOfWeek.value
+            val today = DateUtils.today()
+            val todayDate = DateUtils.formatDateIso(today)
 
-            var titleText = "FORMA"
-            var subtitleText = "Mindful Flow"
+            var streakText = "🔥 1d streak"
+            var completionSummary = "Tracking your daily flow"
+            var weeklyProgress = 50
 
             try {
                 val entryPoint = EntryPointAccessors.fromApplication(
                     context.applicationContext,
-                    EnsoWidgetEntryPoint::class.java
+                    HabitMatrixEntryPoint::class.java
                 )
                 val habitDao = entryPoint.habitDao()
                 val habitCompletionDao = entryPoint.habitCompletionDao()
 
                 runBlocking(Dispatchers.IO) {
-                    val allHabits = habitDao.getActiveHabits().first()
-                    val completions = habitCompletionDao.getCompletionsForDate(todayDate).first()
-                    val completedHabitIds = completions.map { it.habitId }.toSet()
+                    val activeHabits = habitDao.getActiveHabits().first()
+                    val totalHabits = activeHabits.size.coerceAtLeast(1)
 
-                    val scheduledHabits = allHabits.filter { habit ->
-                        val repeatDays = if (habit.repeatDays.isBlank()) {
-                            emptySet()
-                        } else {
-                            habit.repeatDays.split(",").mapNotNull { it.trim().toIntOrNull() }.toSet()
-                        }
-                        (repeatDays.isEmpty() || repeatDays.contains(dayOfWeek)) && !habit.isWintering
+                    var weekCompletionsCount = 0
+                    for (i in 0..6) {
+                        val d = today.minusDays(i.toLong())
+                        val dStr = DateUtils.formatDateIso(d)
+                        val comps = habitCompletionDao.getCompletionsForDate(dStr).first()
+                        weekCompletionsCount += comps.size
                     }
 
-                    val total = scheduledHabits.size
-                    val done = scheduledHabits.count { completedHabitIds.contains(it.id) }
+                    weeklyProgress = ((weekCompletionsCount.toDouble() / (totalHabits * 7).toDouble()) * 100).toInt().coerceIn(0, 100)
+                    completionSummary = "$weekCompletionsCount rituals completed in the past 7 days"
 
-                    if (total > 0) {
-                        val pct = ((done.toDouble() / total.toDouble()) * 100).toInt()
-                        titleText = "$pct% Done"
-                        subtitleText = "$done of $total rituals"
-                    }
+                    // Quick streak estimation
+                    val todayComps = habitCompletionDao.getCompletionsForDate(todayDate).first()
+                    val streakDays = if (todayComps.isNotEmpty()) (weekCompletionsCount / totalHabits).coerceAtLeast(1) else 0
+                    streakText = "🔥 ${streakDays}d streak"
                 }
             } catch (_: Exception) {}
 
-            views.setTextViewText(R.id.enso_widget_title, titleText)
-            views.setTextViewText(R.id.enso_widget_subtitle, subtitleText)
+            views.setTextViewText(R.id.matrix_widget_streak, streakText)
+            views.setTextViewText(R.id.matrix_widget_history_summary, completionSummary)
+            views.setProgressBar(R.id.matrix_widget_progress, 100, weeklyProgress, false)
 
-            // Intent to launch MainActivity
             val intent = Intent(context, MainActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                putExtra("navigate_to", "today")
+                putExtra("navigate_to", "stats")
             }
             val pendingIntent = PendingIntent.getActivity(
                 context,
-                200,
+                201,
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
-            views.setOnClickPendingIntent(R.id.enso_widget_root, pendingIntent)
+            views.setOnClickPendingIntent(R.id.matrix_widget_root, pendingIntent)
 
             appWidgetManager.updateAppWidget(appWidgetId, views)
         }
