@@ -31,14 +31,7 @@ import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.ExpandLess
 import androidx.compose.material.icons.rounded.ExpandMore
-import androidx.compose.material.icons.rounded.Fingerprint
-import androidx.compose.material.icons.rounded.Insights
-import androidx.compose.material.icons.rounded.Palette
-import androidx.compose.material.icons.rounded.Psychology
 import androidx.compose.material.icons.rounded.Security
-import androidx.compose.material.icons.rounded.Spa
-import androidx.compose.material.icons.rounded.Stars
-import androidx.compose.material.icons.rounded.WbSunny
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -61,7 +54,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -70,18 +62,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.forma.app.core.designsystem.FormaTheme
 import com.forma.app.core.designsystem.motion.formaPressEffect
 import com.forma.app.domain.model.SubscriptionTier
-import com.forma.app.domain.model.TierFeatureComparison
 import com.forma.app.ui.settings.SettingsViewModel
 import kotlinx.coroutines.launch
 
-private val FounderGold = Color(0xFFD4AF37)
-private val FounderGoldSoft = Color(0xFFFDF8EA)
-
 /**
- * ProPaywallBottomSheet – Forma's Comprehensive 3-Tier Experience:
- * 1. Free Tier (Sanctuary Explorer)
- * 2. Monthly Pro ($4.99/mo with 7-Day Free Trial)
- * 3. Lifetime Founder ($49.99 one-time payment)
+ * ProPaywallBottomSheet – Forma's Comprehensive 3-Tier Experience.
+ * Seamlessly adapts to every PaletteFamily (Matcha & Oat, Espresso, Monochrome, Terracotta, Lavender)
+ * and honors both Light and Dark theme modes dynamically.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -201,7 +188,7 @@ fun ProPaywallBottomSheet(
                 text = if (isPro)
                     "You have active access as ${currentTier.title}. Every ritual, AI schedule, and soundscape is ready."
                 else
-                    "Your daily habits and timeline are free forever. Upgrade to Pro or Lifetime for AI synthesis, biometric locks, and acoustic soundscapes.",
+                    "Your daily habits and timeline are free forever. Upgrade to Pro or Founder for AI synthesis, biometric locks, and acoustic soundscapes.",
                 style = FormaTheme.typography.bodyMedium,
                 color = colors.textSecondary,
                 fontSize = 14.sp,
@@ -256,9 +243,8 @@ fun ProPaywallBottomSheet(
                     headline = "Forma Founder",
                     priceTag = "$49.99",
                     period = "one-time",
-                    subtitle = "Pay once · Lifetime access · Founder Gold badge",
+                    subtitle = "Pay once · Lifetime access · Founder VIP badge",
                     badge = "SAVE 70%",
-                    accentColor = FounderGold,
                     onSelect = { selectedTier = SubscriptionTier.LIFETIME_FOUNDER }
                 )
             }
@@ -282,7 +268,7 @@ fun ProPaywallBottomSheet(
                     SubscriptionTier.FREE -> {
                         ProFeatureBullet("Up to 5 active daily rituals with streak tracking")
                         ProFeatureBullet("Clean chronological timeline & day planning")
-                        ProFeatureBullet("Signature Matcha & Oat serene visual theme")
+                        ProFeatureBullet("Serene aesthetic theme matching your space")
                         ProFeatureBullet("Local encrypted database with offline JSON export")
                     }
                     SubscriptionTier.MONTHLY_PRO -> {
@@ -295,8 +281,8 @@ fun ProPaywallBottomSheet(
                     }
                     SubscriptionTier.LIFETIME_FOUNDER -> {
                         ProFeatureBullet("All Forma Pro capabilities permanently (no recurring bills)")
-                        ProFeatureBullet("Exclusive Founder Gold emblem on profile & Intentional Circles")
-                        ProFeatureBullet("VIP priority access to future AI models and acoustic stems")
+                        ProFeatureBullet("Exclusive Founder VIP emblem on profile & Circles")
+                        ProFeatureBullet("Priority access to future AI models and acoustic stems")
                         ProFeatureBullet("Lifetime updates & highest priority cloud sync")
                     }
                 }
@@ -352,7 +338,7 @@ fun ProPaywallBottomSheet(
                     ComparisonRow("Biometric Lock", "—", "✓ Included", "✓ Included")
                     ComparisonRow("Acoustic Audio", "Basic", "All 5+ stems", "All 5+ stems")
                     ComparisonRow("Clerk Cloud Sync", "—", "✓ Included", "✓ Included")
-                    ComparisonRow("Founder Gold Badge", "—", "—", "✓ Exclusive")
+                    ComparisonRow("Founder Badge", "—", "—", "✓ Exclusive")
                     ComparisonRow("Billing Mode", "Free", "$4.99 / mo", "$49.99 once")
                 }
             }
@@ -380,18 +366,11 @@ fun ProPaywallBottomSheet(
                     .shadow(
                         elevation = if (isCtaEnabled) 8.dp else 0.dp,
                         shape = RoundedCornerShape(18.dp),
-                        ambientColor = if (selectedTier == SubscriptionTier.LIFETIME_FOUNDER) FounderGold.copy(alpha = 0.25f) else colors.accent.copy(alpha = 0.25f),
-                        spotColor = if (selectedTier == SubscriptionTier.LIFETIME_FOUNDER) FounderGold.copy(alpha = 0.4f) else colors.accent.copy(alpha = 0.4f)
+                        ambientColor = colors.accent.copy(alpha = 0.25f),
+                        spotColor = colors.accent.copy(alpha = 0.4f)
                     )
                     .clip(RoundedCornerShape(18.dp))
-                    .background(
-                        when {
-                            !isCtaEnabled -> colors.surfaceVariant
-                            selectedTier == SubscriptionTier.LIFETIME_FOUNDER -> FounderGold
-                            selectedTier == SubscriptionTier.MONTHLY_PRO -> colors.accent
-                            else -> colors.surfaceVariant
-                        }
-                    )
+                    .background(if (isCtaEnabled) colors.accent else colors.surfaceVariant)
                     .clickable(enabled = isCtaEnabled) {
                         coroutineScope.launch {
                             isPurchasing = true
@@ -436,11 +415,7 @@ fun ProPaywallBottomSheet(
                         text = ctaButtonText,
                         style = FormaTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
-                        color = if (isCtaEnabled) {
-                            if (selectedTier == SubscriptionTier.LIFETIME_FOUNDER) Color(0xFF2C2411) else colors.onAccent
-                        } else {
-                            colors.textSecondary
-                        },
+                        color = if (isCtaEnabled) colors.onAccent else colors.textSecondary,
                         fontSize = 15.sp,
                         letterSpacing = 0.3.sp
                     )
@@ -498,20 +473,18 @@ private fun TierSelectionCard(
     period: String,
     subtitle: String,
     badge: String? = null,
-    accentColor: Color? = null,
     onSelect: () -> Unit
 ) {
     val colors = FormaTheme.colors
-    val activeColor = accentColor ?: colors.accent
 
     val cardBorderColor by animateColorAsState(
-        targetValue = if (isSelected) activeColor else colors.border.copy(alpha = 0.6f),
+        targetValue = if (isSelected) colors.accent else colors.border.copy(alpha = 0.6f),
         label = "tierBorder"
     )
 
     val cardBgColor by animateColorAsState(
         targetValue = if (isSelected) {
-            if (accentColor != null) FounderGoldSoft.copy(alpha = 0.35f) else colors.accentSoft.copy(alpha = 0.5f)
+            colors.accentSoft.copy(alpha = 0.55f)
         } else {
             colors.surfaceVariant.copy(alpha = 0.35f)
         },
@@ -538,8 +511,8 @@ private fun TierSelectionCard(
                         modifier = Modifier
                             .size(20.dp)
                             .clip(CircleShape)
-                            .border(1.5.dp, if (isSelected) activeColor else colors.textTertiary, CircleShape)
-                            .background(if (isSelected) activeColor else Color.Transparent),
+                            .border(1.5.dp, if (isSelected) colors.accent else colors.textTertiary, CircleShape)
+                            .background(if (isSelected) colors.accent else Color.Transparent),
                         contentAlignment = Alignment.Center
                     ) {
                         if (isSelected) {
@@ -547,7 +520,7 @@ private fun TierSelectionCard(
                                 modifier = Modifier
                                     .size(8.dp)
                                     .clip(CircleShape)
-                                    .background(if (accentColor != null) Color(0xFF2C2411) else colors.onAccent)
+                                    .background(colors.onAccent)
                             )
                         }
                     }
@@ -584,13 +557,13 @@ private fun TierSelectionCard(
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
-                            .background(activeColor)
+                            .background(colors.accent)
                             .padding(horizontal = 7.dp, vertical = 3.dp)
                     ) {
                         Text(
                             text = badge,
                             fontWeight = FontWeight.Bold,
-                            color = if (accentColor != null) Color(0xFF2C2411) else colors.onAccent,
+                            color = colors.onAccent,
                             fontSize = 9.5.sp,
                             letterSpacing = 0.6.sp
                         )
@@ -700,7 +673,7 @@ private fun ComparisonRow(
             text = founder,
             style = FormaTheme.typography.bodySmall,
             fontWeight = FontWeight.Bold,
-            color = FounderGold,
+            color = colors.accent,
             fontSize = 11.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier.weight(1f)

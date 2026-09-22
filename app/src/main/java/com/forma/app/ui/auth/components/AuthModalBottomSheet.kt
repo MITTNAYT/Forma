@@ -1,9 +1,8 @@
-﻿package com.forma.app.ui.auth.components
+package com.forma.app.ui.auth.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,7 +29,6 @@ import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Visibility
 import androidx.compose.material.icons.rounded.VisibilityOff
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -49,6 +47,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
@@ -72,6 +71,10 @@ enum class AuthMode {
     FORGOT_PASSWORD
 }
 
+/**
+ * AuthModalBottomSheet – Forma's native Clerk authentication sheet.
+ * Fully styled to dynamically match the active PaletteFamily and ThemeMode.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AuthModalBottomSheet(
@@ -189,7 +192,7 @@ fun AuthModalBottomSheet(
                         modifier = Modifier
                             .weight(1f)
                             .clip(RoundedCornerShape(12.dp))
-                            .background(if (mode == AuthMode.SIGN_IN) colors.surface else androidx.compose.ui.graphics.Color.Transparent)
+                            .background(if (mode == AuthMode.SIGN_IN) colors.surface else Color.Transparent)
                             .formaPressEffect(targetScale = 0.98f) { mode = AuthMode.SIGN_IN }
                             .padding(vertical = 8.dp),
                         contentAlignment = Alignment.Center
@@ -205,7 +208,7 @@ fun AuthModalBottomSheet(
                         modifier = Modifier
                             .weight(1f)
                             .clip(RoundedCornerShape(12.dp))
-                            .background(if (mode == AuthMode.SIGN_UP) colors.surface else androidx.compose.ui.graphics.Color.Transparent)
+                            .background(if (mode == AuthMode.SIGN_UP) colors.surface else Color.Transparent)
                             .formaPressEffect(targetScale = 0.98f) { mode = AuthMode.SIGN_UP }
                             .padding(vertical = 8.dp),
                         contentAlignment = Alignment.Center
@@ -257,10 +260,13 @@ fun AuthModalBottomSheet(
                         shape = RoundedCornerShape(16.dp),
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                         colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = colors.surfaceVariant.copy(alpha = 0.35f),
+                            unfocusedContainerColor = colors.surfaceVariant.copy(alpha = 0.2f),
                             focusedBorderColor = colors.accent,
                             unfocusedBorderColor = colors.border,
                             focusedTextColor = colors.textPrimary,
-                            unfocusedTextColor = colors.textPrimary
+                            unfocusedTextColor = colors.textPrimary,
+                            cursorColor = colors.accent
                         ),
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -275,10 +281,13 @@ fun AuthModalBottomSheet(
                     shape = RoundedCornerShape(16.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = if (mode == AuthMode.FORGOT_PASSWORD) ImeAction.Done else ImeAction.Next),
                     colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = colors.surfaceVariant.copy(alpha = 0.35f),
+                        unfocusedContainerColor = colors.surfaceVariant.copy(alpha = 0.2f),
                         focusedBorderColor = colors.accent,
                         unfocusedBorderColor = colors.border,
                         focusedTextColor = colors.textPrimary,
-                        unfocusedTextColor = colors.textPrimary
+                        unfocusedTextColor = colors.textPrimary,
+                        cursorColor = colors.accent
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -305,10 +314,13 @@ fun AuthModalBottomSheet(
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
                         keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                         colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = colors.surfaceVariant.copy(alpha = 0.35f),
+                            unfocusedContainerColor = colors.surfaceVariant.copy(alpha = 0.2f),
                             focusedBorderColor = colors.accent,
                             unfocusedBorderColor = colors.border,
                             focusedTextColor = colors.textPrimary,
-                            unfocusedTextColor = colors.textPrimary
+                            unfocusedTextColor = colors.textPrimary,
+                            cursorColor = colors.accent
                         ),
                         modifier = Modifier.fillMaxWidth()
                     )
