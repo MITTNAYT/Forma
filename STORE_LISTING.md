@@ -1,7 +1,7 @@
-# Google Play Store Listing — HabitFlow v2
+﻿# Google Play Store Listing — Forma
 
 ## App Title
-HabitFlow: Mindful Daily Habit & Focus Tracker
+Forma: Mindful Daily Habit & Focus Tracker
 
 ## Short Description (80 characters max)
 Architect your daily flow with mindful rituals, focus timer, and AI schedule.
@@ -10,11 +10,11 @@ Architect your daily flow with mindful rituals, focus timer, and AI schedule.
 
 ## Full Description (4000 characters max)
 
-**Transform intention into quiet mastery with HabitFlow v2.**
+**Transform intention into quiet mastery with Forma.**
 
-HabitFlow is an architectural, mindful daily habit tracker and focus system designed for deep work, balanced living, and intentional routines. Inspired by editorial aesthetics and Notion minimalism, HabitFlow replaces chaotic notifications and cluttered to-do lists with a serene, beautiful rhythm.
+Forma is an architectural, mindful daily habit tracker and focus system designed for deep work, balanced living, and intentional routines. Inspired by editorial aesthetics and Notion minimalism, Forma replaces chaotic notifications and cluttered to-do lists with a serene, beautiful rhythm.
 
-### 🌿 Why HabitFlow?
+### 🌿 Why Forma?
 
 - **Architectural Daily Timeline**: Structure your day with intuitive, non-scrollable 7-day visual strips and energy-balanced time blocks.
 - **Smart AI Day Planning**: One tap crafts an optimized schedule tailored to your goal — whether it's a *Deep Focus Sprint*, *Health & Movement Balance*, or *Study & Retention Sprint*.

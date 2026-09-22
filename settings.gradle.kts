@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "HabitFlow"
+rootProject.name = "Forma"
 include(":app")

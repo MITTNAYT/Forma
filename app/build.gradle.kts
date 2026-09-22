@@ -26,11 +26,11 @@ val geminiApiKey = (localProps["GEMINI_API_KEY"] as? String)
     ?: System.getenv("GEMINI_API_KEY") ?: ""
 
 android {
-    namespace = "com.habitflow.app"
+    namespace = "com.forma.app"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.habitflow.app"
+        applicationId = "com.forma.app"
         minSdk = 26
         targetSdk = 35
         versionCode = 2

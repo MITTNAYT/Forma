@@ -5,5 +5,5 @@
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:navigationBarColor">@color/notion_light_bg</item>
     </style>
-    <style name="Theme.HabitFlow" parent="Theme.Forma" />
+    <style name="Theme.Forma.Splash" parent="Theme.Forma" />
 </resources>

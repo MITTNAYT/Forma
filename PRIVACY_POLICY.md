@@ -1,20 +1,20 @@
-# Privacy Policy for HabitFlow v2
+﻿# Privacy Policy for Forma
 
 **Last updated:** September 2026
 
-HabitFlow v2 is designed with a fundamental commitment to user privacy and digital sovereignty. We believe your daily habits, focus metrics, and mindful routines are deeply personal.
+Forma is designed with a fundamental commitment to user privacy and digital sovereignty. We believe your daily habits, focus metrics, and mindful routines are deeply personal.
 
 ---
 
 ### 1. Offline-First Architecture
-- HabitFlow v2 is an **offline-first application**.
+- Forma is an **offline-first application**.
 - All your habits, task time blocks, streaks, focus timer records, and preferences are stored **locally on your device** via an encrypted local SQLite database (Room).
-- No account creation, login, email address, or telephone number is required to use HabitFlow v2.
+- No account creation, login, email address, or telephone number is required to use Forma.
 
 ---
 
 ### 2. Zero Analytics & Tracking
-- HabitFlow v2 **does not include third-party analytics, tracking SDKs, or advertising libraries**.
+- Forma **does not include third-party analytics, tracking SDKs, or advertising libraries**.
 - We do not track your location, browsing habits, device fingerprint, or usage time.
 - No personal data is transmitted to external telemetry servers.
 
@@ -35,5 +35,5 @@ HabitFlow v2 is designed with a fundamental commitment to user privacy and digit
 ---
 
 ### 5. Contact
-For questions regarding HabitFlow v2 or this privacy policy, open an issue on our GitHub repository:
-https://github.com/MITTNAYT/habitflow-v2
+For questions regarding Forma or this privacy policy, open an issue on our GitHub repository:
+https://github.com/MITTNAYT/forma

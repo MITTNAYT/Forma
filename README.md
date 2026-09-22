@@ -1,4 +1,4 @@
-# Forma (HabitFlow v2) — Native Android
+﻿# Forma (Forma) — Native Android
 
 > **Structured daily timeline meets mindful habit tracking. Pure Japanese Paper & Tea aesthetic.**
 
@@ -69,10 +69,10 @@ Forma strictly adheres to **Clean Architecture** with unidirectional data flow (
 
 ```bash
 # Clone the repository
-git clone https://github.com/MITTNAYT/habitflow-v2.git
+git clone https://github.com/MITTNAYT/forma.git
 
 # Navigate to directory
-cd "HabitFlow v2"
+cd "Forma"
 
 # Compile and assemble debug APK
 ./gradlew assembleDebug

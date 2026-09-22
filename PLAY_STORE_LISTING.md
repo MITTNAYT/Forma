@@ -1,16 +1,16 @@
-# HabitFlow: Zen Rituals & Focus — Google Play Store Listing Package
+﻿# Forma: Zen Rituals & Focus — Google Play Store Listing Package
 
 ---
 
 ## 📱 Store Metadata
 
-- **App Name**: `HabitFlow: Zen Rituals & Focus` *(29 / 30 chars)*
+- **App Name**: `Forma: Zen Rituals & Focus` *(29 / 30 chars)*
 - **Short Description**: `Build mindful habits, cue-chains, timeboxing & focus without distraction.` *(74 / 80 chars)*
 - **Category**: Productivity / Health & Fitness
 - **Content Rating**: Everyone (3+)
 - **Target Audience**: Students, knowledge workers, creators, mindfulness practitioners, and individuals seeking intentional daily architecture.
-- **Privacy URL**: `https://habitflow.app/privacy`
-- **Support Email**: `support@habitflow.app`
+- **Privacy URL**: `https://forma.app/privacy`
+- **Support Email**: `support@forma.app`
 
 ---
 
@@ -19,7 +19,7 @@
 ```markdown
 Transform chaotic routines into a serene daily rhythm. 
 
-HabitFlow is a Japanese minimalism-inspired daily architecture app designed to help you build enduring rituals, timebox your focus, and cultivate peace — completely offline and privacy-first.
+Forma is a Japanese minimalism-inspired daily architecture app designed to help you build enduring rituals, timebox your focus, and cultivate peace — completely offline and privacy-first.
 
 No noisy feeds. No intrusive popups. Zero data tracking. Just pure intention, mindful pacing, and aesthetic clarity.
 
@@ -62,7 +62,7 @@ No noisy feeds. No intrusive popups. Zero data tracking. Just pure intention, mi
 • Physics-based spring animations and fluid micro-interactions.
 • Interactive Material You widgets for your home screen.
 
-Stop scrolling through dopamine traps. Reclaim your focus and architect your best days with HabitFlow.
+Stop scrolling through dopamine traps. Reclaim your focus and architect your best days with Forma.
 ```
 
 ---
