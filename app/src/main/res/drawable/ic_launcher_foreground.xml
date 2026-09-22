@@ -5,50 +5,50 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Soft Ambient Drop Shadow for Outer Disc -->
+    <!-- Soft Ambient Cast Shadow for Base Disc -->
     <path
         android:fillColor="#152B381A"
-        android:pathData="M 55,18 A 39,39 0 1,1 54.99,18 Z" />
+        android:pathData="M 54.6,26.8 A 29,29 0 1,1 54.59,26.8 Z" />
     <path
         android:fillColor="#222B381A"
-        android:pathData="M 54.5,16.5 A 39,39 0 1,1 54.49,16.5 Z" />
+        android:pathData="M 54.3,25.8 A 29,29 0 1,1 54.29,25.8 Z" />
 
     <!-- 1. Outer Elevated Base Disc (Warm Clean White/Cream) -->
     <path
         android:fillColor="#FDFCFA"
         android:strokeColor="#E4E8DF"
         android:strokeWidth="0.8"
-        android:pathData="M 54,15 A 39,39 0 1,1 53.99,15 Z" />
+        android:pathData="M 54,25 A 29,29 0 1,1 53.99,25 Z" />
 
     <!-- 2. Outer Sculptural Olive Arc (Matching Attached User Logo) -->
     <path
         android:strokeColor="#4E612B"
-        android:strokeWidth="9.2"
+        android:strokeWidth="6.8"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
-        android:pathData="M 62.4,22.6 A 32.5,32.5 0 1,0 82.1,70.25" />
+        android:pathData="M 60.2,30.8 A 23.8,23.8 0 1,0 74.6,65.9" />
 
-    <!-- Soft Drop Shadow for Middle Raised Disc -->
+    <!-- Soft Cast Shadow for Middle Raised Disc -->
     <path
         android:fillColor="#182B381A"
-        android:pathData="M 55,32.5 A 23,23 0 1,1 54.99,32.5 Z" />
+        android:pathData="M 54.4,38 A 17,17 0 1,1 54.39,38 Z" />
 
-    <!-- 3. Middle Raised Disc (Pure Clean White Platform) -->
+    <!-- 3. Middle Raised Disc (Pure Clean White Plateau) -->
     <path
         android:fillColor="#FFFFFF"
         android:strokeColor="#E6EAE2"
         android:strokeWidth="0.8"
-        android:pathData="M 54,31 A 23,23 0 1,1 53.99,31 Z" />
+        android:pathData="M 54,37 A 17,17 0 1,1 53.99,37 Z" />
 
     <!-- 4. Middle Olive Ring (Full Concentric Ring) -->
     <path
         android:strokeColor="#4E612B"
-        android:strokeWidth="5.2"
-        android:pathData="M 54,40 A 14,14 0 1,1 53.99,40 Z" />
+        android:strokeWidth="3.8"
+        android:pathData="M 54,43.5 A 10.5,10.5 0 1,1 53.99,43.5 Z" />
 
     <!-- 5. Center Olive Solid Core Dot -->
     <path
         android:fillColor="#4E612B"
-        android:pathData="M 54,48.5 A 5.5,5.5 0 1,1 53.99,48.5 Z" />
+        android:pathData="M 54,49.8 A 4.2,4.2 0 1,1 53.99,49.8 Z" />
 
 </vector>

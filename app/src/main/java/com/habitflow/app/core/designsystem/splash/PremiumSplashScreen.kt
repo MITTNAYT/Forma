@@ -163,26 +163,26 @@ fun PremiumSplashScreen(
                     ) {
                         Box(
                             modifier = Modifier
-                                .width(16.dp)
+                                .width(14.dp)
                                 .height(0.8.dp)
                                 .clip(RoundedCornerShape(0.4.dp))
-                                .background(colors.accent.copy(alpha = 0.65f))
+                                .background(colors.accent.copy(alpha = 0.5f))
                         )
-                        Spacer(modifier = Modifier.width(9.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "GIVE FORM TO YOUR DAYS",
+                            text = "Where intention takes form.",
                             fontWeight = FontWeight.Medium,
                             color = colors.accent,
-                            letterSpacing = 2.4.sp,
-                            fontSize = 10.sp
+                            letterSpacing = 1.6.sp,
+                            fontSize = 11.5.sp
                         )
-                        Spacer(modifier = Modifier.width(9.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
                         Box(
                             modifier = Modifier
-                                .width(16.dp)
+                                .width(14.dp)
                                 .height(0.8.dp)
                                 .clip(RoundedCornerShape(0.4.dp))
-                                .background(colors.accent.copy(alpha = 0.65f))
+                                .background(colors.accent.copy(alpha = 0.5f))
                         )
                     }
                 }

@@ -44,6 +44,7 @@ class GetHabitStatsUseCase @Inject constructor(
 
                 val completedOnDate = completionsByDate[dateIso]?.size ?: 0
                 val totalScheduled = scheduledForDate.size
+                val missedOnDate = if (date.isBefore(today)) (totalScheduled - completedOnDate).coerceAtLeast(0) else 0
 
                 val intensity = if (totalScheduled > 0) {
                     (completedOnDate.toFloat() / totalScheduled.toFloat()).coerceIn(0f, 1f)
@@ -55,6 +56,8 @@ class GetHabitStatsUseCase @Inject constructor(
                     date = dateIso,
                     totalScheduled = totalScheduled,
                     completedCount = completedOnDate,
+                    skippedCount = 0,
+                    missedCount = missedOnDate,
                     intensity = intensity,
                     dayOfMonth = date.dayOfMonth
                 )
@@ -79,6 +82,7 @@ class GetHabitStatsUseCase @Inject constructor(
 
                 val completedOnDate = completionsByDate[dateIso]?.size ?: 0
                 val totalScheduled = scheduledForDate.size
+                val missedOnDate = if (date.isBefore(today)) (totalScheduled - completedOnDate).coerceAtLeast(0) else 0
 
                 val intensity = if (totalScheduled > 0) {
                     (completedOnDate.toFloat() / totalScheduled.toFloat()).coerceIn(0f, 1f)
@@ -90,6 +94,8 @@ class GetHabitStatsUseCase @Inject constructor(
                     date = dateIso,
                     totalScheduled = totalScheduled,
                     completedCount = completedOnDate,
+                    skippedCount = 0,
+                    missedCount = missedOnDate,
                     intensity = intensity,
                     dayOfMonth = dayNum
                 )
@@ -98,8 +104,9 @@ class GetHabitStatsUseCase @Inject constructor(
             val bestCurrentStreak = perHabitStats.maxOfOrNull { it.currentStreak } ?: 0
             val bestAllTimeStreak = perHabitStats.maxOfOrNull { it.longestStreak } ?: 0
 
-            val totalScheduledAllTime = perHabitStats.sumOf { (it.totalCompletions * 100) / (if (it.completionRatePercentage > 0) it.completionRatePercentage else 100) }
             val totalCompletionsAllTime = perHabitStats.sumOf { it.totalCompletions }
+            val totalMissedAllTime = perHabitStats.sumOf { it.missedCount }
+            val totalSkippedAllTime = perHabitStats.sumOf { it.skippedCount }
 
             val overallCompletionRate = if (perHabitStats.isNotEmpty()) {
                 (perHabitStats.map { it.completionRatePercentage }.average()).toInt().coerceIn(0, 100)
@@ -112,6 +119,9 @@ class GetHabitStatsUseCase @Inject constructor(
                 overallCompletionRate = overallCompletionRate,
                 bestCurrentStreak = bestCurrentStreak,
                 bestAllTimeStreak = bestAllTimeStreak,
+                totalCompletedCount = totalCompletionsAllTime,
+                totalSkippedCount = totalSkippedAllTime,
+                totalMissedCount = totalMissedAllTime,
                 heatmapDays = heatmapDays,
                 perHabitStats = perHabitStats,
                 monthName = monthName,

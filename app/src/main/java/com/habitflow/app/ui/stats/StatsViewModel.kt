@@ -42,6 +42,13 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+enum class AnalysisItemStatus {
+    COMPLETED,
+    SKIPPED,
+    MISSED,
+    PENDING
+}
+
 @Immutable
 data class DayFocusItem(
     val dateIso: String,
@@ -54,10 +61,12 @@ data class DayFocusItem(
 
 @Immutable
 data class DayRitualDetail(
-    val habitId: String,
-    val habitName: String,
-    val habitIcon: String,
-    val isCompleted: Boolean
+    val id: String,
+    val name: String,
+    val icon: String,
+    val isTask: Boolean = false,
+    val status: AnalysisItemStatus = AnalysisItemStatus.PENDING,
+    val isCompleted: Boolean = status == AnalysisItemStatus.COMPLETED
 )
 
 @Immutable
@@ -65,6 +74,8 @@ data class DayDetailInfo(
     val dateIso: String,
     val formattedDate: String,
     val completedCount: Int,
+    val skippedCount: Int = 0,
+    val missedCount: Int = 0,
     val totalScheduled: Int,
     val focusMinutes: Int,
     val rituals: List<DayRitualDetail>
@@ -212,43 +223,73 @@ class StatsViewModel @Inject constructor(
             } catch (_: Exception) {
                 LocalDate.now()
             }
+            val today = LocalDate.now()
+            val isPast = parsedDate.isBefore(today)
 
             val formatter = DateTimeFormatter.ofPattern("EEEE, d MMMM yyyy", Locale.US)
             val formattedDate = parsedDate.format(formatter)
             val dayOfWeek = DateUtils.getDayOfWeekInt(parsedDate)
 
-            // Query habits and completions
-            habitRepository.getAllHabits(includeArchived = false).combine(
-                habitRepository.getCompletionsForDate(dateIso)
-            ) { habits, completions ->
-                val scheduled = habits.filter { (it.repeatDays.isEmpty() || it.repeatDays.contains(dayOfWeek)) && !it.isWintering }
+            // Query habits, completions, timeline tasks, and focus time
+            combine(
+                habitRepository.getAllHabits(includeArchived = false),
+                habitRepository.getCompletionsForDate(dateIso),
+                timelineRepository.getTimelineItemsForDate(dateIso),
+                focusTrackerRepository.getTotalFocusTimeForDate(dateIso)
+            ) { habits, completions, timelineItems, focusSecs ->
+                val scheduledHabits = habits.filter {
+                    (it.repeatDays.isEmpty() || it.repeatDays.contains(dayOfWeek)) && !it.isWintering
+                }
                 val completedHabitIds = completions.map { it.habitId }.toSet()
 
-                val rituals = scheduled.map { habit ->
+                val habitDetails = scheduledHabits.map { habit ->
+                    val isDone = completedHabitIds.contains(habit.id)
+                    val status = when {
+                        isDone -> AnalysisItemStatus.COMPLETED
+                        isPast -> AnalysisItemStatus.MISSED
+                        else -> AnalysisItemStatus.PENDING
+                    }
                     DayRitualDetail(
-                        habitId = habit.id,
-                        habitName = habit.name,
-                        habitIcon = habit.icon,
-                        isCompleted = completedHabitIds.contains(habit.id)
+                        id = habit.id,
+                        name = habit.name,
+                        icon = habit.icon,
+                        isTask = false,
+                        status = status
                     )
                 }
 
-                focusTrackerRepository.getTotalFocusTimeForDate(dateIso).combine(
-                    MutableStateFlow(rituals)
-                ) { focusSecs, rits ->
-                    DayDetailInfo(
-                        dateIso = dateIso,
-                        formattedDate = formattedDate,
-                        completedCount = completions.size,
-                        totalScheduled = scheduled.size,
-                        focusMinutes = focusSecs / 60,
-                        rituals = rits
+                val taskDetails = timelineItems.map { task ->
+                    val status = when {
+                        task.completed -> AnalysisItemStatus.COMPLETED
+                        isPast -> AnalysisItemStatus.MISSED
+                        else -> AnalysisItemStatus.PENDING
+                    }
+                    DayRitualDetail(
+                        id = task.id,
+                        name = task.title,
+                        icon = task.icon,
+                        isTask = true,
+                        status = status
                     )
                 }
-            }.collect { detailFlow ->
-                detailFlow.collect { detailInfo ->
-                    _selectedMatrixDay.value = detailInfo
-                }
+
+                val allItems = habitDetails + taskDetails
+                val completedTotal = allItems.count { it.status == AnalysisItemStatus.COMPLETED }
+                val skippedTotal = allItems.count { it.status == AnalysisItemStatus.SKIPPED }
+                val missedTotal = allItems.count { it.status == AnalysisItemStatus.MISSED }
+
+                DayDetailInfo(
+                    dateIso = dateIso,
+                    formattedDate = formattedDate,
+                    completedCount = completedTotal,
+                    skippedCount = skippedTotal,
+                    missedCount = missedTotal,
+                    totalScheduled = allItems.size,
+                    focusMinutes = focusSecs / 60,
+                    rituals = allItems
+                )
+            }.collect { detailInfo ->
+                _selectedMatrixDay.value = detailInfo
             }
         }
     }

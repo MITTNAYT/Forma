@@ -107,6 +107,7 @@ class CalculateStreakUseCase @Inject constructor() {
         }
 
         val totalCompletions = completedDatesSet.size
+        val missedCount = (totalScheduledDays - totalCompletions).coerceAtLeast(0)
         val completionRate = if (totalScheduledDays > 0) {
             ((totalCompletions.toFloat() / totalScheduledDays.toFloat()) * 100).toInt().coerceIn(0, 100)
         } else {
@@ -121,7 +122,9 @@ class CalculateStreakUseCase @Inject constructor() {
             currentStreak = currentStreak,
             longestStreak = longestStreak.coerceAtLeast(currentStreak),
             totalCompletions = totalCompletions,
-            completionRatePercentage = completionRate
+            completionRatePercentage = completionRate,
+            skippedCount = 0,
+            missedCount = missedCount
         )
     }
 }

@@ -36,11 +36,15 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.AutoAwesome
+import androidx.compose.material.icons.rounded.Bolt
+import androidx.compose.material.icons.rounded.Brush
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Nature
+import androidx.compose.material.icons.rounded.School
 import androidx.compose.material.icons.rounded.Spa
 import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material.icons.rounded.LocalFireDepartment
-import androidx.compose.material.icons.rounded.Mic
+import androidx.compose.material.icons.rounded.WbSunny
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -48,6 +52,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import com.habitflow.app.ui.today.components.AiStudioSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
@@ -133,7 +138,7 @@ fun TodayScreen(
     var showBreathingSheet by remember { mutableStateOf(false) }
     var showGuidedRoutineSheet by remember { mutableStateOf(false) }
     var showJournalSheet by remember { mutableStateOf(false) }
-    var showVoiceAssistantSheet by remember { mutableStateOf(false) }
+    var showAiStudioSheet by remember { mutableStateOf(false) }
     var selectedDetailItem by remember { mutableStateOf<TodayScheduleItem?>(null) }
     var celebrationInfo by remember { mutableStateOf<Pair<String, Int>?>(null) }
     val haptic = LocalHapticFeedback.current
@@ -323,105 +328,104 @@ fun TodayScreen(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                // AI Plan pill
+                                // AI Studio pill
                                 Box(
                                     modifier = Modifier
-                                        .weight(1f)
+                                        .weight(1.2f)
                                         .onGloballyPositioned { coordinates ->
                                             aiPlanBounds = coordinates.boundsInRoot()
                                         }
                                         .clip(RoundedCornerShape(12.dp))
                                         .background(colors.surfaceVariant)
-                                        .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
+                                        .border(1.dp, colors.accent.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
                                         .formaPressEffect(targetScale = 0.93f) {
                                             haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                            showAiPresetSheet = true
+                                            showAiStudioSheet = true
                                         }
                                         .padding(vertical = 9.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
-
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.AutoAwesome,
-                                        contentDescription = "AI Plan",
-                                        tint = colors.textSecondary,
-                                        modifier = Modifier.size(13.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(5.dp))
-                                    Text(
-                                        text = "AI Plan",
-                                        style = FormaTheme.typography.labelSmall,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = colors.textSecondary,
-                                        fontSize = 12.sp
-                                    )
-                                }
-                            }
-
-                            // Voice pill
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(colors.surfaceVariant)
-                                    .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
-                                    .formaPressEffect(targetScale = 0.93f) {
-                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                        showVoiceAssistantSheet = true
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.AutoAwesome,
+                                            contentDescription = "AI Studio",
+                                            tint = colors.accent,
+                                            modifier = Modifier.size(13.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(5.dp))
+                                        Text(
+                                            text = "AI Studio",
+                                            style = FormaTheme.typography.labelSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = colors.textPrimary,
+                                            fontSize = 12.sp
+                                        )
                                     }
-                                    .padding(vertical = 9.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Mic,
-                                        contentDescription = "Voice",
-                                        tint = colors.textSecondary,
-                                        modifier = Modifier.size(13.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(5.dp))
-                                    Text(
-                                        text = "Voice",
-                                        style = FormaTheme.typography.labelSmall,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = colors.textSecondary,
-                                        fontSize = 12.sp
-                                    )
                                 }
-                            }
 
-                            // Zen Rebalance pill
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(colors.surfaceVariant)
-                                    .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
-                                    .formaPressEffect(targetScale = 0.93f) {
-                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                        viewModel.rebalanceDayTimeline()
+                                // Zen Rebalance pill
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(colors.surfaceVariant)
+                                        .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
+                                        .formaPressEffect(targetScale = 0.93f) {
+                                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                            viewModel.rebalanceDayTimeline()
+                                        }
+                                        .padding(vertical = 9.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.Spa,
+                                            contentDescription = "Rebalance",
+                                            tint = colors.textSecondary,
+                                            modifier = Modifier.size(13.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(5.dp))
+                                        Text(
+                                            text = "Rebalance",
+                                            style = FormaTheme.typography.labelSmall,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = colors.textSecondary,
+                                            fontSize = 12.sp
+                                        )
                                     }
-                                    .padding(vertical = 9.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Spa,
-                                        contentDescription = "Rebalance",
-                                        tint = colors.textSecondary,
-                                        modifier = Modifier.size(13.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(5.dp))
-                                    Text(
-                                        text = "Rebalance",
-                                        style = FormaTheme.typography.labelSmall,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = colors.textSecondary,
-                                        fontSize = 12.sp
-                                    )
                                 }
-                            }
+
+                                // Mindful Reflect pill
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(colors.surfaceVariant)
+                                        .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
+                                        .formaPressEffect(targetScale = 0.93f) {
+                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                            showMorningSheet = true
+                                        }
+                                        .padding(vertical = 9.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.WbSunny,
+                                            contentDescription = "Reflect",
+                                            tint = colors.textSecondary,
+                                            modifier = Modifier.size(13.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(5.dp))
+                                        Text(
+                                            text = "Reflect",
+                                            style = FormaTheme.typography.labelSmall,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = colors.textSecondary,
+                                            fontSize = 12.sp
+                                        )
+                                    }
+                                }
 
                             // Calendar icon button (stays as compact icon only)
                             Box(
@@ -955,6 +959,9 @@ fun TodayScreen(
                                         AiPlanPreset.DEEP_WORK -> Icons.Rounded.Timer
                                         AiPlanPreset.HEALTH_BALANCE -> Icons.Rounded.Spa
                                         AiPlanPreset.EXAM_STUDY -> Icons.Rounded.LocalFireDepartment
+                                        AiPlanPreset.PRODUCTIVITY_SPRINT -> Icons.Rounded.Bolt
+                                        AiPlanPreset.CREATIVE_FLOW -> Icons.Rounded.Brush
+                                        AiPlanPreset.MINDFUL_WEEKEND -> Icons.Rounded.WbSunny
                                     },
                                     contentDescription = null,
                                     tint = colors.accent,
@@ -1026,17 +1033,10 @@ fun TodayScreen(
         )
     }
 
-    if (showVoiceAssistantSheet) {
-        val activeHabits = daySchedule?.items?.filterIsInstance<TodayScheduleItem.HabitItem>()?.map { it.habit } ?: emptyList()
-        com.habitflow.app.ui.today.components.VoiceAssistantSheet(
-            activeHabits = activeHabits,
-            onCompleteHabit = { habitId ->
-                viewModel.completeHabitById(habitId)
-            },
-            onSaveGratitude = { gratitude ->
-                viewModel.saveDailyGratitude(gratitude)
-            },
-            onDismiss = { showVoiceAssistantSheet = false }
+    if (showAiStudioSheet) {
+        com.habitflow.app.ui.today.components.AiStudioSheet(
+            viewModel = viewModel,
+            onDismiss = { showAiStudioSheet = false }
         )
     }
 

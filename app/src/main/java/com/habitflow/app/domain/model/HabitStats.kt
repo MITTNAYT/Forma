@@ -11,7 +11,9 @@ data class HabitStreakInfo(
     val currentStreak: Int,
     val longestStreak: Int,
     val totalCompletions: Int,
-    val completionRatePercentage: Int
+    val completionRatePercentage: Int,
+    val skippedCount: Int = 0,
+    val missedCount: Int = 0
 )
 
 @Immutable
@@ -19,6 +21,8 @@ data class DayCompletionRate(
     val date: String, // YYYY-MM-DD
     val totalScheduled: Int,
     val completedCount: Int,
+    val skippedCount: Int = 0,
+    val missedCount: Int = 0,
     val intensity: Float, // 0.0f to 1.0f for grayscale heatmap
     val dayOfMonth: Int = 1
 )
@@ -29,6 +33,9 @@ data class OverallHabitStats(
     val overallCompletionRate: Int, // 0 - 100
     val bestCurrentStreak: Int,
     val bestAllTimeStreak: Int,
+    val totalCompletedCount: Int = 0,
+    val totalSkippedCount: Int = 0,
+    val totalMissedCount: Int = 0,
     val heatmapDays: List<DayCompletionRate>,
     val perHabitStats: List<HabitStreakInfo>,
     val monthName: String = "",

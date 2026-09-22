@@ -1,4 +1,4 @@
-﻿package com.habitflow.app.ui.stats
+package com.habitflow.app.ui.stats
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -213,6 +213,86 @@ fun StatsScreen(
                                 .clip(RoundedCornerShape(4.dp))
                                 .background(colors.accent)
                         )
+                    }
+
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    // 3-Way Lifetime Telemetry Badges (Completed / Skipped / Missed)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        // Completed Tile
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(colors.surface)
+                                .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                                .padding(vertical = 8.dp, horizontal = 10.dp)
+                        ) {
+                            Column {
+                                Text(
+                                    text = "${currentStats.totalCompletedCount}",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 16.sp,
+                                    color = colors.accent
+                                )
+                                Text(
+                                    text = "Completed",
+                                    fontSize = 10.5.sp,
+                                    color = colors.textSecondary
+                                )
+                            }
+                        }
+
+                        // Skipped Tile
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(colors.surface)
+                                .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                                .padding(vertical = 8.dp, horizontal = 10.dp)
+                        ) {
+                            Column {
+                                Text(
+                                    text = "${currentStats.totalSkippedCount}",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 16.sp,
+                                    color = colors.textSecondary
+                                )
+                                Text(
+                                    text = "Skipped",
+                                    fontSize = 10.5.sp,
+                                    color = colors.textSecondary
+                                )
+                            }
+                        }
+
+                        // Missed Tile
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(colors.surface)
+                                .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                                .padding(vertical = 8.dp, horizontal = 10.dp)
+                        ) {
+                            Column {
+                                Text(
+                                    text = "${currentStats.totalMissedCount}",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 16.sp,
+                                    color = if (currentStats.totalMissedCount > 0) Color(0xFFC0392B) else colors.textTertiary
+                                )
+                                Text(
+                                    text = "Missed",
+                                    fontSize = 10.5.sp,
+                                    color = colors.textSecondary
+                                )
+                            }
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))

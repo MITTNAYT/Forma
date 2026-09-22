@@ -1,4 +1,4 @@
-﻿package com.habitflow.app.ui.stats.components
+package com.habitflow.app.ui.stats.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,7 +17,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.HourglassEmpty
 import androidx.compose.material.icons.rounded.RadioButtonUnchecked
+import androidx.compose.material.icons.rounded.Spa
 import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -29,11 +31,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.habitflow.app.core.designsystem.FormaTheme
 import com.habitflow.app.core.designsystem.icon.HabitFlowIcon
+import com.habitflow.app.ui.stats.AnalysisItemStatus
 import com.habitflow.app.ui.stats.DayDetailInfo
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -115,49 +119,134 @@ fun RhythmDayDetailSheet(
                     .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(20.dp))
                     .padding(16.dp)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Text(
-                            text = "FLOW STATUS",
-                            style = FormaTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = colors.textTertiary,
-                            fontSize = 10.sp,
-                            letterSpacing = 1.sp
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = if (dayInfo.totalScheduled > 0) {
-                                "${dayInfo.completedCount} of ${dayInfo.totalScheduled} Rituals Completed"
-                            } else if (dayInfo.completedCount > 0) {
-                                "${dayInfo.completedCount} Rituals Completed"
-                            } else {
-                                "Rest Day • 0 Rituals Scheduled"
-                            },
-                            style = FormaTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = colors.textPrimary,
-                            fontSize = 14.sp
-                        )
+                Column {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Text(
+                                text = "FLOW VELOCITY",
+                                style = FormaTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = colors.textTertiary,
+                                fontSize = 10.sp,
+                                letterSpacing = 1.sp
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = if (dayInfo.totalScheduled > 0) {
+                                    "${dayInfo.completedCount} of ${dayInfo.totalScheduled} Intentions Fulfilled"
+                                } else if (dayInfo.completedCount > 0) {
+                                    "${dayInfo.completedCount} Intentions Fulfilled"
+                                } else {
+                                    "Rest Day • 0 Items Scheduled"
+                                },
+                                style = FormaTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = colors.textPrimary,
+                                fontSize = 14.sp
+                            )
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(if (completionRate > 0) colors.accentSoft else colors.surfaceVariant)
+                                .padding(horizontal = 10.dp, vertical = 6.dp)
+                        ) {
+                            Text(
+                                text = "$completionRate%",
+                                style = FormaTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = if (completionRate > 0) colors.accent else colors.textTertiary,
+                                fontSize = 12.sp
+                            )
+                        }
                     }
 
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(if (completionRate > 0) colors.accentSoft else colors.surfaceVariant)
-                            .padding(horizontal = 10.dp, vertical = 6.dp)
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    // 3-Way Metrics Breakdown (Completed / Skipped / Missed)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text(
-                            text = "$completionRate%",
-                            style = FormaTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = if (completionRate > 0) colors.accent else colors.textTertiary,
-                            fontSize = 12.sp
-                        )
+                        // Completed Pill
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(colors.surface)
+                                .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                                .padding(vertical = 8.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    text = "${dayInfo.completedCount}",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 15.sp,
+                                    color = colors.accent
+                                )
+                                Text(
+                                    text = "Completed",
+                                    fontSize = 10.sp,
+                                    color = colors.textSecondary
+                                )
+                            }
+                        }
+
+                        // Skipped Pill
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(colors.surface)
+                                .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                                .padding(vertical = 8.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    text = "${dayInfo.skippedCount}",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 15.sp,
+                                    color = colors.textSecondary
+                                )
+                                Text(
+                                    text = "Skipped",
+                                    fontSize = 10.sp,
+                                    color = colors.textSecondary
+                                )
+                            }
+                        }
+
+                        // Missed Pill
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(colors.surface)
+                                .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                                .padding(vertical = 8.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    text = "${dayInfo.missedCount}",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 15.sp,
+                                    color = if (dayInfo.missedCount > 0) Color(0xFFC0392B) else colors.textTertiary
+                                )
+                                Text(
+                                    text = "Missed",
+                                    fontSize = 10.sp,
+                                    color = colors.textSecondary
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -207,7 +296,7 @@ fun RhythmDayDetailSheet(
             Spacer(modifier = Modifier.height(22.dp))
 
             Text(
-                text = "SCHEDULED RITUALS",
+                text = "SCHEDULED RITUALS & TASKS",
                 style = FormaTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
                 color = colors.textTertiary,
@@ -226,7 +315,7 @@ fun RhythmDayDetailSheet(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "No rituals were scheduled on this date.",
+                        text = "No rituals or tasks were scheduled on this date.",
                         style = FormaTheme.typography.bodyMedium,
                         color = colors.textSecondary,
                         fontSize = 13.sp
@@ -256,36 +345,108 @@ fun RhythmDayDetailSheet(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     HabitFlowIcon(
-                                        iconKey = ritual.habitIcon,
-                                        contentDescription = ritual.habitName,
+                                        iconKey = ritual.icon,
+                                        contentDescription = ritual.name,
                                         tint = colors.accent,
                                         modifier = Modifier.size(18.dp)
                                     )
                                 }
                                 Spacer(modifier = Modifier.width(12.dp))
-                                Text(
-                                    text = ritual.habitName,
-                                    style = FormaTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = colors.textPrimary,
-                                    fontSize = 14.sp
-                                )
+                                Column {
+                                    Text(
+                                        text = ritual.name,
+                                        style = FormaTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = colors.textPrimary,
+                                        fontSize = 14.sp
+                                    )
+                                    Text(
+                                        text = if (ritual.isTask) "Committed Task" else "Habit Ritual",
+                                        style = FormaTheme.typography.labelSmall,
+                                        color = colors.textTertiary,
+                                        fontSize = 10.sp
+                                    )
+                                }
                             }
 
-                            if (ritual.isCompleted) {
-                                Icon(
-                                    imageVector = Icons.Rounded.CheckCircle,
-                                    contentDescription = "Completed",
-                                    tint = colors.accent,
-                                    modifier = Modifier.size(22.dp)
-                                )
-                            } else {
-                                Icon(
-                                    imageVector = Icons.Rounded.RadioButtonUnchecked,
-                                    contentDescription = "Incomplete",
-                                    tint = colors.textTertiary,
-                                    modifier = Modifier.size(22.dp)
-                                )
+                            when (ritual.status) {
+                                AnalysisItemStatus.COMPLETED -> {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(colors.accentSoft)
+                                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.CheckCircle,
+                                            contentDescription = "Completed",
+                                            tint = colors.accent,
+                                            modifier = Modifier.size(14.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(
+                                            text = "Done",
+                                            fontWeight = FontWeight.Bold,
+                                            color = colors.accent,
+                                            fontSize = 11.sp
+                                        )
+                                    }
+                                }
+                                AnalysisItemStatus.SKIPPED -> {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(colors.surface)
+                                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.Spa,
+                                            contentDescription = "Skipped",
+                                            tint = colors.textSecondary,
+                                            modifier = Modifier.size(14.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(
+                                            text = "Skipped",
+                                            fontWeight = FontWeight.Medium,
+                                            color = colors.textSecondary,
+                                            fontSize = 11.sp
+                                        )
+                                    }
+                                }
+                                AnalysisItemStatus.MISSED -> {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(Color(0xFFC0392B).copy(alpha = 0.12f))
+                                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.Close,
+                                            contentDescription = "Missed",
+                                            tint = Color(0xFFC0392B),
+                                            modifier = Modifier.size(14.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(
+                                            text = "Missed",
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color(0xFFC0392B),
+                                            fontSize = 11.sp
+                                        )
+                                    }
+                                }
+                                AnalysisItemStatus.PENDING -> {
+                                    Icon(
+                                        imageVector = Icons.Rounded.RadioButtonUnchecked,
+                                        contentDescription = "Pending",
+                                        tint = colors.textTertiary,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
                             }
                         }
                     }

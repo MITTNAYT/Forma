@@ -3,10 +3,15 @@ package com.habitflow.app.ui.today
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.habitflow.app.core.util.DateUtils
+import com.habitflow.app.domain.model.AiGenerationResult
 import com.habitflow.app.domain.model.DaySchedule
+import com.habitflow.app.domain.model.Habit
+import com.habitflow.app.domain.model.TimeOfDay
 import com.habitflow.app.domain.model.TimelineItem
 import com.habitflow.app.domain.model.TodayScheduleItem
+import com.habitflow.app.domain.repository.AiPlanPreset
 import com.habitflow.app.domain.repository.BillingRepository
+import com.habitflow.app.domain.repository.HabitRepository
 import com.habitflow.app.domain.repository.TimelineRepository
 import com.habitflow.app.domain.repository.UserPreferencesRepository
 import com.habitflow.app.domain.usecase.GetTodayTimelineUseCase
@@ -26,10 +31,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
-
-import com.habitflow.app.domain.model.Habit
-import com.habitflow.app.domain.model.TimeOfDay
-import com.habitflow.app.domain.repository.HabitRepository
 
 sealed interface TodayUiEvent {
     object ShowProPaywall : TodayUiEvent
@@ -58,6 +59,9 @@ class TodayViewModel @Inject constructor(
 
     private val _isAiPlanning = MutableStateFlow(false)
     val isAiPlanning: StateFlow<Boolean> = _isAiPlanning.asStateFlow()
+
+    private val _aiPreviewResult = MutableStateFlow<AiGenerationResult?>(null)
+    val aiPreviewResult: StateFlow<AiGenerationResult?> = _aiPreviewResult.asStateFlow()
 
     private val _eventFlow = MutableSharedFlow<TodayUiEvent>()
     val eventFlow: SharedFlow<TodayUiEvent> = _eventFlow.asSharedFlow()
@@ -153,13 +157,88 @@ class TodayViewModel @Inject constructor(
         }
     }
 
-    fun requestAiDayPlan(preset: com.habitflow.app.domain.repository.AiPlanPreset = com.habitflow.app.domain.repository.AiPlanPreset.DEEP_WORK) {
+    fun clearAiPreview() {
+        _aiPreviewResult.value = null
+    }
+
+    fun generateAiPlan(
+        prompt: String = "",
+        preset: AiPlanPreset? = null,
+        onSuccess: (() -> Unit)? = null
+    ) {
+        viewModelScope.launch {
+            _isAiPlanning.value = true
+            val dateIso = DateUtils.formatDateIso(_selectedDate.value)
+            try {
+                val result = planDayWithAiUseCase.generatePreview(
+                    date = dateIso,
+                    prompt = prompt,
+                    preset = preset
+                )
+                _aiPreviewResult.value = result
+                _isAiPlanning.value = false
+                zenFeedback.onMilestoneReached()
+                onSuccess?.invoke()
+            } catch (e: Exception) {
+                _isAiPlanning.value = false
+                _eventFlow.emit(TodayUiEvent.ShowToast("AI Generation error: ${e.localizedMessage}"))
+            }
+        }
+    }
+
+    fun decomposeGoalWithAi(goal: String, onSuccess: (() -> Unit)? = null) {
+        viewModelScope.launch {
+            _isAiPlanning.value = true
+            val dateIso = DateUtils.formatDateIso(_selectedDate.value)
+            try {
+                val result = planDayWithAiUseCase.decomposeGoal(goal, dateIso)
+                _aiPreviewResult.value = result
+                _isAiPlanning.value = false
+                zenFeedback.onMilestoneReached()
+                onSuccess?.invoke()
+            } catch (e: Exception) {
+                _isAiPlanning.value = false
+                _eventFlow.emit(TodayUiEvent.ShowToast("Goal decomposition error: ${e.localizedMessage}"))
+            }
+        }
+    }
+
+    fun applyAiPlanBatch(
+        tasks: List<TimelineItem>,
+        habits: List<Habit>,
+        onComplete: () -> Unit
+    ) {
+        viewModelScope.launch {
+            val dateIso = DateUtils.formatDateIso(_selectedDate.value)
+            tasks.forEach { task ->
+                timelineRepository.insertTimelineItem(task.copy(date = dateIso))
+            }
+            habits.forEach { habit ->
+                habitRepository.insertHabit(habit)
+            }
+            _aiPreviewResult.value = null
+            zenFeedback.onMilestoneReached()
+            _eventFlow.emit(TodayUiEvent.ShowToast("Added ${tasks.size} tasks & ${habits.size} habits to your flow."))
+            onComplete()
+        }
+    }
+
+    fun addSingleHabit(habit: Habit) {
+        viewModelScope.launch {
+            habitRepository.insertHabit(habit)
+            zenFeedback.onHabitCompleted()
+            _eventFlow.emit(TodayUiEvent.ShowToast("Habit '${habit.name}' added to sanctuary."))
+        }
+    }
+
+    fun requestAiDayPlan(preset: AiPlanPreset = AiPlanPreset.DEEP_WORK) {
         viewModelScope.launch {
             _isAiPlanning.value = true
             val dateIso = DateUtils.formatDateIso(_selectedDate.value)
             when (val result = planDayWithAiUseCase(dateIso, preset)) {
                 is PlanDayWithAiUseCase.Result.Success -> {
                     _isAiPlanning.value = false
+                    zenFeedback.onMilestoneReached()
                     _eventFlow.emit(TodayUiEvent.ShowToast("AI added ${result.generatedItems.size} optimized time blocks for ${preset.title}!"))
                 }
                 is PlanDayWithAiUseCase.Result.RequiresPro -> {

@@ -12,15 +12,15 @@
         android:strokeColor="#000000"
         android:strokeWidth="0.8"
         android:strokeAlpha="0.3"
-        android:pathData="M 54,15 A 39,39 0 1,1 53.99,15 Z" />
+        android:pathData="M 54,25 A 29,29 0 1,1 53.99,25 Z" />
 
     <!-- Outer Sculptural Arc -->
     <path
         android:strokeColor="#000000"
-        android:strokeWidth="9.2"
+        android:strokeWidth="6.8"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
-        android:pathData="M 62.4,22.6 A 32.5,32.5 0 1,0 82.1,70.25" />
+        android:pathData="M 60.2,30.8 A 23.8,23.8 0 1,0 74.6,65.9" />
 
     <!-- Middle Raised Disc -->
     <path
@@ -29,17 +29,17 @@
         android:strokeColor="#000000"
         android:strokeWidth="0.8"
         android:strokeAlpha="0.3"
-        android:pathData="M 54,31 A 23,23 0 1,1 53.99,31 Z" />
+        android:pathData="M 54,37 A 17,17 0 1,1 53.99,37 Z" />
 
     <!-- Middle Concentric Ring -->
     <path
         android:strokeColor="#000000"
-        android:strokeWidth="5.2"
-        android:pathData="M 54,40 A 14,14 0 1,1 53.99,40 Z" />
+        android:strokeWidth="3.8"
+        android:pathData="M 54,43.5 A 10.5,10.5 0 1,1 53.99,43.5 Z" />
 
     <!-- Center Core Dot -->
     <path
         android:fillColor="#000000"
-        android:pathData="M 54,48.5 A 5.5,5.5 0 1,1 53.99,48.5 Z" />
+        android:pathData="M 54,49.8 A 4.2,4.2 0 1,1 53.99,49.8 Z" />
 
 </vector>
