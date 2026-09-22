@@ -250,7 +250,7 @@ fun MorningAlignmentSheet(
                         )
                     } else {
                         Text(
-                            text = "Synthesize",
+                            text = "Align Schedule",
                             style = FormaTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = FormaTheme.colors.accent,

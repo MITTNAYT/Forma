@@ -24,6 +24,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Archive
+import androidx.compose.material.icons.rounded.Spa
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -355,23 +357,34 @@ fun EmptyHabitsState(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = if (isArchivedView) "📦" else "⚡",
-            fontSize = 44.sp
-        )
+        Box(
+            modifier = Modifier
+                .size(56.dp)
+                .clip(androidx.compose.foundation.shape.CircleShape)
+                .background(colors.accentSoft),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = if (isArchivedView) Icons.Rounded.Archive else Icons.Rounded.Spa,
+                contentDescription = null,
+                tint = colors.accent,
+                modifier = Modifier.size(26.dp)
+            )
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = if (isArchivedView) "No archived habits" else "Build your daily rituals",
+            text = if (isArchivedView) "No archived rituals" else "A clean slate.",
             style = FormaTheme.typography.titleLarge,
+            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
             color = colors.textPrimary
         )
 
         Spacer(modifier = Modifier.height(6.dp))
 
         Text(
-            text = if (isArchivedView) "Archived habits will appear here." else "Forma gives you unlimited recurring habits, streaks, and analytics for free.",
+            text = if (isArchivedView) "Archived rituals will appear here peacefully." else "Add a quiet moment to anchor your day.",
             style = FormaTheme.typography.bodyMedium,
             color = colors.textSecondary,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -380,7 +393,7 @@ fun EmptyHabitsState(
         if (!isArchivedView) {
             Spacer(modifier = Modifier.height(24.dp))
             FormaButton(
-                text = "+ Create First Habit",
+                text = "+ Create Ritual",
                 onClick = onCreateHabit,
                 style = FormaButtonStyle.PRIMARY
             )

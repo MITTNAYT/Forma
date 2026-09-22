@@ -1,4 +1,4 @@
-﻿package com.habitflow.app.ui.today.components
+package com.habitflow.app.ui.today.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -57,7 +57,7 @@ fun BehanceHeroBanner(
 
     val subtitle = when {
         completedCount == 0 && totalCount > 0 -> "Begin gently • $totalCount mindful intentions ahead"
-        completedCount == totalCount && totalCount > 0 -> "All intentions complete • In absolute rhythm"
+        completedCount == totalCount && totalCount > 0 -> "Done with care • You made space for what matters."
         else -> "${totalCount - completedCount} rituals remaining • Keep the momentum"
     }
 

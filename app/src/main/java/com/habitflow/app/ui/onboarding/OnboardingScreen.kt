@@ -170,20 +170,21 @@ private fun WelcomeStep(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // 2. Forma wordmark below it, displayMedium bold, accent color
+        // 2. Headline: Less noise. More intention.
         Text(
-            text = "Forma",
-            style = FormaTheme.typography.displayMedium,
+            text = "Less noise. More intention.",
+            style = FormaTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
-            color = colors.accent,
+            color = colors.textPrimary,
+            textAlign = TextAlign.Center,
             letterSpacing = (-0.6).sp
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // 3. Tagline from strings.xml
+        // 3. Sub-headline: forma is your quiet space to build daily rhythm without the guilt.
         Text(
-            text = stringResource(R.string.tagline),
+            text = "forma is your quiet space to build daily rhythm without the guilt.",
             style = FormaTheme.typography.bodyLarge,
             fontWeight = FontWeight.Normal,
             color = colors.textSecondary,
@@ -331,7 +332,7 @@ private fun ChooseThemeStep(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "STEP 2 OF 3 • AESTHETICS",
+            text = "STEP 2 OF 3 • PHILOSOPHY & PALETTE",
             style = FormaTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
             color = colors.accent,
@@ -342,7 +343,7 @@ private fun ChooseThemeStep(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Choose Your Aesthetic",
+            text = "No streaks. Just presence.",
             style = FormaTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             color = colors.textPrimary,
@@ -352,7 +353,7 @@ private fun ChooseThemeStep(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "You can change this anytime in Settings.",
+            text = "Focus on showing up, one small ritual at a time. Select your visual sanctuary:",
             style = FormaTheme.typography.bodyMedium,
             color = colors.textSecondary,
             textAlign = TextAlign.Center
@@ -462,7 +463,7 @@ private fun ChooseStarterPackStep(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "STEP 3 OF 3 • STARTER FOUNDATION",
+            text = "STEP 3 OF 3 • COMMITMENT",
             style = FormaTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
             color = colors.accent,
@@ -473,7 +474,7 @@ private fun ChooseStarterPackStep(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Choose Your Starter Rituals",
+            text = "Where intention takes form.",
             style = FormaTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             color = colors.textPrimary,
@@ -483,7 +484,7 @@ private fun ChooseStarterPackStep(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Select a foundation pack to start your journey. You can modify or add more habits anytime.",
+            text = "Choose your first ritual for today. You can shape or expand your cadence anytime.",
             style = FormaTheme.typography.bodyMedium,
             color = colors.textSecondary,
             textAlign = TextAlign.Center

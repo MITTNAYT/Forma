@@ -1,4 +1,4 @@
-﻿package com.habitflow.app.ui.today.components
+package com.habitflow.app.ui.today.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -284,7 +284,7 @@ fun HabitTaskDetailBottomSheet(
                     }
                 }
 
-                // Streak (If Habit)
+                // Streak / Flow (If Habit)
                 if (item is TodayScheduleItem.HabitItem) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
@@ -296,7 +296,7 @@ fun HabitTaskDetailBottomSheet(
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
                             Text(
-                                text = "Current Streak",
+                                text = "Flow Momentum",
                                 style = FormaTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Medium,
                                 color = colors.textTertiary,

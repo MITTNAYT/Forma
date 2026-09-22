@@ -508,7 +508,7 @@ fun SettingsScreen(
 
             // ── Section: Notifications & Feel ──────────────────────────
             item {
-                SettingsSectionHeader(label = "NOTIFICATIONS & PROMPTS", modifier = Modifier.padding(horizontal = 24.dp))
+                SettingsSectionHeader(label = "GENTLE NUDGES & PROMPTS", modifier = Modifier.padding(horizontal = 24.dp))
                 Spacer(modifier = Modifier.height(8.dp))
             }
             item {
@@ -524,7 +524,7 @@ fun SettingsScreen(
                     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                         SettingsToggleRow(
                             icon = Icons.Rounded.WbSunny,
-                            title = "Morning Alignment (8:00 AM)",
+                            title = "Morning Alignment Nudge (8:00 AM)",
                             subtitle = "Gentle intention setting to begin your day with focus",
                             checked = morningReminderEnabled,
                             onCheckedChange = {
@@ -535,7 +535,7 @@ fun SettingsScreen(
                         SettingsDivider()
                         SettingsToggleRow(
                             icon = Icons.Rounded.Bedtime,
-                            title = "Evening Sanctuary (9:30 PM)",
+                            title = "Evening Sanctuary Nudge (9:30 PM)",
                             subtitle = "Reflect peacefully and rollover unfinished tasks",
                             checked = eveningReminderEnabled,
                             onCheckedChange = {
@@ -631,7 +631,7 @@ fun SettingsScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "HabitFlow  ·  v2.0",
+                        text = "Forma  ·  v2.0",
                         color = colors.textTertiary,
                         fontSize = 11.sp,
                         letterSpacing = 1.sp

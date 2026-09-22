@@ -311,13 +311,20 @@ fun TodayScreen(
 
                             Spacer(modifier = Modifier.height(6.dp))
 
-                            // Row 2: Greeting headline (full width, no competing elements)
+                            // Row 2: Greeting headline & microcopy
                             Text(
                                 text = "$greeting $userName",
                                 style = FormaTheme.typography.displayMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = colors.textPrimary,
                                 letterSpacing = (-0.6).sp
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = "Start gently. What does today need from you?",
+                                style = FormaTheme.typography.bodySmall,
+                                color = colors.textSecondary,
+                                fontSize = 12.sp
                             )
 
                             Spacer(modifier = Modifier.height(12.dp))
@@ -1087,7 +1094,7 @@ fun EmptyPeacefulState(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "A Peaceful Clean Slate",
+            text = "A clean slate.",
             style = FormaTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             color = colors.textPrimary,
@@ -1097,7 +1104,7 @@ fun EmptyPeacefulState(
         Spacer(modifier = Modifier.height(6.dp))
 
         Text(
-            text = "No rituals scheduled for this day.\nTake a breath or create a mindful intention.",
+            text = "Add a quiet moment to anchor your day.\nTake a breath or create a mindful intention.",
             style = FormaTheme.typography.bodyMedium,
             color = colors.textSecondary,
             textAlign = TextAlign.Center,
