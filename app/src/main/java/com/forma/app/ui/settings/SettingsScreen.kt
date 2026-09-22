@@ -80,13 +80,12 @@ import com.forma.app.ui.settings.components.ProPaywallBottomSheet
 import androidx.compose.material.icons.rounded.CloudDone
 import androidx.compose.material.icons.rounded.CloudSync
 import androidx.compose.material.icons.rounded.GraphicEq
-import androidx.compose.material.icons.rounded.People
 import androidx.compose.material3.CircularProgressIndicator
 import com.forma.app.domain.model.AuthState
 import com.forma.app.ui.auth.AuthViewModel
 import com.forma.app.ui.auth.components.AuthModalBottomSheet
-import com.forma.app.ui.circles.CirclesScreen
-import com.forma.app.ui.circles.CirclesViewModel
+import com.forma.app.ui.habits.HabitsViewModel
+import com.forma.app.ui.habits.components.HabitTemplatesSheet
 import com.forma.app.ui.settings.components.VaultDialogMode
 import com.forma.app.ui.soundscape.SoundscapePlayerSheet
 import com.forma.app.ui.soundscape.SoundscapeViewModel
@@ -99,7 +98,7 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
     authViewModel: AuthViewModel = hiltViewModel(),
     soundscapeViewModel: SoundscapeViewModel = hiltViewModel(),
-    circlesViewModel: CirclesViewModel = hiltViewModel()
+    habitsViewModel: HabitsViewModel = hiltViewModel()
 ) {
     val colors = FormaTheme.colors
     val context = LocalContext.current
@@ -114,11 +113,15 @@ fun SettingsScreen(
     val isBiometricLockEnabled by viewModel.isBiometricLockEnabled.collectAsState()
     val isPrivacyMaskingEnabled by viewModel.isPrivacyMaskingEnabled.collectAsState()
 
+    val authState by authViewModel.authState.collectAsState()
+    val isSyncing by authViewModel.isSyncing.collectAsState()
+    val lastSyncedAt by authViewModel.lastSyncedAt.collectAsState()
+
     var showPaywall by remember { mutableStateOf(false) }
     var showEditProfileDialog by remember { mutableStateOf(false) }
     var showAuthBottomSheet by remember { mutableStateOf(false) }
     var showSoundscapeSheet by remember { mutableStateOf(false) }
-    var showCirclesSheet by remember { mutableStateOf(false) }
+    var showTemplatesSheet by remember { mutableStateOf(false) }
     var showChronotypeSheet by remember { mutableStateOf(false) }
     var vaultDialogMode by remember { mutableStateOf<VaultDialogMode?>(null) }
     var hapticsEnabled by remember { mutableStateOf(true) }
@@ -407,12 +410,173 @@ fun SettingsScreen(
                     }
                 }
 
+                Spacer(modifier = Modifier.height(14.dp))
+            }
+
+            // ── Cloud Backup & Multi-Device Sync Card (Integrated with Account) ──
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(colors.surface)
+                        .border(1.dp, colors.border.copy(alpha = 0.4f), RoundedCornerShape(20.dp))
+                        .padding(16.dp)
+                ) {
+                    when (val state = authState) {
+                        is AuthState.Authenticated -> {
+                            val user = state.user
+                            Column {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(38.dp)
+                                                .clip(CircleShape)
+                                                .background(colors.accentSoft),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Rounded.CloudDone,
+                                                contentDescription = "Synced",
+                                                tint = colors.accent,
+                                                modifier = Modifier.size(20.dp)
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.width(12.dp))
+                                        Column {
+                                            Text(
+                                                text = user.displayName ?: "Sanctuary Member",
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = colors.textPrimary,
+                                                fontSize = 14.sp
+                                            )
+                                            Text(
+                                                text = user.email ?: "Cloud Sync Active",
+                                                color = colors.textSecondary,
+                                                fontSize = 11.sp
+                                            )
+                                        }
+                                    }
+
+                                    // Sync Now Button
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(10.dp))
+                                            .background(colors.accentSoft)
+                                            .formaPressEffect(targetScale = 0.95f) {
+                                                authViewModel.syncNow()
+                                            }
+                                            .padding(horizontal = 10.dp, vertical = 6.dp)
+                                    ) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            if (isSyncing) {
+                                                CircularProgressIndicator(
+                                                    modifier = Modifier.size(11.dp),
+                                                    strokeWidth = 1.5.dp,
+                                                    color = colors.accent
+                                                )
+                                                Spacer(modifier = Modifier.width(5.dp))
+                                            }
+                                            Text(
+                                                text = if (isSyncing) "Syncing..." else "Sync Now",
+                                                fontWeight = FontWeight.Bold,
+                                                color = colors.accent,
+                                                fontSize = 11.sp
+                                            )
+                                        }
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(12.dp))
+                                SettingsDivider()
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = if (lastSyncedAt != null) "Last backed up to cloud" else "Offline-first local cache active",
+                                        color = colors.textTertiary,
+                                        fontSize = 11.sp
+                                    )
+                                    TextButton(
+                                        onClick = { authViewModel.signOut() },
+                                        contentPadding = PaddingValues(0.dp)
+                                    ) {
+                                        Text(
+                                            text = "Sign Out",
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = colors.textSecondary,
+                                            fontSize = 11.sp
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        else -> {
+                            Column {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(38.dp)
+                                            .clip(CircleShape)
+                                            .background(colors.accentSoft),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.CloudSync,
+                                            contentDescription = "Cloud Sync",
+                                            tint = colors.accent,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = "Cloud Backup & Multi-Device Sync",
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = colors.textPrimary,
+                                            fontSize = 14.sp
+                                        )
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Text(
+                                            text = "Sign in with Google or Email to sync rituals across devices.",
+                                            color = colors.textSecondary,
+                                            fontSize = 11.sp,
+                                            lineHeight = 15.sp
+                                        )
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(12.dp))
+
+                                com.forma.app.core.designsystem.component.FormaButton(
+                                    text = "Connect Google / Email",
+                                    onClick = { showAuthBottomSheet = true },
+                                    style = com.forma.app.core.designsystem.component.FormaButtonStyle.PRIMARY,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+                        }
+                    }
+                }
                 Spacer(modifier = Modifier.height(24.dp))
             }
 
             // ── Section: Appearance ──────────────────────────────────────
             item {
-                SettingsSectionHeader(label = "APPEARANCE", modifier = Modifier.padding(horizontal = 24.dp))
+                SettingsSectionHeader(label = "APPEARANCE & ATMOSPHERE", modifier = Modifier.padding(horizontal = 24.dp))
                 Spacer(modifier = Modifier.height(8.dp))
             }
             item {
@@ -759,16 +923,12 @@ fun SettingsScreen(
                 Spacer(modifier = Modifier.height(20.dp))
             }
 
-            // ── Section: Sync Sanctuary (Firebase Google & Email Sync) ──
+            // ── Section: Mindfulness & Sound Sanctuary ─────────────────
             item {
-                SettingsSectionHeader(label = "SYNC SANCTUARY", modifier = Modifier.padding(horizontal = 24.dp))
+                SettingsSectionHeader(label = "MINDFULNESS & SOUND SANCTUARY", modifier = Modifier.padding(horizontal = 24.dp))
                 Spacer(modifier = Modifier.height(8.dp))
             }
             item {
-                val authState by authViewModel.authState.collectAsState()
-                val isSyncing by authViewModel.isSyncing.collectAsState()
-                val lastSyncedAt by authViewModel.lastSyncedAt.collectAsState()
-
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -776,185 +936,21 @@ fun SettingsScreen(
                         .clip(RoundedCornerShape(20.dp))
                         .background(colors.surface)
                         .border(1.dp, colors.border.copy(alpha = 0.4f), RoundedCornerShape(20.dp))
-                        .padding(16.dp)
-                ) {
-                    when (val state = authState) {
-                        is AuthState.Authenticated -> {
-                            val user = state.user
-                            Column {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
-                                        Box(
-                                            modifier = Modifier
-                                                .size(38.dp)
-                                                .clip(CircleShape)
-                                                .background(colors.accentSoft),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Rounded.CloudDone,
-                                                contentDescription = "Synced",
-                                                tint = colors.accent,
-                                                modifier = Modifier.size(20.dp)
-                                            )
-                                        }
-                                        Spacer(modifier = Modifier.width(12.dp))
-                                        Column {
-                                            Text(
-                                                text = user.displayName ?: "Sanctuary Member",
-                                                fontWeight = FontWeight.SemiBold,
-                                                color = colors.textPrimary,
-                                                fontSize = 14.sp
-                                            )
-                                            Text(
-                                                text = user.email ?: "Cloud Sync Active",
-                                                color = colors.textSecondary,
-                                                fontSize = 11.sp
-                                            )
-                                        }
-                                    }
-
-                                    // Sync Now Button
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(RoundedCornerShape(10.dp))
-                                            .background(colors.accentSoft)
-                                            .formaPressEffect(targetScale = 0.95f) {
-                                                authViewModel.syncNow()
-                                            }
-                                            .padding(horizontal = 10.dp, vertical = 6.dp)
-                                    ) {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            if (isSyncing) {
-                                                CircularProgressIndicator(
-                                                    modifier = Modifier.size(11.dp),
-                                                    strokeWidth = 1.5.dp,
-                                                    color = colors.accent
-                                                )
-                                                Spacer(modifier = Modifier.width(5.dp))
-                                            }
-                                            Text(
-                                                text = if (isSyncing) "Syncing..." else "Sync Now",
-                                                fontWeight = FontWeight.Bold,
-                                                color = colors.accent,
-                                                fontSize = 11.sp
-                                            )
-                                        }
-                                    }
-                                }
-
-                                Spacer(modifier = Modifier.height(12.dp))
-                                SettingsDivider()
-                                Spacer(modifier = Modifier.height(8.dp))
-
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = if (lastSyncedAt != null) "Last backed up to cloud" else "Offline-first local cache active",
-                                        color = colors.textTertiary,
-                                        fontSize = 11.sp
-                                    )
-                                    TextButton(
-                                        onClick = { authViewModel.signOut() },
-                                        contentPadding = PaddingValues(0.dp)
-                                    ) {
-                                        Text(
-                                            text = "Sign Out",
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = colors.textSecondary,
-                                            fontSize = 11.sp
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                        else -> {
-                            Column {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(38.dp)
-                                            .clip(CircleShape)
-                                            .background(colors.accentSoft),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Rounded.CloudSync,
-                                            contentDescription = "Cloud Sync",
-                                            tint = colors.accent,
-                                            modifier = Modifier.size(20.dp)
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                    Column(modifier = Modifier.weight(1f)) {
-                                        Text(
-                                            text = "Cloud Backup & Multi-Device Sync",
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = colors.textPrimary,
-                                            fontSize = 14.sp
-                                        )
-                                        Spacer(modifier = Modifier.height(2.dp))
-                                        Text(
-                                            text = "Sign in with Google or Email to sync rituals across devices.",
-                                            color = colors.textSecondary,
-                                            fontSize = 11.sp,
-                                            lineHeight = 15.sp
-                                        )
-                                    }
-                                }
-
-                                Spacer(modifier = Modifier.height(12.dp))
-
-                                com.forma.app.core.designsystem.component.FormaButton(
-                                    text = "Connect Google / Email",
-                                    onClick = { showAuthBottomSheet = true },
-                                    style = com.forma.app.core.designsystem.component.FormaButtonStyle.PRIMARY,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.height(20.dp))
-            }
-
-            // ── Section: Sound Sanctuary & Community Circles ───────────
-            item {
-                SettingsSectionHeader(label = "SOUND SANCTUARY & COMMUNITY", modifier = Modifier.padding(horizontal = 24.dp))
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(colors.surface)
                         .padding(vertical = 4.dp)
                 ) {
                     Column {
+                        SettingsTapRow(
+                            icon = Icons.Rounded.Spa,
+                            title = "Habit & Ritual Templates",
+                            subtitle = "Explore 15+ curated, science-backed rituals for focus, sleep & health",
+                            onClick = { showTemplatesSheet = true }
+                        )
+                        SettingsDivider(indent = 50.dp)
                         SettingsTapRow(
                             icon = Icons.Rounded.GraphicEq,
                             title = "Acoustic Sound Sanctuary",
                             subtitle = "Rain on Cedar, Tibetan Bowls & Alpine Streams",
                             onClick = { showSoundscapeSheet = true }
-                        )
-                        SettingsDivider(indent = 50.dp)
-                        SettingsTapRow(
-                            icon = Icons.Rounded.People,
-                            title = "Intentional Circles",
-                            subtitle = "Private shared rituals & mindful accountability with friends",
-                            onClick = { showCirclesSheet = true }
                         )
                     }
                 }
@@ -1138,21 +1134,14 @@ fun SettingsScreen(
         )
     }
 
-    if (showCirclesSheet) {
-        androidx.compose.ui.window.Dialog(
-            onDismissRequest = { showCirclesSheet = false },
-            properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)
-        ) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                CirclesScreen(
-                    viewModel = circlesViewModel,
-                    onNavigateToAuth = {
-                        showCirclesSheet = false
-                        showAuthBottomSheet = true
-                    }
-                )
-            }
-        }
+    if (showTemplatesSheet) {
+        HabitTemplatesSheet(
+            onAddHabit = { habit ->
+                habitsViewModel.saveHabit(habit)
+                Toast.makeText(context, "Added '${habit.name}' to your sanctuary", Toast.LENGTH_SHORT).show()
+            },
+            onDismiss = { showTemplatesSheet = false }
+        )
     }
 
     if (showChronotypeSheet) {

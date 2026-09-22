@@ -1,4 +1,4 @@
-﻿package com.forma.app.ui.habits
+package com.forma.app.ui.habits
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -57,6 +57,7 @@ import com.forma.app.domain.model.Habit
 import com.forma.app.domain.model.TimeOfDay
 import com.forma.app.ui.habits.components.HabitCard
 import com.forma.app.ui.habits.components.HabitStackSequencerSheet
+import com.forma.app.ui.habits.components.HabitTemplatesSheet
 import com.forma.app.ui.timeline.CreationType
 import com.forma.app.ui.timeline.components.AddEditTimelineSheet
 import com.forma.app.ui.today.components.InlineQuickEntryBar
@@ -73,6 +74,7 @@ fun HabitsScreen(
     var showAddEditDialog by remember { mutableStateOf(false) }
     var editingHabit by remember { mutableStateOf<Habit?>(null) }
     var showStackSequencerSheet by remember { mutableStateOf(false) }
+    var showTemplatesSheet by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -80,6 +82,12 @@ fun HabitsScreen(
                 title = "Habits",
                 subtitle = "Unlimited recurring habits & streaks",
                 actions = {
+                    FormaButton(
+                        text = "Templates",
+                        onClick = { showTemplatesSheet = true },
+                        style = FormaButtonStyle.OUTLINE
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
                     if (uiState.activeHabits.isNotEmpty() && !uiState.showArchived) {
                         FormaButton(
                             text = "▶ Flow",
@@ -252,6 +260,9 @@ fun HabitsScreen(
                     onCreateHabit = {
                         editingHabit = null
                         showAddEditDialog = true
+                    },
+                    onBrowseTemplates = {
+                        showTemplatesSheet = true
                     }
                 )
             } else {
@@ -309,6 +320,17 @@ fun HabitsScreen(
             }
         )
     }
+
+    if (showTemplatesSheet) {
+        HabitTemplatesSheet(
+            onAddHabit = { habit ->
+                viewModel.saveHabit(habit)
+            },
+            onDismiss = {
+                showTemplatesSheet = false
+            }
+        )
+    }
 }
 
 @Composable
@@ -346,6 +368,7 @@ fun FilterChip(
 fun EmptyHabitsState(
     isArchivedView: Boolean,
     onCreateHabit: () -> Unit,
+    onBrowseTemplates: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val colors = FormaTheme.colors
@@ -392,11 +415,18 @@ fun EmptyHabitsState(
 
         if (!isArchivedView) {
             Spacer(modifier = Modifier.height(24.dp))
-            FormaButton(
-                text = "+ Create Ritual",
-                onClick = onCreateHabit,
-                style = FormaButtonStyle.PRIMARY
-            )
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                FormaButton(
+                    text = "Templates",
+                    onClick = onBrowseTemplates,
+                    style = FormaButtonStyle.OUTLINE
+                )
+                FormaButton(
+                    text = "+ Create Ritual",
+                    onClick = onCreateHabit,
+                    style = FormaButtonStyle.PRIMARY
+                )
+            }
         }
     }
 }

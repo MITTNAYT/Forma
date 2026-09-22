@@ -89,7 +89,6 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
-import com.forma.app.ui.today.components.InlineQuickEntryBar
 import com.forma.app.ui.today.components.BehanceHabitCard
 import com.forma.app.ui.today.components.BehanceHeroBanner
 import com.forma.app.ui.today.components.DynamicStreakIsland
@@ -241,36 +240,6 @@ fun TodayScreen(
                                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    // Quick Flow button (Freeform Pomodoro Focus Session)
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(RoundedCornerShape(12.dp))
-                                            .background(colors.surfaceVariant)
-                                            .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
-                                            .formaPressEffect(targetScale = 0.92f) {
-                                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                                onNavigateToFocusTimer("freeform", "Mindful Focus", 25, false)
-                                            }
-                                            .padding(horizontal = 10.dp, vertical = 6.dp)
-                                    ) {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Icon(
-                                                imageVector = Icons.Rounded.Timer,
-                                                contentDescription = "Quick Flow",
-                                                tint = colors.textPrimary,
-                                                modifier = Modifier.size(13.dp)
-                                            )
-                                            Spacer(modifier = Modifier.width(5.dp))
-                                            Text(
-                                                text = "Quick Flow",
-                                                style = FormaTheme.typography.labelSmall,
-                                                fontWeight = FontWeight.Bold,
-                                                color = colors.textPrimary,
-                                                fontSize = 11.sp
-                                            )
-                                        }
-                                    }
-
                                     // Single primary ritual pill (Morning Clarity / Evening Rest)
                                     val currentHour = LocalTime.now().hour
                                     val isEvening = currentHour >= 18 || currentHour < 4
@@ -704,22 +673,7 @@ fun TodayScreen(
                     )
                 }
 
-                // 4b. Inline Quick Entry Bar (Instant In-Place Keyboard Activation)
-                item {
-                    InlineQuickEntryBar(
-                        onQuickAdd = { title, isHabit ->
-                            viewModel.quickAddInlineItem(title, isHabit)
-                        },
-                        modifier = Modifier
-                            .onGloballyPositioned { coordinates ->
-                                addButtonBounds = coordinates.boundsInRoot()
-                            }
-                            .padding(horizontal = 20.dp, vertical = 6.dp)
-                    )
-                }
-
-
-                item { Spacer(modifier = Modifier.height(8.dp)) }
+                item { Spacer(modifier = Modifier.height(4.dp)) }
 
                 // 5. Mindful Habits & Tasks List
                 if (daySchedule != null) {
