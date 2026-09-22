@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.habitflow.app.core.notification.NotificationHelper
 import com.habitflow.app.core.util.DateUtils
+import com.habitflow.app.domain.model.EnergyLevel
 import com.habitflow.app.domain.model.Habit
 import com.habitflow.app.domain.model.Subtask
 import com.habitflow.app.domain.model.TimeOfDay
@@ -32,7 +33,7 @@ enum class CreationType {
 
 data class AddEditTimelineUiState(
     val id: String = UUID.randomUUID().toString(),
-    val creationType: CreationType = CreationType.TASK,
+    val creationType: CreationType = CreationType.HABIT,
     val title: String = "",
     val date: String = DateUtils.formatDateIso(DateUtils.today()),
     val startDate: String = DateUtils.formatDateIso(DateUtils.today()),
@@ -40,15 +41,21 @@ data class AddEditTimelineUiState(
     val isIndefinite: Boolean = true,
     val hasTime: Boolean = true,
     val startTime: String = "09:15",
-    val durationMinutes: Int = 60,
-    val endTime: String = "10:15",
+    val durationMinutes: Int = 30,
+    val endTime: String = "09:45",
     val icon: String = "target",
     val colorTag: String = "#4E6542",
     val notes: String = "",
     val subtasks: List<Subtask> = emptyList(),
     val timeOfDay: TimeOfDay = TimeOfDay.MORNING,
-    val recurrenceType: String = "ONCE", // ONCE, DAILY, WEEKLY, MONTHLY
+    val energyLevel: EnergyLevel = EnergyLevel.MEDIUM,
+    val recurrenceType: String = "DAILY", // DAILY, ONCE, WEEKDAYS, CUSTOM
     val repeatDays: Set<Int> = setOf(1, 2, 3, 4, 5, 6, 7),
+    val stackedCueText: String = "",
+    val isWintering: Boolean = false,
+    val hasReminder: Boolean = true,
+    val reminderHour: Int = 8,
+    val reminderMinute: Int = 0,
     val alerts: List<String> = listOf("At start of task", "15m before start"),
     val reminderMinutesBefore: Int? = 15,
     val completed: Boolean = false,
@@ -97,7 +104,7 @@ class AddEditTimelineViewModel @Inject constructor(
         if (!itemId.isNullOrBlank()) {
             loadItem(itemId)
         } else {
-            val dateToUse = selectedDate ?: com.habitflow.app.core.util.DateUtils.formatDateIso(com.habitflow.app.core.util.DateUtils.today())
+            val dateToUse = selectedDate ?: DateUtils.formatDateIso(DateUtils.today())
             _uiState.value = AddEditTimelineUiState(
                 date = dateToUse,
                 startDate = dateToUse
@@ -111,7 +118,7 @@ class AddEditTimelineViewModel @Inject constructor(
             val timelineItem = timelineRepository.getTimelineItemById(id).first()
             if (timelineItem != null) {
                 val start = timelineItem.startTime ?: "09:15"
-                val end = timelineItem.endTime ?: "10:15"
+                val end = timelineItem.endTime ?: "09:45"
                 val dur = calculateDuration(start, end)
 
                 _uiState.value = AddEditTimelineUiState(
@@ -138,6 +145,7 @@ class AddEditTimelineViewModel @Inject constructor(
             } else {
                 val habit = habitRepository.getHabitById(id).first()
                 if (habit != null) {
+                    val remTime = habit.reminderTimeMinutes
                     _uiState.value = AddEditTimelineUiState(
                         id = habit.id,
                         creationType = CreationType.HABIT,
@@ -145,10 +153,16 @@ class AddEditTimelineViewModel @Inject constructor(
                         icon = habit.icon,
                         colorTag = habit.colorTag,
                         timeOfDay = habit.timeOfDay,
+                        energyLevel = habit.energyLevel,
                         repeatDays = habit.repeatDays,
                         startDate = habit.startDate ?: DateUtils.formatDateIso(DateUtils.today()),
                         endDate = habit.endDate,
                         isIndefinite = habit.isIndefinite,
+                        stackedCueText = habit.stackedCueText ?: "",
+                        isWintering = habit.isWintering,
+                        hasReminder = remTime != null,
+                        reminderHour = (remTime ?: 480) / 60,
+                        reminderMinute = (remTime ?: 480) % 60,
                         recurrenceType = "DAILY",
                         isEditMode = true,
                         isLoading = false
@@ -171,13 +185,22 @@ class AddEditTimelineViewModel @Inject constructor(
     fun setEndDate(date: String?) { _uiState.value = _uiState.value.copy(endDate = date) }
     fun setIsIndefinite(indefinite: Boolean) { _uiState.value = _uiState.value.copy(isIndefinite = indefinite) }
 
+    fun setEnergyLevel(energy: EnergyLevel) { _uiState.value = _uiState.value.copy(energyLevel = energy) }
+    fun setStackedCueText(cue: String) { _uiState.value = _uiState.value.copy(stackedCueText = cue) }
+    fun setIsWintering(wintering: Boolean) { _uiState.value = _uiState.value.copy(isWintering = wintering) }
+
+    fun setHasReminder(enabled: Boolean) { _uiState.value = _uiState.value.copy(hasReminder = enabled) }
+    fun setReminderTime(hour: Int, minute: Int) {
+        _uiState.value = _uiState.value.copy(reminderHour = hour, reminderMinute = minute)
+    }
+
     fun applySmartParse(parsed: com.habitflow.app.core.util.ParsedTaskResult) {
         val current = _uiState.value
         val hasTime = parsed.startTime != null
         val start = parsed.startTime ?: current.startTime
         val end = parsed.endTime ?: current.endTime
         val dur = parsed.isEstimatedDurationMinutes ?: calculateDuration(start, end)
-        val dateStr = parsed.date?.let { com.habitflow.app.core.util.DateUtils.formatDateIso(it) } ?: current.date
+        val dateStr = parsed.date?.let { DateUtils.formatDateIso(it) } ?: current.date
 
         _uiState.value = current.copy(
             title = parsed.cleanTitle,
@@ -268,21 +291,25 @@ class AddEditTimelineViewModel @Inject constructor(
 
         viewModelScope.launch {
             if (state.creationType == CreationType.HABIT) {
-                // Save as recurring habit with start and final date / infinity support
+                // Save as recurring habit with complete attributes
+                val remMinutes = if (state.hasReminder) {
+                    state.reminderHour * 60 + state.reminderMinute
+                } else null
+
                 val habit = Habit(
                     id = state.id,
                     name = state.title.trim(),
                     icon = state.icon,
                     colorTag = state.colorTag,
                     timeOfDay = state.timeOfDay,
+                    energyLevel = state.energyLevel,
                     repeatDays = state.repeatDays,
                     startDate = state.startDate,
                     endDate = if (state.isIndefinite) null else state.endDate,
                     isIndefinite = state.isIndefinite,
-                    reminderTimeMinutes = if (state.hasTime) {
-                        val parsed = try { LocalTime.parse(state.startTime) } catch (_: Exception) { LocalTime.of(8, 0) }
-                        parsed.hour * 60 + parsed.minute
-                    } else null,
+                    reminderTimeMinutes = remMinutes,
+                    stackedCueText = state.stackedCueText.trim().ifEmpty { null },
+                    isWintering = state.isWintering,
                     updatedAt = System.currentTimeMillis()
                 )
                 if (state.isEditMode) {
@@ -291,7 +318,7 @@ class AddEditTimelineViewModel @Inject constructor(
                     habitRepository.insertHabit(habit)
                 }
             } else {
-                // Save as one-time timeline commitment
+                // Save as one-time or recurring timeline commitment
                 val isRecurring = state.recurrenceType != "ONCE"
                 val item = TimelineItem(
                     id = state.id,
@@ -345,7 +372,7 @@ class AddEditTimelineViewModel @Inject constructor(
             val end = parsed.plusMinutes(durationMinutes.toLong())
             end.format(DateTimeFormatter.ofPattern("HH:mm"))
         } catch (_: Exception) {
-            "10:15"
+            "09:45"
         }
     }
 
@@ -354,9 +381,9 @@ class AddEditTimelineViewModel @Inject constructor(
             val s = LocalTime.parse(startTime)
             val e = LocalTime.parse(endTime)
             val dur = java.time.temporal.ChronoUnit.MINUTES.between(s, e).toInt()
-            if (dur > 0) dur else 60
+            if (dur > 0) dur else 30
         } catch (_: Exception) {
-            60
+            30
         }
     }
 }

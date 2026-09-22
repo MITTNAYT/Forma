@@ -1,4 +1,4 @@
-﻿package com.habitflow.app.ui.habits
+package com.habitflow.app.ui.habits
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -53,9 +53,10 @@ import com.habitflow.app.core.designsystem.motion.formaStaggeredEntrance
 import com.habitflow.app.core.designsystem.component.FormaTopAppBar
 import com.habitflow.app.domain.model.Habit
 import com.habitflow.app.domain.model.TimeOfDay
-import com.habitflow.app.ui.habits.components.AddEditHabitDialog
 import com.habitflow.app.ui.habits.components.HabitCard
 import com.habitflow.app.ui.habits.components.HabitStackSequencerSheet
+import com.habitflow.app.ui.timeline.CreationType
+import com.habitflow.app.ui.timeline.components.AddEditTimelineSheet
 import com.habitflow.app.ui.today.components.InlineQuickEntryBar
 
 @androidx.compose.material3.ExperimentalMaterial3Api
@@ -284,24 +285,16 @@ fun HabitsScreen(
     }
 
     if (showAddEditDialog) {
-        AddEditHabitDialog(
-            initialHabit = editingHabit,
+        AddEditTimelineSheet(
+            itemId = editingHabit?.id,
+            initialCreationType = CreationType.HABIT,
             onDismiss = {
-                showAddEditDialog = false
-                editingHabit = null
-            },
-            onSave = { habit ->
-                viewModel.saveHabit(habit)
-                showAddEditDialog = false
-                editingHabit = null
-            },
-            onDelete = { habit ->
-                viewModel.deleteHabit(habit)
                 showAddEditDialog = false
                 editingHabit = null
             }
         )
     }
+
 
     if (showStackSequencerSheet && uiState.activeHabits.isNotEmpty()) {
         HabitStackSequencerSheet(
