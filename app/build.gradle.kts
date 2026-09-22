@@ -22,9 +22,13 @@ val keystoreProps: Properties = Properties().apply {
 val localProps: Properties = Properties().apply {
     val f = rootProject.file("local.properties")
     if (f.exists()) load(f.inputStream())
+    val envFile = rootProject.file(".env")
+    if (envFile.exists()) load(envFile.inputStream())
 }
 val geminiApiKey = (localProps["GEMINI_API_KEY"] as? String)
     ?: System.getenv("GEMINI_API_KEY") ?: ""
+val clerkPublishableKey = (localProps["CLERK_PUBLISHABLE_KEY"] as? String)
+    ?: System.getenv("CLERK_PUBLISHABLE_KEY") ?: "pk_test_dW5pcXVlLW1vbml0b3ItNDg0Ny5jbGVyay5hY2NvdW50cy5kZXYk"
 
 android {
     namespace = "com.forma.app"
@@ -38,6 +42,7 @@ android {
         versionName = "2.0.0"
 
         buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")
+        buildConfigField("String", "CLERK_PUBLISHABLE_KEY", "\"$clerkPublishableKey\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

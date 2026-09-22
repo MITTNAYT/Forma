@@ -1,24 +1,23 @@
-﻿package com.forma.app.data.repository
+package com.forma.app.data.repository
 
 import android.content.Context
-import com.google.firebase.FirebaseApp
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.auth.UserProfileChangeRequest
+import com.forma.app.core.auth.clerk.ClerkClient
 import com.forma.app.domain.model.AuthState
 import com.forma.app.domain.model.AuthUser
 import com.forma.app.domain.repository.AuthRepository
+import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class AuthRepositoryImpl @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val clerkClient: ClerkClient
 ) : AuthRepository {
 
     private val firebaseAuth: FirebaseAuth? by lazy {
@@ -32,52 +31,48 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override val authState: Flow<AuthState> = callbackFlow {
-        val auth = firebaseAuth
-        if (auth == null) {
-            trySend(AuthState.Unauthenticated)
-            awaitClose { }
-            return@callbackFlow
-        }
-
-        val listener = FirebaseAuth.AuthStateListener { firebase ->
-            val user = firebase.currentUser
-            if (user != null) {
-                trySend(
-                    AuthState.Authenticated(
-                        AuthUser(
-                            uid = user.uid,
-                            email = user.email,
-                            displayName = user.displayName,
-                            photoUrl = user.photoUrl?.toString(),
-                            isAnonymous = user.isAnonymous
-                        )
+    override val authState: Flow<AuthState> = clerkClient.cachedUser.map { user ->
+        if (user != null) {
+            AuthState.Authenticated(user)
+        } else {
+            val fbUser = firebaseAuth?.currentUser
+            if (fbUser != null) {
+                AuthState.Authenticated(
+                    AuthUser(
+                        uid = fbUser.uid,
+                        email = fbUser.email,
+                        displayName = fbUser.displayName,
+                        photoUrl = fbUser.photoUrl?.toString(),
+                        isAnonymous = fbUser.isAnonymous
                     )
                 )
             } else {
-                trySend(AuthState.Unauthenticated)
+                AuthState.Unauthenticated
             }
         }
-
-        auth.addAuthStateListener(listener)
-        awaitClose { auth.removeAuthStateListener(listener) }
     }
 
     override suspend fun getCurrentUser(): AuthUser? {
-        val user = firebaseAuth?.currentUser ?: return null
+        val clerkUser = clerkClient.getCurrentUser()
+        if (clerkUser != null) return clerkUser
+
+        val fbUser = firebaseAuth?.currentUser ?: return null
         return AuthUser(
-            uid = user.uid,
-            email = user.email,
-            displayName = user.displayName,
-            photoUrl = user.photoUrl?.toString(),
-            isAnonymous = user.isAnonymous
+            uid = fbUser.uid,
+            email = fbUser.email,
+            displayName = fbUser.displayName,
+            photoUrl = fbUser.photoUrl?.toString(),
+            isAnonymous = fbUser.isAnonymous
         )
     }
 
     override suspend fun signInWithGoogle(idToken: String): Result<AuthUser> {
-        val auth = firebaseAuth ?: return Result.failure(IllegalStateException("Firebase is not initialized."))
+        val clerkResult = clerkClient.signInWithGoogleToken(idToken)
+        if (clerkResult.isSuccess) return clerkResult
+
+        val auth = firebaseAuth ?: return clerkResult
         return try {
-            val credential = GoogleAuthProvider.getCredential(idToken, null)
+            val credential = com.google.firebase.auth.GoogleAuthProvider.getCredential(idToken, null)
             val result = auth.signInWithCredential(credential).await()
             val user = result.user ?: throw IllegalStateException("Google sign-in user is null")
             Result.success(
@@ -90,12 +85,16 @@ class AuthRepositoryImpl @Inject constructor(
                 )
             )
         } catch (e: Exception) {
-            Result.failure(e)
+            clerkResult
         }
     }
 
     override suspend fun signInWithEmail(email: String, password: String): Result<AuthUser> {
-        val auth = firebaseAuth ?: return Result.failure(IllegalStateException("Firebase is not initialized."))
+        val clerkResult = clerkClient.signInWithEmail(email, password)
+        if (clerkResult.isSuccess) return clerkResult
+
+        // Secondary fallback to Firebase if enabled
+        val auth = firebaseAuth ?: return clerkResult
         return try {
             val result = auth.signInWithEmailAndPassword(email.trim(), password).await()
             val user = result.user ?: throw IllegalStateException("User is null after sign in")
@@ -109,7 +108,7 @@ class AuthRepositoryImpl @Inject constructor(
                 )
             )
         } catch (e: Exception) {
-            Result.failure(e)
+            clerkResult
         }
     }
 
@@ -118,13 +117,16 @@ class AuthRepositoryImpl @Inject constructor(
         password: String,
         displayName: String?
     ): Result<AuthUser> {
-        val auth = firebaseAuth ?: return Result.failure(IllegalStateException("Firebase is not initialized."))
+        val clerkResult = clerkClient.signUpWithEmail(email, password, displayName)
+        if (clerkResult.isSuccess) return clerkResult
+
+        val auth = firebaseAuth ?: return clerkResult
         return try {
             val result = auth.createUserWithEmailAndPassword(email.trim(), password).await()
             val user = result.user ?: throw IllegalStateException("User creation returned null")
 
             if (!displayName.isNullOrBlank()) {
-                val profileUpdates = UserProfileChangeRequest.Builder()
+                val profileUpdates = com.google.firebase.auth.UserProfileChangeRequest.Builder()
                     .setDisplayName(displayName.trim())
                     .build()
                 user.updateProfile(profileUpdates).await()
@@ -140,26 +142,28 @@ class AuthRepositoryImpl @Inject constructor(
                 )
             )
         } catch (e: Exception) {
-            Result.failure(e)
+            clerkResult
         }
     }
 
     override suspend fun sendPasswordReset(email: String): Result<Unit> {
-        val auth = firebaseAuth ?: return Result.failure(IllegalStateException("Firebase is not initialized."))
+        val clerkResult = clerkClient.sendPasswordReset(email)
+        if (clerkResult.isSuccess) return clerkResult
+
+        val auth = firebaseAuth ?: return clerkResult
         return try {
             auth.sendPasswordResetEmail(email.trim()).await()
             Result.success(Unit)
         } catch (e: Exception) {
-            Result.failure(e)
+            clerkResult
         }
     }
 
     override suspend fun signOut(): Result<Unit> {
-        return try {
+        clerkClient.signOut()
+        try {
             firebaseAuth?.signOut()
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+        } catch (_: Exception) { }
+        return Result.success(Unit)
     }
 }

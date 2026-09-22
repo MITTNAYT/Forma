@@ -1,10 +1,11 @@
-﻿package com.forma.app.data.repository
+package com.forma.app.data.repository
 
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingClient
@@ -13,7 +14,7 @@ import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryPurchasesParams
-import com.forma.app.core.util.Constants
+import com.forma.app.domain.model.SubscriptionTier
 import com.forma.app.domain.repository.BillingRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
@@ -40,27 +41,42 @@ class BillingRepositoryImpl @Inject constructor(
 
     private object PreferencesKeys {
         val IS_PRO_ACTIVE = booleanPreferencesKey("is_pro_active")
+        val SUBSCRIPTION_TIER = stringPreferencesKey("subscription_tier")
     }
 
-    private val _isPro = MutableStateFlow(false)
-    override val isPro: Flow<Boolean> = context.billingDataStore.data.map { preferences ->
-        preferences[PreferencesKeys.IS_PRO_ACTIVE] ?: _isPro.value
+    private val _currentTier = MutableStateFlow(SubscriptionTier.FREE)
+    override val currentTier: Flow<SubscriptionTier> = context.billingDataStore.data.map { preferences ->
+        val tierId = preferences[PreferencesKeys.SUBSCRIPTION_TIER]
+        val legacyPro = preferences[PreferencesKeys.IS_PRO_ACTIVE] ?: false
+        if (tierId != null) {
+            SubscriptionTier.fromId(tierId)
+        } else if (legacyPro) {
+            SubscriptionTier.LIFETIME_FOUNDER
+        } else {
+            _currentTier.value
+        }
     }
+
+    override val isPro: Flow<Boolean> = currentTier.map { it.isProAccess }
 
     private var billingClient: BillingClient? = null
     private var isClientConnected = false
 
     companion object {
         const val PRODUCT_PRO_MONTHLY = "forma_pro_monthly"
-        const val PRODUCT_PRO_ANNUAL = "forma_pro_annual"
         const val PRODUCT_PRO_LIFETIME = "forma_pro_lifetime"
     }
 
     init {
-        // Initialize cached Pro status from DataStore
         scope.launch {
-            val cachedPro = context.billingDataStore.data.map { it[PreferencesKeys.IS_PRO_ACTIVE] ?: false }.first()
-            _isPro.value = cachedPro
+            val cachedTier = context.billingDataStore.data.map { prefs ->
+                val id = prefs[PreferencesKeys.SUBSCRIPTION_TIER]
+                val pro = prefs[PreferencesKeys.IS_PRO_ACTIVE] ?: false
+                if (id != null) SubscriptionTier.fromId(id)
+                else if (pro) SubscriptionTier.LIFETIME_FOUNDER
+                else SubscriptionTier.FREE
+            }.first()
+            _currentTier.value = cachedTier
             initBillingClient()
         }
     }
@@ -74,7 +90,6 @@ class BillingRepositoryImpl @Inject constructor(
 
             startBillingConnection()
         } catch (e: Exception) {
-            // Non-GMS or testing environment safe fallback
             isClientConnected = false
         }
     }
@@ -101,77 +116,95 @@ class BillingRepositoryImpl @Inject constructor(
         val client = billingClient ?: return
         if (!isClientConnected) return
 
-        // 1. Check active subscriptions
+        // 1. Check active subscriptions (Monthly Pro)
         val subsParams = QueryPurchasesParams.newBuilder()
             .setProductType(BillingClient.ProductType.SUBS)
             .build()
 
         client.queryPurchasesAsync(subsParams) { result, purchases ->
             if (result.responseCode == BillingClient.BillingResponseCode.OK) {
-                handlePurchases(purchases)
+                handlePurchases(purchases, isSubscription = true)
             }
         }
 
-        // 2. Check active in-app lifetime purchases
+        // 2. Check active in-app lifetime purchases (Lifetime Founder)
         val inAppParams = QueryPurchasesParams.newBuilder()
             .setProductType(BillingClient.ProductType.INAPP)
             .build()
 
         client.queryPurchasesAsync(inAppParams) { result, purchases ->
             if (result.responseCode == BillingClient.BillingResponseCode.OK) {
-                handlePurchases(purchases)
+                handlePurchases(purchases, isSubscription = false)
             }
         }
     }
 
     override fun onPurchasesUpdated(billingResult: BillingResult, purchases: List<Purchase>?) {
         if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
-            handlePurchases(purchases)
+            handlePurchases(purchases, isSubscription = false)
         }
     }
 
-    private fun handlePurchases(purchases: List<Purchase>) {
-        var hasActivePro = false
+    private fun handlePurchases(purchases: List<Purchase>, isSubscription: Boolean = false) {
+        var resolvedTier: SubscriptionTier? = null
 
         for (purchase in purchases) {
             if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
-                hasActivePro = true
+                if (purchase.products.contains(PRODUCT_PRO_MONTHLY) || isSubscription) {
+                    resolvedTier = SubscriptionTier.MONTHLY_PRO
+                } else if (purchase.products.contains(PRODUCT_PRO_LIFETIME)) {
+                    resolvedTier = SubscriptionTier.LIFETIME_FOUNDER
+                } else {
+                    resolvedTier = SubscriptionTier.MONTHLY_PRO
+                }
 
-                // Acknowledge purchase if not acknowledged yet
                 if (!purchase.isAcknowledged) {
                     val ackParams = AcknowledgePurchaseParams.newBuilder()
                         .setPurchaseToken(purchase.purchaseToken)
                         .build()
-                    billingClient?.acknowledgePurchase(ackParams) { /* Purchase acknowledged */ }
+                    billingClient?.acknowledgePurchase(ackParams) { }
                 }
             }
         }
 
-        if (hasActivePro) {
+        if (resolvedTier != null) {
+            val finalTier = resolvedTier
             scope.launch {
-                setProStatus(true)
+                setSubscriptionTier(finalTier)
             }
         }
     }
 
-    override suspend fun purchasePro(): Result<Boolean> = withContext(Dispatchers.IO) {
-        // In local development / debug environment or when billing is verified:
-        setProStatus(true)
+    override suspend fun purchaseMonthlyPro(): Result<Boolean> = withContext(Dispatchers.IO) {
+        setSubscriptionTier(SubscriptionTier.MONTHLY_PRO)
         Result.success(true)
     }
+
+    override suspend fun purchaseLifetimeFounder(): Result<Boolean> = withContext(Dispatchers.IO) {
+        setSubscriptionTier(SubscriptionTier.LIFETIME_FOUNDER)
+        Result.success(true)
+    }
+
+    override suspend fun purchasePro(): Result<Boolean> = purchaseLifetimeFounder()
 
     override suspend fun restorePurchases(): Result<Boolean> = withContext(Dispatchers.IO) {
         if (isClientConnected && billingClient != null) {
             queryActivePurchases()
         }
-        val currentStatus = context.billingDataStore.data.map { it[PreferencesKeys.IS_PRO_ACTIVE] ?: false }.first()
-        Result.success(currentStatus)
+        val current = currentTier.first()
+        Result.success(current.isProAccess)
+    }
+
+    override suspend fun setSubscriptionTier(tier: SubscriptionTier) {
+        _currentTier.value = tier
+        context.billingDataStore.edit { preferences ->
+            preferences[PreferencesKeys.SUBSCRIPTION_TIER] = tier.id
+            preferences[PreferencesKeys.IS_PRO_ACTIVE] = tier.isProAccess
+        }
     }
 
     override suspend fun setProStatus(isPro: Boolean) {
-        _isPro.value = isPro
-        context.billingDataStore.edit { preferences ->
-            preferences[PreferencesKeys.IS_PRO_ACTIVE] = isPro
-        }
+        val targetTier = if (isPro) SubscriptionTier.LIFETIME_FOUNDER else SubscriptionTier.FREE
+        setSubscriptionTier(targetTier)
     }
 }

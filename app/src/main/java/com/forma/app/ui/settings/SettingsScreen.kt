@@ -108,6 +108,7 @@ fun SettingsScreen(
     val darkModeOption by viewModel.darkModeOption.collectAsState()
     val notificationsEnabled by viewModel.notificationsEnabled.collectAsState()
     val isPro by viewModel.isPro.collectAsState()
+    val currentTier by viewModel.currentTier.collectAsState()
     val userName by viewModel.userName.collectAsState()
     val chronotype by viewModel.chronotype.collectAsState()
     val isBiometricLockEnabled by viewModel.isBiometricLockEnabled.collectAsState()
@@ -230,21 +231,37 @@ fun SettingsScreen(
                                         modifier = Modifier
                                             .clip(RoundedCornerShape(6.dp))
                                             .background(
-                                                if (isPro) colors.accent else colors.accentSoft
+                                                when (currentTier) {
+                                                    com.forma.app.domain.model.SubscriptionTier.LIFETIME_FOUNDER -> androidx.compose.ui.graphics.Color(0xFFD4AF37)
+                                                    com.forma.app.domain.model.SubscriptionTier.MONTHLY_PRO -> colors.accent
+                                                    com.forma.app.domain.model.SubscriptionTier.FREE -> colors.accentSoft
+                                                }
                                             )
                                             .padding(horizontal = 7.dp, vertical = 2.dp)
                                     ) {
                                         Text(
-                                            text = if (isPro) "PRO" else "FREE",
+                                            text = when (currentTier) {
+                                                com.forma.app.domain.model.SubscriptionTier.LIFETIME_FOUNDER -> "FOUNDER"
+                                                com.forma.app.domain.model.SubscriptionTier.MONTHLY_PRO -> "PRO"
+                                                com.forma.app.domain.model.SubscriptionTier.FREE -> "EXPLORER"
+                                            },
                                             fontWeight = FontWeight.Bold,
-                                            color = if (isPro) colors.onAccent else colors.accent,
+                                            color = when (currentTier) {
+                                                com.forma.app.domain.model.SubscriptionTier.LIFETIME_FOUNDER -> androidx.compose.ui.graphics.Color(0xFF2C2411)
+                                                com.forma.app.domain.model.SubscriptionTier.MONTHLY_PRO -> colors.onAccent
+                                                com.forma.app.domain.model.SubscriptionTier.FREE -> colors.accent
+                                            },
                                             fontSize = 9.sp,
                                             letterSpacing = 0.8.sp
                                         )
                                     }
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(
-                                        text = "Forma member",
+                                        text = when (currentTier) {
+                                            com.forma.app.domain.model.SubscriptionTier.LIFETIME_FOUNDER -> "Lifetime Founder"
+                                            com.forma.app.domain.model.SubscriptionTier.MONTHLY_PRO -> "Pro Member"
+                                            com.forma.app.domain.model.SubscriptionTier.FREE -> "Sanctuary Explorer"
+                                        },
                                         color = colors.textTertiary,
                                         fontSize = 11.sp
                                     )
@@ -280,7 +297,13 @@ fun SettingsScreen(
                         .padding(horizontal = 20.dp)
                         .clip(RoundedCornerShape(24.dp))
                         .background(colors.surface)
-                        .border(1.2.dp, colors.accent.copy(alpha = 0.35f), RoundedCornerShape(24.dp))
+                        .border(
+                            1.2.dp,
+                            if (currentTier == com.forma.app.domain.model.SubscriptionTier.LIFETIME_FOUNDER)
+                                androidx.compose.ui.graphics.Color(0xFFD4AF37).copy(alpha = 0.45f)
+                            else colors.accent.copy(alpha = 0.35f),
+                            RoundedCornerShape(24.dp)
+                        )
                         .formaPressEffect(targetScale = 0.97f) {
                             haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                             showPaywall = true
@@ -300,13 +323,19 @@ fun SettingsScreen(
                                 modifier = Modifier
                                     .size(46.dp)
                                     .clip(RoundedCornerShape(16.dp))
-                                    .background(colors.accentSoft),
+                                    .background(
+                                        if (currentTier == com.forma.app.domain.model.SubscriptionTier.LIFETIME_FOUNDER)
+                                            androidx.compose.ui.graphics.Color(0xFFFDF8EA)
+                                        else colors.accentSoft
+                                    ),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     imageVector = Icons.Rounded.Spa,
                                     contentDescription = null,
-                                    tint = colors.accent,
+                                    tint = if (currentTier == com.forma.app.domain.model.SubscriptionTier.LIFETIME_FOUNDER)
+                                        androidx.compose.ui.graphics.Color(0xFFD4AF37)
+                                    else colors.accent,
                                     modifier = Modifier.size(22.dp)
                                 )
                             }
@@ -316,7 +345,11 @@ fun SettingsScreen(
                             Column {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(
-                                        text = "Forma Pro",
+                                        text = when (currentTier) {
+                                            com.forma.app.domain.model.SubscriptionTier.LIFETIME_FOUNDER -> "Forma Founder"
+                                            com.forma.app.domain.model.SubscriptionTier.MONTHLY_PRO -> "Forma Pro"
+                                            com.forma.app.domain.model.SubscriptionTier.FREE -> "Forma Pro"
+                                        },
                                         fontWeight = FontWeight.Bold,
                                         color = colors.textPrimary,
                                         fontSize = 16.sp
@@ -325,13 +358,27 @@ fun SettingsScreen(
                                     Box(
                                         modifier = Modifier
                                             .clip(RoundedCornerShape(6.dp))
-                                            .background(colors.accent.copy(alpha = 0.14f))
+                                            .background(
+                                                when (currentTier) {
+                                                    com.forma.app.domain.model.SubscriptionTier.LIFETIME_FOUNDER -> androidx.compose.ui.graphics.Color(0xFFD4AF37)
+                                                    com.forma.app.domain.model.SubscriptionTier.MONTHLY_PRO -> colors.accent
+                                                    com.forma.app.domain.model.SubscriptionTier.FREE -> colors.accent.copy(alpha = 0.14f)
+                                                }
+                                            )
                                             .padding(horizontal = 6.dp, vertical = 2.dp)
                                     ) {
                                         Text(
-                                            text = if (isPro) "LIFETIME ACTIVE" else "UPGRADE",
+                                            text = when (currentTier) {
+                                                com.forma.app.domain.model.SubscriptionTier.LIFETIME_FOUNDER -> "FOUNDER"
+                                                com.forma.app.domain.model.SubscriptionTier.MONTHLY_PRO -> "MONTHLY PRO"
+                                                com.forma.app.domain.model.SubscriptionTier.FREE -> "UPGRADE"
+                                            },
                                             fontWeight = FontWeight.Bold,
-                                            color = colors.accent,
+                                            color = when (currentTier) {
+                                                com.forma.app.domain.model.SubscriptionTier.LIFETIME_FOUNDER -> androidx.compose.ui.graphics.Color(0xFF2C2411)
+                                                com.forma.app.domain.model.SubscriptionTier.MONTHLY_PRO -> colors.onAccent
+                                                com.forma.app.domain.model.SubscriptionTier.FREE -> colors.accent
+                                            },
                                             fontSize = 9.5.sp,
                                             letterSpacing = 0.6.sp
                                         )
@@ -339,8 +386,11 @@ fun SettingsScreen(
                                 }
                                 Spacer(modifier = Modifier.height(3.dp))
                                 Text(
-                                    text = if (isPro) "Full sanctuary unlocked · AI synthesis & deep metrics"
-                                    else "AI day synthesis · Deep analytics · Custom themes",
+                                    text = when (currentTier) {
+                                        com.forma.app.domain.model.SubscriptionTier.LIFETIME_FOUNDER -> "Lifetime sanctuary unlocked · All future updates included"
+                                        com.forma.app.domain.model.SubscriptionTier.MONTHLY_PRO -> "Monthly sanctuary active · Full AI synthesis & deep metrics"
+                                        com.forma.app.domain.model.SubscriptionTier.FREE -> "AI day synthesis · Deep analytics · Custom themes"
+                                    },
                                     color = colors.textSecondary,
                                     fontSize = 11.5.sp,
                                     lineHeight = 16.sp

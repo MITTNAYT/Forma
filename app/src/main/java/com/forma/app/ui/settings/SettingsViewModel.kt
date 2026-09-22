@@ -69,6 +69,9 @@ class SettingsViewModel @Inject constructor(
     val isPro: StateFlow<Boolean> = billingRepository.isPro
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
+    val currentTier: StateFlow<com.forma.app.domain.model.SubscriptionTier> = billingRepository.currentTier
+        .stateIn(viewModelScope, SharingStarted.Eagerly, com.forma.app.domain.model.SubscriptionTier.FREE)
+
     fun setChronotype(chronotype: com.forma.app.domain.model.Chronotype) {
         viewModelScope.launch {
             preferencesRepository.setChronotype(chronotype)
@@ -226,20 +229,38 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun toggleMorningReminder(context: Context, enabled: Boolean) {
+    fun scheduleDailyReminders(context: Context, enabled: Boolean) {
         if (enabled) {
-            com.forma.app.core.notification.MindfulReminderScheduler.scheduleMorningReminder(context, 8, 0)
+            com.forma.app.core.notification.MindfulReminderScheduler.scheduleMorningReminder(context)
+            com.forma.app.core.notification.MindfulReminderScheduler.scheduleEveningReminder(context)
+        } else {
+            com.forma.app.core.notification.MindfulReminderScheduler.cancelMorningReminder(context)
+            com.forma.app.core.notification.MindfulReminderScheduler.cancelEveningReminder(context)
+        }
+    }
+
+    fun scheduleMorningReminder(context: Context, enabled: Boolean) {
+        if (enabled) {
+            com.forma.app.core.notification.MindfulReminderScheduler.scheduleMorningReminder(context)
         } else {
             com.forma.app.core.notification.MindfulReminderScheduler.cancelMorningReminder(context)
         }
     }
 
-    fun toggleEveningReminder(context: Context, enabled: Boolean) {
+    fun toggleMorningReminder(context: Context, enabled: Boolean) {
+        scheduleMorningReminder(context, enabled)
+    }
+
+    fun scheduleEveningReminder(context: Context, enabled: Boolean) {
         if (enabled) {
-            com.forma.app.core.notification.MindfulReminderScheduler.scheduleEveningReminder(context, 21, 30)
+            com.forma.app.core.notification.MindfulReminderScheduler.scheduleEveningReminder(context)
         } else {
             com.forma.app.core.notification.MindfulReminderScheduler.cancelEveningReminder(context)
         }
+    }
+
+    fun toggleEveningReminder(context: Context, enabled: Boolean) {
+        scheduleEveningReminder(context, enabled)
     }
 
     fun playBackgroundSound(context: Context, sound: com.forma.app.core.audio.AmbientSound, timerMinutes: Int) {
@@ -250,15 +271,33 @@ class SettingsViewModel @Inject constructor(
         com.forma.app.core.audio.AmbientSoundService.stop(context)
     }
 
+    fun purchaseMonthlyPro() {
+        viewModelScope.launch {
+            billingRepository.purchaseMonthlyPro()
+        }
+    }
+
+    fun purchaseLifetimeFounder() {
+        viewModelScope.launch {
+            billingRepository.purchaseLifetimeFounder()
+        }
+    }
+
     fun purchasePro() {
         viewModelScope.launch {
-            billingRepository.purchasePro()
+            billingRepository.purchaseLifetimeFounder()
         }
     }
 
     fun restorePurchases() {
         viewModelScope.launch {
             billingRepository.restorePurchases()
+        }
+    }
+
+    fun setSubscriptionTier(tier: com.forma.app.domain.model.SubscriptionTier) {
+        viewModelScope.launch {
+            billingRepository.setSubscriptionTier(tier)
         }
     }
 
