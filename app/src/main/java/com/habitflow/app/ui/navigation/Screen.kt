@@ -41,8 +41,8 @@ sealed class Screen(
     }
 
     companion object {
-        // Strict 5 slots: Home -> Habits -> AddItem (+) -> Analysis -> Settings
+        // Strict 5 slots: Home -> Pomodoro -> AddItem (+) -> Analysis -> Settings
         val bottomNavItems: List<Screen>
-            get() = listOf(Home, Habits, AddItem, Analysis, Settings)
+            get() = listOf(Home, Pomodoro, AddItem, Analysis, Settings)
     }
 }
