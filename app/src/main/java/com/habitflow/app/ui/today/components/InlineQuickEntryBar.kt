@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.today.components
+﻿package com.habitflow.app.ui.today.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -58,7 +58,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import com.habitflow.app.core.designsystem.motion.formaPressEffect
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -70,7 +70,7 @@ fun InlineQuickEntryBar(
     modifier: Modifier = Modifier,
     placeholder: String = "Type a new ritual or intention..."
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     val haptic = LocalHapticFeedback.current
     val focusManager = LocalFocusManager.current
     val coroutineScope = rememberCoroutineScope()
@@ -171,7 +171,7 @@ fun InlineQuickEntryBar(
                                 }
                             }
                         },
-                    textStyle = NotionTheme.typography.bodyMedium.copy(
+                    textStyle = FormaTheme.typography.bodyMedium.copy(
                         color = colors.textPrimary,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
@@ -191,7 +191,7 @@ fun InlineQuickEntryBar(
                             if (text.isEmpty()) {
                                 Text(
                                     text = if (isHabitMode) "Add recurring daily ritual..." else placeholder,
-                                    style = NotionTheme.typography.bodyMedium,
+                                    style = FormaTheme.typography.bodyMedium,
                                     color = colors.textTertiary,
                                     fontSize = 14.sp
                                 )
@@ -268,7 +268,7 @@ fun InlineQuickEntryBar(
                             ) {
                                 Text(
                                     text = label,
-                                    style = NotionTheme.typography.labelSmall,
+                                    style = FormaTheme.typography.labelSmall,
                                     fontWeight = if (active) FontWeight.Bold else FontWeight.Normal,
                                     color = if (active) colors.accent else colors.textSecondary,
                                     fontSize = 11.sp
@@ -279,7 +279,7 @@ fun InlineQuickEntryBar(
 
                     Text(
                         text = "↵ Enter to save",
-                        style = NotionTheme.typography.labelSmall,
+                        style = FormaTheme.typography.labelSmall,
                         color = colors.textTertiary,
                         fontSize = 10.5.sp
                     )

@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.stats.components
+﻿package com.habitflow.app.ui.stats.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -32,7 +32,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import com.habitflow.app.core.designsystem.icon.HabitFlowIcon
 import com.habitflow.app.ui.stats.DayDetailInfo
 
@@ -42,7 +42,7 @@ fun RhythmDayDetailSheet(
     dayInfo: DayDetailInfo,
     onDismiss: () -> Unit
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
@@ -66,7 +66,7 @@ fun RhythmDayDetailSheet(
                 Column {
                     Text(
                         text = "RHYTHM TELEMETRY",
-                        style = NotionTheme.typography.labelSmall,
+                        style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = colors.accent,
                         letterSpacing = 1.2.sp,
@@ -75,7 +75,7 @@ fun RhythmDayDetailSheet(
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = dayInfo.formattedDate,
-                        style = NotionTheme.typography.titleLarge,
+                        style = FormaTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = colors.textPrimary,
                         fontSize = 18.sp
@@ -123,7 +123,7 @@ fun RhythmDayDetailSheet(
                     Column {
                         Text(
                             text = "FLOW STATUS",
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = colors.textTertiary,
                             fontSize = 10.sp,
@@ -138,7 +138,7 @@ fun RhythmDayDetailSheet(
                             } else {
                                 "Rest Day • 0 Rituals Scheduled"
                             },
-                            style = NotionTheme.typography.titleMedium,
+                            style = FormaTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = colors.textPrimary,
                             fontSize = 14.sp
@@ -153,7 +153,7 @@ fun RhythmDayDetailSheet(
                     ) {
                         Text(
                             text = "$completionRate%",
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = if (completionRate > 0) colors.accent else colors.textTertiary,
                             fontSize = 12.sp
@@ -184,7 +184,7 @@ fun RhythmDayDetailSheet(
                     Column {
                         Text(
                             text = "FOCUS TIME INVESTED",
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = colors.accent,
                             fontSize = 10.sp,
@@ -195,7 +195,7 @@ fun RhythmDayDetailSheet(
                         val label = if (hrs > 0) "${hrs}h ${mins}m deep focus" else "${mins}m deep focus"
                         Text(
                             text = label,
-                            style = NotionTheme.typography.titleMedium,
+                            style = FormaTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = colors.textPrimary,
                             fontSize = 15.sp
@@ -208,7 +208,7 @@ fun RhythmDayDetailSheet(
 
             Text(
                 text = "SCHEDULED RITUALS",
-                style = NotionTheme.typography.labelSmall,
+                style = FormaTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
                 color = colors.textTertiary,
                 letterSpacing = 1.1.sp,
@@ -227,7 +227,7 @@ fun RhythmDayDetailSheet(
                 ) {
                     Text(
                         text = "No rituals were scheduled on this date.",
-                        style = NotionTheme.typography.bodyMedium,
+                        style = FormaTheme.typography.bodyMedium,
                         color = colors.textSecondary,
                         fontSize = 13.sp
                     )
@@ -265,7 +265,7 @@ fun RhythmDayDetailSheet(
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Text(
                                     text = ritual.habitName,
-                                    style = NotionTheme.typography.bodyMedium,
+                                    style = FormaTheme.typography.bodyMedium,
                                     fontWeight = FontWeight.Bold,
                                     color = colors.textPrimary,
                                     fontSize = 14.sp

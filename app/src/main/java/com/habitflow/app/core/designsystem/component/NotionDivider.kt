@@ -9,10 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 
 @Composable
-fun NotionDivider(
+fun FormaDivider(
     modifier: Modifier = Modifier,
     thickness: Dp = 1.dp,
     verticalPadding: Dp = 0.dp
@@ -22,6 +22,19 @@ fun NotionDivider(
             .fillMaxWidth()
             .padding(vertical = verticalPadding)
             .height(thickness)
-            .background(NotionTheme.colors.border)
+            .background(FormaTheme.colors.border)
+    )
+}
+
+@Composable
+fun NotionDivider(
+    modifier: Modifier = Modifier,
+    thickness: Dp = 1.dp,
+    verticalPadding: Dp = 0.dp
+) {
+    FormaDivider(
+        modifier = modifier,
+        thickness = thickness,
+        verticalPadding = verticalPadding
     )
 }

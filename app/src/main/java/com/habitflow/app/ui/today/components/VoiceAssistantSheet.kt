@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.today.components
+﻿package com.habitflow.app.ui.today.components
 
 import android.content.Intent
 import android.os.Bundle
@@ -63,7 +63,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import com.habitflow.app.core.designsystem.motion.formaPressEffect
 import com.habitflow.app.core.nlp.NaturalLanguageHabitParser
 import com.habitflow.app.core.nlp.ParsedVoiceAction
@@ -80,7 +80,7 @@ fun VoiceAssistantSheet(
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 ) {
     val context = LocalContext.current
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     val parser = remember { NaturalLanguageHabitParser() }
 
     var isListening by remember { mutableStateOf(false) }
@@ -201,7 +201,7 @@ fun VoiceAssistantSheet(
                 Column {
                     Text(
                         text = "VOICE RITUAL ASSISTANT",
-                        style = NotionTheme.typography.labelSmall,
+                        style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = colors.accent,
                         letterSpacing = 1.2.sp,
@@ -209,7 +209,7 @@ fun VoiceAssistantSheet(
                     )
                     Text(
                         text = "Speak naturally to log rituals",
-                        style = NotionTheme.typography.bodySmall,
+                        style = FormaTheme.typography.bodySmall,
                         color = colors.textSecondary,
                         fontSize = 12.sp
                     )
@@ -251,7 +251,7 @@ fun VoiceAssistantSheet(
 
             Text(
                 text = if (isListening) "Listening... speak what you completed" else "Tap microphone to speak",
-                style = NotionTheme.typography.labelMedium,
+                style = FormaTheme.typography.labelMedium,
                 fontWeight = FontWeight.Bold,
                 color = if (isListening) colors.accent else colors.textTertiary,
                 fontSize = 13.sp
@@ -284,7 +284,7 @@ fun VoiceAssistantSheet(
                             capitalization = androidx.compose.ui.text.input.KeyboardCapitalization.Sentences,
                             imeAction = androidx.compose.ui.text.input.ImeAction.Done
                         ),
-                        textStyle = NotionTheme.typography.bodyMedium.copy(
+                        textStyle = FormaTheme.typography.bodyMedium.copy(
                             color = colors.textPrimary,
                             fontSize = 14.sp
                         ),
@@ -292,7 +292,7 @@ fun VoiceAssistantSheet(
                             if (transcriptText.isEmpty()) {
                                 Text(
                                     text = "e.g. \"I finished morning tea and read for 20 mins, feeling calm\"",
-                                    style = NotionTheme.typography.bodyMedium,
+                                    style = FormaTheme.typography.bodyMedium,
                                     color = colors.textTertiary,
                                     fontSize = 13.sp
                                 )
@@ -312,7 +312,7 @@ fun VoiceAssistantSheet(
             if (matched.isNotEmpty() || !gratitude.isNullOrBlank()) {
                 Text(
                     text = "DETECTED INTENTS",
-                    style = NotionTheme.typography.labelSmall,
+                    style = FormaTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = colors.textTertiary,
                     letterSpacing = 1.1.sp,
@@ -352,7 +352,7 @@ fun VoiceAssistantSheet(
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
                                         text = habit.name,
-                                        style = NotionTheme.typography.titleSmall,
+                                        style = FormaTheme.typography.titleSmall,
                                         fontWeight = FontWeight.Bold,
                                         color = colors.textPrimary,
                                         fontSize = 14.sp
@@ -361,7 +361,7 @@ fun VoiceAssistantSheet(
 
                                 Text(
                                     text = "Ready to complete",
-                                    style = NotionTheme.typography.labelSmall,
+                                    style = FormaTheme.typography.labelSmall,
                                     color = colors.accent,
                                     fontSize = 11.sp
                                 )
@@ -382,7 +382,7 @@ fun VoiceAssistantSheet(
                                 Column {
                                     Text(
                                         text = "Evening Reflection Note",
-                                        style = NotionTheme.typography.labelSmall,
+                                        style = FormaTheme.typography.labelSmall,
                                         fontWeight = FontWeight.Bold,
                                         color = colors.accent,
                                         fontSize = 11.sp
@@ -390,7 +390,7 @@ fun VoiceAssistantSheet(
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Text(
                                         text = "\"$gratitude\"",
-                                        style = NotionTheme.typography.bodySmall,
+                                        style = FormaTheme.typography.bodySmall,
                                         color = colors.textPrimary,
                                         fontSize = 13.sp
                                     )
@@ -421,7 +421,7 @@ fun VoiceAssistantSheet(
                 ) {
                     Text(
                         text = "Confirm & Log All (${matched.size} items)",
-                        style = NotionTheme.typography.titleSmall,
+                        style = FormaTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         color = colors.onAccent,
                         fontSize = 14.sp

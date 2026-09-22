@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.timeline.components
+﻿package com.habitflow.app.ui.timeline.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -43,9 +43,9 @@ import com.habitflow.app.core.designsystem.motion.formaPressEffect
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import com.habitflow.app.core.designsystem.icon.FormaIcon
-import com.habitflow.app.core.designsystem.icon.HabitFlowIcons
+import com.habitflow.app.core.designsystem.icon.FormaIcons
 
 /**
  * Zen Color Palette for tasks, rituals, and icons.
@@ -73,7 +73,7 @@ fun IconPickerDialog(
     onColorSelected: ((String) -> Unit)? = null,
     onDismiss: () -> Unit
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     val haptic = LocalHapticFeedback.current
     var activeColorHex by remember { mutableStateOf(selectedColor) }
     val activeColor = try {
@@ -102,7 +102,7 @@ fun IconPickerDialog(
                 Column {
                     Text(
                         text = "ICON & AESTHETIC",
-                        style = NotionTheme.typography.labelSmall,
+                        style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = colors.textTertiary,
                         letterSpacing = 1.2.sp,
@@ -110,7 +110,7 @@ fun IconPickerDialog(
                     )
                     Text(
                         text = "Personalize Ritual",
-                        style = NotionTheme.typography.titleMedium,
+                        style = FormaTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = colors.textPrimary,
                         fontSize = 20.sp
@@ -138,7 +138,7 @@ fun IconPickerDialog(
             // 1. Color Palette Selector Row
             Text(
                 text = "CHOOSE COLOR TONE",
-                style = NotionTheme.typography.labelSmall,
+                style = FormaTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
                 color = colors.textTertiary,
                 letterSpacing = 1.2.sp,
@@ -195,7 +195,7 @@ fun IconPickerDialog(
             // 2. Icon Grid with Live Color Tint
             Text(
                 text = "CHOOSE EMBLEM",
-                style = NotionTheme.typography.labelSmall,
+                style = FormaTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
                 color = colors.textTertiary,
                 letterSpacing = 1.2.sp,
@@ -209,7 +209,7 @@ fun IconPickerDialog(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                HabitFlowIcons.allIcons.forEach { (iconKey, label, category) ->
+                FormaIcons.allIcons.forEach { (iconKey, label, category) ->
                     val isSelected = selectedIcon.equals(iconKey, ignoreCase = true)
 
                     Box(

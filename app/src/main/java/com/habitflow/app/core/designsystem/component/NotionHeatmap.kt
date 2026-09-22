@@ -19,15 +19,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import com.habitflow.app.domain.model.DayCompletionRate
 
 @Composable
-fun NotionHeatmap(
+fun FormaHeatmap(
     heatmapDays: List<DayCompletionRate>,
     modifier: Modifier = Modifier
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
 
     // 5 weeks, each week having 7 days (Mon-Sun)
     val dayLabels = listOf("M", "T", "W", "T", "F", "S", "S")
@@ -45,13 +45,13 @@ fun NotionHeatmap(
         ) {
             Text(
                 text = "5-WEEK CONSISTENCY",
-                style = NotionTheme.typography.labelSmall,
+                style = FormaTheme.typography.labelSmall,
                 color = colors.textSecondary,
                 letterSpacing = 1.sp
             )
             Text(
                 text = "Grayscale intensity",
-                style = NotionTheme.typography.labelSmall,
+                style = FormaTheme.typography.labelSmall,
                 color = colors.textTertiary
             )
         }
@@ -74,7 +74,7 @@ fun NotionHeatmap(
                     ) {
                         Text(
                             text = label,
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             color = colors.textTertiary,
                             fontSize = 9.sp
                         )
@@ -101,9 +101,9 @@ fun NotionHeatmap(
                         Box(
                             modifier = Modifier
                                 .size(24.dp)
-                                .clip(NotionTheme.shapes.extraSmall)
+                                .clip(FormaTheme.shapes.extraSmall)
                                 .background(cellColor)
-                                .border(0.5.dp, colors.border.copy(alpha = 0.5f), NotionTheme.shapes.extraSmall)
+                                .border(0.5.dp, colors.border.copy(alpha = 0.5f), FormaTheme.shapes.extraSmall)
                         )
                     }
                 }
@@ -120,7 +120,7 @@ fun NotionHeatmap(
         ) {
             Text(
                 text = "Less",
-                style = NotionTheme.typography.labelSmall,
+                style = FormaTheme.typography.labelSmall,
                 color = colors.textTertiary,
                 fontSize = 10.sp
             )
@@ -137,9 +137,9 @@ fun NotionHeatmap(
                 Box(
                     modifier = Modifier
                         .size(10.dp)
-                        .clip(NotionTheme.shapes.extraSmall)
+                        .clip(FormaTheme.shapes.extraSmall)
                         .background(sampleColor)
-                        .border(0.5.dp, colors.border.copy(alpha = 0.4f), NotionTheme.shapes.extraSmall)
+                        .border(0.5.dp, colors.border.copy(alpha = 0.4f), FormaTheme.shapes.extraSmall)
                 )
                 Spacer(modifier = Modifier.width(3.dp))
             }
@@ -147,12 +147,23 @@ fun NotionHeatmap(
             Spacer(modifier = Modifier.width(3.dp))
             Text(
                 text = "More",
-                style = NotionTheme.typography.labelSmall,
+                style = FormaTheme.typography.labelSmall,
                 color = colors.textTertiary,
                 fontSize = 10.sp
             )
         }
     }
+}
+
+@Composable
+fun NotionHeatmap(
+    heatmapDays: List<DayCompletionRate>,
+    modifier: Modifier = Modifier
+) {
+    FormaHeatmap(
+        heatmapDays = heatmapDays,
+        modifier = modifier
+    )
 }
 
 private fun calculateGrayscaleCellColor(

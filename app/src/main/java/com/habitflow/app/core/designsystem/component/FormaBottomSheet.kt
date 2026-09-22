@@ -1,4 +1,4 @@
-package com.habitflow.app.core.designsystem.component
+﻿package com.habitflow.app.core.designsystem.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -38,7 +38,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import com.habitflow.app.core.designsystem.motion.formaPressEffect
 
 /**
@@ -61,10 +61,10 @@ fun FormaBottomSheet(
     subtitle: String? = null,
     showCloseButton: Boolean = true,
     trailingAction: (@Composable () -> Unit)? = null,
-    containerColor: Color = NotionTheme.colors.background,
+    containerColor: Color = FormaTheme.colors.background,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     val focusManager = LocalFocusManager.current
 
     ModalBottomSheet(
@@ -115,7 +115,7 @@ fun FormaBottomSheet(
                         if (title != null) {
                             Text(
                                 text = title,
-                                style = NotionTheme.typography.headlineMedium,
+                                style = FormaTheme.typography.headlineMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = colors.textPrimary,
                                 fontSize = 20.sp,
@@ -126,7 +126,7 @@ fun FormaBottomSheet(
                             Spacer(modifier = Modifier.height(2.dp))
                             Text(
                                 text = subtitle,
-                                style = NotionTheme.typography.bodySmall,
+                                style = FormaTheme.typography.bodySmall,
                                 color = colors.textSecondary,
                                 fontSize = 12.5.sp
                             )

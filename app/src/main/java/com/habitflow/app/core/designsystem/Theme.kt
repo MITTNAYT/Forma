@@ -1,13 +1,18 @@
 package com.habitflow.app.core.designsystem
 
 import android.app.Activity
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
@@ -15,22 +20,27 @@ import com.habitflow.app.domain.repository.DarkModeOption
 import com.habitflow.app.domain.repository.PaletteFamily
 import com.habitflow.app.domain.repository.ThemeMode
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.tween
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.graphics.Color
+val LocalFormaColors = staticCompositionLocalOf { MatchaLightColorScheme }
+val LocalNotionColors = LocalFormaColors
 
-val LocalNotionColors = staticCompositionLocalOf { MatchaLightColorScheme }
-
-object NotionTheme {
-    val colors: NotionColorScheme
+object FormaTheme {
+    val colors: FormaColorScheme
         @Composable
         @ReadOnlyComposable
-        get() = LocalNotionColors.current
+        get() = LocalFormaColors.current
 
-    val typography = HabitFlowTypography
-    val shapes = HabitFlowShapes
+    val typography = FormaTypography
+    val shapes = FormaShapes
+}
+
+object NotionTheme {
+    val colors: FormaColorScheme
+        @Composable
+        @ReadOnlyComposable
+        get() = FormaTheme.colors
+
+    val typography = FormaTheme.typography
+    val shapes = FormaTheme.shapes
 }
 
 @Composable
@@ -71,7 +81,7 @@ fun animatedStructuredColorScheme(target: StructuredColorScheme): StructuredColo
 }
 
 @Composable
-fun HabitFlowTheme(
+fun FormaTheme(
     paletteFamily: PaletteFamily = PaletteFamily.MATCHA_OAT,
     darkModeOption: DarkModeOption = DarkModeOption.LIGHT,
     themeMode: ThemeMode = ThemeMode.MATCHA_OAT,
@@ -110,12 +120,29 @@ fun HabitFlowTheme(
     }
 
     CompositionLocalProvider(
-        LocalNotionColors provides animatedColors
+        LocalFormaColors provides animatedColors
     ) {
         MaterialTheme(
-            typography = HabitFlowTypography,
-            shapes = HabitFlowShapes,
+            typography = FormaTypography,
+            shapes = FormaShapes,
             content = content
         )
     }
+}
+
+@Composable
+fun HabitFlowTheme(
+    paletteFamily: PaletteFamily = PaletteFamily.MATCHA_OAT,
+    darkModeOption: DarkModeOption = DarkModeOption.LIGHT,
+    themeMode: ThemeMode = ThemeMode.MATCHA_OAT,
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit
+) {
+    FormaTheme(
+        paletteFamily = paletteFamily,
+        darkModeOption = darkModeOption,
+        themeMode = themeMode,
+        darkTheme = darkTheme,
+        content = content
+    )
 }

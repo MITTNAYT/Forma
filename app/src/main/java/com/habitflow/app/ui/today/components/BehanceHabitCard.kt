@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.today.components
+﻿package com.habitflow.app.ui.today.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
@@ -45,7 +45,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import com.habitflow.app.core.designsystem.motion.FormaMotion
 import com.habitflow.app.core.designsystem.motion.formaPressEffect
 import com.habitflow.app.core.designsystem.icon.HabitFlowIcon
@@ -67,7 +67,7 @@ fun BehanceHabitCard(
     onStartFocus: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     val haptic = LocalHapticFeedback.current
     val scope = rememberCoroutineScope()
 
@@ -209,7 +209,7 @@ fun BehanceHabitCard(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = title,
-                            style = NotionTheme.typography.titleMedium,
+                            style = FormaTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = if (isDone || cardData.isWintering) colors.textSecondary else colors.textPrimary,
                             fontSize = 16.sp,
@@ -223,7 +223,7 @@ fun BehanceHabitCard(
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
                                 text = "🍵 Wintering",
-                                style = NotionTheme.typography.labelSmall,
+                                style = FormaTheme.typography.labelSmall,
                                 color = colors.accent,
                                 fontSize = 10.sp,
                                 modifier = Modifier
@@ -238,7 +238,7 @@ fun BehanceHabitCard(
 
                     Text(
                         text = subtitle,
-                        style = NotionTheme.typography.bodySmall,
+                        style = FormaTheme.typography.bodySmall,
                         color = colors.textSecondary,
                         fontSize = 13.sp,
                         maxLines = 1,
@@ -249,7 +249,7 @@ fun BehanceHabitCard(
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = "↳ ${cardData.cueText}",
-                            style = NotionTheme.typography.bodySmall,
+                            style = FormaTheme.typography.bodySmall,
                             color = colors.textTertiary,
                             fontSize = 11.sp,
                             maxLines = 1,

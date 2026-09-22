@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.ai
+﻿package com.habitflow.app.ui.ai
 
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
@@ -54,8 +54,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.habitflow.app.core.designsystem.LuxuryIceBlue
-import com.habitflow.app.core.designsystem.NotionTheme
-import com.habitflow.app.core.designsystem.component.NotionCard
+import com.habitflow.app.core.designsystem.FormaTheme
+import com.habitflow.app.core.designsystem.component.FormaCard
 import com.habitflow.app.ui.settings.components.ProPaywallBottomSheet
 import com.habitflow.app.ui.today.TodayViewModel
 
@@ -65,7 +65,7 @@ fun AiPlannerScreen(
     todayViewModel: TodayViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
 
     var promptText by remember { mutableStateOf("") }
     val isAiPlanning by todayViewModel.isAiPlanning.collectAsState()
@@ -102,7 +102,7 @@ fun AiPlannerScreen(
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
                     text = "Forma Intelligence",
-                    style = NotionTheme.typography.labelSmall,
+                    style = FormaTheme.typography.labelSmall,
                     color = colors.textPrimary,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -112,7 +112,7 @@ fun AiPlannerScreen(
 
             Text(
                 text = "What do you need to accomplish today?",
-                style = NotionTheme.typography.displayLarge,
+                style = FormaTheme.typography.displayLarge,
                 color = colors.textPrimary,
                 fontWeight = FontWeight.Bold,
                 fontSize = 28.sp,
@@ -157,7 +157,7 @@ fun AiPlannerScreen(
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = "Daily Briefing",
-                                style = NotionTheme.typography.titleMedium,
+                                style = FormaTheme.typography.titleMedium,
                                 color = colors.textPrimary,
                                 fontWeight = FontWeight.Bold
                             )
@@ -165,7 +165,7 @@ fun AiPlannerScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "Synthesize daily commitments, habits, and energy peaks into a coherent plan.",
-                            style = NotionTheme.typography.bodySmall,
+                            style = FormaTheme.typography.bodySmall,
                             color = colors.textSecondary,
                             lineHeight = 16.sp
                         )
@@ -201,7 +201,7 @@ fun AiPlannerScreen(
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = "Deep Flow Matrix",
-                                style = NotionTheme.typography.titleMedium,
+                                style = FormaTheme.typography.titleMedium,
                                 color = colors.textPrimary,
                                 fontWeight = FontWeight.Bold
                             )
@@ -209,7 +209,7 @@ fun AiPlannerScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "Block high-cognitive tasks with 15-minute restorative recovery intervals.",
-                            style = NotionTheme.typography.bodySmall,
+                            style = FormaTheme.typography.bodySmall,
                             color = colors.textSecondary,
                             lineHeight = 16.sp
                         )
@@ -240,7 +240,7 @@ fun AiPlannerScreen(
                             Text(
                                 text = "Tell me your schedule or goals...",
                                 color = colors.textTertiary,
-                                style = NotionTheme.typography.bodyMedium
+                                style = FormaTheme.typography.bodyMedium
                             )
                         },
                         keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(

@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.stats.components
+﻿package com.habitflow.app.ui.stats.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -37,7 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import com.habitflow.app.core.util.DateUtils
 import java.time.LocalDate
 
@@ -46,7 +46,7 @@ fun YearlyParchmentHeatmap(
     completionsByDate: Map<String, Int>,
     modifier: Modifier = Modifier
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     val scrollState = rememberScrollState()
 
     var selectedDayInfo by remember { mutableStateOf<Pair<String, Int>?>(null) }
@@ -104,7 +104,7 @@ fun YearlyParchmentHeatmap(
                     Column {
                         Text(
                             text = "365-DAY ZEN PARCHMENT",
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = colors.textTertiary,
                             letterSpacing = 1.2.sp,
@@ -112,7 +112,7 @@ fun YearlyParchmentHeatmap(
                         )
                         Text(
                             text = "Yearly Ritual Consistency",
-                            style = NotionTheme.typography.titleMedium,
+                            style = FormaTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = colors.textPrimary,
                             fontSize = 15.sp
@@ -130,7 +130,7 @@ fun YearlyParchmentHeatmap(
                 ) {
                     Text(
                         text = "$totalYearCompletions Rituals",
-                        style = NotionTheme.typography.labelSmall,
+                        style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = colors.accent,
                         fontSize = 11.sp
@@ -197,7 +197,7 @@ fun YearlyParchmentHeatmap(
                     selectedDayInfo?.let { (date, count) ->
                         Text(
                             text = "$date: $count rituals",
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = colors.accent,
                             fontSize = 11.sp
@@ -207,7 +207,7 @@ fun YearlyParchmentHeatmap(
                 if (selectedDayInfo == null) {
                     Text(
                         text = "Tap cell to inspect",
-                        style = NotionTheme.typography.bodySmall,
+                        style = FormaTheme.typography.bodySmall,
                         color = colors.textTertiary,
                         fontSize = 11.sp
                     )
@@ -220,7 +220,7 @@ fun YearlyParchmentHeatmap(
                 ) {
                     Text(
                         text = "Less",
-                        style = NotionTheme.typography.labelSmall,
+                        style = FormaTheme.typography.labelSmall,
                         color = colors.textTertiary,
                         fontSize = 9.5.sp
                     )
@@ -240,7 +240,7 @@ fun YearlyParchmentHeatmap(
                     }
                     Text(
                         text = "More",
-                        style = NotionTheme.typography.labelSmall,
+                        style = FormaTheme.typography.labelSmall,
                         color = colors.textTertiary,
                         fontSize = 9.5.sp
                     )

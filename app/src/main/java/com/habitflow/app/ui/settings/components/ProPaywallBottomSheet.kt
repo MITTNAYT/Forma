@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.settings.components
+﻿package com.habitflow.app.ui.settings.components
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -61,7 +61,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import com.habitflow.app.ui.settings.SettingsViewModel
 import kotlinx.coroutines.launch
 
@@ -79,7 +79,7 @@ fun ProPaywallBottomSheet(
     onDismiss: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     val isPro by viewModel.isPro.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     var isPurchasing by remember { mutableStateOf(false) }
@@ -142,7 +142,7 @@ fun ProPaywallBottomSheet(
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = "FORMA PRO",
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = colors.accent,
                             letterSpacing = 1.6.sp,
@@ -172,7 +172,7 @@ fun ProPaywallBottomSheet(
             // ── 2. Editorial Headline & Description ───────────────────
             Text(
                 text = if (isPro) "You are on Forma Pro" else "Elevate Your\nDaily Rhythm",
-                style = NotionTheme.typography.headlineLarge,
+                style = FormaTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
                 color = colors.textPrimary,
                 fontSize = 28.sp,
@@ -187,7 +187,7 @@ fun ProPaywallBottomSheet(
                     "All Pro capabilities are active on your device. Thank you for cultivating mindful flow."
                 else
                     "Your core rituals and timeline are free forever. Pro unlocks AI schedule synthesis, deep analytics, and unlimited aesthetic freedom.",
-                style = NotionTheme.typography.bodyMedium,
+                style = FormaTheme.typography.bodyMedium,
                 color = colors.textSecondary,
                 fontSize = 14.sp,
                 lineHeight = 20.sp
@@ -198,7 +198,7 @@ fun ProPaywallBottomSheet(
             // ── 3. Organized Feature Pillars ─────────────────────────
             Text(
                 text = "WHAT'S INCLUDED",
-                style = NotionTheme.typography.labelSmall,
+                style = FormaTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
                 color = colors.textTertiary,
                 letterSpacing = 1.4.sp,
@@ -250,7 +250,7 @@ fun ProPaywallBottomSheet(
                         ) {
                             Text(
                                 text = "LIFETIME MEMBERSHIP",
-                                style = NotionTheme.typography.labelSmall,
+                                style = FormaTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = colors.accent,
                                 letterSpacing = 1.2.sp,
@@ -277,7 +277,7 @@ fun ProPaywallBottomSheet(
                         Row(verticalAlignment = Alignment.Bottom) {
                             Text(
                                 text = "$19",
-                                style = NotionTheme.typography.headlineLarge,
+                                style = FormaTheme.typography.headlineLarge,
                                 fontWeight = FontWeight.Bold,
                                 color = colors.textPrimary,
                                 fontSize = 38.sp,
@@ -285,7 +285,7 @@ fun ProPaywallBottomSheet(
                             )
                             Text(
                                 text = ".99",
-                                style = NotionTheme.typography.titleMedium,
+                                style = FormaTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = colors.textSecondary,
                                 fontSize = 20.sp,
@@ -294,7 +294,7 @@ fun ProPaywallBottomSheet(
                             Spacer(modifier = Modifier.width(10.dp))
                             Text(
                                 text = "one-time · yours forever",
-                                style = NotionTheme.typography.bodySmall,
+                                style = FormaTheme.typography.bodySmall,
                                 color = colors.textSecondary,
                                 fontSize = 12.sp,
                                 modifier = Modifier.padding(bottom = 8.dp)
@@ -305,7 +305,7 @@ fun ProPaywallBottomSheet(
 
                         Text(
                             text = "No subscriptions. No recurring charges. Free future updates.",
-                            style = NotionTheme.typography.bodySmall,
+                            style = FormaTheme.typography.bodySmall,
                             color = colors.textTertiary,
                             fontSize = 12.sp
                         )
@@ -363,7 +363,7 @@ fun ProPaywallBottomSheet(
                     } else {
                         Text(
                             text = "Unlock Lifetime Access — $19.99",
-                            style = NotionTheme.typography.labelLarge,
+                            style = FormaTheme.typography.labelLarge,
                             fontWeight = FontWeight.Bold,
                             color = colors.onAccent,
                             fontSize = 15.sp,
@@ -389,7 +389,7 @@ fun ProPaywallBottomSheet(
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = "Google Play verified checkout  ·  Instant restore",
-                        style = NotionTheme.typography.bodySmall,
+                        style = FormaTheme.typography.bodySmall,
                         color = colors.textTertiary,
                         fontSize = 11.sp
                     )
@@ -401,7 +401,7 @@ fun ProPaywallBottomSheet(
                 ) {
                     Text(
                         text = "Restore Purchases",
-                        style = NotionTheme.typography.labelSmall,
+                        style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Medium,
                         color = colors.textSecondary,
                         fontSize = 12.sp
@@ -428,7 +428,7 @@ fun ProPaywallBottomSheet(
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
                             text = "Lifetime Membership Active",
-                            style = NotionTheme.typography.titleSmall,
+                            style = FormaTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold,
                             color = colors.accent,
                             fontSize = 15.sp
@@ -450,7 +450,7 @@ private fun ProFeatureCard(
     subtitle: String,
     badge: String
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -488,7 +488,7 @@ private fun ProFeatureCard(
                 ) {
                     Text(
                         text = title,
-                        style = NotionTheme.typography.titleSmall,
+                        style = FormaTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         color = colors.textPrimary,
                         fontSize = 14.sp
@@ -514,7 +514,7 @@ private fun ProFeatureCard(
 
                 Text(
                     text = subtitle,
-                    style = NotionTheme.typography.bodySmall,
+                    style = FormaTheme.typography.bodySmall,
                     color = colors.textSecondary,
                     fontSize = 12.sp,
                     lineHeight = 16.sp

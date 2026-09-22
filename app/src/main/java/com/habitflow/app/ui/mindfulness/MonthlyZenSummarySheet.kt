@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.mindfulness
+﻿package com.habitflow.app.ui.mindfulness
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -37,7 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import com.habitflow.app.core.designsystem.component.FormaEmblem
 import com.habitflow.app.core.designsystem.motion.formaPressEffect
 
@@ -56,7 +56,7 @@ fun MonthlyZenSummarySheet(
     onDismiss: () -> Unit,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -83,7 +83,7 @@ fun MonthlyZenSummarySheet(
                     Column {
                         Text(
                             text = "MONTHLY REFLECTION",
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = colors.textTertiary,
                             letterSpacing = 1.2.sp,
@@ -91,7 +91,7 @@ fun MonthlyZenSummarySheet(
                         )
                         Text(
                             text = "${summaryData.monthName} Zen Summary",
-                            style = NotionTheme.typography.titleMedium,
+                            style = FormaTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = colors.textPrimary,
                             fontSize = 16.sp
@@ -129,7 +129,7 @@ fun MonthlyZenSummarySheet(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = "Peaceful Consistency",
-                        style = NotionTheme.typography.labelSmall,
+                        style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = colors.accent,
                         letterSpacing = 1.2.sp,
@@ -140,7 +140,7 @@ fun MonthlyZenSummarySheet(
 
                     Text(
                         text = "A Month of Mindful Living",
-                        style = NotionTheme.typography.headlineSmall,
+                        style = FormaTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         color = colors.textPrimary,
                         fontSize = 20.sp,
@@ -172,14 +172,14 @@ fun MonthlyZenSummarySheet(
                                 Spacer(modifier = Modifier.height(10.dp))
                                 Text(
                                     text = String.format("%.1fh", summaryData.focusHours),
-                                    style = NotionTheme.typography.headlineMedium,
+                                    style = FormaTheme.typography.headlineMedium,
                                     fontWeight = FontWeight.Bold,
                                     color = colors.textPrimary,
                                     fontSize = 22.sp
                                 )
                                 Text(
                                     text = "Deep Focus Flow",
-                                    style = NotionTheme.typography.labelSmall,
+                                    style = FormaTheme.typography.labelSmall,
                                     color = colors.textSecondary,
                                     fontSize = 11.sp
                                 )
@@ -204,14 +204,14 @@ fun MonthlyZenSummarySheet(
                                 Spacer(modifier = Modifier.height(10.dp))
                                 Text(
                                     text = "${summaryData.ritualsCompleted}",
-                                    style = NotionTheme.typography.headlineMedium,
+                                    style = FormaTheme.typography.headlineMedium,
                                     fontWeight = FontWeight.Bold,
                                     color = colors.textPrimary,
                                     fontSize = 22.sp
                                 )
                                 Text(
                                     text = "Rituals Honored",
-                                    style = NotionTheme.typography.labelSmall,
+                                    style = FormaTheme.typography.labelSmall,
                                     color = colors.textSecondary,
                                     fontSize = 11.sp
                                 )
@@ -243,14 +243,14 @@ fun MonthlyZenSummarySheet(
                                 Spacer(modifier = Modifier.height(10.dp))
                                 Text(
                                     text = "${summaryData.reflectionsLogged}",
-                                    style = NotionTheme.typography.headlineMedium,
+                                    style = FormaTheme.typography.headlineMedium,
                                     fontWeight = FontWeight.Bold,
                                     color = colors.textPrimary,
                                     fontSize = 22.sp
                                 )
                                 Text(
                                     text = "Days Reflected",
-                                    style = NotionTheme.typography.labelSmall,
+                                    style = FormaTheme.typography.labelSmall,
                                     color = colors.textSecondary,
                                     fontSize = 11.sp
                                 )
@@ -275,14 +275,14 @@ fun MonthlyZenSummarySheet(
                                 Spacer(modifier = Modifier.height(10.dp))
                                 Text(
                                     text = String.format("%.1f/5", summaryData.averagePeaceRating),
-                                    style = NotionTheme.typography.headlineMedium,
+                                    style = FormaTheme.typography.headlineMedium,
                                     fontWeight = FontWeight.Bold,
                                     color = colors.textPrimary,
                                     fontSize = 22.sp
                                 )
                                 Text(
                                     text = "Peace Index",
-                                    style = NotionTheme.typography.labelSmall,
+                                    style = FormaTheme.typography.labelSmall,
                                     color = colors.textSecondary,
                                     fontSize = 11.sp
                                 )
@@ -303,7 +303,7 @@ fun MonthlyZenSummarySheet(
                     ) {
                         Text(
                             text = "“A quiet mind carries strength through all seasons. Your deliberate rhythm this month is crafting lasting peace.”",
-                            style = NotionTheme.typography.bodySmall,
+                            style = FormaTheme.typography.bodySmall,
                             color = colors.textSecondary,
                             textAlign = TextAlign.Center,
                             lineHeight = 18.sp,
@@ -330,7 +330,7 @@ fun MonthlyZenSummarySheet(
             ) {
                 Text(
                     text = "Close Summary",
-                    style = NotionTheme.typography.titleMedium,
+                    style = FormaTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = colors.onAccent,
                     fontSize = 15.sp

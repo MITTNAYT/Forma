@@ -6,11 +6,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.habitflow.app.core.designsystem.HabitFlowTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import com.habitflow.app.domain.repository.DarkModeOption
 import com.habitflow.app.domain.repository.PaletteFamily
 import com.habitflow.app.domain.repository.UserPreferencesRepository
-import com.habitflow.app.ui.HabitFlowApp
+import com.habitflow.app.ui.FormaApp
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -28,11 +28,11 @@ class MainActivity : ComponentActivity() {
             val paletteFamily by preferencesRepository.paletteFamily.collectAsState(initial = PaletteFamily.MATCHA_OAT)
             val darkModeOption by preferencesRepository.darkModeOption.collectAsState(initial = DarkModeOption.LIGHT)
 
-            HabitFlowTheme(
+            FormaTheme(
                 paletteFamily = paletteFamily,
                 darkModeOption = darkModeOption
             ) {
-                HabitFlowApp(preferencesRepository = preferencesRepository)
+                FormaApp(preferencesRepository = preferencesRepository)
             }
         }
     }

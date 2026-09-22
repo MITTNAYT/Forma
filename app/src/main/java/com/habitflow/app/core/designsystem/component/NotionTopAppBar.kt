@@ -9,10 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -20,17 +18,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 
 @Composable
-fun NotionTopAppBar(
+fun FormaTopAppBar(
     title: String,
     modifier: Modifier = Modifier,
     subtitle: String? = null,
     onBackClick: (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {}
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
 
     Column(
         modifier = modifier
@@ -60,14 +58,14 @@ fun NotionTopAppBar(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = title,
-                    style = NotionTheme.typography.headlineLarge,
+                    style = FormaTheme.typography.headlineLarge,
                     color = colors.textPrimary
                 )
                 if (!subtitle.isNullOrBlank()) {
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         text = subtitle,
-                        style = NotionTheme.typography.bodySmall,
+                        style = FormaTheme.typography.bodySmall,
                         color = colors.textSecondary
                     )
                 }
@@ -78,6 +76,23 @@ fun NotionTopAppBar(
             }
         }
 
-        NotionDivider()
+        FormaDivider()
     }
+}
+
+@Composable
+fun NotionTopAppBar(
+    title: String,
+    modifier: Modifier = Modifier,
+    subtitle: String? = null,
+    onBackClick: (() -> Unit)? = null,
+    actions: @Composable RowScope.() -> Unit = {}
+) {
+    FormaTopAppBar(
+        title = title,
+        modifier = modifier,
+        subtitle = subtitle,
+        onBackClick = onBackClick,
+        actions = actions
+    )
 }

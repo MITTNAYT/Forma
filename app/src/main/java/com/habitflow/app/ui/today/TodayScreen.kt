@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.today
+﻿package com.habitflow.app.ui.today
 
 import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
@@ -76,7 +76,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import com.habitflow.app.core.util.DateUtils
 import com.habitflow.app.domain.model.TodayScheduleItem
 import com.habitflow.app.ui.settings.components.ProPaywallBottomSheet
@@ -109,7 +109,7 @@ fun TodayScreen(
     viewModel: TodayViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
 
     val selectedDate by viewModel.selectedDate.collectAsState()
     val daySchedule by viewModel.daySchedule.collectAsState()
@@ -202,164 +202,193 @@ fun TodayScreen(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 24.dp, end = 24.dp, top = 20.dp, bottom = 12.dp)
+                            .padding(start = 24.dp, end = 24.dp, top = 20.dp, bottom = 4.dp)
                     ) {
-                        Text(
-                            text = dateFormatted.uppercase(),
-                            style = NotionTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = colors.accent,
-                            letterSpacing = 1.2.sp,
-                            fontSize = 11.sp
-                        )
-
-                        Spacer(modifier = Modifier.height(4.dp))
-
+                        // Row 1: Date label + primary action only (Morning/Evening ritual)
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "$greeting $userName",
-                                style = NotionTheme.typography.headlineLarge,
+                                text = dateFormatted.uppercase(),
+                                style = FormaTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
-                                color = colors.textPrimary,
-                                fontSize = 28.sp,
-                                letterSpacing = (-0.5).sp
+                                color = colors.accent,
+                                letterSpacing = 1.2.sp,
+                                fontSize = 11.sp
                             )
 
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                // Morning Clarity / Evening Wind-down Action Pill
-                                val currentHour = LocalTime.now().hour
-                                val isEvening = currentHour >= 18 || currentHour < 4
-                                val ritualTitle = if (isEvening) "Evening Rest" else "Morning Clarity"
-                                val ritualIcon = if (isEvening) Icons.Rounded.Spa else Icons.Rounded.AutoAwesome
+                            // Single primary ritual pill (Morning Clarity / Evening Rest)
+                            val currentHour = LocalTime.now().hour
+                            val isEvening = currentHour >= 18 || currentHour < 4
+                            val ritualTitle = if (isEvening) "Evening Rest" else "Morning Clarity"
+                            val ritualIcon = if (isEvening) Icons.Rounded.Spa else Icons.Rounded.AutoAwesome
 
-                                Box(
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(12.dp))
-                                        .background(colors.accentSoft)
-                                        .border(1.dp, colors.accent.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
-                                        .formaPressEffect(targetScale = 0.92f) {
-                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                            if (isEvening) {
-                                                showEveningSheet = true
-                                            } else {
-                                                showMorningSheet = true
-                                            }
-                                        }
-                                        .padding(horizontal = 10.dp, vertical = 7.dp)
-                                ) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(
-                                            imageVector = ritualIcon,
-                                            contentDescription = ritualTitle,
-                                            tint = colors.accent,
-                                            modifier = Modifier.size(13.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(5.dp))
-                                        Text(
-                                            text = ritualTitle,
-                                            style = NotionTheme.typography.labelSmall,
-                                            fontWeight = FontWeight.Bold,
-                                            color = colors.accent,
-                                            fontSize = 11.sp
-                                        )
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(colors.accentSoft)
+                                    .border(1.dp, colors.accent.copy(alpha = 0.35f), RoundedCornerShape(12.dp))
+                                    .formaPressEffect(targetScale = 0.92f) {
+                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                        if (isEvening) showEveningSheet = true else showMorningSheet = true
                                     }
-                                }
-
-                                Spacer(modifier = Modifier.width(6.dp))
-
-                                // Zen Rebalance Button
-                                Box(
-                                    modifier = Modifier
-                                        .size(36.dp)
-                                        .clip(CircleShape)
-                                        .background(colors.surface)
-                                        .border(1.dp, colors.border.copy(alpha = 0.6f), CircleShape)
-                                        .formaPressEffect(targetScale = 0.90f) {
-                                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                            viewModel.rebalanceDayTimeline()
-                                        },
-                                    contentAlignment = Alignment.Center
-                                ) {
+                                    .padding(horizontal = 10.dp, vertical = 6.dp)
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(
-                                        imageVector = Icons.Rounded.Spa,
-                                        contentDescription = "Zen Rebalance",
+                                        imageVector = ritualIcon,
+                                        contentDescription = ritualTitle,
                                         tint = colors.accent,
-                                        modifier = Modifier.size(17.dp)
+                                        modifier = Modifier.size(13.dp)
                                     )
-                                }
-
-                                Spacer(modifier = Modifier.width(6.dp))
-
-                                // AI Plan Pill Button
-                                Box(
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(12.dp))
-                                        .background(colors.surfaceVariant)
-                                        .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
-                                        .formaPressEffect(targetScale = 0.92f) {
-                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                            showAiPresetSheet = true
-                                        }
-                                        .padding(horizontal = 9.dp, vertical = 7.dp)
-                                ) {
+                                    Spacer(modifier = Modifier.width(5.dp))
                                     Text(
-                                        text = "AI Plan",
-                                        style = NotionTheme.typography.labelSmall,
+                                        text = ritualTitle,
+                                        style = FormaTheme.typography.labelSmall,
                                         fontWeight = FontWeight.Bold,
-                                        color = colors.textPrimary,
+                                        color = colors.accent,
                                         fontSize = 11.sp
                                     )
                                 }
+                            }
+                        }
 
-                                Spacer(modifier = Modifier.width(6.dp))
+                        Spacer(modifier = Modifier.height(6.dp))
 
-                                // Voice Assistant Mic Button
-                                Box(
-                                    modifier = Modifier
-                                        .size(36.dp)
-                                        .clip(CircleShape)
-                                        .background(colors.accentSoft)
-                                        .border(1.dp, colors.accent.copy(alpha = 0.5f), CircleShape)
-                                        .formaPressEffect(targetScale = 0.90f) {
-                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                            showVoiceAssistantSheet = true
-                                        },
-                                    contentAlignment = Alignment.Center
-                                ) {
+                        // Row 2: Greeting headline (full width, no competing elements)
+                        Text(
+                            text = "$greeting $userName",
+                            style = FormaTheme.typography.displayMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = colors.textPrimary,
+                            letterSpacing = (-0.6).sp
+                        )
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Row 3: Secondary action pills — compact, equal weight
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            // AI Plan pill
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(colors.surfaceVariant)
+                                    .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
+                                    .formaPressEffect(targetScale = 0.93f) {
+                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                        showAiPresetSheet = true
+                                    }
+                                    .padding(vertical = 9.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.AutoAwesome,
+                                        contentDescription = "AI Plan",
+                                        tint = colors.textSecondary,
+                                        modifier = Modifier.size(13.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(5.dp))
+                                    Text(
+                                        text = "AI Plan",
+                                        style = FormaTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = colors.textSecondary,
+                                        fontSize = 12.sp
+                                    )
+                                }
+                            }
+
+                            // Voice pill
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(colors.surfaceVariant)
+                                    .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
+                                    .formaPressEffect(targetScale = 0.93f) {
+                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                        showVoiceAssistantSheet = true
+                                    }
+                                    .padding(vertical = 9.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(
                                         imageVector = Icons.Rounded.Mic,
-                                        contentDescription = "Voice Assistant",
-                                        tint = colors.accent,
-                                        modifier = Modifier.size(17.dp)
+                                        contentDescription = "Voice",
+                                        tint = colors.textSecondary,
+                                        modifier = Modifier.size(13.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(5.dp))
+                                    Text(
+                                        text = "Voice",
+                                        style = FormaTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = colors.textSecondary,
+                                        fontSize = 12.sp
                                     )
                                 }
+                            }
 
-                                Spacer(modifier = Modifier.width(6.dp))
-
-                                // Calendar Icon
-                                Box(
-                                    modifier = Modifier
-                                        .size(36.dp)
-                                        .clip(CircleShape)
-                                        .background(colors.surface)
-                                        .border(1.dp, colors.border.copy(alpha = 0.6f), CircleShape)
-                                        .formaPressEffect(targetScale = 0.90f) {
-                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                            showDatePickerDialog = true
-                                        },
-                                    contentAlignment = Alignment.Center
-                                ) {
+                            // Zen Rebalance pill
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(colors.surfaceVariant)
+                                    .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
+                                    .formaPressEffect(targetScale = 0.93f) {
+                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        viewModel.rebalanceDayTimeline()
+                                    }
+                                    .padding(vertical = 9.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(
-                                        imageVector = Icons.Rounded.CalendarMonth,
-                                        contentDescription = "Pick Date",
-                                        tint = colors.textPrimary,
-                                        modifier = Modifier.size(17.dp)
+                                        imageVector = Icons.Rounded.Spa,
+                                        contentDescription = "Rebalance",
+                                        tint = colors.textSecondary,
+                                        modifier = Modifier.size(13.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(5.dp))
+                                    Text(
+                                        text = "Rebalance",
+                                        style = FormaTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = colors.textSecondary,
+                                        fontSize = 12.sp
                                     )
                                 }
+                            }
+
+                            // Calendar icon button (stays as compact icon only)
+                            Box(
+                                modifier = Modifier
+                                    .size(38.dp)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(colors.surfaceVariant)
+                                    .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
+                                    .formaPressEffect(targetScale = 0.90f) {
+                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                        showDatePickerDialog = true
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.CalendarMonth,
+                                    contentDescription = "Pick Date",
+                                    tint = colors.textSecondary,
+                                    modifier = Modifier.size(16.dp)
+                                )
                             }
                         }
                     }
@@ -418,7 +447,7 @@ fun TodayScreen(
                                 ) {
                                     Text(
                                         text = dayName,
-                                        style = NotionTheme.typography.labelSmall,
+                                        style = FormaTheme.typography.labelSmall,
                                         fontWeight = FontWeight.Bold,
                                         color = subTextColor,
                                         fontSize = 10.5.sp,
@@ -427,7 +456,7 @@ fun TodayScreen(
 
                                     Text(
                                         text = dayNum,
-                                        style = NotionTheme.typography.titleMedium,
+                                        style = FormaTheme.typography.titleMedium,
                                         fontWeight = FontWeight.Bold,
                                         color = textColor,
                                         fontSize = 16.sp,
@@ -497,7 +526,7 @@ fun TodayScreen(
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(
                                         text = "Breathe",
-                                        style = NotionTheme.typography.labelSmall,
+                                        style = FormaTheme.typography.labelSmall,
                                         fontWeight = FontWeight.Bold,
                                         color = colors.textPrimary,
                                         fontSize = 12.sp
@@ -529,7 +558,7 @@ fun TodayScreen(
                                     Spacer(modifier = Modifier.width(5.dp))
                                     Text(
                                         text = "Journal",
-                                        style = NotionTheme.typography.labelSmall,
+                                        style = FormaTheme.typography.labelSmall,
                                         fontWeight = FontWeight.Bold,
                                         color = colors.textPrimary,
                                         fontSize = 12.sp
@@ -563,7 +592,7 @@ fun TodayScreen(
                                         Spacer(modifier = Modifier.width(5.dp))
                                         Text(
                                             text = "Flow",
-                                            style = NotionTheme.typography.labelSmall,
+                                            style = FormaTheme.typography.labelSmall,
                                             fontWeight = FontWeight.Bold,
                                             color = colors.accent,
                                             fontSize = 12.sp
@@ -581,7 +610,7 @@ fun TodayScreen(
                 item {
                     Text(
                         text = "TODAY'S RITUALS",
-                        style = NotionTheme.typography.labelSmall,
+                        style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = colors.textTertiary,
                         letterSpacing = 1.2.sp,
@@ -802,7 +831,7 @@ fun TodayScreen(
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "PLAN DAY WITH AI",
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = colors.accent,
                             letterSpacing = 1.2.sp,
@@ -826,14 +855,14 @@ fun TodayScreen(
 
                 Text(
                     text = "Select an Architectural Rhythm",
-                    style = NotionTheme.typography.titleMedium,
+                    style = FormaTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = colors.textPrimary,
                     fontSize = 16.sp
                 )
                 Text(
                     text = "Forma AI will generate energy-balanced time blocks based on your goal.",
-                    style = NotionTheme.typography.bodySmall,
+                    style = FormaTheme.typography.bodySmall,
                     color = colors.textSecondary,
                     fontSize = 12.sp,
                     modifier = Modifier.padding(top = 2.dp, bottom = 16.dp)
@@ -875,14 +904,14 @@ fun TodayScreen(
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = preset.title,
-                                    style = NotionTheme.typography.titleSmall,
+                                    style = FormaTheme.typography.titleSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = colors.textPrimary,
                                     fontSize = 14.sp
                                 )
                                 Text(
                                     text = preset.subtitle,
-                                    style = NotionTheme.typography.bodySmall,
+                                    style = FormaTheme.typography.bodySmall,
                                     color = colors.textSecondary,
                                     fontSize = 11.sp
                                 )
@@ -957,7 +986,7 @@ fun EmptyPeacefulState(
     onAddTask: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
 
     Column(
         modifier = modifier
@@ -985,7 +1014,7 @@ fun EmptyPeacefulState(
 
         Text(
             text = "A Peaceful Clean Slate",
-            style = NotionTheme.typography.titleLarge,
+            style = FormaTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             color = colors.textPrimary,
             fontSize = 18.sp
@@ -995,7 +1024,7 @@ fun EmptyPeacefulState(
 
         Text(
             text = "No rituals scheduled for this day.\nTake a breath or create a mindful intention.",
-            style = NotionTheme.typography.bodyMedium,
+            style = FormaTheme.typography.bodyMedium,
             color = colors.textSecondary,
             textAlign = TextAlign.Center,
             fontSize = 13.sp
@@ -1012,7 +1041,7 @@ fun EmptyPeacefulState(
         ) {
             Text(
                 text = "+ Add Mindful Ritual",
-                style = NotionTheme.typography.labelSmall,
+                style = FormaTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
                 color = colors.onAccent,
                 fontSize = 13.sp

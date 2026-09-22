@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.habitflow.app.core.util.Constants
 import com.habitflow.app.data.local.DatabaseCallback
-import com.habitflow.app.data.local.HabitFlowDatabase
+import com.habitflow.app.data.local.FormaDatabase
 import com.habitflow.app.data.local.dao.HabitCompletionDao
 import com.habitflow.app.data.local.dao.HabitDao
 import com.habitflow.app.data.local.dao.TimelineDao
@@ -36,13 +36,13 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideHabitFlowDatabase(
+    fun provideFormaDatabase(
         @ApplicationContext context: Context,
         databaseCallback: DatabaseCallback
-    ): HabitFlowDatabase {
+    ): FormaDatabase {
         return Room.databaseBuilder(
             context,
-            HabitFlowDatabase::class.java,
+            FormaDatabase::class.java,
             Constants.DATABASE_NAME
         )
             .addCallback(databaseCallback)
@@ -51,23 +51,22 @@ object DatabaseModule {
     }
 
     @Provides
-    fun provideHabitDao(database: HabitFlowDatabase): HabitDao {
+    fun provideHabitDao(database: FormaDatabase): HabitDao {
         return database.habitDao()
     }
 
     @Provides
-    fun provideHabitCompletionDao(database: HabitFlowDatabase): HabitCompletionDao {
+    fun provideHabitCompletionDao(database: FormaDatabase): HabitCompletionDao {
         return database.habitCompletionDao()
     }
 
     @Provides
-    fun provideTimelineDao(database: HabitFlowDatabase): TimelineDao {
+    fun provideTimelineDao(database: FormaDatabase): TimelineDao {
         return database.timelineDao()
     }
 
     @Provides
-    fun provideDailyReflectionDao(database: HabitFlowDatabase): com.habitflow.app.data.local.dao.DailyReflectionDao {
+    fun provideDailyReflectionDao(database: FormaDatabase): com.habitflow.app.data.local.dao.DailyReflectionDao {
         return database.dailyReflectionDao()
     }
 }
-

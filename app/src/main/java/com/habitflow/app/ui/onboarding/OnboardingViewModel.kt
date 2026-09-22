@@ -2,6 +2,7 @@ package com.habitflow.app.ui.onboarding
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.habitflow.app.domain.repository.PaletteFamily
 import com.habitflow.app.domain.repository.UserPreferencesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,6 +14,7 @@ import javax.inject.Inject
 enum class OnboardingStep {
     WELCOME,
     ENTER_NAME,
+    CHOOSE_THEME,
     GREETING
 }
 
@@ -35,8 +37,19 @@ class OnboardingViewModel @Inject constructor(
         _step.value = OnboardingStep.ENTER_NAME
     }
 
+    fun goToThemeStep() {
+        _step.value = OnboardingStep.CHOOSE_THEME
+    }
+
     fun submitName() {
         if (_name.value.isNotBlank()) {
+            _step.value = OnboardingStep.CHOOSE_THEME
+        }
+    }
+
+    fun selectTheme(palette: PaletteFamily) {
+        viewModelScope.launch {
+            preferencesRepository.setPaletteFamily(palette)
             _step.value = OnboardingStep.GREETING
         }
     }

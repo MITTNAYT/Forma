@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.habits.components
+﻿package com.habitflow.app.ui.habits.components
 
 import android.widget.Toast
 import androidx.compose.animation.core.animateFloatAsState
@@ -55,7 +55,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.habitflow.app.core.audio.ZenSoundscapeEngine
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import com.habitflow.app.core.designsystem.motion.formaPressEffect
 import com.habitflow.app.domain.model.Habit
 import kotlinx.coroutines.delay
@@ -69,7 +69,7 @@ fun HabitStackSequencerSheet(
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 ) {
     val context = LocalContext.current
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     val soundEngine = remember { ZenSoundscapeEngine() }
 
     var currentStepIndex by remember { mutableIntStateOf(0) }
@@ -140,7 +140,7 @@ fun HabitStackSequencerSheet(
                 Column {
                     Text(
                         text = "HABIT STACK SEQUENCER",
-                        style = NotionTheme.typography.labelSmall,
+                        style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = colors.accent,
                         letterSpacing = 1.2.sp,
@@ -148,7 +148,7 @@ fun HabitStackSequencerSheet(
                     )
                     Text(
                         text = "Executing cue-chained rituals",
-                        style = NotionTheme.typography.bodySmall,
+                        style = FormaTheme.typography.bodySmall,
                         color = colors.textSecondary,
                         fontSize = 12.sp
                     )
@@ -192,14 +192,14 @@ fun HabitStackSequencerSheet(
                         val secs = secondsRemaining % 60
                         Text(
                             text = String.format("%02d:%02d", mins, secs),
-                            style = NotionTheme.typography.headlineLarge,
+                            style = FormaTheme.typography.headlineLarge,
                             fontWeight = FontWeight.Bold,
                             color = colors.textPrimary,
                             fontSize = 32.sp
                         )
                         Text(
                             text = "Step ${currentStepIndex + 1} of ${habitStack.size}",
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             color = colors.textSecondary,
                             fontSize = 11.sp
                         )
@@ -210,7 +210,7 @@ fun HabitStackSequencerSheet(
 
                 Text(
                     text = currentHabit.name,
-                    style = NotionTheme.typography.titleLarge,
+                    style = FormaTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = colors.textPrimary,
                     fontSize = 20.sp,
@@ -220,7 +220,7 @@ fun HabitStackSequencerSheet(
                 if (!currentHabit.stackedCueText.isNullOrBlank()) {
                     Text(
                         text = currentHabit.stackedCueText,
-                        style = NotionTheme.typography.bodySmall,
+                        style = FormaTheme.typography.bodySmall,
                         color = colors.accent,
                         fontSize = 12.5.sp,
                         textAlign = TextAlign.Center
@@ -296,14 +296,14 @@ fun HabitStackSequencerSheet(
                         Spacer(modifier = Modifier.height(10.dp))
                         Text(
                             text = "Habit Stack Complete!",
-                            style = NotionTheme.typography.titleLarge,
+                            style = FormaTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = colors.accent,
                             fontSize = 20.sp
                         )
                         Text(
                             text = "All chained rituals successfully fulfilled with mindfulness.",
-                            style = NotionTheme.typography.bodySmall,
+                            style = FormaTheme.typography.bodySmall,
                             color = colors.textPrimary,
                             fontSize = 13.sp,
                             textAlign = TextAlign.Center
@@ -317,7 +317,7 @@ fun HabitStackSequencerSheet(
             // Step-by-Step Chain Preview
             Text(
                 text = "CUE CHAIN PLAYLIST",
-                style = NotionTheme.typography.labelSmall,
+                style = FormaTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
                 color = colors.textTertiary,
                 letterSpacing = 1.1.sp,
@@ -372,7 +372,7 @@ fun HabitStackSequencerSheet(
                                     } else {
                                         Text(
                                             text = "${index + 1}",
-                                            style = NotionTheme.typography.labelSmall,
+                                            style = FormaTheme.typography.labelSmall,
                                             fontWeight = FontWeight.Bold,
                                             color = if (isCurrent) colors.accent else colors.textTertiary,
                                             fontSize = 11.sp
@@ -385,7 +385,7 @@ fun HabitStackSequencerSheet(
                                 Column {
                                     Text(
                                         text = habit.name,
-                                        style = NotionTheme.typography.titleSmall,
+                                        style = FormaTheme.typography.titleSmall,
                                         fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.Medium,
                                         color = colors.textPrimary,
                                         fontSize = 14.sp
@@ -393,7 +393,7 @@ fun HabitStackSequencerSheet(
                                     if (!habit.stackedCueText.isNullOrBlank()) {
                                         Text(
                                             text = habit.stackedCueText,
-                                            style = NotionTheme.typography.bodySmall,
+                                            style = FormaTheme.typography.bodySmall,
                                             color = colors.textSecondary,
                                             fontSize = 11.sp
                                         )
@@ -403,7 +403,7 @@ fun HabitStackSequencerSheet(
 
                             Text(
                                 text = if (isPast) "Done" else if (isCurrent) "Now" else "Queued",
-                                style = NotionTheme.typography.labelSmall,
+                                style = FormaTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = if (isCurrent) colors.accent else colors.textTertiary,
                                 fontSize = 11.sp

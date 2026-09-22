@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.today.components
+﻿package com.habitflow.app.ui.today.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -37,7 +37,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 
 @Composable
 fun BehanceHeroBanner(
@@ -45,7 +45,7 @@ fun BehanceHeroBanner(
     totalCount: Int,
     modifier: Modifier = Modifier
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     val progress = if (totalCount > 0) completedCount.toFloat() / totalCount.toFloat() else 0f
     val animatedProgress by animateFloatAsState(
         targetValue = progress,
@@ -87,7 +87,7 @@ fun BehanceHeroBanner(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "DAILY FLOW VELOCITY",
-                        style = NotionTheme.typography.labelSmall,
+                        style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = colors.textTertiary,
                         letterSpacing = 1.2.sp,
@@ -104,7 +104,7 @@ fun BehanceHeroBanner(
                 ) {
                     Text(
                         text = "$percentInt% Done",
-                        style = NotionTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
+                        style = FormaTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
                         fontWeight = FontWeight.Bold,
                         color = colors.accent,
                         fontSize = 11.sp
@@ -122,7 +122,7 @@ fun BehanceHeroBanner(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "$completedCount of $totalCount Rituals Flowed",
-                        style = NotionTheme.typography.titleLarge.copy(fontFeatureSettings = "tnum"),
+                        style = FormaTheme.typography.titleLarge.copy(fontFeatureSettings = "tnum"),
                         fontWeight = FontWeight.Bold,
                         color = colors.textPrimary,
                         fontSize = 18.sp,
@@ -131,7 +131,7 @@ fun BehanceHeroBanner(
                     Spacer(modifier = Modifier.height(3.dp))
                     Text(
                         text = subtitle,
-                        style = NotionTheme.typography.bodySmall,
+                        style = FormaTheme.typography.bodySmall,
                         color = colors.textSecondary,
                         fontSize = 12.sp
                     )

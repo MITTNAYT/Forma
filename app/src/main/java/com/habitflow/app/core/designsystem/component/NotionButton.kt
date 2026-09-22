@@ -24,25 +24,27 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 
-enum class NotionButtonStyle {
+enum class FormaButtonStyle {
     PRIMARY,
     OUTLINE,
     GHOST,
     SOFT_PILL
 }
 
+typealias NotionButtonStyle = FormaButtonStyle
+
 @Composable
-fun NotionButton(
+fun FormaButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    style: NotionButtonStyle = NotionButtonStyle.PRIMARY,
+    style: FormaButtonStyle = FormaButtonStyle.PRIMARY,
     enabled: Boolean = true,
     leadingIcon: (@Composable () -> Unit)? = null
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val buttonScale by animateFloatAsState(
@@ -51,7 +53,7 @@ fun NotionButton(
     )
 
     when (style) {
-        NotionButtonStyle.PRIMARY -> {
+        FormaButtonStyle.PRIMARY -> {
             Button(
                 onClick = onClick,
                 enabled = enabled,
@@ -75,14 +77,14 @@ fun NotionButton(
                     }
                     Text(
                         text = text,
-                        style = NotionTheme.typography.titleMedium,
+                        style = FormaTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp
                     )
                 }
             }
         }
-        NotionButtonStyle.SOFT_PILL -> {
+        FormaButtonStyle.SOFT_PILL -> {
             Button(
                 onClick = onClick,
                 enabled = enabled,
@@ -106,14 +108,14 @@ fun NotionButton(
                     }
                     Text(
                         text = text,
-                        style = NotionTheme.typography.titleSmall,
+                        style = FormaTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp
                     )
                 }
             }
         }
-        NotionButtonStyle.OUTLINE -> {
+        FormaButtonStyle.OUTLINE -> {
             OutlinedButton(
                 onClick = onClick,
                 enabled = enabled,
@@ -137,14 +139,14 @@ fun NotionButton(
                     }
                     Text(
                         text = text,
-                        style = NotionTheme.typography.titleMedium,
+                        style = FormaTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 14.sp
                     )
                 }
             }
         }
-        NotionButtonStyle.GHOST -> {
+        FormaButtonStyle.GHOST -> {
             TextButton(
                 onClick = onClick,
                 enabled = enabled,
@@ -166,7 +168,7 @@ fun NotionButton(
                     }
                     Text(
                         text = text,
-                        style = NotionTheme.typography.titleSmall,
+                        style = FormaTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp
                     )
@@ -174,4 +176,23 @@ fun NotionButton(
             }
         }
     }
+}
+
+@Composable
+fun NotionButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    style: FormaButtonStyle = FormaButtonStyle.PRIMARY,
+    enabled: Boolean = true,
+    leadingIcon: (@Composable () -> Unit)? = null
+) {
+    FormaButton(
+        text = text,
+        onClick = onClick,
+        modifier = modifier,
+        style = style,
+        enabled = enabled,
+        leadingIcon = leadingIcon
+    )
 }

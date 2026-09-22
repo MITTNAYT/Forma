@@ -1,4 +1,4 @@
-package com.habitflow.app.core.designsystem.component
+﻿package com.habitflow.app.core.designsystem.component
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.CubicBezierEasing
@@ -33,7 +33,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -49,9 +49,9 @@ fun FormaEmblem(
     modifier: Modifier = Modifier,
     size: Dp = 108.dp,
     animated: Boolean = false,
-    glyphColor: Color = NotionTheme.colors.accent,
-    auraColor: Color = NotionTheme.colors.accentSoft,
-    pearlColor: Color = NotionTheme.colors.onAccent
+    glyphColor: Color = FormaTheme.colors.accent,
+    auraColor: Color = FormaTheme.colors.accentSoft,
+    pearlColor: Color = FormaTheme.colors.onAccent
 ) {
     // ── Continuous Zen Breathing Aura ──────────────────────────────
     val infiniteTransition = rememberInfiniteTransition(label = "zen_breathe")

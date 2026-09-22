@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.today.components
+﻿package com.habitflow.app.ui.today.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -19,9 +19,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.habitflow.app.core.designsystem.NotionTheme
-import com.habitflow.app.core.designsystem.component.NotionCard
-import com.habitflow.app.core.designsystem.component.NotionRingToggle
+import com.habitflow.app.core.designsystem.FormaTheme
+import com.habitflow.app.core.designsystem.component.FormaCard
+import com.habitflow.app.core.designsystem.component.FormaRingToggle
 import com.habitflow.app.core.designsystem.component.StreakBadge
 import com.habitflow.app.domain.model.EnergyLevel
 import com.habitflow.app.domain.model.TodayScheduleItem
@@ -32,12 +32,12 @@ fun HabitTimelineRow(
     onToggle: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     val habit = item.habit
 
-    NotionCard(
+    FormaCard(
         modifier = modifier.fillMaxWidth(),
-        shape = NotionTheme.shapes.small,
+        shape = FormaTheme.shapes.small,
         backgroundColor = if (item.isDoneToday) colors.surfaceVariant.copy(alpha = 0.5f) else colors.surface,
         borderColor = if (item.isDoneToday) colors.border.copy(alpha = 0.6f) else colors.border
     ) {
@@ -54,7 +54,7 @@ fun HabitTimelineRow(
                 Box(
                     modifier = Modifier
                         .size(36.dp)
-                        .clip(NotionTheme.shapes.extraSmall)
+                        .clip(FormaTheme.shapes.extraSmall)
                         .background(colors.surfaceVariant),
                     contentAlignment = Alignment.Center
                 ) {
@@ -66,7 +66,7 @@ fun HabitTimelineRow(
                 Column {
                     Text(
                         text = habit.name,
-                        style = NotionTheme.typography.titleMedium,
+                        style = FormaTheme.typography.titleMedium,
                         color = if (item.isDoneToday) colors.textTertiary else colors.textPrimary,
                         textDecoration = if (item.isDoneToday) TextDecoration.LineThrough else TextDecoration.None
                     )
@@ -77,7 +77,7 @@ fun HabitTimelineRow(
                     ) {
                         Text(
                             text = habit.timeOfDay.displayName,
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             color = colors.textSecondary
                         )
 
@@ -94,7 +94,7 @@ fun HabitTimelineRow(
                 }
             }
 
-            NotionRingToggle(
+            FormaRingToggle(
                 checked = item.isDoneToday,
                 onToggle = onToggle
             )
@@ -104,7 +104,7 @@ fun HabitTimelineRow(
 
 @Composable
 fun EnergyIndicator(energyLevel: EnergyLevel, modifier: Modifier = Modifier) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
 
     Row(
         modifier = modifier,

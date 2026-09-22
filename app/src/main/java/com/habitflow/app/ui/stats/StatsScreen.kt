@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.stats
+﻿package com.habitflow.app.ui.stats
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -60,7 +60,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import com.habitflow.app.core.designsystem.icon.HabitFlowIcon
 import com.habitflow.app.core.designsystem.motion.formaPressEffect
 import com.habitflow.app.domain.model.DayCompletionRate
@@ -87,7 +87,7 @@ enum class FocusTimeTab(val label: String) {
 fun StatsScreen(
     viewModel: StatsViewModel = hiltViewModel()
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     val stats by viewModel.stats.collectAsState()
     val focusStats by viewModel.focusStats.collectAsState()
     val isPro by viewModel.isPro.collectAsState()
@@ -136,137 +136,178 @@ fun StatsScreen(
             contentPadding = PaddingValues(top = 16.dp, bottom = 120.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // 1. Editorial Minimalist Header
+            // 1. Hero Consistency Metric Block
             item {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp)
+                        .padding(horizontal = 24.dp, vertical = 16.dp)
                 ) {
+                    // Small label stays
                     Text(
-                        text = "RHYTHM & ANALYSIS",
-                        style = NotionTheme.typography.labelSmall,
+                        text = "YOUR RHYTHM",
+                        style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = colors.textTertiary,
                         letterSpacing = 1.5.sp,
                         fontSize = 11.sp
                     )
-                    Spacer(modifier = Modifier.height(2.dp))
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    // Hero completion rate — biggest number on screen
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.Bottom
                     ) {
                         Text(
-                            text = "Mindful Metrics",
-                            style = NotionTheme.typography.headlineLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = colors.textPrimary,
-                            fontSize = 28.sp,
-                            letterSpacing = (-0.6).sp
+                            text = "$completionRate",
+                            style = FormaTheme.typography.displayLarge,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = colors.accent,
+                            fontSize = 56.sp,
+                            letterSpacing = (-1.5).sp
                         )
-
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        Text(
+                            text = "%",
+                            style = FormaTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = colors.accent.copy(alpha = 0.6f),
+                            modifier = Modifier.padding(bottom = 8.dp, start = 3.dp)
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column(
+                            modifier = Modifier.padding(bottom = 8.dp)
                         ) {
-                            // Breathwork Pacer Pill
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(14.dp))
-                                    .background(colors.accentSoft)
-                                    .border(1.dp, colors.accent.copy(alpha = 0.35f), RoundedCornerShape(14.dp))
-                                    .clickable { showBreathworkSheet = true }
-                                    .padding(horizontal = 9.dp, vertical = 6.dp)
-                            ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Spa,
-                                        contentDescription = "Breathwork",
-                                        tint = colors.accent,
-                                        modifier = Modifier.size(13.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(
-                                        text = "Breath",
-                                        style = NotionTheme.typography.labelSmall,
-                                        fontWeight = FontWeight.Bold,
-                                        color = colors.accent,
-                                        fontSize = 11.sp
-                                    )
-                                }
-                            }
+                            Text(
+                                text = "overall",
+                                style = FormaTheme.typography.bodySmall,
+                                color = colors.textSecondary
+                            )
+                            Text(
+                                text = "consistency",
+                                style = FormaTheme.typography.bodySmall,
+                                color = colors.textSecondary
+                            )
+                        }
+                    }
 
-                            // Weekly Zen Retro Pill
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(14.dp))
-                                    .background(colors.surfaceVariant)
-                                    .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(14.dp))
-                                    .clickable { showWeeklyRetroSheet = true }
-                                    .padding(horizontal = 9.dp, vertical = 6.dp)
-                            ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.AutoGraph,
-                                        contentDescription = "Retro",
-                                        tint = colors.textPrimary,
-                                        modifier = Modifier.size(13.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(
-                                        text = "Retro",
-                                        style = NotionTheme.typography.labelSmall,
-                                        fontWeight = FontWeight.Bold,
-                                        color = colors.textPrimary,
-                                        fontSize = 11.sp
-                                    )
-                                }
-                            }
+                    Spacer(modifier = Modifier.height(4.dp))
 
-                            // AI Insights Pill
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(14.dp))
-                                    .background(colors.accentSoft)
-                                    .border(1.dp, colors.accent.copy(alpha = 0.4f), RoundedCornerShape(14.dp))
-                                    .clickable { showInsightsSheet = true }
-                                    .padding(horizontal = 9.dp, vertical = 6.dp)
-                            ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.AutoAwesome,
-                                        contentDescription = "Insights",
-                                        tint = colors.accent,
-                                        modifier = Modifier.size(13.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(
-                                        text = "AI",
-                                        style = NotionTheme.typography.labelSmall,
-                                        fontWeight = FontWeight.Bold,
-                                        color = colors.accent,
-                                        fontSize = 11.sp
-                                    )
-                                }
-                            }
+                    // Animated progress bar under the big number
+                    val animatedProgress by animateFloatAsState(
+                        targetValue = flowProgress,
+                        animationSpec = tween(durationMillis = 800, easing = FastOutSlowInEasing),
+                        label = "hero_progress"
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(5.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(colors.accentMuted)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(animatedProgress)
+                                .fillMaxHeight()
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(colors.accent)
+                        )
+                    }
 
-                            Spacer(modifier = Modifier.width(2.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
-                            Box(
-                                modifier = Modifier
-                                    .size(36.dp)
-                                    .clip(CircleShape)
-                                    .background(colors.surface)
-                                    .border(1.5.dp, colors.accent, CircleShape),
-                                contentAlignment = Alignment.Center
-                            ) {
+                    // Secondary context line
+                    Text(
+                        text = "${currentStats.bestCurrentStreak} day current run  ·  ${currentStats.totalActiveHabits} active habits",
+                        style = FormaTheme.typography.bodySmall,
+                        color = colors.textSecondary,
+                        fontSize = 12.sp
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Action pills row (Breathwork + Retro + Insights)
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        // Breathwork pill
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(colors.accentSoft)
+                                .border(1.dp, colors.accent.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
+                                .formaPressEffect(targetScale = 0.93f) { showBreathworkSheet = true }
+                                .padding(horizontal = 12.dp, vertical = 8.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Spa,
+                                    contentDescription = "Breathwork",
+                                    tint = colors.accent,
+                                    modifier = Modifier.size(13.dp)
+                                )
+                                Spacer(modifier = Modifier.width(5.dp))
                                 Text(
-                                    text = userInitial,
-                                    style = NotionTheme.typography.titleMedium,
+                                    text = "Breathwork",
+                                    style = FormaTheme.typography.labelSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = colors.accent,
-                                    fontSize = 14.sp
+                                    fontSize = 12.sp
+                                )
+                            }
+                        }
+
+                        // Weekly Retro pill
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(colors.surfaceVariant)
+                                .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
+                                .formaPressEffect(targetScale = 0.93f) { showWeeklyRetroSheet = true }
+                                .padding(horizontal = 12.dp, vertical = 8.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Rounded.AutoAwesome,
+                                    contentDescription = "Weekly Retro",
+                                    tint = colors.textSecondary,
+                                    modifier = Modifier.size(13.dp)
+                                )
+                                Spacer(modifier = Modifier.width(5.dp))
+                                Text(
+                                    text = "Weekly Retro",
+                                    style = FormaTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = colors.textSecondary,
+                                    fontSize = 12.sp
+                                )
+                            }
+                        }
+
+                        // Insights pill
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(colors.surfaceVariant)
+                                .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
+                                .formaPressEffect(targetScale = 0.93f) { showInsightsSheet = true }
+                                .padding(horizontal = 12.dp, vertical = 8.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Rounded.AutoGraph,
+                                    contentDescription = "Insights",
+                                    tint = colors.textSecondary,
+                                    modifier = Modifier.size(13.dp)
+                                )
+                                Spacer(modifier = Modifier.width(5.dp))
+                                Text(
+                                    text = "Insights",
+                                    style = FormaTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = colors.textSecondary,
+                                    fontSize = 12.sp
                                 )
                             }
                         }
@@ -329,14 +370,14 @@ fun StatsScreen(
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
                                     text = "$completionRate%",
-                                    style = NotionTheme.typography.titleLarge.copy(fontFeatureSettings = "tnum"),
+                                    style = FormaTheme.typography.titleLarge.copy(fontFeatureSettings = "tnum"),
                                     fontWeight = FontWeight.Bold,
                                     color = colors.textPrimary,
                                     fontSize = 20.sp
                                 )
                                 Text(
                                     text = "RHYTHM",
-                                    style = NotionTheme.typography.labelSmall,
+                                    style = FormaTheme.typography.labelSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = colors.accent,
                                     fontSize = 9.sp,
@@ -360,11 +401,11 @@ fun StatsScreen(
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(Icons.Rounded.LocalFireDepartment, contentDescription = null, tint = colors.accent, modifier = Modifier.size(16.dp))
                                     Spacer(modifier = Modifier.width(6.dp))
-                                    Text(text = "Current Streak", style = NotionTheme.typography.bodySmall, color = colors.textSecondary, fontSize = 12.sp)
+                                    Text(text = "Current Streak", style = FormaTheme.typography.bodySmall, color = colors.textSecondary, fontSize = 12.sp)
                                 }
                                 Text(
                                     text = "${currentStats.bestCurrentStreak} days",
-                                    style = NotionTheme.typography.bodyMedium.copy(fontFeatureSettings = "tnum"),
+                                    style = FormaTheme.typography.bodyMedium.copy(fontFeatureSettings = "tnum"),
                                     fontWeight = FontWeight.Bold,
                                     color = colors.textPrimary,
                                     fontSize = 13.sp
@@ -379,11 +420,11 @@ fun StatsScreen(
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(Icons.Rounded.Spa, contentDescription = null, tint = colors.accent, modifier = Modifier.size(16.dp))
                                     Spacer(modifier = Modifier.width(6.dp))
-                                    Text(text = "Active Rituals", style = NotionTheme.typography.bodySmall, color = colors.textSecondary, fontSize = 12.sp)
+                                    Text(text = "Active Rituals", style = FormaTheme.typography.bodySmall, color = colors.textSecondary, fontSize = 12.sp)
                                 }
                                 Text(
                                     text = "${currentStats.totalActiveHabits}",
-                                    style = NotionTheme.typography.bodyMedium.copy(fontFeatureSettings = "tnum"),
+                                    style = FormaTheme.typography.bodyMedium.copy(fontFeatureSettings = "tnum"),
                                     fontWeight = FontWeight.Bold,
                                     color = colors.textPrimary,
                                     fontSize = 13.sp
@@ -398,11 +439,11 @@ fun StatsScreen(
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(Icons.Rounded.Star, contentDescription = null, tint = colors.accent, modifier = Modifier.size(16.dp))
                                     Spacer(modifier = Modifier.width(6.dp))
-                                    Text(text = "Best Record", style = NotionTheme.typography.bodySmall, color = colors.textSecondary, fontSize = 12.sp)
+                                    Text(text = "Best Record", style = FormaTheme.typography.bodySmall, color = colors.textSecondary, fontSize = 12.sp)
                                 }
                                 Text(
                                     text = "${currentStats.bestAllTimeStreak} days",
-                                    style = NotionTheme.typography.bodyMedium.copy(fontFeatureSettings = "tnum"),
+                                    style = FormaTheme.typography.bodyMedium.copy(fontFeatureSettings = "tnum"),
                                     fontWeight = FontWeight.Bold,
                                     color = colors.textPrimary,
                                     fontSize = 13.sp
@@ -452,7 +493,7 @@ fun StatsScreen(
                                 ) {
                                     Text(
                                         text = tab.label,
-                                        style = NotionTheme.typography.labelSmall,
+                                        style = FormaTheme.typography.labelSmall,
                                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                                         color = textColor,
                                         fontSize = 12.sp
@@ -494,7 +535,7 @@ fun StatsScreen(
                                 Column {
                                     Text(
                                         text = "FOCUS INVESTMENT",
-                                        style = NotionTheme.typography.labelSmall,
+                                        style = FormaTheme.typography.labelSmall,
                                         fontWeight = FontWeight.Bold,
                                         color = colors.textTertiary,
                                         letterSpacing = 1.2.sp,
@@ -504,7 +545,7 @@ fun StatsScreen(
                                     Row(verticalAlignment = Alignment.Bottom) {
                                         Text(
                                             text = decimalHours,
-                                            style = NotionTheme.typography.headlineLarge.copy(fontFeatureSettings = "tnum"),
+                                            style = FormaTheme.typography.headlineLarge.copy(fontFeatureSettings = "tnum"),
                                             fontWeight = FontWeight.Bold,
                                             color = colors.textPrimary,
                                             fontSize = 38.sp,
@@ -513,7 +554,7 @@ fun StatsScreen(
                                         Spacer(modifier = Modifier.width(6.dp))
                                         Text(
                                             text = "HOURS",
-                                            style = NotionTheme.typography.titleSmall,
+                                            style = FormaTheme.typography.titleSmall,
                                             fontWeight = FontWeight.Bold,
                                             color = colors.accent,
                                             fontSize = 14.sp,
@@ -550,7 +591,7 @@ fun StatsScreen(
                                     ) {
                                         Text(
                                             text = weekLabel,
-                                            style = NotionTheme.typography.labelSmall,
+                                            style = FormaTheme.typography.labelSmall,
                                             fontWeight = FontWeight.Bold,
                                             color = colors.accent,
                                             fontSize = 11.sp
@@ -630,7 +671,7 @@ fun StatsScreen(
 
                                         Text(
                                             text = dayFocus.dayLetter,
-                                            style = NotionTheme.typography.labelSmall,
+                                            style = FormaTheme.typography.labelSmall,
                                             fontWeight = if (isSelected || dayFocus.isToday) FontWeight.Bold else FontWeight.Medium,
                                             color = if (isSelected) colors.accent else if (dayFocus.isToday) colors.textPrimary else colors.textTertiary,
                                             fontSize = 11.sp
@@ -648,7 +689,7 @@ fun StatsScreen(
                                 ) {
                                     Text(
                                         text = "${selDay.dayLetter} • ${selDay.dateIso}",
-                                        style = NotionTheme.typography.labelSmall,
+                                        style = FormaTheme.typography.labelSmall,
                                         fontWeight = FontWeight.Bold,
                                         color = colors.textTertiary,
                                         fontSize = 12.sp
@@ -658,7 +699,7 @@ fun StatsScreen(
                                     val timeStr = if (hrs > 0) "${hrs}h ${mins}m" else "${mins}m"
                                     Text(
                                         text = timeStr,
-                                        style = NotionTheme.typography.bodyMedium.copy(fontFeatureSettings = "tnum"),
+                                        style = FormaTheme.typography.bodyMedium.copy(fontFeatureSettings = "tnum"),
                                         fontWeight = FontWeight.Bold,
                                         color = colors.accent,
                                         fontSize = 14.sp
@@ -680,7 +721,7 @@ fun StatsScreen(
                     ) {
                         Text(
                             text = "TOP FOCUSED COMMITMENTS",
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = colors.textTertiary,
                             letterSpacing = 1.2.sp,
@@ -704,7 +745,7 @@ fun StatsScreen(
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Text(
                                         text = "You haven't committed to anything yet.",
-                                        style = NotionTheme.typography.bodyMedium,
+                                        style = FormaTheme.typography.bodyMedium,
                                         color = colors.textSecondary,
                                         fontSize = 13.sp
                                     )
@@ -740,7 +781,7 @@ fun StatsScreen(
                                                 ) {
                                                     Text(
                                                         text = rankStr,
-                                                        style = NotionTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
+                                                        style = FormaTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
                                                         fontWeight = FontWeight.Bold,
                                                         color = colors.accent,
                                                         fontSize = 12.sp
@@ -748,7 +789,7 @@ fun StatsScreen(
                                                     Spacer(modifier = Modifier.width(12.dp))
                                                     Text(
                                                         text = itemSummary.title,
-                                                        style = NotionTheme.typography.titleMedium,
+                                                        style = FormaTheme.typography.titleMedium,
                                                         fontWeight = FontWeight.Bold,
                                                         color = colors.textPrimary,
                                                         fontSize = 14.sp
@@ -757,7 +798,7 @@ fun StatsScreen(
 
                                                 Text(
                                                     text = timeLabel,
-                                                    style = NotionTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
+                                                    style = FormaTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
                                                     fontWeight = FontWeight.Bold,
                                                     color = colors.accent,
                                                     fontSize = 13.sp
@@ -806,7 +847,7 @@ fun StatsScreen(
 
                         Text(
                             text = matrixTitle,
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = colors.textTertiary,
                             letterSpacing = 1.2.sp,
@@ -836,7 +877,7 @@ fun StatsScreen(
                                         ) {
                                             Text(
                                                 text = letter,
-                                                style = NotionTheme.typography.labelSmall,
+                                                style = FormaTheme.typography.labelSmall,
                                                 fontWeight = FontWeight.Bold,
                                                 color = colors.textTertiary,
                                                 fontSize = 11.sp
@@ -882,7 +923,7 @@ fun StatsScreen(
                                                     ) {
                                                         Text(
                                                             text = "${dayRate.dayOfMonth}",
-                                                            style = NotionTheme.typography.labelSmall,
+                                                            style = FormaTheme.typography.labelSmall,
                                                             fontWeight = FontWeight.Bold,
                                                             color = if (dayRate.completedCount > 0 && intensity >= 0.5f) colors.onAccent else colors.textPrimary,
                                                             fontSize = 11.sp
@@ -910,7 +951,7 @@ fun StatsScreen(
                                 ) {
                                     Text(
                                         text = "Less Active",
-                                        style = NotionTheme.typography.labelSmall,
+                                        style = FormaTheme.typography.labelSmall,
                                         color = colors.textTertiary,
                                         fontSize = 10.sp
                                     )
@@ -928,7 +969,7 @@ fun StatsScreen(
 
                                     Text(
                                         text = "Mastery",
-                                        style = NotionTheme.typography.labelSmall,
+                                        style = FormaTheme.typography.labelSmall,
                                         color = colors.textTertiary,
                                         fontSize = 10.sp
                                     )
@@ -938,7 +979,7 @@ fun StatsScreen(
 
                                 Text(
                                     text = "Tap any day to inspect completed rituals & focus duration",
-                                    style = NotionTheme.typography.labelSmall,
+                                    style = FormaTheme.typography.labelSmall,
                                     color = colors.textTertiary,
                                     fontSize = 10.sp,
                                     textAlign = TextAlign.Center,
@@ -982,7 +1023,7 @@ fun StatsScreen(
                             )
                             Text(
                                 text = "HABIT SYNERGY & CORRELATIONS",
-                                style = NotionTheme.typography.labelSmall,
+                                style = FormaTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = colors.textTertiary,
                                 letterSpacing = 1.2.sp,
@@ -1028,7 +1069,7 @@ fun StatsScreen(
                                             Column(modifier = Modifier.weight(1f)) {
                                                 Text(
                                                     text = "${correlation.primaryHabitName} → ${correlation.correlatedFactor}",
-                                                    style = NotionTheme.typography.titleMedium,
+                                                    style = FormaTheme.typography.titleMedium,
                                                     fontWeight = FontWeight.Bold,
                                                     color = colors.textPrimary,
                                                     fontSize = 14.sp
@@ -1036,7 +1077,7 @@ fun StatsScreen(
                                                 Spacer(modifier = Modifier.height(2.dp))
                                                 Text(
                                                     text = correlation.insightSummary,
-                                                    style = NotionTheme.typography.bodySmall,
+                                                    style = FormaTheme.typography.bodySmall,
                                                     color = colors.textSecondary,
                                                     fontSize = 12.sp,
                                                     lineHeight = 16.sp
@@ -1054,7 +1095,7 @@ fun StatsScreen(
                                         ) {
                                             Text(
                                                 text = if (correlation.impactPercentage > 0) "+${correlation.impactPercentage}%" else "${correlation.impactPercentage}%",
-                                                style = NotionTheme.typography.labelSmall,
+                                                style = FormaTheme.typography.labelSmall,
                                                 fontWeight = FontWeight.Bold,
                                                 color = if (correlation.isPositive) colors.accent else colors.textSecondary,
                                                 fontSize = 12.sp

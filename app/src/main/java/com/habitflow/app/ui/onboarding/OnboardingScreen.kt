@@ -27,6 +27,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowForward
 import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Spa
 import androidx.compose.material3.Button
@@ -43,15 +44,32 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import com.habitflow.app.core.designsystem.component.FormaEmblem
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.R
+import com.habitflow.app.core.designsystem.CoffeeLightAccent
+import com.habitflow.app.core.designsystem.CoffeeLightBg
+import com.habitflow.app.core.designsystem.FormaTheme
+import com.habitflow.app.core.designsystem.LavenderLightAccent
+import com.habitflow.app.core.designsystem.LavenderLightBg
+import com.habitflow.app.core.designsystem.MatchaLightAccent
+import com.habitflow.app.core.designsystem.MatchaLightBg
+import com.habitflow.app.core.designsystem.MonoLightAccent
+import com.habitflow.app.core.designsystem.MonoLightBg
+import com.habitflow.app.core.designsystem.TerracottaLightAccent
+import com.habitflow.app.core.designsystem.TerracottaLightBg
+import com.habitflow.app.core.designsystem.component.FormaButton
+import com.habitflow.app.core.designsystem.component.FormaButtonStyle
+import com.habitflow.app.core.designsystem.component.FormaEmblem
+import com.habitflow.app.core.designsystem.motion.formaPressEffect
+import com.habitflow.app.domain.repository.PaletteFamily
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -59,7 +77,7 @@ fun OnboardingScreen(
     onOnboardingFinished: () -> Unit,
     viewModel: OnboardingViewModel = hiltViewModel()
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     val step by viewModel.step.collectAsState()
     val name by viewModel.name.collectAsState()
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -98,6 +116,11 @@ fun OnboardingScreen(
                             }
                         )
                     }
+                    OnboardingStep.CHOOSE_THEME -> {
+                        ChooseThemeStep(
+                            onSelectTheme = { palette -> viewModel.selectTheme(palette) }
+                        )
+                    }
                     OnboardingStep.GREETING -> {
                         GreetingStep(
                             name = name,
@@ -116,88 +139,51 @@ fun OnboardingScreen(
 private fun WelcomeStep(
     onStart: () -> Unit
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
 
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Forma Architectural Emblem
+        // 1. Forma Architectural Emblem centered 80x80dp
         FormaEmblem(
-            size = 104.dp,
+            size = 80.dp,
             animated = true
         )
 
-        Spacer(modifier = Modifier.height(28.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-        // Brand Pill
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(12.dp))
-                .background(colors.surfaceVariant)
-                .padding(horizontal = 14.dp, vertical = 6.dp)
-        ) {
-            Text(
-                text = "WELCOME TO FORMA",
-                style = NotionTheme.typography.labelSmall,
-                fontWeight = FontWeight.Bold,
-                color = colors.accent,
-                letterSpacing = 1.4.sp,
-                fontSize = 11.sp
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
+        // 2. Forma wordmark below it, displayMedium bold, accent color
         Text(
-            text = "Give Form to Your Days.\nCultivate lasting rhythm.",
-            style = NotionTheme.typography.headlineLarge,
+            text = "Forma",
+            style = FormaTheme.typography.displayMedium,
             fontWeight = FontWeight.Bold,
-            color = colors.textPrimary,
-            fontSize = 30.sp,
-            lineHeight = 38.sp,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            color = colors.accent,
+            letterSpacing = (-0.6).sp
         )
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
+        // 3. Tagline from strings.xml
         Text(
-            text = "Forma is Latin for form and shape. An architectural routine and focus sanctuary crafted for intentional living. Completely offline, zero tracking, and pure focus.",
-            style = NotionTheme.typography.bodyMedium,
+            text = stringResource(R.string.tagline),
+            style = FormaTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Normal,
             color = colors.textSecondary,
-            fontSize = 14.sp,
-            lineHeight = 22.sp,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 16.dp)
         )
 
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(48.dp))
 
-        Button(
+        // 4. "Get Started →" button
+        FormaButton(
+            text = "Get Started",
             onClick = onStart,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = colors.accent,
-                contentColor = colors.onAccent
-            ),
-            shape = RoundedCornerShape(20.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-        ) {
-            Text(
-                text = "Begin Clean Slate",
-                style = NotionTheme.typography.labelLarge,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Icon(
-                imageVector = Icons.Rounded.ArrowForward,
-                contentDescription = null,
-                modifier = Modifier.size(18.dp)
-            )
-        }
+            style = FormaButtonStyle.PRIMARY,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 
@@ -207,7 +193,7 @@ private fun EnterNameStep(
     onNameChange: (String) -> Unit,
     onContinue: () -> Unit
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -216,8 +202,8 @@ private fun EnterNameStep(
     ) {
         // Step indicator
         Text(
-            text = "STEP 1 OF 2 • PERSONAL SANCTUARY",
-            style = NotionTheme.typography.labelSmall,
+            text = "STEP 1 OF 3 • PERSONAL SANCTUARY",
+            style = FormaTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
             color = colors.accent,
             letterSpacing = 1.2.sp,
@@ -228,7 +214,7 @@ private fun EnterNameStep(
 
         Text(
             text = "What should we call you?",
-            style = NotionTheme.typography.headlineLarge,
+            style = FormaTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             color = colors.textPrimary,
             fontSize = 28.sp,
@@ -239,7 +225,7 @@ private fun EnterNameStep(
 
         Text(
             text = "Your name helps personalize your daily greetings and focus sanctuary.",
-            style = NotionTheme.typography.bodyMedium,
+            style = FormaTheme.typography.bodyMedium,
             color = colors.textSecondary,
             fontSize = 14.sp,
             lineHeight = 20.sp
@@ -254,7 +240,7 @@ private fun EnterNameStep(
                 Text(
                     text = "e.g. Maya or David",
                     color = colors.textTertiary,
-                    style = NotionTheme.typography.bodyLarge
+                    style = FormaTheme.typography.bodyLarge
                 )
             },
             leadingIcon = {
@@ -304,7 +290,7 @@ private fun EnterNameStep(
         ) {
             Text(
                 text = "Continue",
-                style = NotionTheme.typography.labelLarge,
+                style = FormaTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp
             )
@@ -319,11 +305,136 @@ private fun EnterNameStep(
 }
 
 @Composable
+private fun ChooseThemeStep(
+    onSelectTheme: (PaletteFamily) -> Unit
+) {
+    val colors = FormaTheme.colors
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "STEP 2 OF 3 • AESTHETICS",
+            style = FormaTheme.typography.labelSmall,
+            fontWeight = FontWeight.Bold,
+            color = colors.accent,
+            letterSpacing = 1.2.sp,
+            fontSize = 11.sp
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "Choose Your Aesthetic",
+            style = FormaTheme.typography.headlineLarge,
+            fontWeight = FontWeight.Bold,
+            color = colors.textPrimary,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "You can change this anytime in Settings.",
+            style = FormaTheme.typography.bodyMedium,
+            color = colors.textSecondary,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(28.dp))
+
+        // Theme palette cards
+        val palettes = listOf(
+            Triple(PaletteFamily.MATCHA_OAT, "Matcha & Oat", "Botanical sage — calm and grounded"),
+            Triple(PaletteFamily.COFFEE_CREAM, "Espresso & Champagne", "Rich, warm, and sophisticated"),
+            Triple(PaletteFamily.MONOCHROME, "Monochrome", "Pure black and white — OLED-sharp"),
+            Triple(PaletteFamily.TERRACOTTA_SAND, "Terracotta & Sand", "Earthy clay warmth"),
+            Triple(PaletteFamily.LAVENDER_MILK, "Lavender & Milk", "Serene, soft, and dreamy"),
+        )
+
+        palettes.forEach { (palette, name, desc) ->
+            val previewAccent = when (palette) {
+                PaletteFamily.MATCHA_OAT -> MatchaLightAccent
+                PaletteFamily.COFFEE_CREAM, PaletteFamily.WALNUT_ESPRESSO -> CoffeeLightAccent
+                PaletteFamily.MONOCHROME -> MonoLightAccent
+                PaletteFamily.TERRACOTTA_SAND -> TerracottaLightAccent
+                PaletteFamily.LAVENDER_MILK -> LavenderLightAccent
+            }
+            val previewBg = when (palette) {
+                PaletteFamily.MATCHA_OAT -> MatchaLightBg
+                PaletteFamily.COFFEE_CREAM, PaletteFamily.WALNUT_ESPRESSO -> CoffeeLightBg
+                PaletteFamily.MONOCHROME -> MonoLightBg
+                PaletteFamily.TERRACOTTA_SAND -> TerracottaLightBg
+                PaletteFamily.LAVENDER_MILK -> LavenderLightBg
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(colors.surface)
+                    .border(1.dp, colors.border.copy(alpha = 0.7f), RoundedCornerShape(20.dp))
+                    .formaPressEffect(targetScale = 0.97f) { onSelectTheme(palette) }
+                    .padding(16.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Color preview swatch
+                    Box(
+                        modifier = Modifier
+                            .size(52.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(previewBg)
+                            .border(1.dp, previewAccent.copy(alpha = 0.3f), RoundedCornerShape(14.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(26.dp)
+                                .clip(CircleShape)
+                                .background(previewAccent)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = name,
+                            style = FormaTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = colors.textPrimary
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = desc,
+                            style = FormaTheme.typography.bodySmall,
+                            color = colors.textSecondary
+                        )
+                    }
+
+                    Icon(
+                        imageVector = Icons.Rounded.ChevronRight,
+                        contentDescription = null,
+                        tint = colors.textTertiary,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+        }
+    }
+}
+
+@Composable
 private fun GreetingStep(
     name: String,
     onEnterApp: () -> Unit
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     val displayName = name.trim().ifBlank { "Friend" }
 
     Column(
@@ -352,22 +463,22 @@ private fun GreetingStep(
 
         Text(
             text = "Welcome to Forma, $displayName! ✨",
-            style = NotionTheme.typography.headlineLarge,
+            style = FormaTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             color = colors.textPrimary,
             fontSize = 30.sp,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            textAlign = TextAlign.Center
         )
 
         Spacer(modifier = Modifier.height(10.dp))
 
         Text(
             text = "Your personal sanctuary is ready. We've prepared a 100% clean slate so you can give form to habits and focus that truly matter to you.",
-            style = NotionTheme.typography.bodyMedium,
+            style = FormaTheme.typography.bodyMedium,
             color = colors.textSecondary,
             fontSize = 14.sp,
             lineHeight = 22.sp,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 12.dp)
         )
 
@@ -404,7 +515,7 @@ private fun GreetingStep(
         ) {
             Text(
                 text = "Enter Forma",
-                style = NotionTheme.typography.labelLarge,
+                style = FormaTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp
             )
@@ -420,7 +531,7 @@ private fun GreetingStep(
 
 @Composable
 private fun BulletRow(text: String) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -433,7 +544,7 @@ private fun BulletRow(text: String) {
         Spacer(modifier = Modifier.width(10.dp))
         Text(
             text = text,
-            style = NotionTheme.typography.bodySmall,
+            style = FormaTheme.typography.bodySmall,
             color = colors.textPrimary,
             fontSize = 13.sp
         )

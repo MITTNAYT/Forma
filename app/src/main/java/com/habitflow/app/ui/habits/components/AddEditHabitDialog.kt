@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.habits.components
+﻿package com.habitflow.app.ui.habits.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -51,10 +51,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.habitflow.app.core.designsystem.NotionTheme
-import com.habitflow.app.core.designsystem.component.NotionButton
-import com.habitflow.app.core.designsystem.component.NotionButtonStyle
-import com.habitflow.app.core.designsystem.component.NotionDivider
+import com.habitflow.app.core.designsystem.FormaTheme
+import com.habitflow.app.core.designsystem.component.FormaButton
+import com.habitflow.app.core.designsystem.component.FormaButtonStyle
+import com.habitflow.app.core.designsystem.component.FormaDivider
 import com.habitflow.app.core.util.Constants
 import com.habitflow.app.domain.model.EnergyLevel
 import com.habitflow.app.domain.model.Habit
@@ -68,7 +68,7 @@ fun AddEditHabitDialog(
     onSave: (Habit) -> Unit,
     onDelete: ((Habit) -> Unit)? = null
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     val isEdit = initialHabit != null
 
     var name by remember { mutableStateOf(initialHabit?.name ?: "") }
@@ -118,7 +118,7 @@ fun AddEditHabitDialog(
             ) {
                 Text(
                     text = if (isEdit) "Edit Habit" else "New Habit",
-                    style = NotionTheme.typography.headlineMedium,
+                    style = FormaTheme.typography.headlineMedium,
                     color = colors.textPrimary
                 )
 
@@ -141,10 +141,10 @@ fun AddEditHabitDialog(
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Habit Name", style = NotionTheme.typography.bodySmall) },
+                label = { Text("Habit Name", style = FormaTheme.typography.bodySmall) },
                 placeholder = { Text("e.g. Read 20 pages, Morning Run", color = colors.textTertiary) },
                 singleLine = true,
-                shape = NotionTheme.shapes.small,
+                shape = FormaTheme.shapes.small,
                 keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
                     capitalization = androidx.compose.ui.text.input.KeyboardCapitalization.Sentences,
                     autoCorrectEnabled = true,
@@ -186,14 +186,14 @@ fun AddEditHabitDialog(
                 ) {
                     Text(
                         text = if (name.length < 30) "Mindful & concise" else "Focused ritual",
-                        style = NotionTheme.typography.labelSmall,
+                        style = FormaTheme.typography.labelSmall,
                         color = parsedColor.copy(alpha = 0.8f),
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Medium
                     )
                     Text(
                         text = "${name.length} chars",
-                        style = NotionTheme.typography.labelSmall,
+                        style = FormaTheme.typography.labelSmall,
                         color = colors.textTertiary,
                         fontSize = 10.sp
                     )
@@ -205,7 +205,7 @@ fun AddEditHabitDialog(
             // Icon Picker
             Text(
                 text = "ICON",
-                style = NotionTheme.typography.labelSmall,
+                style = FormaTheme.typography.labelSmall,
                 color = colors.textSecondary
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -219,12 +219,12 @@ fun AddEditHabitDialog(
                     Box(
                         modifier = Modifier
                             .size(42.dp)
-                            .clip(NotionTheme.shapes.extraSmall)
+                            .clip(FormaTheme.shapes.extraSmall)
                             .background(if (isSelected) colors.textPrimary else colors.surfaceVariant)
                             .border(
                                 1.dp,
                                 if (isSelected) colors.textPrimary else Color.Transparent,
-                                NotionTheme.shapes.extraSmall
+                                FormaTheme.shapes.extraSmall
                             )
                             .clickable { icon = iconKey },
                         contentAlignment = Alignment.Center
@@ -244,7 +244,7 @@ fun AddEditHabitDialog(
             // Color Accent Selection
             Text(
                 text = "COLOR ACCENT",
-                style = NotionTheme.typography.labelSmall,
+                style = FormaTheme.typography.labelSmall,
                 color = colors.textSecondary
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -289,7 +289,7 @@ fun AddEditHabitDialog(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(NotionTheme.shapes.small)
+                    .clip(FormaTheme.shapes.small)
                     .background(colors.surfaceVariant.copy(alpha = 0.45f))
                     .padding(14.dp)
             ) {
@@ -300,7 +300,7 @@ fun AddEditHabitDialog(
                 ) {
                     Text(
                         text = "RITUAL DURATION & HORIZON",
-                        style = NotionTheme.typography.labelSmall,
+                        style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = colors.textTertiary,
                         letterSpacing = 1.sp,
@@ -324,7 +324,7 @@ fun AddEditHabitDialog(
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = if (isIndefinite) "Ongoing / Forever" else "Set Target End",
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = if (isIndefinite) colors.accent else colors.textTertiary,
                             fontSize = 10.5.sp
@@ -351,7 +351,7 @@ fun AddEditHabitDialog(
                         Column {
                             Text(
                                 text = "START DATE",
-                                style = NotionTheme.typography.labelSmall,
+                                style = FormaTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = colors.textTertiary,
                                 fontSize = 9.sp
@@ -359,7 +359,7 @@ fun AddEditHabitDialog(
                             Spacer(modifier = Modifier.height(2.dp))
                             Text(
                                 text = startDate,
-                                style = NotionTheme.typography.titleMedium,
+                                style = FormaTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = colors.textPrimary,
                                 fontSize = 12.5.sp
@@ -380,7 +380,7 @@ fun AddEditHabitDialog(
                         Column {
                             Text(
                                 text = "TARGET FINAL DATE",
-                                style = NotionTheme.typography.labelSmall,
+                                style = FormaTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = if (isIndefinite) colors.textTertiary.copy(alpha = 0.5f) else colors.textTertiary,
                                 fontSize = 9.sp
@@ -388,7 +388,7 @@ fun AddEditHabitDialog(
                             Spacer(modifier = Modifier.height(2.dp))
                             Text(
                                 text = if (isIndefinite) "No End (Forever ∞)" else (endDate ?: "Tap to set"),
-                                style = NotionTheme.typography.titleMedium,
+                                style = FormaTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = if (isIndefinite) colors.textTertiary else colors.textPrimary,
                                 fontSize = 12.5.sp
@@ -403,7 +403,7 @@ fun AddEditHabitDialog(
             // Time of Day
             Text(
                 text = "TIME OF DAY",
-                style = NotionTheme.typography.labelSmall,
+                style = FormaTheme.typography.labelSmall,
                 color = colors.textSecondary
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -416,12 +416,12 @@ fun AddEditHabitDialog(
                     Box(
                         modifier = Modifier
                             .weight(1f)
-                            .clip(NotionTheme.shapes.extraSmall)
+                            .clip(FormaTheme.shapes.extraSmall)
                             .background(if (isSelected) colors.textPrimary else colors.surfaceVariant)
                             .border(
                                 1.dp,
                                 if (isSelected) Color.Transparent else colors.border,
-                                NotionTheme.shapes.extraSmall
+                                FormaTheme.shapes.extraSmall
                             )
                             .clickable { timeOfDay = tod }
                             .padding(vertical = 8.dp),
@@ -429,7 +429,7 @@ fun AddEditHabitDialog(
                     ) {
                         Text(
                             text = tod.displayName,
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             color = if (isSelected) colors.surface else colors.textPrimary,
                             fontSize = 11.sp
                         )
@@ -442,7 +442,7 @@ fun AddEditHabitDialog(
             // Energy Level
             Text(
                 text = "ENERGY LEVEL REQUIRED",
-                style = NotionTheme.typography.labelSmall,
+                style = FormaTheme.typography.labelSmall,
                 color = colors.textSecondary
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -455,12 +455,12 @@ fun AddEditHabitDialog(
                     Box(
                         modifier = Modifier
                             .weight(1f)
-                            .clip(NotionTheme.shapes.extraSmall)
+                            .clip(FormaTheme.shapes.extraSmall)
                             .background(if (isSelected) colors.textPrimary else colors.surfaceVariant)
                             .border(
                                 1.dp,
                                 if (isSelected) Color.Transparent else colors.border,
-                                NotionTheme.shapes.extraSmall
+                                FormaTheme.shapes.extraSmall
                             )
                             .clickable { energyLevel = level }
                             .padding(vertical = 8.dp),
@@ -468,7 +468,7 @@ fun AddEditHabitDialog(
                     ) {
                         Text(
                             text = level.displayName,
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             color = if (isSelected) colors.surface else colors.textPrimary,
                             fontSize = 11.sp
                         )
@@ -481,7 +481,7 @@ fun AddEditHabitDialog(
             // Repeat Days
             Text(
                 text = "REPEAT DAYS",
-                style = NotionTheme.typography.labelSmall,
+                style = FormaTheme.typography.labelSmall,
                 color = colors.textSecondary
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -494,12 +494,12 @@ fun AddEditHabitDialog(
                     Box(
                         modifier = Modifier
                             .size(36.dp)
-                            .clip(NotionTheme.shapes.extraSmall)
+                            .clip(FormaTheme.shapes.extraSmall)
                             .background(if (isSelected) colors.accent else colors.surfaceVariant)
                             .border(
                                 1.dp,
                                 if (isSelected) colors.accent else colors.border,
-                                NotionTheme.shapes.extraSmall
+                                FormaTheme.shapes.extraSmall
                             )
                             .clickable {
                                 repeatDays = if (isSelected) {
@@ -512,7 +512,7 @@ fun AddEditHabitDialog(
                     ) {
                         Text(
                             text = dayNames[i - 1],
-                            style = NotionTheme.typography.titleMedium,
+                            style = FormaTheme.typography.titleMedium,
                             color = if (isSelected) Color.White else colors.textPrimary
                         )
                     }
@@ -530,12 +530,12 @@ fun AddEditHabitDialog(
                 Column {
                     Text(
                         text = "Daily Reminder",
-                        style = NotionTheme.typography.titleMedium,
+                        style = FormaTheme.typography.titleMedium,
                         color = colors.textPrimary
                     )
                     Text(
                         text = if (hasReminder) String.format("%02d:%02d", reminderHour, reminderMinute) else "Off",
-                        style = NotionTheme.typography.bodySmall,
+                        style = FormaTheme.typography.bodySmall,
                         color = colors.textSecondary
                     )
                 }
@@ -558,17 +558,17 @@ fun AddEditHabitDialog(
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "HABIT STACKING (CUE CHAIN)",
-                    style = NotionTheme.typography.labelSmall,
+                    style = FormaTheme.typography.labelSmall,
                     color = colors.textSecondary
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 OutlinedTextField(
                     value = stackedCueText,
                     onValueChange = { stackedCueText = it },
-                    label = { Text("Precursor Cue / Habit Trigger", style = NotionTheme.typography.bodySmall) },
+                    label = { Text("Precursor Cue / Habit Trigger", style = FormaTheme.typography.bodySmall) },
                     placeholder = { Text("e.g. After I brew morning tea...", color = colors.textTertiary) },
                     singleLine = true,
-                    shape = NotionTheme.shapes.small,
+                    shape = FormaTheme.shapes.small,
                     keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
                         capitalization = androidx.compose.ui.text.input.KeyboardCapitalization.Sentences,
                         autoCorrectEnabled = true,
@@ -590,7 +590,7 @@ fun AddEditHabitDialog(
                 )
                 Text(
                     text = "Anchor this ritual directly after an existing daily rhythm for effortless habit stacking.",
-                    style = NotionTheme.typography.bodySmall,
+                    style = FormaTheme.typography.bodySmall,
                     color = colors.textTertiary,
                     fontSize = 11.sp,
                     modifier = Modifier.padding(top = 4.dp, start = 4.dp)
@@ -603,7 +603,7 @@ fun AddEditHabitDialog(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(NotionTheme.shapes.small)
+                    .clip(FormaTheme.shapes.small)
                     .background(colors.surfaceVariant.copy(alpha = 0.5f))
                     .padding(horizontal = 14.dp, vertical = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -612,13 +612,13 @@ fun AddEditHabitDialog(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "🍵 Seasonal Wintering Mode",
-                        style = NotionTheme.typography.titleMedium,
+                        style = FormaTheme.typography.titleMedium,
                         color = colors.textPrimary,
                         fontSize = 14.sp
                     )
                     Text(
                         text = "Pause this ritual during travel, illness, or resting periods without penalty to your Consistency Index.",
-                        style = NotionTheme.typography.bodySmall,
+                        style = FormaTheme.typography.bodySmall,
                         color = colors.textSecondary,
                         fontSize = 11.sp
                     )
@@ -637,7 +637,7 @@ fun AddEditHabitDialog(
             }
 
             Spacer(modifier = Modifier.height(24.dp))
-            NotionDivider()
+            FormaDivider()
             Spacer(modifier = Modifier.height(16.dp))
 
             // Action Buttons
@@ -650,7 +650,7 @@ fun AddEditHabitDialog(
                         onClick = { onDelete(initialHabit) },
                         modifier = Modifier
                             .size(42.dp)
-                            .clip(NotionTheme.shapes.small)
+                            .clip(FormaTheme.shapes.small)
                             .background(colors.surfaceVariant)
                     ) {
                         Icon(
@@ -661,7 +661,7 @@ fun AddEditHabitDialog(
                     }
                 }
 
-                NotionButton(
+                FormaButton(
                     text = if (isEdit) "Save Changes" else "Create Habit",
                     onClick = {
                         if (name.isNotBlank()) {

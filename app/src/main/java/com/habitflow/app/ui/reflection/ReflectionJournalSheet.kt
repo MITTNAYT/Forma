@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.reflection
+﻿package com.habitflow.app.ui.reflection
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -42,7 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import com.habitflow.app.core.designsystem.haptics.rememberZenHaptics
 import com.habitflow.app.domain.model.DailyReflection
 import com.habitflow.app.domain.model.EnergyLevel
@@ -56,7 +56,7 @@ fun ReflectionJournalSheet(
     viewModel: DailyReflectionViewModel,
     onDismiss: () -> Unit
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     val zenHaptics = rememberZenHaptics()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val reflections by viewModel.recentReflections.collectAsState()
@@ -84,7 +84,7 @@ fun ReflectionJournalSheet(
                 Column {
                     Text(
                         text = "MINDFUL ARCHIVE",
-                        style = NotionTheme.typography.labelSmall,
+                        style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = colors.textTertiary,
                         letterSpacing = 1.2.sp,
@@ -93,7 +93,7 @@ fun ReflectionJournalSheet(
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         text = "Reflections & Journal",
-                        style = NotionTheme.typography.headlineLarge,
+                        style = FormaTheme.typography.headlineLarge,
                         fontWeight = FontWeight.Bold,
                         color = colors.textPrimary,
                         fontSize = 24.sp,
@@ -154,7 +154,7 @@ fun ReflectionJournalSheet(
 
                         Text(
                             text = "No reflections recorded yet",
-                            style = NotionTheme.typography.titleMedium,
+                            style = FormaTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = colors.textPrimary,
                             fontSize = 16.sp
@@ -164,7 +164,7 @@ fun ReflectionJournalSheet(
 
                         Text(
                             text = "Complete your Morning Clarity or Evening Wind-down on the Today tab to grow your mindful journal.",
-                            style = NotionTheme.typography.bodySmall,
+                            style = FormaTheme.typography.bodySmall,
                             color = colors.textSecondary,
                             fontSize = 12.5.sp,
                             modifier = Modifier.padding(horizontal = 32.dp),
@@ -195,7 +195,7 @@ private fun ReflectionCard(
     reflection: DailyReflection,
     modifier: Modifier = Modifier
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
 
     val formattedDate = try {
         val parsed = LocalDate.parse(reflection.date)
@@ -229,7 +229,7 @@ private fun ReflectionCard(
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = formattedDate,
-                        style = NotionTheme.typography.labelSmall,
+                        style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = colors.textPrimary,
                         fontSize = 12.5.sp
@@ -260,7 +260,7 @@ private fun ReflectionCard(
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = energyText,
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = colors.accent,
                             fontSize = 11.sp
@@ -274,7 +274,7 @@ private fun ReflectionCard(
                 Spacer(modifier = Modifier.height(14.dp))
                 Text(
                     text = "MORNING CLARITY INTENTIONS",
-                    style = NotionTheme.typography.labelSmall,
+                    style = FormaTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = colors.textTertiary,
                     letterSpacing = 1.sp,
@@ -296,7 +296,7 @@ private fun ReflectionCard(
                             )
                             Text(
                                 text = intention,
-                                style = NotionTheme.typography.bodySmall,
+                                style = FormaTheme.typography.bodySmall,
                                 color = colors.textPrimary,
                                 fontSize = 13.sp,
                                 lineHeight = 18.sp
@@ -311,7 +311,7 @@ private fun ReflectionCard(
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
                     text = "EVENING GRATITUDE & REST",
-                    style = NotionTheme.typography.labelSmall,
+                    style = FormaTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = colors.textTertiary,
                     letterSpacing = 1.sp,
@@ -336,7 +336,7 @@ private fun ReflectionCard(
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = reflection.gratitudeNote,
-                            style = NotionTheme.typography.bodySmall,
+                            style = FormaTheme.typography.bodySmall,
                             color = colors.textSecondary,
                             fontSize = 12.5.sp,
                             lineHeight = 17.sp
@@ -355,7 +355,7 @@ private fun ReflectionCard(
                 ) {
                     Text(
                         text = "Mindfulness Presence",
-                        style = NotionTheme.typography.bodySmall,
+                        style = FormaTheme.typography.bodySmall,
                         color = colors.textTertiary,
                         fontSize = 11.5.sp
                     )

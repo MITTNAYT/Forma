@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.habits
+﻿package com.habitflow.app.ui.habits
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -45,12 +45,12 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
-import com.habitflow.app.core.designsystem.NotionTheme
-import com.habitflow.app.core.designsystem.component.NotionButton
-import com.habitflow.app.core.designsystem.component.NotionButtonStyle
-import com.habitflow.app.core.designsystem.component.NotionDivider
+import com.habitflow.app.core.designsystem.FormaTheme
+import com.habitflow.app.core.designsystem.component.FormaButton
+import com.habitflow.app.core.designsystem.component.FormaButtonStyle
+import com.habitflow.app.core.designsystem.component.FormaDivider
 import com.habitflow.app.core.designsystem.motion.formaStaggeredEntrance
-import com.habitflow.app.core.designsystem.component.NotionTopAppBar
+import com.habitflow.app.core.designsystem.component.FormaTopAppBar
 import com.habitflow.app.domain.model.Habit
 import com.habitflow.app.domain.model.TimeOfDay
 import com.habitflow.app.ui.habits.components.AddEditHabitDialog
@@ -63,7 +63,7 @@ import com.habitflow.app.ui.today.components.InlineQuickEntryBar
 fun HabitsScreen(
     viewModel: HabitsViewModel = hiltViewModel()
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     val focusManager = LocalFocusManager.current
     val uiState by viewModel.uiState.collectAsState()
 
@@ -73,25 +73,25 @@ fun HabitsScreen(
 
     Scaffold(
         topBar = {
-            NotionTopAppBar(
+            FormaTopAppBar(
                 title = "Habits",
                 subtitle = "Unlimited recurring habits & streaks",
                 actions = {
                     if (uiState.activeHabits.isNotEmpty() && !uiState.showArchived) {
-                        NotionButton(
+                        FormaButton(
                             text = "▶ Flow",
                             onClick = { showStackSequencerSheet = true },
-                            style = NotionButtonStyle.OUTLINE
+                            style = FormaButtonStyle.OUTLINE
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                     }
-                    NotionButton(
+                    FormaButton(
                         text = "+ Habit",
                         onClick = {
                             editingHabit = null
                             showAddEditDialog = true
                         },
-                        style = NotionButtonStyle.PRIMARY
+                        style = FormaButtonStyle.PRIMARY
                     )
                 }
             )
@@ -104,7 +104,7 @@ fun HabitsScreen(
                 },
                 containerColor = colors.accent,
                 contentColor = Color.White,
-                shape = NotionTheme.shapes.medium
+                shape = FormaTheme.shapes.medium
             ) {
                 Icon(
                     imageVector = Icons.Rounded.Add,
@@ -158,7 +158,7 @@ fun HabitsScreen(
                         value = uiState.searchQuery,
                         onValueChange = { viewModel.setSearchQuery(it) },
                         modifier = Modifier.weight(1f),
-                        textStyle = NotionTheme.typography.bodyMedium.copy(
+                        textStyle = FormaTheme.typography.bodyMedium.copy(
                             color = colors.textPrimary,
                             fontSize = 14.sp
                         ),
@@ -175,7 +175,7 @@ fun HabitsScreen(
                             if (uiState.searchQuery.isEmpty()) {
                                 Text(
                                     text = "Search habits, intentions, or tags...",
-                                    style = NotionTheme.typography.bodyMedium,
+                                    style = FormaTheme.typography.bodyMedium,
                                     color = colors.textTertiary,
                                     fontSize = 13.5.sp
                                 )
@@ -239,7 +239,7 @@ fun HabitsScreen(
                 )
             }
 
-            NotionDivider()
+            FormaDivider()
 
             val habitList = if (uiState.showArchived) uiState.archivedHabits else uiState.activeHabits
 
@@ -323,16 +323,16 @@ fun FilterChip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
 
     Box(
         modifier = modifier
-            .clip(NotionTheme.shapes.extraSmall)
+            .clip(FormaTheme.shapes.extraSmall)
             .background(if (isSelected) colors.textPrimary else colors.surfaceVariant)
             .border(
                 1.dp,
                 if (isSelected) Color.Transparent else colors.border,
-                NotionTheme.shapes.extraSmall
+                FormaTheme.shapes.extraSmall
             )
             .clickable { onClick() }
             .padding(horizontal = 12.dp, vertical = 6.dp),
@@ -340,7 +340,7 @@ fun FilterChip(
     ) {
         Text(
             text = text,
-            style = NotionTheme.typography.labelMedium,
+            style = FormaTheme.typography.labelMedium,
             color = if (isSelected) colors.surface else colors.textPrimary,
             fontSize = 12.sp
         )
@@ -353,7 +353,7 @@ fun EmptyHabitsState(
     onCreateHabit: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
 
     Column(
         modifier = modifier
@@ -371,7 +371,7 @@ fun EmptyHabitsState(
 
         Text(
             text = if (isArchivedView) "No archived habits" else "Build your daily rituals",
-            style = NotionTheme.typography.titleLarge,
+            style = FormaTheme.typography.titleLarge,
             color = colors.textPrimary
         )
 
@@ -379,17 +379,17 @@ fun EmptyHabitsState(
 
         Text(
             text = if (isArchivedView) "Archived habits will appear here." else "Forma gives you unlimited recurring habits, streaks, and analytics for free.",
-            style = NotionTheme.typography.bodyMedium,
+            style = FormaTheme.typography.bodyMedium,
             color = colors.textSecondary,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
 
         if (!isArchivedView) {
             Spacer(modifier = Modifier.height(24.dp))
-            NotionButton(
+            FormaButton(
                 text = "+ Create First Habit",
                 onClick = onCreateHabit,
-                style = NotionButtonStyle.PRIMARY
+                style = FormaButtonStyle.PRIMARY
             )
         }
     }

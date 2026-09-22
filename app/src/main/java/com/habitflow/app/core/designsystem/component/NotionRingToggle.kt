@@ -26,15 +26,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 
 @Composable
-fun NotionRingToggle(
+fun FormaRingToggle(
     checked: Boolean,
     onToggle: () -> Unit,
     modifier: Modifier = Modifier,
     size: Dp = 26.dp,
-    accentColor: Color = NotionTheme.colors.accent
+    accentColor: Color = FormaTheme.colors.accent
 ) {
     val bgColor by animateColorAsState(
         targetValue = if (checked) accentColor else Color.Transparent,
@@ -74,4 +74,21 @@ fun NotionRingToggle(
             )
         }
     }
+}
+
+@Composable
+fun NotionRingToggle(
+    checked: Boolean,
+    onToggle: () -> Unit,
+    modifier: Modifier = Modifier,
+    size: Dp = 26.dp,
+    accentColor: Color = FormaTheme.colors.accent
+) {
+    FormaRingToggle(
+        checked = checked,
+        onToggle = onToggle,
+        modifier = modifier,
+        size = size,
+        accentColor = accentColor
+    )
 }

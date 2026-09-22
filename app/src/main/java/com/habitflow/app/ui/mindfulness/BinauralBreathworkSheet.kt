@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.mindfulness
+﻿package com.habitflow.app.ui.mindfulness
 
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
@@ -60,7 +60,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.habitflow.app.core.audio.BinauralBeatsEngine
 import com.habitflow.app.core.audio.BinauralMode
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import kotlinx.coroutines.delay
 
 enum class BinauralBreathPattern(val title: String, val inhale: Int, val hold1: Int, val exhale: Int, val hold2: Int) {
@@ -79,7 +79,7 @@ fun BinauralBreathworkSheet(
     onDismiss: () -> Unit,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     val haptic = LocalHapticFeedback.current
     val binauralEngine = remember { BinauralBeatsEngine() }
 
@@ -215,7 +215,7 @@ fun BinauralBreathworkSheet(
                     Column {
                         Text(
                             text = "BINAURAL BREATHWORK",
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = colors.accent,
                             letterSpacing = 1.2.sp,
@@ -223,7 +223,7 @@ fun BinauralBreathworkSheet(
                         )
                         Text(
                             text = "Dual-Frequency Coherence",
-                            style = NotionTheme.typography.bodySmall,
+                            style = FormaTheme.typography.bodySmall,
                             color = colors.textSecondary,
                             fontSize = 12.sp
                         )
@@ -262,7 +262,7 @@ fun BinauralBreathworkSheet(
                     ) {
                         Text(
                             text = pattern.name,
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                             color = if (isSelected) colors.onAccent else colors.textPrimary,
                             fontSize = 11.sp
@@ -316,7 +316,7 @@ fun BinauralBreathworkSheet(
                                 BinauralBreathPhase.EXHALE -> "EXHALE"
                                 BinauralBreathPhase.HOLD_OUT -> "HOLD"
                             },
-                            style = NotionTheme.typography.titleMedium,
+                            style = FormaTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = Color.White,
                             fontSize = 15.sp,
@@ -324,7 +324,7 @@ fun BinauralBreathworkSheet(
                         )
                         Text(
                             text = "$phaseSecondsRemaining",
-                            style = NotionTheme.typography.headlineLarge,
+                            style = FormaTheme.typography.headlineLarge,
                             fontWeight = FontWeight.Bold,
                             color = Color.White,
                             fontSize = 32.sp
@@ -358,7 +358,7 @@ fun BinauralBreathworkSheet(
 
                 Text(
                     text = "$completedCycles breath cycles completed",
-                    style = NotionTheme.typography.bodyMedium,
+                    style = FormaTheme.typography.bodyMedium,
                     color = colors.textPrimary,
                     fontSize = 13.5.sp,
                     fontWeight = FontWeight.Medium
@@ -392,7 +392,7 @@ fun BinauralBreathworkSheet(
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
                                 text = "Binaural Beats (Wear Headphones)",
-                                style = NotionTheme.typography.labelSmall,
+                                style = FormaTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = colors.textPrimary,
                                 fontSize = 11.5.sp
@@ -401,7 +401,7 @@ fun BinauralBreathworkSheet(
 
                         Text(
                             text = if (binauralEnabled) "ON" else "OFF",
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = if (binauralEnabled) colors.accent else colors.textTertiary,
                             fontSize = 11.sp,
@@ -437,7 +437,7 @@ fun BinauralBreathworkSheet(
                                 ) {
                                     Text(
                                         text = "${mode.targetHz} Hz",
-                                        style = NotionTheme.typography.labelSmall,
+                                        style = FormaTheme.typography.labelSmall,
                                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                                         color = if (isSelected) colors.accent else colors.textSecondary,
                                         fontSize = 10.5.sp

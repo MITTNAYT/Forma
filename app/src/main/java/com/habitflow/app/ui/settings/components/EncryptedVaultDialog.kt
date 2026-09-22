@@ -45,9 +45,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.habitflow.app.core.designsystem.NotionTheme
-import com.habitflow.app.core.designsystem.component.NotionButton
-import com.habitflow.app.core.designsystem.component.NotionButtonStyle
+import com.habitflow.app.core.designsystem.FormaTheme
+import com.habitflow.app.core.designsystem.component.FormaButton
+import com.habitflow.app.core.designsystem.component.FormaButtonStyle
 
 enum class VaultDialogMode {
     ENCRYPT_EXPORT,
@@ -62,7 +62,7 @@ fun EncryptedVaultDialog(
     onRestoreWithPassword: (passphrase: String, encryptedPayload: String) -> Unit
 ) {
     val context = LocalContext.current
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
 
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
@@ -99,14 +99,14 @@ fun EncryptedVaultDialog(
                 Column {
                     Text(
                         text = if (isExport) "Zero-Knowledge Vault Export" else "Restore Encrypted Vault",
-                        style = NotionTheme.typography.titleMedium,
+                        style = FormaTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = colors.textPrimary,
                         fontSize = 17.sp
                     )
                     Text(
                         text = "AES-256-GCM • PBKDF2-SHA256",
-                        style = NotionTheme.typography.labelSmall,
+                        style = FormaTheme.typography.labelSmall,
                         color = colors.textTertiary,
                         fontSize = 11.sp
                     )
@@ -132,7 +132,7 @@ fun EncryptedVaultDialog(
                         } else {
                             "Paste the encrypted envelope or vault string below, then enter your master passphrase to safely unpack your records."
                         },
-                        style = NotionTheme.typography.bodySmall,
+                        style = FormaTheme.typography.bodySmall,
                         color = colors.textSecondary,
                         fontSize = 12.sp,
                         lineHeight = 16.sp
@@ -152,7 +152,7 @@ fun EncryptedVaultDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(110.dp),
-                        textStyle = NotionTheme.typography.bodySmall.copy(
+                        textStyle = FormaTheme.typography.bodySmall.copy(
                             color = colors.textPrimary,
                             fontSize = 12.sp
                         ),
@@ -183,7 +183,7 @@ fun EncryptedVaultDialog(
                         IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
                             Text(
                                 text = if (isPasswordVisible) "Hide" else "Show",
-                                style = NotionTheme.typography.labelSmall,
+                                style = FormaTheme.typography.labelSmall,
                                 color = colors.accent,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 11.sp
@@ -192,7 +192,7 @@ fun EncryptedVaultDialog(
                     },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    textStyle = NotionTheme.typography.bodyMedium.copy(color = colors.textPrimary),
+                    textStyle = FormaTheme.typography.bodyMedium.copy(color = colors.textPrimary),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = colors.accent,
                         unfocusedBorderColor = colors.border,
@@ -217,7 +217,7 @@ fun EncryptedVaultDialog(
                         ),
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
-                        textStyle = NotionTheme.typography.bodyMedium.copy(color = colors.textPrimary),
+                        textStyle = FormaTheme.typography.bodyMedium.copy(color = colors.textPrimary),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = colors.accent,
                             unfocusedBorderColor = colors.border,
@@ -230,7 +230,7 @@ fun EncryptedVaultDialog(
                 errorMessage?.let { err ->
                     Text(
                         text = err,
-                        style = NotionTheme.typography.bodySmall,
+                        style = FormaTheme.typography.bodySmall,
                         color = Color(0xFFC0392B),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.SemiBold
@@ -239,20 +239,20 @@ fun EncryptedVaultDialog(
             }
         },
         confirmButton = {
-            NotionButton(
+            FormaButton(
                 text = if (isProcessing) "Encrypting..." else if (isExport) "Export Encrypted Vault" else "Decrypt & Restore",
                 onClick = {
                     if (password.length < 6) {
                         errorMessage = "Passphrase must be at least 6 characters."
-                        return@NotionButton
+                        return@FormaButton
                     }
                     if (isExport && password != confirmPassword) {
                         errorMessage = "Passphrases do not match."
-                        return@NotionButton
+                        return@FormaButton
                     }
                     if (!isExport && encryptedPayload.isBlank()) {
                         errorMessage = "Please provide the encrypted vault text."
-                        return@NotionButton
+                        return@FormaButton
                     }
 
                     isProcessing = true
@@ -262,15 +262,15 @@ fun EncryptedVaultDialog(
                         onRestoreWithPassword(password, encryptedPayload)
                     }
                 },
-                style = NotionButtonStyle.PRIMARY,
+                style = FormaButtonStyle.PRIMARY,
                 enabled = !isProcessing && password.isNotBlank()
             )
         },
         dismissButton = {
-            NotionButton(
+            FormaButton(
                 text = "Cancel",
                 onClick = onDismiss,
-                style = NotionButtonStyle.OUTLINE,
+                style = FormaButtonStyle.OUTLINE,
                 enabled = !isProcessing
             )
         }

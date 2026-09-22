@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.reflection
+﻿package com.habitflow.app.ui.reflection
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -50,7 +50,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import com.habitflow.app.domain.model.EnergyLevel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,7 +70,7 @@ fun MorningAlignmentSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = NotionTheme.colors.background,
+        containerColor = FormaTheme.colors.background,
         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
     ) {
         Column(
@@ -92,13 +92,13 @@ fun MorningAlignmentSheet(
                         modifier = Modifier
                             .size(40.dp)
                             .clip(CircleShape)
-                            .background(NotionTheme.colors.accentSoft),
+                            .background(FormaTheme.colors.accentSoft),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Rounded.LightMode,
                             contentDescription = null,
-                            tint = NotionTheme.colors.accent,
+                            tint = FormaTheme.colors.accent,
                             modifier = Modifier.size(22.dp)
                         )
                     }
@@ -108,12 +108,12 @@ fun MorningAlignmentSheet(
                             text = "Morning Clarity",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.SemiBold,
-                            color = NotionTheme.colors.textPrimary
+                            color = FormaTheme.colors.textPrimary
                         )
                         Text(
                             text = "Set your 3 mindful anchors for today",
                             fontSize = 12.sp,
-                            color = NotionTheme.colors.textSecondary
+                            color = FormaTheme.colors.textSecondary
                         )
                     }
                 }
@@ -121,7 +121,7 @@ fun MorningAlignmentSheet(
                     Icon(
                         imageVector = Icons.Rounded.Close,
                         contentDescription = "Close",
-                        tint = NotionTheme.colors.textSecondary
+                        tint = FormaTheme.colors.textSecondary
                     )
                 }
             }
@@ -133,8 +133,8 @@ fun MorningAlignmentSheet(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp))
-                    .background(NotionTheme.colors.surfaceVariant.copy(alpha = 0.5f))
-                    .border(1.dp, NotionTheme.colors.border, RoundedCornerShape(16.dp))
+                    .background(FormaTheme.colors.surfaceVariant.copy(alpha = 0.5f))
+                    .border(1.dp, FormaTheme.colors.border, RoundedCornerShape(16.dp))
                     .padding(16.dp)
             ) {
                 Text(
@@ -142,7 +142,7 @@ fun MorningAlignmentSheet(
                     fontSize = 13.sp,
                     fontStyle = FontStyle.Italic,
                     lineHeight = 18.sp,
-                    color = NotionTheme.colors.textPrimary
+                    color = FormaTheme.colors.textPrimary
                 )
             }
 
@@ -153,7 +153,7 @@ fun MorningAlignmentSheet(
                 text = "Today's Energy Rhythm",
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Medium,
-                color = NotionTheme.colors.textSecondary
+                color = FormaTheme.colors.textSecondary
             )
             Spacer(modifier = Modifier.height(8.dp))
             Row(
@@ -187,7 +187,7 @@ fun MorningAlignmentSheet(
                 text = "Keystone Intentions (1–3)",
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Medium,
-                color = NotionTheme.colors.textSecondary
+                color = FormaTheme.colors.textSecondary
             )
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -226,8 +226,8 @@ fun MorningAlignmentSheet(
                     .height(52.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = NotionTheme.colors.accent,
-                    contentColor = NotionTheme.colors.onAccent
+                    containerColor = FormaTheme.colors.accent,
+                    contentColor = FormaTheme.colors.onAccent
                 )
             ) {
                 Text(
@@ -247,9 +247,9 @@ private fun EnergyOption(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val bg = if (selected) NotionTheme.colors.accentSoft else NotionTheme.colors.surfaceVariant.copy(alpha = 0.4f)
-    val border = if (selected) NotionTheme.colors.accent else NotionTheme.colors.border
-    val textCol = if (selected) NotionTheme.colors.accent else NotionTheme.colors.textSecondary
+    val bg = if (selected) FormaTheme.colors.accentSoft else FormaTheme.colors.surfaceVariant.copy(alpha = 0.4f)
+    val border = if (selected) FormaTheme.colors.accent else FormaTheme.colors.border
+    val textCol = if (selected) FormaTheme.colors.accent else FormaTheme.colors.textSecondary
 
     Box(
         modifier = modifier
@@ -281,14 +281,14 @@ private fun KeystoneInput(
         value = value,
         onValueChange = onValueChange,
         placeholder = {
-            Text(text = placeholder, fontSize = 13.sp, color = NotionTheme.colors.textSecondary.copy(alpha = 0.6f))
+            Text(text = placeholder, fontSize = 13.sp, color = FormaTheme.colors.textSecondary.copy(alpha = 0.6f))
         },
         leadingIcon = {
             Text(
                 text = number,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
-                color = NotionTheme.colors.accent,
+                color = FormaTheme.colors.accent,
                 modifier = Modifier.padding(start = 12.dp)
             )
         },
@@ -302,13 +302,13 @@ private fun KeystoneInput(
         ),
         keyboardActions = KeyboardActions(onDone = { onDone() }),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = NotionTheme.colors.accent,
-            unfocusedBorderColor = NotionTheme.colors.border,
-            focusedContainerColor = NotionTheme.colors.surfaceVariant.copy(alpha = 0.3f),
-            unfocusedContainerColor = NotionTheme.colors.surfaceVariant.copy(alpha = 0.3f),
-            focusedTextColor = NotionTheme.colors.textPrimary,
-            unfocusedTextColor = NotionTheme.colors.textPrimary,
-            cursorColor = NotionTheme.colors.accent
+            focusedBorderColor = FormaTheme.colors.accent,
+            unfocusedBorderColor = FormaTheme.colors.border,
+            focusedContainerColor = FormaTheme.colors.surfaceVariant.copy(alpha = 0.3f),
+            unfocusedContainerColor = FormaTheme.colors.surfaceVariant.copy(alpha = 0.3f),
+            focusedTextColor = FormaTheme.colors.textPrimary,
+            unfocusedTextColor = FormaTheme.colors.textPrimary,
+            cursorColor = FormaTheme.colors.accent
         )
     )
 }

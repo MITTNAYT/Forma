@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.habits.components
+﻿package com.habitflow.app.ui.habits.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -27,8 +27,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.habitflow.app.core.designsystem.NotionTheme
-import com.habitflow.app.core.designsystem.component.NotionCard
+import com.habitflow.app.core.designsystem.FormaTheme
+import com.habitflow.app.core.designsystem.component.FormaCard
 import com.habitflow.app.core.designsystem.component.StreakBadge
 import com.habitflow.app.domain.model.Habit
 import com.habitflow.app.domain.model.HabitStreakInfo
@@ -43,12 +43,12 @@ fun HabitCard(
     onWinteringToggle: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     val dayNames = listOf("M", "T", "W", "T", "F", "S", "S")
 
-    NotionCard(
+    FormaCard(
         modifier = modifier.fillMaxWidth(),
-        shape = NotionTheme.shapes.small,
+        shape = FormaTheme.shapes.small,
         onClick = onEdit
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
@@ -64,7 +64,7 @@ fun HabitCard(
                     Box(
                         modifier = Modifier
                             .size(38.dp)
-                            .clip(NotionTheme.shapes.extraSmall)
+                            .clip(FormaTheme.shapes.extraSmall)
                             .background(if (habit.isWintering) Color(0xFFE3EBE7) else colors.surfaceVariant),
                         contentAlignment = Alignment.Center
                     ) {
@@ -82,14 +82,14 @@ fun HabitCard(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 text = habit.name,
-                                style = NotionTheme.typography.titleMedium,
+                                style = FormaTheme.typography.titleMedium,
                                 color = colors.textPrimary
                             )
                             if (habit.isWintering) {
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Box(
                                     modifier = Modifier
-                                        .clip(NotionTheme.shapes.extraSmall)
+                                        .clip(FormaTheme.shapes.extraSmall)
                                         .background(Color(0xFFE1EAE6))
                                         .padding(horizontal = 6.dp, vertical = 2.dp)
                                 ) {
@@ -103,7 +103,7 @@ fun HabitCard(
                                         Spacer(modifier = Modifier.width(3.dp))
                                         Text(
                                             text = "Wintering",
-                                            style = NotionTheme.typography.labelSmall,
+                                            style = FormaTheme.typography.labelSmall,
                                             color = Color(0xFF4A7268),
                                             fontSize = 9.5.sp,
                                             fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
@@ -119,7 +119,7 @@ fun HabitCard(
                         ) {
                             Text(
                                 text = habit.timeOfDay.displayName,
-                                style = NotionTheme.typography.labelSmall,
+                                style = FormaTheme.typography.labelSmall,
                                 color = colors.textSecondary
                             )
 
@@ -189,13 +189,13 @@ fun HabitCard(
                         Box(
                             modifier = Modifier
                                 .size(20.dp)
-                                .clip(NotionTheme.shapes.extraSmall)
+                                .clip(FormaTheme.shapes.extraSmall)
                                 .background(if (isScheduled) colors.textPrimary else colors.surfaceVariant),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = dayNames[i - 1],
-                                style = NotionTheme.typography.labelSmall,
+                                style = FormaTheme.typography.labelSmall,
                                 color = if (isScheduled) colors.surface else colors.textTertiary,
                                 fontSize = 9.sp
                             )
@@ -206,7 +206,7 @@ fun HabitCard(
                 streakInfo?.let {
                     Text(
                         text = "Best: ${it.longestStreak}d",
-                        style = NotionTheme.typography.labelSmall,
+                        style = FormaTheme.typography.labelSmall,
                         color = colors.textTertiary
                     )
                 }

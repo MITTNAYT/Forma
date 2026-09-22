@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.mindfulness
+﻿package com.habitflow.app.ui.mindfulness
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
@@ -52,7 +52,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.habitflow.app.core.audio.ZenFeedbackManager
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import com.habitflow.app.core.designsystem.icon.HabitFlowIcon
 import com.habitflow.app.core.designsystem.motion.formaPressEffect
 import com.habitflow.app.domain.model.TodayScheduleItem
@@ -67,7 +67,7 @@ fun GuidedRoutineSheet(
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 ) {
     val context = LocalContext.current
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
 
     var currentIndex by remember { mutableIntStateOf(0) }
     var isTimerRunning by remember { mutableStateOf(false) }
@@ -141,7 +141,7 @@ fun GuidedRoutineSheet(
                     Column {
                         Text(
                             text = "FLOW SEQUENCER",
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = colors.textTertiary,
                             letterSpacing = 1.2.sp,
@@ -149,7 +149,7 @@ fun GuidedRoutineSheet(
                         )
                         Text(
                             text = if (isFinished) "Routine Completed" else "Ritual ${currentIndex + 1} of ${habits.size}",
-                            style = NotionTheme.typography.titleMedium,
+                            style = FormaTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = colors.textPrimary,
                             fontSize = 16.sp
@@ -232,7 +232,7 @@ fun GuidedRoutineSheet(
 
                         Text(
                             text = "Routine Complete",
-                            style = NotionTheme.typography.headlineMedium,
+                            style = FormaTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold,
                             color = colors.textPrimary,
                             fontSize = 22.sp
@@ -242,7 +242,7 @@ fun GuidedRoutineSheet(
 
                         Text(
                             text = "Your daily rituals have been honored. Go forward with calm presence.",
-                            style = NotionTheme.typography.bodyMedium,
+                            style = FormaTheme.typography.bodyMedium,
                             color = colors.textSecondary,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.padding(horizontal = 16.dp)
@@ -261,7 +261,7 @@ fun GuidedRoutineSheet(
                         ) {
                             Text(
                                 text = "Return to Day",
-                                style = NotionTheme.typography.titleMedium,
+                                style = FormaTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = colors.onAccent,
                                 fontSize = 15.sp
@@ -304,7 +304,7 @@ fun GuidedRoutineSheet(
 
                                 Text(
                                     text = habit.name,
-                                    style = NotionTheme.typography.headlineSmall,
+                                    style = FormaTheme.typography.headlineSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = colors.textPrimary,
                                     textAlign = TextAlign.Center
@@ -313,7 +313,7 @@ fun GuidedRoutineSheet(
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     text = "${habit.timeOfDay.name.lowercase().replaceFirstChar { it.uppercase() }} Mindful Ritual",
-                                    style = NotionTheme.typography.bodyMedium,
+                                    style = FormaTheme.typography.bodyMedium,
                                     color = colors.textSecondary,
                                     textAlign = TextAlign.Center,
                                     fontSize = 14.sp
@@ -341,7 +341,7 @@ fun GuidedRoutineSheet(
                                     val secs = timerSeconds % 60
                                     Text(
                                         text = String.format("%02d:%02d", mins, secs),
-                                        style = NotionTheme.typography.labelMedium,
+                                        style = FormaTheme.typography.labelMedium,
                                         fontWeight = FontWeight.Bold,
                                         color = colors.textPrimary,
                                         fontSize = 14.sp
@@ -377,7 +377,7 @@ fun GuidedRoutineSheet(
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(
                                         text = "Skip",
-                                        style = NotionTheme.typography.labelSmall,
+                                        style = FormaTheme.typography.labelSmall,
                                         fontWeight = FontWeight.Bold,
                                         color = colors.textSecondary,
                                         fontSize = 13.sp
@@ -406,7 +406,7 @@ fun GuidedRoutineSheet(
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(
                                         text = "Complete & Next",
-                                        style = NotionTheme.typography.labelSmall,
+                                        style = FormaTheme.typography.labelSmall,
                                         fontWeight = FontWeight.Bold,
                                         color = colors.onAccent,
                                         fontSize = 13.sp

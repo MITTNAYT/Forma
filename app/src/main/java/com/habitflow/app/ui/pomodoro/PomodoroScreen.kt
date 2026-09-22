@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.pomodoro
+﻿package com.habitflow.app.ui.pomodoro
 
 import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
@@ -69,7 +69,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.habitflow.app.core.audio.AmbientSound
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import com.habitflow.app.core.designsystem.motion.formaPressEffect
 import com.habitflow.app.domain.model.TodayScheduleItem
 
@@ -81,7 +81,7 @@ fun PomodoroScreen(
     onNavigateBack: () -> Unit = {},
     viewModel: PomodoroViewModel = hiltViewModel()
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     val context = LocalContext.current
     val zenHaptics = rememberZenHaptics()
 
@@ -174,7 +174,7 @@ fun PomodoroScreen(
                 ) {
                     Text(
                         text = "FOCUS & CADENCE",
-                        style = NotionTheme.typography.labelSmall,
+                        style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = colors.textTertiary,
                         letterSpacing = 1.5.sp,
@@ -183,7 +183,7 @@ fun PomodoroScreen(
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         text = "Zen Focus",
-                        style = NotionTheme.typography.headlineLarge,
+                        style = FormaTheme.typography.headlineLarge,
                         fontWeight = FontWeight.Bold,
                         color = colors.textPrimary,
                         fontSize = 28.sp,
@@ -236,7 +236,7 @@ fun PomodoroScreen(
                             ) {
                                 Text(
                                     text = mode.title,
-                                    style = NotionTheme.typography.labelSmall,
+                                    style = FormaTheme.typography.labelSmall,
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                                     color = textColor,
                                     fontSize = 12.sp
@@ -257,7 +257,7 @@ fun PomodoroScreen(
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = "ACTIVE COMMITMENT",
-                        style = NotionTheme.typography.labelSmall,
+                        style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = colors.textTertiary,
                         letterSpacing = 1.2.sp,
@@ -301,7 +301,7 @@ fun PomodoroScreen(
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text(
                                     text = "General Flow",
-                                    style = NotionTheme.typography.labelSmall,
+                                    style = FormaTheme.typography.labelSmall,
                                     fontWeight = if (isGeneral) FontWeight.Bold else FontWeight.Medium,
                                     color = if (isGeneral) colors.accent else colors.textPrimary,
                                     fontSize = 12.sp
@@ -343,7 +343,7 @@ fun PomodoroScreen(
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(
                                         text = itemTitle,
-                                        style = NotionTheme.typography.labelSmall,
+                                        style = FormaTheme.typography.labelSmall,
                                         fontWeight = if (isChosen) FontWeight.Bold else FontWeight.Medium,
                                         color = if (isChosen) colors.accent else colors.textPrimary,
                                         fontSize = 12.sp,
@@ -438,7 +438,7 @@ fun PomodoroScreen(
                         ) {
                             Text(
                                 text = formattedTime,
-                                style = NotionTheme.typography.headlineLarge.copy(
+                                style = FormaTheme.typography.headlineLarge.copy(
                                     fontFeatureSettings = "tnum"
                                 ),
                                 fontWeight = FontWeight.Bold,
@@ -457,7 +457,7 @@ fun PomodoroScreen(
                             ) {
                                 Text(
                                     text = if (isRunning) "Deep in Flow" else "Paused",
-                                    style = NotionTheme.typography.labelSmall,
+                                    style = FormaTheme.typography.labelSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = if (isRunning) colors.accent else colors.textSecondary,
                                     fontSize = 11.sp
@@ -516,7 +516,7 @@ fun PomodoroScreen(
                     ) {
                         Text(
                             text = "-5m",
-                            style = NotionTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
+                            style = FormaTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
                             fontWeight = FontWeight.Bold,
                             color = colors.textPrimary,
                             fontSize = 12.sp
@@ -572,7 +572,7 @@ fun PomodoroScreen(
                             Spacer(modifier = Modifier.width(3.dp))
                             Text(
                                 text = "+5m",
-                                style = NotionTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
+                                style = FormaTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
                                 fontWeight = FontWeight.Bold,
                                 color = colors.textPrimary,
                                 fontSize = 12.sp
@@ -598,7 +598,7 @@ fun PomodoroScreen(
                     ) {
                         Text(
                             text = "ORGANIC FOCUS SOUNDSCAPES",
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = colors.textTertiary,
                             letterSpacing = 1.2.sp,
@@ -611,7 +611,7 @@ fun PomodoroScreen(
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text(
                                     text = "Synthesizing Live",
-                                    style = NotionTheme.typography.labelSmall,
+                                    style = FormaTheme.typography.labelSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = colors.accent,
                                     fontSize = 10.5.sp
@@ -680,7 +680,7 @@ fun PomodoroScreen(
 
                                     Text(
                                         text = sound.displayName,
-                                        style = NotionTheme.typography.titleMedium,
+                                        style = FormaTheme.typography.titleMedium,
                                         fontWeight = FontWeight.Bold,
                                         color = if (isSelected) colors.accent else colors.textPrimary,
                                         fontSize = 13.sp,
@@ -691,7 +691,7 @@ fun PomodoroScreen(
 
                                     Text(
                                         text = sound.description,
-                                        style = NotionTheme.typography.bodySmall,
+                                        style = FormaTheme.typography.bodySmall,
                                         color = colors.textSecondary,
                                         fontSize = 10.5.sp,
                                         lineHeight = 14.sp,
@@ -743,14 +743,14 @@ fun PomodoroScreen(
                             Column {
                                 Text(
                                     text = "$totalMinutesToday mins focused today",
-                                    style = NotionTheme.typography.titleMedium.copy(fontFeatureSettings = "tnum"),
+                                    style = FormaTheme.typography.titleMedium.copy(fontFeatureSettings = "tnum"),
                                     fontWeight = FontWeight.Bold,
                                     color = colors.textPrimary,
                                     fontSize = 14.sp
                                 )
                                 Text(
                                     text = "Accumulated across all rituals",
-                                    style = NotionTheme.typography.bodySmall,
+                                    style = FormaTheme.typography.bodySmall,
                                     color = colors.textSecondary,
                                     fontSize = 11.sp
                                 )
@@ -770,7 +770,7 @@ fun PomodoroScreen(
                             ) {
                                 Text(
                                     text = "Save",
-                                    style = NotionTheme.typography.labelSmall,
+                                    style = FormaTheme.typography.labelSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = colors.onAccent,
                                     fontSize = 12.sp

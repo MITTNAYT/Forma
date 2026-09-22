@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.focus
+﻿package com.habitflow.app.ui.focus
 
 import android.widget.Toast
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -59,14 +59,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 
 @Composable
 fun FocusTimerScreen(
     onNavigateBack: () -> Unit,
     viewModel: FocusTimerViewModel = hiltViewModel()
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     val context = LocalContext.current
 
     val timeRemaining by viewModel.timeRemainingSeconds.collectAsState()
@@ -139,7 +139,7 @@ fun FocusTimerScreen(
                 ) {
                     Text(
                         text = "Complete Ritual & Log Time",
-                        style = NotionTheme.typography.titleMedium,
+                        style = FormaTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = colors.onAccent,
                         fontSize = 15.sp
@@ -185,7 +185,7 @@ fun FocusTimerScreen(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = "FLOW SANCTUARY",
-                        style = NotionTheme.typography.labelSmall,
+                        style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = colors.accent,
                         letterSpacing = 1.4.sp,
@@ -194,7 +194,7 @@ fun FocusTimerScreen(
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         text = viewModel.itemTitle,
-                        style = NotionTheme.typography.titleMedium,
+                        style = FormaTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = colors.textPrimary,
                         fontSize = 16.sp
@@ -256,7 +256,7 @@ fun FocusTimerScreen(
                     ) {
                         Text(
                             text = formattedTime,
-                            style = NotionTheme.typography.headlineLarge,
+                            style = FormaTheme.typography.headlineLarge,
                             fontWeight = FontWeight.Bold,
                             color = colors.textPrimary,
                             fontSize = timeFontSize,
@@ -273,7 +273,7 @@ fun FocusTimerScreen(
                         ) {
                             Text(
                                 text = if (isRunning) "Deep in Flow" else "Paused",
-                                style = NotionTheme.typography.labelSmall,
+                                style = FormaTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = if (isRunning) colors.accent else colors.textSecondary,
                                 fontSize = 11.sp
@@ -355,7 +355,7 @@ fun FocusTimerScreen(
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = "+5m",
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = colors.textPrimary,
                             fontSize = 12.sp
@@ -391,7 +391,7 @@ fun FocusTimerScreen(
                     ) {
                         Text(
                             text = soundscape.displayName,
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                             color = if (isSelected) colors.accent else colors.textSecondary,
                             fontSize = 12.sp
@@ -426,7 +426,7 @@ fun FocusTimerScreen(
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "$totalMinutesLogged mins invested in this ritual",
-                            style = NotionTheme.typography.bodySmall,
+                            style = FormaTheme.typography.bodySmall,
                             color = colors.textSecondary,
                             fontSize = 12.sp
                         )
@@ -440,7 +440,7 @@ fun FocusTimerScreen(
                     ) {
                         Text(
                             text = "Logged",
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = colors.accent,
                             fontSize = 10.sp

@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.analytics.components
+﻿package com.habitflow.app.ui.analytics.components
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -34,7 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import com.habitflow.app.core.designsystem.motion.formaPressEffect
 import com.habitflow.app.core.share.MilestoneCardExporter
 import kotlinx.coroutines.launch
@@ -48,7 +48,7 @@ fun ShareMilestoneDialog(
     onDismiss: () -> Unit
 ) {
     val context = LocalContext.current
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     val scope = rememberCoroutineScope()
 
     BasicAlertDialog(
@@ -73,7 +73,7 @@ fun ShareMilestoneDialog(
                 ) {
                     Text(
                         text = "CELEBRATE MILESTONE",
-                        style = NotionTheme.typography.labelSmall,
+                        style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = colors.accent,
                         letterSpacing = 1.2.sp,
@@ -118,7 +118,7 @@ fun ShareMilestoneDialog(
                         ) {
                             Text(
                                 text = streakDays.toString(),
-                                style = NotionTheme.typography.headlineLarge,
+                                style = FormaTheme.typography.headlineLarge,
                                 fontWeight = FontWeight.Bold,
                                 color = colors.accent,
                                 fontSize = 34.sp
@@ -129,7 +129,7 @@ fun ShareMilestoneDialog(
 
                         Text(
                             text = habitTitle,
-                            style = NotionTheme.typography.titleMedium,
+                            style = FormaTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = colors.textPrimary,
                             fontSize = 18.sp,
@@ -138,7 +138,7 @@ fun ShareMilestoneDialog(
 
                         Text(
                             text = "$streakDays Days of Consistent Flow",
-                            style = NotionTheme.typography.bodySmall,
+                            style = FormaTheme.typography.bodySmall,
                             color = colors.textSecondary,
                             fontSize = 12.sp,
                             textAlign = TextAlign.Center
@@ -183,7 +183,7 @@ fun ShareMilestoneDialog(
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "Export & Share Story Card",
-                            style = NotionTheme.typography.titleMedium,
+                            style = FormaTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = colors.onAccent,
                             fontSize = 14.sp

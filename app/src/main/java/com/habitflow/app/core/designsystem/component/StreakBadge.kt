@@ -1,4 +1,4 @@
-package com.habitflow.app.core.designsystem.component
+﻿package com.habitflow.app.core.designsystem.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 
 @Composable
 fun StreakBadge(
@@ -25,16 +25,16 @@ fun StreakBadge(
     modifier: Modifier = Modifier,
     showFireIcon: Boolean = true
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
 
     Row(
         modifier = modifier
-            .clip(NotionTheme.shapes.extraSmall)
+            .clip(FormaTheme.shapes.extraSmall)
             .background(if (streakCount > 0) colors.textPrimary else colors.surfaceVariant)
             .border(
                 1.dp,
                 if (streakCount > 0) colors.textPrimary else colors.border,
-                NotionTheme.shapes.extraSmall
+                FormaTheme.shapes.extraSmall
             )
             .padding(horizontal = 7.dp, vertical = 2.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -50,7 +50,7 @@ fun StreakBadge(
         }
         Text(
             text = "$streakCount",
-            style = NotionTheme.typography.labelSmall,
+            style = FormaTheme.typography.labelSmall,
             color = if (streakCount > 0) com.habitflow.app.core.designsystem.ObsidianBlackBg else colors.textSecondary
         )
     }

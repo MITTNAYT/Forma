@@ -1,7 +1,6 @@
 package com.habitflow.app.core.designsystem.component
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.padding
@@ -12,15 +11,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import com.habitflow.app.core.designsystem.motion.formaPressEffect
 
 @Composable
-fun NotionCard(
+fun FormaCard(
     modifier: Modifier = Modifier,
-    shape: Shape = NotionTheme.shapes.medium,
-    backgroundColor: Color = NotionTheme.colors.surface,
-    borderColor: Color = NotionTheme.colors.border,
+    shape: Shape = FormaTheme.shapes.medium,
+    backgroundColor: Color = FormaTheme.colors.surface,
+    borderColor: Color = FormaTheme.colors.border,
     borderWidth: Dp = 1.dp,
     onClick: (() -> Unit)? = null,
     content: @Composable BoxScope.() -> Unit
@@ -40,4 +39,25 @@ fun NotionCard(
             content = content
         )
     }
+}
+
+@Composable
+fun NotionCard(
+    modifier: Modifier = Modifier,
+    shape: Shape = FormaTheme.shapes.medium,
+    backgroundColor: Color = FormaTheme.colors.surface,
+    borderColor: Color = FormaTheme.colors.border,
+    borderWidth: Dp = 1.dp,
+    onClick: (() -> Unit)? = null,
+    content: @Composable BoxScope.() -> Unit
+) {
+    FormaCard(
+        modifier = modifier,
+        shape = shape,
+        backgroundColor = backgroundColor,
+        borderColor = borderColor,
+        borderWidth = borderWidth,
+        onClick = onClick,
+        content = content
+    )
 }

@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.analytics.components
+﻿package com.habitflow.app.ui.analytics.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -41,7 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import com.habitflow.app.domain.usecase.MindfulInsight
 import com.habitflow.app.domain.usecase.MindfulInsightsReport
 
@@ -52,7 +52,7 @@ fun MindfulInsightsSheet(
     onDismiss: () -> Unit,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -93,14 +93,14 @@ fun MindfulInsightsSheet(
                     Column {
                         Text(
                             text = "Mindful Insights",
-                            style = NotionTheme.typography.titleMedium,
+                            style = FormaTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = colors.textPrimary,
                             fontSize = 18.sp
                         )
                         Text(
                             text = "Behavioral Flow & Rhythm Patterns",
-                            style = NotionTheme.typography.bodySmall,
+                            style = FormaTheme.typography.bodySmall,
                             color = colors.textSecondary,
                             fontSize = 12.sp
                         )
@@ -142,7 +142,7 @@ fun MindfulInsightsSheet(
                             ) {
                                 Text(
                                     text = "HARMONY SCORE",
-                                    style = NotionTheme.typography.labelSmall,
+                                    style = FormaTheme.typography.labelSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = colors.accent,
                                     letterSpacing = 1.1.sp,
@@ -150,7 +150,7 @@ fun MindfulInsightsSheet(
                                 )
                                 Text(
                                     text = String.format("%.1f", report.overallMindfulnessAvg) + " / 5.0",
-                                    style = NotionTheme.typography.titleMedium,
+                                    style = FormaTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
                                     color = colors.accent,
                                     fontSize = 16.sp
@@ -165,7 +165,7 @@ fun MindfulInsightsSheet(
                                 } else {
                                     "Continue logging your daily rituals and reflections to discover your personal flow catalysts."
                                 },
-                                style = NotionTheme.typography.bodyMedium,
+                                style = FormaTheme.typography.bodyMedium,
                                 color = colors.textPrimary,
                                 fontSize = 14.sp,
                                 lineHeight = 20.sp
@@ -191,7 +191,7 @@ private fun InsightCard(
     insight: MindfulInsight,
     modifier: Modifier = Modifier
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
 
     val iconVector = when (insight.iconName) {
         "bolt" -> Icons.Rounded.ElectricBolt
@@ -232,7 +232,7 @@ private fun InsightCard(
                     Spacer(modifier = Modifier.width(10.dp))
                     Text(
                         text = insight.tag.uppercase(),
-                        style = NotionTheme.typography.labelSmall,
+                        style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = colors.accent,
                         fontSize = 11.sp,
@@ -248,7 +248,7 @@ private fun InsightCard(
                 ) {
                     Text(
                         text = insight.metricHighlight,
-                        style = NotionTheme.typography.labelSmall,
+                        style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = colors.textPrimary,
                         fontSize = 11.sp
@@ -260,7 +260,7 @@ private fun InsightCard(
 
             Text(
                 text = insight.title,
-                style = NotionTheme.typography.titleMedium,
+                style = FormaTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = colors.textPrimary,
                 fontSize = 15.sp
@@ -270,7 +270,7 @@ private fun InsightCard(
 
             Text(
                 text = insight.description,
-                style = NotionTheme.typography.bodySmall,
+                style = FormaTheme.typography.bodySmall,
                 color = colors.textSecondary,
                 fontSize = 13.sp,
                 lineHeight = 18.sp

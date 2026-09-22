@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.inbox
+﻿package com.habitflow.app.ui.inbox
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -39,11 +39,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.habitflow.app.core.designsystem.NotionTheme
-import com.habitflow.app.core.designsystem.component.NotionButton
-import com.habitflow.app.core.designsystem.component.NotionButtonStyle
-import com.habitflow.app.core.designsystem.component.NotionCard
-import com.habitflow.app.core.designsystem.component.NotionCheckbox
+import com.habitflow.app.core.designsystem.FormaTheme
+import com.habitflow.app.core.designsystem.component.FormaButton
+import com.habitflow.app.core.designsystem.component.FormaButtonStyle
+import com.habitflow.app.core.designsystem.component.FormaCard
+import com.habitflow.app.core.designsystem.component.FormaCheckbox
 import com.habitflow.app.domain.model.TimelineItem
 
 @Composable
@@ -52,7 +52,7 @@ fun InboxScreen(
     onNavigateToEditTask: (itemId: String) -> Unit,
     viewModel: InboxViewModel = hiltViewModel()
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     val inboxItems by viewModel.inboxItems.collectAsState()
 
     Scaffold(
@@ -84,7 +84,7 @@ fun InboxScreen(
             // Header
             Text(
                 text = "Inbox",
-                style = NotionTheme.typography.displayLarge,
+                style = FormaTheme.typography.displayLarge,
                 color = colors.textPrimary,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp)
@@ -120,7 +120,7 @@ fun EmptyInboxInspoState(
     onNewTask: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
 
     Column(
         modifier = modifier
@@ -149,7 +149,7 @@ fun EmptyInboxInspoState(
 
         Text(
             text = "Your Unstructured Thoughts",
-            style = NotionTheme.typography.headlineMedium,
+            style = FormaTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = colors.textPrimary,
             textAlign = TextAlign.Center
@@ -159,7 +159,7 @@ fun EmptyInboxInspoState(
 
         Text(
             text = "Capture tasks and thoughts as they come. Move them to your timeline when you're ready to schedule.",
-            style = NotionTheme.typography.bodyMedium,
+            style = FormaTheme.typography.bodyMedium,
             color = colors.textSecondary,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 12.dp)
@@ -168,10 +168,10 @@ fun EmptyInboxInspoState(
         Spacer(modifier = Modifier.height(28.dp))
 
         // Large Rounded Button matching inspo
-        NotionButton(
+        FormaButton(
             text = "+ New Inbox Task",
             onClick = onNewTask,
-            style = NotionButtonStyle.PRIMARY,
+            style = FormaButtonStyle.PRIMARY,
             modifier = Modifier
                 .fillMaxWidth(0.85f)
                 .height(48.dp)
@@ -187,11 +187,11 @@ fun InboxTaskRow(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
 
-    NotionCard(
+    FormaCard(
         modifier = modifier.fillMaxWidth(),
-        shape = NotionTheme.shapes.small,
+        shape = FormaTheme.shapes.small,
         onClick = onClick
     ) {
         Row(
@@ -203,7 +203,7 @@ fun InboxTaskRow(
                 modifier = Modifier.weight(1f),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                NotionCheckbox(
+                FormaCheckbox(
                     checked = item.completed,
                     onCheckedChange = { onToggle() }
                 )
@@ -213,13 +213,13 @@ fun InboxTaskRow(
                 Column {
                     Text(
                         text = item.title,
-                        style = NotionTheme.typography.titleMedium,
+                        style = FormaTheme.typography.titleMedium,
                         color = colors.textPrimary
                     )
                     if (item.notes.isNotBlank()) {
                         Text(
                             text = item.notes,
-                            style = NotionTheme.typography.bodySmall,
+                            style = FormaTheme.typography.bodySmall,
                             color = colors.textSecondary,
                             maxLines = 1
                         )

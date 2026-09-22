@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.today.components
+﻿package com.habitflow.app.ui.today.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -47,7 +47,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import kotlinx.coroutines.delay
 
 @Composable
@@ -58,7 +58,7 @@ fun DynamicStreakIsland(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
 
     val infiniteTransition = rememberInfiniteTransition(label = "flame_pulse")
     val flameScale by infiniteTransition.animateFloat(
@@ -140,7 +140,7 @@ fun DynamicStreakIsland(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 text = "${streakCount.coerceAtLeast(1)}-Day Flow Streak",
-                                style = NotionTheme.typography.titleMedium,
+                                style = FormaTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = colors.textPrimary,
                                 fontSize = 14.sp
@@ -154,7 +154,7 @@ fun DynamicStreakIsland(
                             ) {
                                 Text(
                                     text = "+1 Flow",
-                                    style = NotionTheme.typography.labelSmall,
+                                    style = FormaTheme.typography.labelSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = colors.onAccent,
                                     fontSize = 9.sp
@@ -166,7 +166,7 @@ fun DynamicStreakIsland(
 
                         Text(
                             text = "'$habitTitle' completed. Mindful progress logged.",
-                            style = NotionTheme.typography.bodySmall,
+                            style = FormaTheme.typography.bodySmall,
                             color = colors.textSecondary,
                             fontSize = 11.sp,
                             maxLines = 1

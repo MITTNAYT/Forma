@@ -5,6 +5,7 @@ import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.BarChart
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.rounded.TaskAlt
 import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.ui.graphics.vector.ImageVector
 import java.net.URLEncoder
@@ -15,6 +16,7 @@ sealed class Screen(
     val icon: ImageVector? = null
 ) {
     object Home : Screen("home", "Home", Icons.Rounded.Home)
+    object Habits : Screen("habits", "Habits", Icons.Rounded.TaskAlt)
     object Pomodoro : Screen("pomodoro", "Pomodoro", Icons.Rounded.Timer)
     object AddItem : Screen("add_item", "Add", Icons.Rounded.Add)
     object Analysis : Screen("analysis", "Analysis", Icons.Rounded.BarChart)
@@ -39,9 +41,8 @@ sealed class Screen(
     }
 
     companion object {
-        // Strict order: Home -> Pomodoro -> AddItem (+) -> Analysis -> Settings
-        // Using dynamic getter prevents classloader circular initialization NPE
+        // Strict 5 slots: Home -> Habits -> AddItem (+) -> Analysis -> Settings
         val bottomNavItems: List<Screen>
-            get() = listOf(Home, Pomodoro, AddItem, Analysis, Settings)
+            get() = listOf(Home, Habits, AddItem, Analysis, Settings)
     }
 }

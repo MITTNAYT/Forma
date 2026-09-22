@@ -34,15 +34,11 @@ android {
 
     signingConfigs {
         create("release") {
-            val keystoreFile = rootProject.file("habitflow-release.jks")
-            if (keystoreFile.exists()) {
-                storeFile = keystoreFile
-                storePassword = "habitflow2026"
-                keyAlias = "habitflow"
-                keyPassword = "habitflow2026"
-            } else {
-                initWith(getByName("debug"))
-            }
+            storeFile = System.getenv("KEYSTORE_PATH")?.let { file(it) }
+                ?: rootProject.file("habitflow-release.jks").takeIf { it.exists() }
+            storePassword = System.getenv("KEYSTORE_PASSWORD") ?: ""
+            keyAlias = System.getenv("KEY_ALIAS") ?: ""
+            keyPassword = System.getenv("KEY_PASSWORD") ?: ""
         }
     }
 
@@ -105,6 +101,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.7.6")
 
     // Hilt
     implementation(libs.hilt.android)

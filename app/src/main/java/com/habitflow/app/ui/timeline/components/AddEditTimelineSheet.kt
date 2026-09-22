@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.timeline.components
+﻿package com.habitflow.app.ui.timeline.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -71,7 +71,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import com.habitflow.app.core.designsystem.component.FormaBottomSheet
 import com.habitflow.app.core.designsystem.icon.FormaIcon
 import com.habitflow.app.core.designsystem.motion.FormaMotion
@@ -99,7 +99,7 @@ fun AddEditTimelineSheet(
     onDismiss: () -> Unit,
     viewModel: AddEditTimelineViewModel = hiltViewModel()
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     val haptic = LocalHapticFeedback.current
     val uiState by viewModel.uiState.collectAsState()
 
@@ -210,7 +210,7 @@ fun AddEditTimelineSheet(
                     ) {
                         Text(
                             text = label,
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                             color = textColor,
                             fontSize = 11.5.sp
@@ -276,7 +276,7 @@ fun AddEditTimelineSheet(
                         placeholder = {
                             Text(
                                 text = if (uiState.creationType == CreationType.HABIT) "Name your daily ritual..." else "What is the intention?",
-                                style = NotionTheme.typography.titleMedium,
+                                style = FormaTheme.typography.titleMedium,
                                 color = colors.textTertiary,
                                 fontSize = 15.sp
                             )
@@ -319,7 +319,7 @@ fun AddEditTimelineSheet(
                             unfocusedTextColor = colors.textPrimary,
                             cursorColor = parsedColor
                         ),
-                        textStyle = NotionTheme.typography.titleMedium.copy(
+                        textStyle = FormaTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp
                         ),
@@ -340,14 +340,14 @@ fun AddEditTimelineSheet(
                     ) {
                         Text(
                             text = if (uiState.title.length < 30) "Mindful & concise" else "Focused intention",
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             color = parsedColor.copy(alpha = 0.8f),
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Medium
                         )
                         Text(
                             text = "${uiState.title.length} chars",
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             color = colors.textTertiary,
                             fontSize = 10.sp
                         )
@@ -359,7 +359,7 @@ fun AddEditTimelineSheet(
                 // Color Swatch Bar
                 Text(
                     text = "COLOR ACCENT",
-                    style = NotionTheme.typography.labelSmall,
+                    style = FormaTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = colors.textTertiary,
                     letterSpacing = 1.sp,
@@ -438,7 +438,7 @@ fun AddEditTimelineSheet(
                         Spacer(modifier = Modifier.width(5.dp))
                         Text(
                             text = name,
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             fontWeight = FontWeight.Medium,
                             color = colors.textSecondary,
                             fontSize = 11.sp
@@ -462,7 +462,7 @@ fun AddEditTimelineSheet(
             Column {
                 Text(
                     text = "TIME OF DAY & RHYTHM",
-                    style = NotionTheme.typography.labelSmall,
+                    style = FormaTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = colors.textTertiary,
                     letterSpacing = 1.2.sp,
@@ -511,7 +511,7 @@ fun AddEditTimelineSheet(
                                 Spacer(modifier = Modifier.height(3.dp))
                                 Text(
                                     text = label,
-                                    style = NotionTheme.typography.labelSmall,
+                                    style = FormaTheme.typography.labelSmall,
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                                     color = if (isSelected) parsedColor else colors.textPrimary,
                                     fontSize = 9.5.sp
@@ -537,7 +537,7 @@ fun AddEditTimelineSheet(
             Column {
                 Text(
                     text = "NOTES & INTENTION",
-                    style = NotionTheme.typography.labelSmall,
+                    style = FormaTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = colors.textTertiary,
                     letterSpacing = 1.2.sp,
@@ -589,7 +589,7 @@ fun AddEditTimelineSheet(
         ) {
             Text(
                 text = if (uiState.isEditMode) "Save Changes" else if (uiState.creationType == CreationType.HABIT) "Save Forma Ritual" else "Save Focused Intention",
-                style = NotionTheme.typography.titleMedium,
+                style = FormaTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
                 fontSize = 15.sp

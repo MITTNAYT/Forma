@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.today.components
+﻿package com.habitflow.app.ui.today.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
@@ -51,7 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import kotlinx.coroutines.delay
 
 @Composable
@@ -60,7 +60,7 @@ fun StreakCelebrationOverlay(
     habitName: String,
     onDismiss: () -> Unit
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
 
     val cardScale = remember { Animatable(0.4f) }
     val rippleScale = remember { Animatable(0.5f) }
@@ -192,7 +192,7 @@ fun StreakCelebrationOverlay(
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
                                 text = "${streakCount.coerceAtLeast(1)} DAYS IN RHYTHM",
-                                style = NotionTheme.typography.labelSmall,
+                                style = FormaTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = colors.accent,
                                 letterSpacing = 1.2.sp,
@@ -205,7 +205,7 @@ fun StreakCelebrationOverlay(
 
                     Text(
                         text = "Momentum Flowing!",
-                        style = NotionTheme.typography.headlineMedium,
+                        style = FormaTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         color = colors.textPrimary,
                         fontSize = 22.sp,
@@ -216,7 +216,7 @@ fun StreakCelebrationOverlay(
 
                     Text(
                         text = "You've honored your commitment to '$habitName'. Mindful progress compounds daily.",
-                        style = NotionTheme.typography.bodyMedium,
+                        style = FormaTheme.typography.bodyMedium,
                         color = colors.textSecondary,
                         textAlign = TextAlign.Center,
                         fontSize = 13.sp,
@@ -237,7 +237,7 @@ fun StreakCelebrationOverlay(
                     ) {
                         Text(
                             text = "Keep The Loop Going",
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = colors.onAccent,
                             fontSize = 14.sp

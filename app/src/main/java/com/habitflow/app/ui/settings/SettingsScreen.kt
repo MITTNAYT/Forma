@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.settings
+﻿package com.habitflow.app.ui.settings
 
 import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
@@ -84,7 +84,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import com.habitflow.app.domain.repository.DarkModeOption
 import com.habitflow.app.domain.repository.PaletteFamily
 import com.habitflow.app.ui.settings.components.EncryptedVaultDialog
@@ -98,7 +98,7 @@ fun SettingsScreen(
     onNavigateToStats: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     val context = LocalContext.current
 
     val paletteFamily by viewModel.paletteFamily.collectAsState()
@@ -624,14 +624,14 @@ fun SettingsScreen(
                                 Column {
                                     Text(
                                         text = selectedAmbientSound.displayName,
-                                        style = NotionTheme.typography.titleMedium,
+                                        style = FormaTheme.typography.titleMedium,
                                         fontWeight = FontWeight.Bold,
                                         color = colors.textPrimary,
                                         fontSize = 15.sp
                                     )
                                     Text(
                                         text = selectedAmbientSound.description,
-                                        style = NotionTheme.typography.bodySmall,
+                                        style = FormaTheme.typography.bodySmall,
                                         color = colors.textSecondary,
                                         fontSize = 12.sp,
                                         maxLines = 1
@@ -667,7 +667,7 @@ fun SettingsScreen(
                                     )
                                     Text(
                                         text = if (isAmbientPlaying) "Stop" else "Play",
-                                        style = NotionTheme.typography.labelSmall,
+                                        style = FormaTheme.typography.labelSmall,
                                         color = if (isAmbientPlaying) Color.White else colors.accent,
                                         fontWeight = FontWeight.Bold
                                     )
@@ -682,7 +682,7 @@ fun SettingsScreen(
                         // Sound Selector Grid
                         Text(
                             text = "SOUNDSCAPE SELECTION",
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             color = colors.textTertiary,
                             fontSize = 10.sp,
                             letterSpacing = 0.8.sp,
@@ -740,7 +740,7 @@ fun SettingsScreen(
                                                 )
                                                 Text(
                                                     text = label,
-                                                    style = NotionTheme.typography.labelSmall,
+                                                    style = FormaTheme.typography.labelSmall,
                                                     color = if (isSelected) colors.accent else colors.textPrimary,
                                                     fontSize = 11.sp,
                                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
@@ -758,7 +758,7 @@ fun SettingsScreen(
                         // Sleep Timer Row
                         Text(
                             text = "SLEEP TIMER",
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             color = colors.textTertiary,
                             fontSize = 10.sp,
                             letterSpacing = 0.8.sp,
@@ -792,7 +792,7 @@ fun SettingsScreen(
                                 ) {
                                     Text(
                                         text = label,
-                                        style = NotionTheme.typography.labelSmall,
+                                        style = FormaTheme.typography.labelSmall,
                                         color = if (isSelected) colors.accent else colors.textPrimary,
                                         fontSize = 11.sp,
                                         fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal
@@ -986,7 +986,7 @@ fun SettingsScreen(
                 Column {
                     Text(
                         text = "Paste your exported JSON backup text below to restore your habits, completions, and reflections.",
-                        style = NotionTheme.typography.bodySmall,
+                        style = FormaTheme.typography.bodySmall,
                         color = colors.textSecondary,
                         fontSize = 12.sp
                     )
@@ -1076,7 +1076,7 @@ fun SettingsScreen(
 
 @Composable
 private fun SettingsSectionHeader(label: String, modifier: Modifier = Modifier) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     Text(
         text = label,
         fontWeight = FontWeight.Bold,
@@ -1089,7 +1089,7 @@ private fun SettingsSectionHeader(label: String, modifier: Modifier = Modifier) 
 
 @Composable
 private fun SettingsDivider(indent: Dp = 0.dp) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -1107,7 +1107,7 @@ private fun SettingsToggleRow(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -1165,7 +1165,7 @@ private fun SettingsTapRow(
     subtitle: String,
     onClick: () -> Unit
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     Row(
         modifier = Modifier
             .fillMaxWidth()

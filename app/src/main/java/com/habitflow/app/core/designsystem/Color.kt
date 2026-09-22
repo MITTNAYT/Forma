@@ -322,7 +322,8 @@ val LavenderDarkColorScheme = StructuredColorScheme(
     isDark = true
 )
 
-// Legacy Aliases
+// Aliases
+typealias FormaColorScheme = StructuredColorScheme
 typealias NotionColorScheme = StructuredColorScheme
 val DefaultSageColors = MatchaLightColorScheme
 val LightNotionColors = MatchaLightColorScheme

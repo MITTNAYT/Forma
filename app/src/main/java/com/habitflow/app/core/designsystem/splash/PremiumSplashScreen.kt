@@ -1,4 +1,4 @@
-package com.habitflow.app.core.designsystem.splash
+﻿package com.habitflow.app.core.designsystem.splash
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.CubicBezierEasing
@@ -33,7 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import com.habitflow.app.core.designsystem.component.FormaEmblem
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -50,7 +50,7 @@ import kotlinx.coroutines.launch
 fun PremiumSplashScreen(
     onAnimationFinished: () -> Unit
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
 
     // Wordmark + tagline animation values
     val wordmarkAlpha   = remember { Animatable(0f) }

@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.today.components
+﻿package com.habitflow.app.ui.today.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -45,7 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import com.habitflow.app.core.designsystem.icon.HabitFlowIcon
 import com.habitflow.app.domain.model.Subtask
 import com.habitflow.app.domain.model.TodayScheduleItem
@@ -64,7 +64,7 @@ fun HabitTaskDetailBottomSheet(
     onStartFocus: () -> Unit,
     onToggleSubtask: (subtaskId: String) -> Unit = {}
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     val haptic = LocalHapticFeedback.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -178,7 +178,7 @@ fun HabitTaskDetailBottomSheet(
                     Column {
                         Text(
                             text = if (item is TodayScheduleItem.HabitItem) "HABIT RITUAL" else "COMMITTED TASK",
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = colors.accent,
                             letterSpacing = 1.2.sp,
@@ -187,7 +187,7 @@ fun HabitTaskDetailBottomSheet(
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = title,
-                            style = NotionTheme.typography.headlineMedium,
+                            style = FormaTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold,
                             color = colors.textPrimary,
                             fontSize = 20.sp
@@ -242,14 +242,14 @@ fun HabitTaskDetailBottomSheet(
                     Column {
                         Text(
                             text = "Scheduled Time",
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             fontWeight = FontWeight.Medium,
                             color = colors.textTertiary,
                             fontSize = 11.sp
                         )
                         Text(
                             text = subtitle,
-                            style = NotionTheme.typography.titleMedium,
+                            style = FormaTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = colors.textPrimary,
                             fontSize = 14.sp
@@ -269,14 +269,14 @@ fun HabitTaskDetailBottomSheet(
                     Column {
                         Text(
                             text = "Frequency",
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             fontWeight = FontWeight.Medium,
                             color = colors.textTertiary,
                             fontSize = 11.sp
                         )
                         Text(
                             text = repeatLabel,
-                            style = NotionTheme.typography.titleMedium,
+                            style = FormaTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = colors.textPrimary,
                             fontSize = 14.sp
@@ -297,14 +297,14 @@ fun HabitTaskDetailBottomSheet(
                         Column {
                             Text(
                                 text = "Current Streak",
-                                style = NotionTheme.typography.labelSmall,
+                                style = FormaTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Medium,
                                 color = colors.textTertiary,
                                 fontSize = 11.sp
                             )
                             Text(
                                 text = "$streakCount Days in Flow",
-                                style = NotionTheme.typography.titleMedium,
+                                style = FormaTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = colors.textPrimary,
                                 fontSize = 14.sp
@@ -324,14 +324,14 @@ fun HabitTaskDetailBottomSheet(
                         Column {
                             Text(
                                 text = "Physical Cue (NFC)",
-                                style = NotionTheme.typography.labelSmall,
+                                style = FormaTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Medium,
                                 color = colors.textTertiary,
                                 fontSize = 11.sp
                             )
                             Text(
                                 text = "habitflow://habit/${item.habit.id}",
-                                style = NotionTheme.typography.labelMedium,
+                                style = FormaTheme.typography.labelMedium,
                                 fontWeight = FontWeight.SemiBold,
                                 color = colors.accent,
                                 fontSize = 12.sp
@@ -353,7 +353,7 @@ fun HabitTaskDetailBottomSheet(
                 ) {
                     Text(
                         text = "SUBTASKS",
-                        style = NotionTheme.typography.labelSmall,
+                        style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = colors.textTertiary,
                         letterSpacing = 1.2.sp,
@@ -361,7 +361,7 @@ fun HabitTaskDetailBottomSheet(
                     )
                     Text(
                         text = "$doneSubtasks of ${subtasks.size} done",
-                        style = NotionTheme.typography.labelSmall,
+                        style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = colors.accent,
                         fontSize = 11.sp
@@ -404,7 +404,7 @@ fun HabitTaskDetailBottomSheet(
                             Spacer(modifier = Modifier.width(10.dp))
                             Text(
                                 text = subtask.title,
-                                style = NotionTheme.typography.bodyMedium,
+                                style = FormaTheme.typography.bodyMedium,
                                 color = if (subtask.completed) colors.textTertiary else colors.textPrimary,
                                 textDecoration = if (subtask.completed) TextDecoration.LineThrough else TextDecoration.None,
                                 fontSize = 14.sp
@@ -419,7 +419,7 @@ fun HabitTaskDetailBottomSheet(
                 Spacer(modifier = Modifier.height(18.dp))
                 Text(
                     text = "NOTES & INTENTIONS",
-                    style = NotionTheme.typography.labelSmall,
+                    style = FormaTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = colors.textTertiary,
                     letterSpacing = 1.2.sp,
@@ -435,7 +435,7 @@ fun HabitTaskDetailBottomSheet(
                 ) {
                     Text(
                         text = notes,
-                        style = NotionTheme.typography.bodyMedium,
+                        style = FormaTheme.typography.bodyMedium,
                         color = colors.textSecondary,
                         fontSize = 13.sp
                     )
@@ -473,7 +473,7 @@ fun HabitTaskDetailBottomSheet(
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = "Edit",
-                            style = NotionTheme.typography.titleSmall,
+                            style = FormaTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold,
                             color = colors.textPrimary,
                             fontSize = 14.sp
@@ -504,7 +504,7 @@ fun HabitTaskDetailBottomSheet(
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = "Start Focus",
-                            style = NotionTheme.typography.titleSmall,
+                            style = FormaTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold,
                             color = colors.onAccent,
                             fontSize = 14.sp

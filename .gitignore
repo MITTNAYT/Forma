@@ -13,11 +13,25 @@
 .externalNativeBuild
 .cxx
 local.properties
+keystore.properties
 app/build/
 .idea/
 
-*.apk
+# Signing
+*.jks
+*.keystore
 *.aab
+*.apk
+
+# Build outputs
+/build
+app/build/
+
+# Secrets
+.env
+secrets.properties
+
 .kotlin/
 *.log
 *.png
+

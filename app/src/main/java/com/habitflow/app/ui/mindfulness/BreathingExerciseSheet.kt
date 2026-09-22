@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.mindfulness
+﻿package com.habitflow.app.ui.mindfulness
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -57,7 +57,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.habitflow.app.core.audio.ZenFeedbackManager
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import com.habitflow.app.core.designsystem.motion.formaPressEffect
 import kotlinx.coroutines.delay
 
@@ -101,7 +101,7 @@ fun BreathingExerciseSheet(
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 ) {
     val localContext = LocalContext.current
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
 
     var selectedTechnique by remember { mutableStateOf(BreathingTechnique.BOX_BREATHING) }
     var isRunning by remember { mutableStateOf(true) }
@@ -230,7 +230,7 @@ fun BreathingExerciseSheet(
                     Column {
                         Text(
                             text = "MINDFUL BREATHING",
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = colors.textTertiary,
                             letterSpacing = 1.2.sp,
@@ -238,7 +238,7 @@ fun BreathingExerciseSheet(
                         )
                         Text(
                             text = selectedTechnique.title,
-                            style = NotionTheme.typography.titleMedium,
+                            style = FormaTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = colors.textPrimary,
                             fontSize = 16.sp
@@ -291,7 +291,7 @@ fun BreathingExerciseSheet(
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
                                 text = tech.title,
-                                style = NotionTheme.typography.labelSmall,
+                                style = FormaTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = if (isSel) colors.accent else colors.textSecondary,
                                 fontSize = 12.sp
@@ -337,7 +337,7 @@ fun BreathingExerciseSheet(
                 ) {
                     Text(
                         text = currentPhase.instruction,
-                        style = NotionTheme.typography.titleMedium,
+                        style = FormaTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF2B3327), // Warm deep slate
                         fontSize = 17.sp,
@@ -346,7 +346,7 @@ fun BreathingExerciseSheet(
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
                         text = "$secondsInPhase s",
-                        style = NotionTheme.typography.bodySmall,
+                        style = FormaTheme.typography.bodySmall,
                         fontWeight = FontWeight.SemiBold,
                         color = Color(0xFF637852),
                         fontSize = 14.sp
@@ -368,13 +368,13 @@ fun BreathingExerciseSheet(
             ) {
                 Text(
                     text = "Cycles completed: ",
-                    style = NotionTheme.typography.bodySmall,
+                    style = FormaTheme.typography.bodySmall,
                     color = colors.textTertiary,
                     fontSize = 12.sp
                 )
                 Text(
                     text = "$completedCycles",
-                    style = NotionTheme.typography.bodySmall,
+                    style = FormaTheme.typography.bodySmall,
                     fontWeight = FontWeight.Bold,
                     color = colors.accent,
                     fontSize = 13.sp
@@ -443,7 +443,7 @@ fun BreathingExerciseSheet(
                 ) {
                     Text(
                         text = "Done",
-                        style = NotionTheme.typography.labelSmall,
+                        style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = colors.accent,
                         fontSize = 13.sp

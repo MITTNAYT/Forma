@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.reflection
+﻿package com.habitflow.app.ui.reflection
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -48,7 +48,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,7 +64,7 @@ fun EveningReflectionSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = NotionTheme.colors.background,
+        containerColor = FormaTheme.colors.background,
         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
     ) {
         Column(
@@ -86,13 +86,13 @@ fun EveningReflectionSheet(
                         modifier = Modifier
                             .size(40.dp)
                             .clip(CircleShape)
-                            .background(NotionTheme.colors.accentSoft),
+                            .background(FormaTheme.colors.accentSoft),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Rounded.Bedtime,
                             contentDescription = null,
-                            tint = NotionTheme.colors.accent,
+                            tint = FormaTheme.colors.accent,
                             modifier = Modifier.size(22.dp)
                         )
                     }
@@ -102,12 +102,12 @@ fun EveningReflectionSheet(
                             text = "Evening Sanctuary",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.SemiBold,
-                            color = NotionTheme.colors.textPrimary
+                            color = FormaTheme.colors.textPrimary
                         )
                         Text(
                             text = "Wind down and release the day",
                             fontSize = 12.sp,
-                            color = NotionTheme.colors.textSecondary
+                            color = FormaTheme.colors.textSecondary
                         )
                     }
                 }
@@ -115,7 +115,7 @@ fun EveningReflectionSheet(
                     Icon(
                         imageVector = Icons.Rounded.Close,
                         contentDescription = "Close",
-                        tint = NotionTheme.colors.textSecondary
+                        tint = FormaTheme.colors.textSecondary
                     )
                 }
             }
@@ -127,7 +127,7 @@ fun EveningReflectionSheet(
                 text = "Mindfulness & Flow Today",
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Medium,
-                color = NotionTheme.colors.textSecondary
+                color = FormaTheme.colors.textSecondary
             )
             Spacer(modifier = Modifier.height(8.dp))
             Row(
@@ -141,7 +141,7 @@ fun EveningReflectionSheet(
                         Icon(
                             imageVector = if (isFilled) Icons.Rounded.Star else Icons.Rounded.StarBorder,
                             contentDescription = "Rating $score",
-                            tint = if (isFilled) NotionTheme.colors.accent else NotionTheme.colors.textSecondary.copy(alpha = 0.4f),
+                            tint = if (isFilled) FormaTheme.colors.accent else FormaTheme.colors.textSecondary.copy(alpha = 0.4f),
                             modifier = Modifier.size(32.dp)
                         )
                     }
@@ -155,7 +155,7 @@ fun EveningReflectionSheet(
                 text = "One Gratitude Note",
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Medium,
-                color = NotionTheme.colors.textSecondary
+                color = FormaTheme.colors.textSecondary
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
@@ -165,7 +165,7 @@ fun EveningReflectionSheet(
                     Text(
                         text = "What brought you peace or joy today?",
                         fontSize = 13.sp,
-                        color = NotionTheme.colors.textSecondary.copy(alpha = 0.6f)
+                        color = FormaTheme.colors.textSecondary.copy(alpha = 0.6f)
                     )
                 },
                 modifier = Modifier
@@ -179,13 +179,13 @@ fun EveningReflectionSheet(
                     autoCorrectEnabled = true
                 ),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = NotionTheme.colors.accent,
-                    unfocusedBorderColor = NotionTheme.colors.border,
-                    focusedContainerColor = NotionTheme.colors.surfaceVariant.copy(alpha = 0.3f),
-                    unfocusedContainerColor = NotionTheme.colors.surfaceVariant.copy(alpha = 0.3f),
-                    focusedTextColor = NotionTheme.colors.textPrimary,
-                    unfocusedTextColor = NotionTheme.colors.textPrimary,
-                    cursorColor = NotionTheme.colors.accent
+                    focusedBorderColor = FormaTheme.colors.accent,
+                    unfocusedBorderColor = FormaTheme.colors.border,
+                    focusedContainerColor = FormaTheme.colors.surfaceVariant.copy(alpha = 0.3f),
+                    unfocusedContainerColor = FormaTheme.colors.surfaceVariant.copy(alpha = 0.3f),
+                    focusedTextColor = FormaTheme.colors.textPrimary,
+                    unfocusedTextColor = FormaTheme.colors.textPrimary,
+                    cursorColor = FormaTheme.colors.accent
                 )
             )
 
@@ -196,7 +196,7 @@ fun EveningReflectionSheet(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(12.dp))
-                    .background(NotionTheme.colors.surfaceVariant.copy(alpha = 0.35f))
+                    .background(FormaTheme.colors.surfaceVariant.copy(alpha = 0.35f))
                     .clickable { rolloverTasks = !rolloverTasks }
                     .padding(horizontal = 12.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -205,8 +205,8 @@ fun EveningReflectionSheet(
                     checked = rolloverTasks,
                     onCheckedChange = { rolloverTasks = it },
                     colors = CheckboxDefaults.colors(
-                        checkedColor = NotionTheme.colors.accent,
-                        checkmarkColor = NotionTheme.colors.onAccent
+                        checkedColor = FormaTheme.colors.accent,
+                        checkmarkColor = FormaTheme.colors.onAccent
                     )
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -215,12 +215,12 @@ fun EveningReflectionSheet(
                         text = "Mindful Rollover",
                         fontSize = 13.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = NotionTheme.colors.textPrimary
+                        color = FormaTheme.colors.textPrimary
                     )
                     Text(
                         text = "Shift today's unfinished tasks cleanly to tomorrow",
                         fontSize = 11.sp,
-                        color = NotionTheme.colors.textSecondary
+                        color = FormaTheme.colors.textSecondary
                     )
                 }
             }
@@ -236,8 +236,8 @@ fun EveningReflectionSheet(
                     .height(52.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = NotionTheme.colors.accent,
-                    contentColor = NotionTheme.colors.onAccent
+                    containerColor = FormaTheme.colors.accent,
+                    contentColor = FormaTheme.colors.onAccent
                 )
             ) {
                 Text(

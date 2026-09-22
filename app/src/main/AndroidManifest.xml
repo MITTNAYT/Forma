@@ -15,7 +15,7 @@
     <uses-feature android:name="android.hardware.nfc" android:required="false" />
 
     <application
-        android:name=".HabitFlowApplication"
+        android:name=".FormaApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -23,14 +23,14 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.HabitFlow"
+        android:theme="@style/Theme.Forma"
         tools:targetApi="35">
 
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.HabitFlow"
+            android:theme="@style/Theme.Forma"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -129,14 +129,14 @@
 
         <!-- Home Screen App Widget -->
         <receiver
-            android:name=".core.widget.HabitFlowWidgetProvider"
+            android:name=".core.widget.FormaWidgetProvider"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/habitflow_widget_info" />
+                android:resource="@xml/forma_widget_info" />
         </receiver>
 
         <!-- Ensō Ring 2x2 Widget -->

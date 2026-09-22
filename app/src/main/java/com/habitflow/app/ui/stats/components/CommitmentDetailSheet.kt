@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.stats.components
+﻿package com.habitflow.app.ui.stats.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -33,7 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import com.habitflow.app.domain.repository.FocusItemSummary
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,7 +43,7 @@ fun CommitmentDetailSheet(
     onDismiss: () -> Unit,
     onStartFocusSession: (FocusItemSummary) -> Unit
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
@@ -67,7 +67,7 @@ fun CommitmentDetailSheet(
                 Column {
                     Text(
                         text = if (item.isHabit) "RITUAL COMMITMENT" else "TASK COMMITMENT",
-                        style = NotionTheme.typography.labelSmall,
+                        style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = colors.accent,
                         letterSpacing = 1.2.sp,
@@ -76,7 +76,7 @@ fun CommitmentDetailSheet(
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = item.title,
-                        style = NotionTheme.typography.titleLarge,
+                        style = FormaTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = colors.textPrimary,
                         fontSize = 18.sp
@@ -123,7 +123,7 @@ fun CommitmentDetailSheet(
 
                             Text(
                                 text = "TOTAL FOCUS INVESTED",
-                                style = NotionTheme.typography.labelSmall,
+                                style = FormaTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = colors.textTertiary,
                                 fontSize = 10.sp,
@@ -132,7 +132,7 @@ fun CommitmentDetailSheet(
                             Spacer(modifier = Modifier.height(6.dp))
                             Text(
                                 text = timeStr,
-                                style = NotionTheme.typography.headlineLarge,
+                                style = FormaTheme.typography.headlineLarge,
                                 fontWeight = FontWeight.Bold,
                                 color = colors.textPrimary,
                                 fontSize = 32.sp
@@ -172,7 +172,7 @@ fun CommitmentDetailSheet(
                             Column {
                                 Text(
                                     text = "EST. SESSIONS",
-                                    style = NotionTheme.typography.labelSmall,
+                                    style = FormaTheme.typography.labelSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = colors.textTertiary,
                                     fontSize = 10.sp
@@ -180,7 +180,7 @@ fun CommitmentDetailSheet(
                                 Spacer(modifier = Modifier.height(2.dp))
                                 Text(
                                     text = "$estimatedSessions (~25m ea)",
-                                    style = NotionTheme.typography.bodyMedium,
+                                    style = FormaTheme.typography.bodyMedium,
                                     fontWeight = FontWeight.Bold,
                                     color = colors.textPrimary,
                                     fontSize = 13.sp
@@ -198,7 +198,7 @@ fun CommitmentDetailSheet(
                             Column {
                                 Text(
                                     text = "FLOW TIER",
-                                    style = NotionTheme.typography.labelSmall,
+                                    style = FormaTheme.typography.labelSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = colors.textTertiary,
                                     fontSize = 10.sp
@@ -206,7 +206,7 @@ fun CommitmentDetailSheet(
                                 Spacer(modifier = Modifier.height(2.dp))
                                 Text(
                                     text = if (item.totalMinutes >= 120) "Deep Mastery" else "Emerging Habit",
-                                    style = NotionTheme.typography.bodyMedium,
+                                    style = FormaTheme.typography.bodyMedium,
                                     fontWeight = FontWeight.Bold,
                                     color = colors.accent,
                                     fontSize = 13.sp
@@ -241,7 +241,7 @@ fun CommitmentDetailSheet(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "Start 25m Focus Session",
-                    style = NotionTheme.typography.labelLarge,
+                    style = FormaTheme.typography.labelLarge,
                     fontWeight = FontWeight.Bold,
                     fontSize = 15.sp
                 )

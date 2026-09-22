@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.stats.components
+﻿package com.habitflow.app.ui.stats.components
 
 import android.content.Intent
 import androidx.compose.foundation.background
@@ -45,9 +45,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.habitflow.app.core.designsystem.NotionTheme
-import com.habitflow.app.core.designsystem.component.NotionButton
-import com.habitflow.app.core.designsystem.component.NotionButtonStyle
+import com.habitflow.app.core.designsystem.FormaTheme
+import com.habitflow.app.core.designsystem.component.FormaButton
+import com.habitflow.app.core.designsystem.component.FormaButtonStyle
 import com.habitflow.app.domain.usecase.WeeklyZenRetro
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,7 +58,7 @@ fun WeeklyZenRetroSheet(
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 ) {
     val context = LocalContext.current
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -100,7 +100,7 @@ fun WeeklyZenRetroSheet(
                     Column {
                         Text(
                             text = "WEEKLY ZEN RETRO",
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = colors.accent,
                             letterSpacing = 1.2.sp,
@@ -108,7 +108,7 @@ fun WeeklyZenRetroSheet(
                         )
                         Text(
                             text = retro.weekDateRange,
-                            style = NotionTheme.typography.bodySmall,
+                            style = FormaTheme.typography.bodySmall,
                             color = colors.textSecondary,
                             fontSize = 12.sp
                         )
@@ -139,7 +139,7 @@ fun WeeklyZenRetroSheet(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = "Consistency Index",
-                        style = NotionTheme.typography.labelSmall,
+                        style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = colors.textTertiary,
                         letterSpacing = 1.sp,
@@ -148,14 +148,14 @@ fun WeeklyZenRetroSheet(
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
                         text = "${retro.consistencyScore}%",
-                        style = NotionTheme.typography.headlineLarge,
+                        style = FormaTheme.typography.headlineLarge,
                         fontWeight = FontWeight.Bold,
                         color = colors.accent,
                         fontSize = 44.sp
                     )
                     Text(
                         text = "\"${retro.zenAffirmation}\"",
-                        style = NotionTheme.typography.bodySmall,
+                        style = FormaTheme.typography.bodySmall,
                         color = colors.textSecondary,
                         fontSize = 12.sp,
                         textAlign = TextAlign.Center,
@@ -228,14 +228,14 @@ fun WeeklyZenRetroSheet(
                         Column {
                             Text(
                                 text = "TOP RITUAL ANCHOR",
-                                style = NotionTheme.typography.labelSmall,
+                                style = FormaTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = colors.accent,
                                 fontSize = 10.5.sp
                             )
                             Text(
                                 text = habit.name,
-                                style = NotionTheme.typography.titleSmall,
+                                style = FormaTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = colors.textPrimary,
                                 fontSize = 14.sp
@@ -267,7 +267,7 @@ fun WeeklyZenRetroSheet(
                         Column {
                             Text(
                                 text = "HABIT FRICTION DIAGNOSTIC",
-                                style = NotionTheme.typography.labelSmall,
+                                style = FormaTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = Color(0xFFB58900),
                                 fontSize = 10.5.sp
@@ -275,7 +275,7 @@ fun WeeklyZenRetroSheet(
                             Spacer(modifier = Modifier.height(2.dp))
                             Text(
                                 text = recommendation,
-                                style = NotionTheme.typography.bodySmall,
+                                style = FormaTheme.typography.bodySmall,
                                 color = Color(0xFF584A2B),
                                 fontSize = 12.sp,
                                 lineHeight = 16.sp
@@ -287,7 +287,7 @@ fun WeeklyZenRetroSheet(
             }
 
             // Share Button
-            NotionButton(
+            FormaButton(
                 text = "Share Weekly Zen Summary",
                 onClick = {
                     val shareText = """
@@ -307,7 +307,7 @@ fun WeeklyZenRetroSheet(
                     }
                     context.startActivity(Intent.createChooser(intent, "Share Weekly Zen Retro"))
                 },
-                style = NotionButtonStyle.PRIMARY,
+                style = FormaButtonStyle.PRIMARY,
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -322,7 +322,7 @@ private fun MetricCard(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     modifier: Modifier = Modifier
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(14.dp))
@@ -341,14 +341,14 @@ private fun MetricCard(
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = value,
-                style = NotionTheme.typography.titleMedium,
+                style = FormaTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = colors.textPrimary,
                 fontSize = 15.sp
             )
             Text(
                 text = title,
-                style = NotionTheme.typography.labelSmall,
+                style = FormaTheme.typography.labelSmall,
                 color = colors.textTertiary,
                 fontSize = 10.sp
             )

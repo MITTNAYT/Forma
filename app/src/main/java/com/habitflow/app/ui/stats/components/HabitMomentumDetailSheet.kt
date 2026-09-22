@@ -1,4 +1,4 @@
-package com.habitflow.app.ui.stats.components
+﻿package com.habitflow.app.ui.stats.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -32,7 +32,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.habitflow.app.core.designsystem.NotionTheme
+import com.habitflow.app.core.designsystem.FormaTheme
 import com.habitflow.app.core.designsystem.icon.HabitFlowIcon
 import com.habitflow.app.domain.model.HabitStreakInfo
 
@@ -42,7 +42,7 @@ fun HabitMomentumDetailSheet(
     streakInfo: HabitStreakInfo,
     onDismiss: () -> Unit
 ) {
-    val colors = NotionTheme.colors
+    val colors = FormaTheme.colors
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
@@ -87,7 +87,7 @@ fun HabitMomentumDetailSheet(
                     Column {
                         Text(
                             text = "RITUAL HEALTH & MOMENTUM",
-                            style = NotionTheme.typography.labelSmall,
+                            style = FormaTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = colors.accent,
                             letterSpacing = 1.1.sp,
@@ -96,7 +96,7 @@ fun HabitMomentumDetailSheet(
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = streakInfo.habitName,
-                            style = NotionTheme.typography.titleLarge,
+                            style = FormaTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = colors.textPrimary,
                             fontSize = 18.sp
@@ -140,7 +140,7 @@ fun HabitMomentumDetailSheet(
                         Column {
                             Text(
                                 text = "CONSISTENCY HEALTH",
-                                style = NotionTheme.typography.labelSmall,
+                                style = FormaTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = colors.textTertiary,
                                 fontSize = 10.sp,
@@ -149,7 +149,7 @@ fun HabitMomentumDetailSheet(
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = "${streakInfo.completionRatePercentage}% Rate",
-                                style = NotionTheme.typography.headlineLarge,
+                                style = FormaTheme.typography.headlineLarge,
                                 fontWeight = FontWeight.Bold,
                                 color = colors.textPrimary,
                                 fontSize = 28.sp
@@ -164,7 +164,7 @@ fun HabitMomentumDetailSheet(
                         ) {
                             Text(
                                 text = if (streakInfo.completionRatePercentage >= 80) "Optimal Rhythm" else "Forming Habit",
-                                style = NotionTheme.typography.labelSmall,
+                                style = FormaTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = colors.accent,
                                 fontSize = 11.sp
@@ -218,14 +218,14 @@ fun HabitMomentumDetailSheet(
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "${streakInfo.currentStreak}d",
-                            style = NotionTheme.typography.titleLarge,
+                            style = FormaTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = colors.textPrimary,
                             fontSize = 20.sp
                         )
                         Text(
                             text = "Current",
-                            style = NotionTheme.typography.bodySmall,
+                            style = FormaTheme.typography.bodySmall,
                             color = colors.textTertiary,
                             fontSize = 11.sp
                         )
@@ -250,14 +250,14 @@ fun HabitMomentumDetailSheet(
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "${streakInfo.longestStreak}d",
-                            style = NotionTheme.typography.titleLarge,
+                            style = FormaTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = colors.textPrimary,
                             fontSize = 20.sp
                         )
                         Text(
                             text = "Best Record",
-                            style = NotionTheme.typography.bodySmall,
+                            style = FormaTheme.typography.bodySmall,
                             color = colors.textTertiary,
                             fontSize = 11.sp
                         )
@@ -282,14 +282,14 @@ fun HabitMomentumDetailSheet(
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "${streakInfo.totalCompletions}",
-                            style = NotionTheme.typography.titleLarge,
+                            style = FormaTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = colors.textPrimary,
                             fontSize = 20.sp
                         )
                         Text(
                             text = "Completions",
-                            style = NotionTheme.typography.bodySmall,
+                            style = FormaTheme.typography.bodySmall,
                             color = colors.textTertiary,
                             fontSize = 11.sp
                         )
