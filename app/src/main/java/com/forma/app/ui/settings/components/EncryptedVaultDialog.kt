@@ -1,4 +1,4 @@
-﻿package com.forma.app.ui.settings.components
+package com.forma.app.ui.settings.components
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -147,8 +147,8 @@ fun EncryptedVaultDialog(
                             encryptedPayload = it
                             errorMessage = null
                         },
-                        label = { Text("Encrypted Vault Envelope (.habitvault)", fontSize = 12.sp) },
-                        placeholder = { Text("--- HABITFLOW ENCRYPTED VAULT V1 --- ...", fontSize = 11.sp) },
+                        label = { Text("Encrypted Vault Envelope (.formavault)", fontSize = 12.sp) },
+                        placeholder = { Text("--- FORMA ENCRYPTED VAULT V1 --- ...", fontSize = 11.sp) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(110.dp),

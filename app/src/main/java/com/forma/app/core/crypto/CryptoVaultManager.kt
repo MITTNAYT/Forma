@@ -1,4 +1,4 @@
-﻿package com.forma.app.core.crypto
+package com.forma.app.core.crypto
 
 import android.util.Base64
 import org.json.JSONObject
@@ -17,7 +17,8 @@ import javax.crypto.spec.SecretKeySpec
  */
 object CryptoVaultManager {
 
-    private const val HEADER_MAGIC = "--- HABITFLOW ENCRYPTED VAULT V1 ---"
+    private const val HEADER_MAGIC = "--- FORMA ENCRYPTED VAULT V1 ---"
+    private const val LEGACY_HEADER_MAGIC = "--- HABITFLOW ENCRYPTED VAULT V1 ---"
     private const val ITERATIONS = 65536
     private const val KEY_LENGTH_BITS = 256
     private const val SALT_LENGTH_BYTES = 16
@@ -38,14 +39,14 @@ object CryptoVaultManager {
         // 3. Derive AES-256 Key via PBKDF2-HMAC-SHA256
         val keySpec = PBEKeySpec(passphrase, salt, ITERATIONS, KEY_LENGTH_BITS)
         val keyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
-        val secretKeyBytes = keyFactory.generateSecret(keySpec).encoded
-        val secretKey = SecretKeySpec(secretKeyBytes, "AES")
+        val keyBytes = keyFactory.generateSecret(keySpec).encoded
+        val secretKey = SecretKeySpec(keyBytes, "AES")
 
-        // 4. Encrypt with AES-GCM
+        // 4. Encrypt using AES-256-GCM
         val cipher = Cipher.getInstance("AES/GCM/NoPadding")
         val gcmSpec = GCMParameterSpec(GCM_TAG_LENGTH_BITS, iv)
         cipher.init(Cipher.ENCRYPT_MODE, secretKey, gcmSpec)
-        val cipherText = cipher.doFinal(plainText.toByteArray(StandardCharsets.UTF_8))
+        val cipherText = cipher.doFinal(plainText.toByteArray(Charsets.UTF_8))
 
         // 5. Build envelope JSON
         val envelope = JSONObject().apply {
@@ -64,10 +65,10 @@ object CryptoVaultManager {
     fun decrypt(encryptedEnvelope: String, passphrase: CharArray): Result<String> {
         return runCatching {
             val cleaned = encryptedEnvelope.trim()
-            val jsonStr = if (cleaned.startsWith(HEADER_MAGIC)) {
-                cleaned.removePrefix(HEADER_MAGIC).trim()
-            } else {
-                cleaned
+            val jsonStr = when {
+                cleaned.startsWith(HEADER_MAGIC) -> cleaned.removePrefix(HEADER_MAGIC).trim()
+                cleaned.startsWith(LEGACY_HEADER_MAGIC) -> cleaned.removePrefix(LEGACY_HEADER_MAGIC).trim()
+                else -> cleaned
             }
 
             val json = JSONObject(jsonStr)

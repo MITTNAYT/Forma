@@ -1,4 +1,4 @@
-﻿package com.forma.app.data.repository
+package com.forma.app.data.repository
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -21,7 +21,7 @@ import java.time.temporal.TemporalAdjusters
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private val Context.focusDataStore: DataStore<Preferences> by preferencesDataStore(name = "habitflow_focus_sessions")
+private val Context.focusDataStore: DataStore<Preferences> by preferencesDataStore(name = "forma_focus_sessions")
 
 @Singleton
 class FocusTrackerRepositoryImpl @Inject constructor(

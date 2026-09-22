@@ -1,4 +1,4 @@
-﻿package com.forma.app.core.share
+package com.forma.app.core.share
 
 import android.content.Context
 import android.content.Intent
@@ -57,7 +57,7 @@ object MilestoneCardExporter {
             }
             canvas.drawRoundRect(RectF(margin + 20f, margin + 20f, width - margin - 20f, height - margin - 20f), 36f, 36f, innerBorder)
 
-            // 3. Top Stamp Watermark: "HABITFLOW • RITUAL MASTERY"
+            // 3. Top Stamp Watermark: "FORMA • RITUAL MASTERY"
             val topLabelPaint = Paint().apply {
                 color = Color.rgb(78, 101, 66)
                 textSize = 36f
@@ -66,7 +66,7 @@ object MilestoneCardExporter {
                 textAlign = Paint.Align.CENTER
                 isAntiAlias = true
             }
-            canvas.drawText("HABITFLOW  •  MINDFUL RHYTHM", width / 2f, 260f, topLabelPaint)
+            canvas.drawText("FORMA  •  MINDFUL RHYTHM", width / 2f, 260f, topLabelPaint)
 
             // 4. Central Ensō Circle (Matcha Green Ring)
             val ensoPaint = Paint().apply {
@@ -138,7 +138,7 @@ object MilestoneCardExporter {
                 textAlign = Paint.Align.CENTER
                 isAntiAlias = true
             }
-            canvas.drawText("CRAFTED WITH HABITFLOW V2", width / 2f, 1750f, footerPaint)
+            canvas.drawText("CRAFTED WITH FORMA", width / 2f, 1750f, footerPaint)
 
             // 8. Save to cache and construct share intent
             val shareDir = File(context.cacheDir, "shared")

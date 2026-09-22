@@ -1,8 +1,8 @@
-﻿package com.forma.app.core.util
+package com.forma.app.core.util
 
 object Constants {
-    const val DATABASE_NAME = "habitflow_db"
-    const val PREFERENCES_NAME = "habitflow_preferences"
+    const val DATABASE_NAME = "forma_db"
+    const val PREFERENCES_NAME = "forma_preferences"
 
     const val NOTIFICATION_CHANNEL_HABITS_ID = "forma_habits_channel"
     const val NOTIFICATION_CHANNEL_HABITS_NAME = "Forma Ritual Reminders"

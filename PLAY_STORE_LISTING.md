@@ -1,4 +1,4 @@
-﻿# Forma: Zen Rituals & Focus — Google Play Store Listing Package
+# Forma: Zen Rituals & Focus — Google Play Store Listing Package
 
 ---
 
@@ -24,7 +24,7 @@ Forma is a Japanese minimalism-inspired daily architecture app designed to help 
 No noisy feeds. No intrusive popups. Zero data tracking. Just pure intention, mindful pacing, and aesthetic clarity.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🌿 CORE PILLARS OF HABITFLOW
+🌿 CORE PILLARS OF FORMA
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 1. ⚡ UNLIMITED RITUALS & HABIT STACKING

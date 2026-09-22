@@ -1,4 +1,4 @@
-﻿package com.forma.app.core.nfc
+package com.forma.app.core.nfc
 
 import android.app.Activity
 import android.content.Context
@@ -39,7 +39,7 @@ class NfcManager @Inject constructor() {
         if (uriString.isNullOrBlank()) return null
         return try {
             val uri = Uri.parse(uriString)
-            if (uri.scheme == "habitflow") {
+            if (uri.scheme == "forma" || uri.scheme == "habitflow") {
                 val host = uri.host ?: ""
                 val id = uri.lastPathSegment ?: ""
                 if (id.isNotBlank()) {
