@@ -5,32 +5,50 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- 1. Inner Jade Meditation Plateau Disc (#EDF3EB with #9FB399 border) -->
+    <!-- Soft Ambient Drop Shadow for Outer Disc -->
     <path
-        android:fillColor="#EDF3EB"
-        android:strokeColor="#9FB399"
-        android:strokeWidth="1.2"
-        android:pathData="M 54,34.5 A 19.5,19.5 0 1,1 53.99,34.5 Z" />
+        android:fillColor="#152B381A"
+        android:pathData="M 55,18 A 39,39 0 1,1 54.99,18 Z" />
+    <path
+        android:fillColor="#222B381A"
+        android:pathData="M 54.5,16.5 A 39,39 0 1,1 54.49,16.5 Z" />
 
-    <!-- 2. Subtle Concentric Aura Ring (#C4D4C0) -->
+    <!-- 1. Outer Elevated Base Disc (Warm Clean White/Cream) -->
     <path
-        android:strokeColor="#C4D4C0"
-        android:strokeWidth="0.9"
-        android:pathData="M 54,41.5 A 12.5,12.5 0 1,1 53.99,41.5 Z" />
+        android:fillColor="#FDFCFA"
+        android:strokeColor="#E4E8DF"
+        android:strokeWidth="0.8"
+        android:pathData="M 54,15 A 39,39 0 1,1 53.99,15 Z" />
 
-    <!-- 3. The Pure Zen Ensō Arc (Deep Matcha #4E6542, 4K Vector Precision) -->
+    <!-- 2. Outer Sculptural Olive Arc (Matching Attached User Logo) -->
     <path
-        android:strokeColor="#4E6542"
-        android:strokeWidth="8.6"
+        android:strokeColor="#4E612B"
+        android:strokeWidth="9.2"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
-        android:pathData="M 78.11,63.74 A 26,26 0 1,1 78.11,44.26" />
+        android:pathData="M 62.4,22.6 A 32.5,32.5 0 1,0 82.1,70.25" />
 
-    <!-- 4. Concentric Zen Core Ring (#4E6542 on #F7F8F4) -->
+    <!-- Soft Drop Shadow for Middle Raised Disc -->
     <path
-        android:fillColor="#F7F8F4"
-        android:strokeColor="#4E6542"
-        android:strokeWidth="1.6"
-        android:pathData="M 54,50.4 A 3.6,3.6 0 1,1 53.99,50.4 Z" />
+        android:fillColor="#182B381A"
+        android:pathData="M 55,32.5 A 23,23 0 1,1 54.99,32.5 Z" />
+
+    <!-- 3. Middle Raised Disc (Pure Clean White Platform) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#E6EAE2"
+        android:strokeWidth="0.8"
+        android:pathData="M 54,31 A 23,23 0 1,1 53.99,31 Z" />
+
+    <!-- 4. Middle Olive Ring (Full Concentric Ring) -->
+    <path
+        android:strokeColor="#4E612B"
+        android:strokeWidth="5.2"
+        android:pathData="M 54,40 A 14,14 0 1,1 53.99,40 Z" />
+
+    <!-- 5. Center Olive Solid Core Dot -->
+    <path
+        android:fillColor="#4E612B"
+        android:pathData="M 54,48.5 A 5.5,5.5 0 1,1 53.99,48.5 Z" />
 
 </vector>

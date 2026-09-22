@@ -1,4 +1,4 @@
-﻿package com.habitflow.app.core.designsystem.splash
+package com.habitflow.app.core.designsystem.splash
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.CubicBezierEasing
@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,7 +28,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,18 +39,18 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
- * PremiumSplashScreen – Forma's living opening sequence.
+ * PremiumSplashScreen – Forma's living sculptural opening sequence.
  *
- * Rendered in the serene Matcha & Oat theme (or user's active theme).
- * The FormaEmblem plays its full luminous-draw + heartbeat + breathing-aura sequence,
- * then the FORMA wordmark slides up with staggered letter-tracking, and finally
- * the tagline fades in. Tap anywhere to skip.
+ * Rendered in the serene Matcha & Oat theme (or active theme).
+ * Features the physical layered concentric emblem assembly sequence,
+ * followed by the FORMA wordmark and mindful tagline. Tap anywhere to skip.
  */
 @Composable
 fun PremiumSplashScreen(
     onAnimationFinished: () -> Unit
 ) {
     val colors = FormaTheme.colors
+    val haptic = LocalHapticFeedback.current
 
     // Wordmark + tagline animation values
     val wordmarkAlpha   = remember { Animatable(0f) }
@@ -61,9 +61,11 @@ fun PremiumSplashScreen(
     val dividerWidth    = remember { Animatable(0f) }
 
     LaunchedEffect(Unit) {
-        // Emblem animation runs for ~1700 ms (draw 1200 + bloom & heartbeat)
-        // Wordmark appears in sync with the bloom
-        delay(1300)
+        // Subtle haptic cue as the emblem settles and ripple radiates
+        delay(1150)
+        try {
+            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+        } catch (_: Exception) {}
 
         // Divider hairline sweeps in
         launch { dividerAlpha.animateTo(1f, tween(300)) }
@@ -73,9 +75,9 @@ fun PremiumSplashScreen(
                 animationSpec = tween(400, easing = FastOutSlowInEasing)
             )
         }
-        delay(150)
+        delay(120)
 
-        // HABITFLOW wordmark rises
+        // FORMA wordmark rises
         launch { wordmarkAlpha.animateTo(1f, tween(400, easing = FastOutSlowInEasing)) }
         launch {
             wordmarkY.animateTo(
@@ -91,11 +93,11 @@ fun PremiumSplashScreen(
         }
 
         // Tagline soft fade
-        delay(400)
+        delay(350)
         taglineAlpha.animateTo(1f, tween(500, easing = FastOutSlowInEasing))
 
-        // Linger, then dismiss
-        delay(2200)
+        // Linger, then proceed to app
+        delay(2000)
         onAnimationFinished()
     }
 
@@ -114,16 +116,17 @@ fun PremiumSplashScreen(
             verticalArrangement = Arrangement.Center
         ) {
 
-            // Animated Forma Emblem (owns its own bloom → draw → heartbeat → ring sequence)
+            // Sculptural Tactile Concentric Logo Assembly
             FormaEmblem(
-                size = 128.dp,
+                size = 136.dp,
                 animated = true,
                 glyphColor = colors.accent,
                 auraColor = colors.accentSoft,
-                pearlColor = colors.surface
+                discBaseColor = colors.surface,
+                pearlColor = colors.onAccent
             )
 
-            Spacer(modifier = Modifier.height(28.dp))
+            Spacer(modifier = Modifier.height(30.dp))
 
             // Precision hairline divider
             Box(
@@ -136,7 +139,7 @@ fun PremiumSplashScreen(
 
             Spacer(modifier = Modifier.height(18.dp))
 
-            // FORMA Zen Wordmark
+            // FORMA Wordmark
             Box(
                 modifier = Modifier
                     .alpha(wordmarkAlpha.value)

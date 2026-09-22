@@ -5,34 +5,41 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- 1. Inner Jade Meditation Plateau Disc -->
+    <!-- Outer Elevated Base Disc -->
+    <path
+        android:fillColor="#000000"
+        android:fillAlpha="0.08"
+        android:strokeColor="#000000"
+        android:strokeWidth="0.8"
+        android:strokeAlpha="0.3"
+        android:pathData="M 54,15 A 39,39 0 1,1 53.99,15 Z" />
+
+    <!-- Outer Sculptural Arc -->
+    <path
+        android:strokeColor="#000000"
+        android:strokeWidth="9.2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M 62.4,22.6 A 32.5,32.5 0 1,0 82.1,70.25" />
+
+    <!-- Middle Raised Disc -->
     <path
         android:fillColor="#000000"
         android:fillAlpha="0.12"
         android:strokeColor="#000000"
-        android:strokeAlpha="0.30"
-        android:strokeWidth="1.2"
-        android:pathData="M 54,34.5 A 19.5,19.5 0 1,1 53.99,34.5 Z" />
+        android:strokeWidth="0.8"
+        android:strokeAlpha="0.3"
+        android:pathData="M 54,31 A 23,23 0 1,1 53.99,31 Z" />
 
-    <!-- 2. Subtle Concentric Aura Ring -->
+    <!-- Middle Concentric Ring -->
     <path
         android:strokeColor="#000000"
-        android:strokeAlpha="0.20"
-        android:strokeWidth="0.9"
-        android:pathData="M 54,41.5 A 12.5,12.5 0 1,1 53.99,41.5 Z" />
+        android:strokeWidth="5.2"
+        android:pathData="M 54,40 A 14,14 0 1,1 53.99,40 Z" />
 
-    <!-- 3. The Pure Zen Ensō Arc -->
+    <!-- Center Core Dot -->
     <path
-        android:strokeColor="#000000"
-        android:strokeWidth="8.6"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round"
-        android:pathData="M 78.11,63.74 A 26,26 0 1,1 78.11,44.26" />
-
-    <!-- 4. Concentric Zen Core Ring -->
-    <path
-        android:strokeColor="#000000"
-        android:strokeWidth="1.6"
-        android:pathData="M 54,50.4 A 3.6,3.6 0 1,1 53.99,50.4 Z" />
+        android:fillColor="#000000"
+        android:pathData="M 54,48.5 A 5.5,5.5 0 1,1 53.99,48.5 Z" />
 
 </vector>

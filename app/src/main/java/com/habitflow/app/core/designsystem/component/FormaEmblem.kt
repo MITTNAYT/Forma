@@ -1,9 +1,7 @@
-﻿package com.habitflow.app.core.designsystem.component
+package com.habitflow.app.core.designsystem.component
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.CubicBezierEasing
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
@@ -38,11 +36,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
- * FormaEmblem – The Zen Ensō of Forma.
+ * FormaEmblem – The Physical Tactile Concentric Zen Logo of Forma.
  *
- * Inspired by the Japanese Ensō (円相) — an organic, mindful circular stroke
- * representing presence, tranquility, and the beauty of continuous daily ritual.
- * Its open aperture symbolizes room for growth, flow, and the infinite horizon.
+ * Modeled after the sculptural layered concentric relief emblem:
+ * 1. Elevated Base Disc (Warm Off-White with soft cast shadow)
+ * 2. Outer Sculptural Olive Arc (~280° sweep with rounded caps)
+ * 3. Elevated Middle Disc (Clean White raised plateau with cast shadow)
+ * 4. Concentric Middle Olive Ring
+ * 5. Center Solid Olive Core Dot
  */
 @Composable
 fun FormaEmblem(
@@ -51,31 +52,32 @@ fun FormaEmblem(
     animated: Boolean = false,
     glyphColor: Color = FormaTheme.colors.accent,
     auraColor: Color = FormaTheme.colors.accentSoft,
+    discBaseColor: Color = FormaTheme.colors.surface,
     pearlColor: Color = FormaTheme.colors.onAccent
 ) {
     // ── Continuous Zen Breathing Aura ──────────────────────────────
     val infiniteTransition = rememberInfiniteTransition(label = "zen_breathe")
     val auraBreath by infiniteTransition.animateFloat(
-        initialValue = 0.92f,
-        targetValue = 1.12f,
+        initialValue = 0.94f,
+        targetValue = 1.10f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 3200, easing = CubicBezierEasing(0.4f, 0f, 0.6f, 1f)),
+            animation = tween(durationMillis = 3400, easing = CubicBezierEasing(0.4f, 0f, 0.6f, 1f)),
             repeatMode = RepeatMode.Reverse
         ),
         label = "auraBreath"
     )
     val auraAlpha by infiniteTransition.animateFloat(
-        initialValue = 0.35f,
-        targetValue = 0.65f,
+        initialValue = 0.25f,
+        targetValue = 0.55f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 3200, easing = CubicBezierEasing(0.4f, 0f, 0.6f, 1f)),
+            animation = tween(durationMillis = 3400, easing = CubicBezierEasing(0.4f, 0f, 0.6f, 1f)),
             repeatMode = RepeatMode.Reverse
         ),
         label = "auraAlpha"
     )
     val centerPebblePulse by infiniteTransition.animateFloat(
-        initialValue = 0.95f,
-        targetValue = 1.05f,
+        initialValue = 0.98f,
+        targetValue = 1.03f,
         animationSpec = infiniteRepeatable(
             animation = tween(durationMillis = 2800, easing = CubicBezierEasing(0.4f, 0f, 0.6f, 1f)),
             repeatMode = RepeatMode.Reverse
@@ -83,43 +85,86 @@ fun FormaEmblem(
         label = "pebblePulse"
     )
 
-    // ── Intro Animation Sequence ───────────────────────────────────
-    val drawProgress = remember { Animatable(if (animated) 0f else 1f) }
-    val brushTipAlpha = remember { Animatable(if (animated) 0f else 0f) }
+    // ── Opening Animation Sequence ─────────────────────────────────
+    val discScale = remember { Animatable(if (animated) 0.82f else 1f) }
+    val discAlpha = remember { Animatable(if (animated) 0f else 1f) }
+    val centerDotScale = remember { Animatable(if (animated) 0f else 1f) }
+    val middleRingScale = remember { Animatable(if (animated) 0f else 1f) }
+    val arcDrawProgress = remember { Animatable(if (animated) 0f else 1f) }
+    val arcTipAlpha = remember { Animatable(if (animated) 0f else 0f) }
     val rippleRadius = remember { Animatable(0f) }
     val rippleAlpha = remember { Animatable(0f) }
     val settleScale = remember { Animatable(1f) }
-    val glyphAlpha = remember { Animatable(if (animated) 0f else 1f) }
 
     if (animated) {
         LaunchedEffect(Unit) {
-            launch { glyphAlpha.animateTo(1f, tween(180)) }
-
-            // 1. Mindful Ensō brush sweep
+            // 1. Base discs rise with soft spring
             launch {
-                brushTipAlpha.animateTo(1f, tween(200))
-                drawProgress.animateTo(
+                discAlpha.animateTo(1f, tween(350))
+            }
+            launch {
+                discScale.animateTo(
                     targetValue = 1f,
-                    animationSpec = tween(1350, easing = CubicBezierEasing(0.25f, 0.1f, 0.15f, 1f))
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioLowBouncy,
+                        stiffness = Spring.StiffnessLow
+                    )
                 )
-                brushTipAlpha.animateTo(0f, tween(250))
             }
 
-            // 2. Zen water ripple radiates from center when stroke finishes
-            delay(1300)
+            // 2. Center dot blossoms
+            delay(150)
             launch {
-                rippleAlpha.animateTo(0.55f, tween(120))
+                centerDotScale.animateTo(
+                    targetValue = 1f,
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessMediumLow
+                    )
+                )
+            }
+
+            // 3. Middle ring blossoms
+            delay(120)
+            launch {
+                middleRingScale.animateTo(
+                    targetValue = 1f,
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessLow
+                    )
+                )
+            }
+
+            // 4. Outer sculptural arc sweeps around circumference
+            delay(180)
+            launch {
+                arcTipAlpha.animateTo(1f, tween(180))
+                arcDrawProgress.animateTo(
+                    targetValue = 1f,
+                    animationSpec = tween(
+                        durationMillis = 1150,
+                        easing = CubicBezierEasing(0.22f, 0.0f, 0.18f, 1f)
+                    )
+                )
+                arcTipAlpha.animateTo(0f, tween(200))
+            }
+
+            // 5. Zen water ripple radiates from center when arc concludes
+            delay(1150)
+            launch {
+                rippleAlpha.animateTo(0.45f, tween(100))
                 launch {
                     rippleRadius.animateTo(1f, tween(750, easing = CubicBezierEasing(0.15f, 0f, 0.25f, 1f)))
                 }
-                delay(250)
-                rippleAlpha.animateTo(0f, tween(500))
+                delay(220)
+                rippleAlpha.animateTo(0f, tween(480))
             }
 
-            // 3. Gentle settling inertia
+            // 6. Gentle settling breath
             launch {
                 settleScale.animateTo(
-                    targetValue = 1.035f,
+                    targetValue = 1.025f,
                     animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessLow)
                 )
                 settleScale.animateTo(
@@ -140,127 +185,192 @@ fun FormaEmblem(
             val cx = w / 2f
             val cy = h / 2f
 
-            val strokeWidth = w * 0.098f
-            val ss = settleScale.value
-            val ga = glyphAlpha.value
-
-            // ── 1. Serene Breathing Ambient Aura ───────────────────────
-            val auraR = w * 0.46f * auraBreath
-            drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(
-                        auraColor.copy(alpha = auraAlpha * ga),
-                        auraColor.copy(alpha = 0f)
-                    ),
-                    center = Offset(cx, cy),
-                    radius = auraR
-                ),
-                radius = auraR,
-                center = Offset(cx, cy)
-            )
-
-            // ── 2. Expanding Zen Water Ripple ──────────────────────────
-            if (rippleAlpha.value > 0f) {
-                val rr = w * 0.50f * rippleRadius.value
-                drawCircle(
-                    color = glyphColor.copy(alpha = rippleAlpha.value * 0.5f),
-                    radius = rr.coerceAtLeast(1f),
-                    center = Offset(cx, cy),
-                    style = Stroke(width = strokeWidth * 0.16f)
-                )
-            }
+            val overallScale = settleScale.value * discScale.value
+            val globalAlpha = discAlpha.value
 
             withTransform({
-                scale(ss, ss, Offset(cx, cy))
+                scale(overallScale, overallScale, Offset(cx, cy))
             }) {
-                // ── 3. Inner Pale Jade Disc (Plateau) ──────────────────
-                val innerRadius = w * 0.218f
+                // ── 1. Serene Ambient Aura ─────────────────────────────
+                val auraR = w * 0.48f * auraBreath
                 drawCircle(
-                    color = Color(0xFFEDF3EB).copy(alpha = ga),
-                    radius = innerRadius,
+                    brush = Brush.radialGradient(
+                        colors = listOf(
+                            auraColor.copy(alpha = auraAlpha * globalAlpha),
+                            auraColor.copy(alpha = 0f)
+                        ),
+                        center = Offset(cx, cy),
+                        radius = auraR
+                    ),
+                    radius = auraR,
                     center = Offset(cx, cy)
                 )
-                // Delicate Contour Ring
+
+                // ── 2. Expanding Zen Ripple ────────────────────────────
+                if (rippleAlpha.value > 0f) {
+                    val rr = w * 0.46f * rippleRadius.value
+                    drawCircle(
+                        color = glyphColor.copy(alpha = rippleAlpha.value * 0.5f),
+                        radius = rr.coerceAtLeast(1f),
+                        center = Offset(cx, cy),
+                        style = Stroke(width = w * 0.015f)
+                    )
+                }
+
+                // ── 3. Base Elevated White Disc ────────────────────────
+                val baseDiscRadius = w * 0.40f
+                // Soft directional shadow (downward-right)
                 drawCircle(
-                    color = Color(0xFFA0B39A).copy(alpha = 0.85f * ga),
-                    radius = innerRadius,
+                    brush = Brush.radialGradient(
+                        colors = listOf(
+                            Color.Black.copy(alpha = 0.11f * globalAlpha),
+                            Color.Black.copy(alpha = 0.03f * globalAlpha),
+                            Color.Transparent
+                        ),
+                        center = Offset(cx + w * 0.02f, cy + h * 0.035f),
+                        radius = baseDiscRadius * 1.12f
+                    ),
+                    radius = baseDiscRadius * 1.08f,
+                    center = Offset(cx + w * 0.02f, cy + h * 0.035f)
+                )
+                // Base Disc Body
+                drawCircle(
+                    color = discBaseColor.copy(alpha = globalAlpha),
+                    radius = baseDiscRadius,
+                    center = Offset(cx, cy)
+                )
+                // Subtle tactile rim
+                drawCircle(
+                    color = Color.Black.copy(alpha = 0.05f * globalAlpha),
+                    radius = baseDiscRadius,
                     center = Offset(cx, cy),
-                    style = Stroke(width = strokeWidth * 0.12f)
+                    style = Stroke(width = 1f)
                 )
 
-                // ── 4. Zen Ensō Arc Path (Open Circular Brushstroke) ────
-                val rx = w * 0.273f
-                val ry = h * 0.273f
+                // ── 4. Outer Sculptural Olive Arc ──────────────────────
+                // Arc covers ~280° from ~-75° (top right) sweeping counter-clockwise to ~+25° (bottom right)
+                val arcRadius = w * 0.325f
+                val arcStrokeWidth = w * 0.092f
 
-                val ensoPath = Path().apply {
+                val startAngle = -75f
+                val sweepAngle = -280f
+
+                val arcPath = Path().apply {
                     arcTo(
                         rect = Rect(
-                            left = cx - rx,
-                            top = cy - ry,
-                            right = cx + rx,
-                            bottom = cy + ry
+                            left = cx - arcRadius,
+                            top = cy - arcRadius,
+                            right = cx + arcRadius,
+                            bottom = cy + arcRadius
                         ),
-                        startAngleDegrees = 42f,
-                        sweepAngleDegrees = 320f,
+                        startAngleDegrees = startAngle,
+                        sweepAngleDegrees = sweepAngle,
                         forceMoveTo = true
                     )
                 }
 
                 val pathMeasure = PathMeasure()
-                pathMeasure.setPath(ensoPath, false)
+                pathMeasure.setPath(arcPath, false)
                 val totalLength = pathMeasure.length
-                val drawLength = totalLength * drawProgress.value
+                val drawLength = totalLength * arcDrawProgress.value
 
                 if (drawLength > 0f) {
                     val currentSegment = Path()
                     pathMeasure.getSegment(0f, drawLength, currentSegment, true)
 
-                    // Draw the Ensō stroke
+                    // Arc subtle drop shadow onto base disc
                     drawPath(
                         path = currentSegment,
-                        color = glyphColor.copy(alpha = ga),
+                        color = Color.Black.copy(alpha = 0.12f * globalAlpha),
                         style = Stroke(
-                            width = strokeWidth,
+                            width = arcStrokeWidth,
                             cap = StrokeCap.Round,
                             join = StrokeJoin.Round
                         )
                     )
 
-                    // Luminous leading pen/brush tip
-                    if (brushTipAlpha.value > 0f && drawLength < totalLength) {
+                    // Main Olive Arc Body
+                    drawPath(
+                        path = currentSegment,
+                        color = glyphColor.copy(alpha = globalAlpha),
+                        style = Stroke(
+                            width = arcStrokeWidth,
+                            cap = StrokeCap.Round,
+                            join = StrokeJoin.Round
+                        )
+                    )
+
+                    // Luminous leading tip during draw
+                    if (arcTipAlpha.value > 0f && drawLength < totalLength) {
                         val pos = pathMeasure.getPosition(drawLength)
-                        drawZenTip(
+                        drawArcTip(
                             center = pos,
-                            strokeWidth = strokeWidth,
+                            strokeWidth = arcStrokeWidth,
                             glyphColor = glyphColor,
                             pearlColor = pearlColor,
-                            alpha = brushTipAlpha.value
+                            alpha = arcTipAlpha.value
                         )
                     }
                 }
 
-                // ── 5. Balanced Center Target Ring ─────────────────────
-                val targetRadius = (w * 0.039f) * centerPebblePulse
-                // Fill center with oat background tone
+                // ── 5. Elevated Middle White Disc ──────────────────────
+                val midDiscRadius = w * 0.232f
+                // Middle Disc Drop Shadow
                 drawCircle(
-                    color = Color(0xFFF7F8F4).copy(alpha = ga),
-                    radius = targetRadius,
+                    brush = Brush.radialGradient(
+                        colors = listOf(
+                            Color.Black.copy(alpha = 0.13f * globalAlpha),
+                            Color.Black.copy(alpha = 0.04f * globalAlpha),
+                            Color.Transparent
+                        ),
+                        center = Offset(cx + w * 0.015f, cy + h * 0.025f),
+                        radius = midDiscRadius * 1.15f
+                    ),
+                    radius = midDiscRadius * 1.12f,
+                    center = Offset(cx + w * 0.015f, cy + h * 0.025f)
+                )
+                // Middle Disc Body
+                drawCircle(
+                    color = discBaseColor.copy(alpha = globalAlpha),
+                    radius = midDiscRadius,
                     center = Offset(cx, cy)
                 )
-                // Matcha Outer Ring
+                // Middle Disc Rim
                 drawCircle(
-                    color = glyphColor.copy(alpha = ga),
-                    radius = targetRadius,
+                    color = Color.Black.copy(alpha = 0.05f * globalAlpha),
+                    radius = midDiscRadius,
                     center = Offset(cx, cy),
-                    style = Stroke(width = strokeWidth * 0.15f)
+                    style = Stroke(width = 1f)
                 )
+
+                // ── 6. Middle Concentric Olive Ring ────────────────────
+                val ringRadius = (w * 0.142f) * middleRingScale.value
+                val ringStrokeWidth = w * 0.054f
+                if (ringRadius > 0f) {
+                    drawCircle(
+                        color = glyphColor.copy(alpha = globalAlpha * middleRingScale.value.coerceIn(0f, 1f)),
+                        radius = ringRadius,
+                        center = Offset(cx, cy),
+                        style = Stroke(width = ringStrokeWidth)
+                    )
+                }
+
+                // ── 7. Center Solid Olive Core Dot ─────────────────────
+                val centerDotRadius = (w * 0.056f) * centerDotScale.value * centerPebblePulse
+                if (centerDotRadius > 0f) {
+                    drawCircle(
+                        color = glyphColor.copy(alpha = globalAlpha * centerDotScale.value.coerceIn(0f, 1f)),
+                        radius = centerDotRadius,
+                        center = Offset(cx, cy)
+                    )
+                }
             }
         }
     }
 }
 
-/** Draws the mindful luminous tip leading the Ensō stroke. */
-private fun DrawScope.drawZenTip(
+/** Draws the mindful luminous tip leading the arc stroke. */
+private fun DrawScope.drawArcTip(
     center: Offset,
     strokeWidth: Float,
     glyphColor: Color,
@@ -276,12 +386,12 @@ private fun DrawScope.drawZenTip(
                 Color.Transparent
             ),
             center = center,
-            radius = r * 2.8f
+            radius = r * 2.6f
         ),
-        radius = r * 2.8f,
+        radius = r * 2.6f,
         center = center
     )
-    // Inner droplet core
+    // Inner core
     drawCircle(
         color = pearlColor.copy(alpha = alpha),
         radius = r * 0.75f,
