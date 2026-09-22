@@ -41,4 +41,7 @@ interface TimelineDao {
 
     @Query("SELECT COUNT(*) FROM timeline_items")
     suspend fun getTimelineItemsCount(): Int
+
+    @Query("SELECT * FROM timeline_items")
+    suspend fun getAllTimelineItemsList(): List<TimelineItemEntity>
 }

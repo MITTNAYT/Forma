@@ -41,4 +41,7 @@ interface HabitDao {
 
     @Query("SELECT COUNT(*) FROM habits")
     suspend fun getHabitsCount(): Int
+
+    @Query("SELECT * FROM habits")
+    suspend fun getAllHabitsList(): List<HabitEntity>
 }

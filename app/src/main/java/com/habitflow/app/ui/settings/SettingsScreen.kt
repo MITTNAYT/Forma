@@ -77,6 +77,12 @@ import com.habitflow.app.domain.repository.DarkModeOption
 import com.habitflow.app.domain.repository.PaletteFamily
 import com.habitflow.app.ui.settings.components.EncryptedVaultDialog
 import com.habitflow.app.ui.settings.components.ProPaywallBottomSheet
+import androidx.compose.material.icons.rounded.CloudDone
+import androidx.compose.material.icons.rounded.CloudSync
+import androidx.compose.material3.CircularProgressIndicator
+import com.habitflow.app.domain.model.AuthState
+import com.habitflow.app.ui.auth.AuthViewModel
+import com.habitflow.app.ui.auth.components.AuthModalBottomSheet
 import com.habitflow.app.ui.settings.components.VaultDialogMode
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -84,7 +90,8 @@ import com.habitflow.app.ui.settings.components.VaultDialogMode
 fun SettingsScreen(
     onNavigateToHabits: () -> Unit,
     onNavigateToStats: () -> Unit,
-    viewModel: SettingsViewModel = hiltViewModel()
+    viewModel: SettingsViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val colors = FormaTheme.colors
     val context = LocalContext.current
@@ -97,6 +104,7 @@ fun SettingsScreen(
 
     var showPaywall by remember { mutableStateOf(false) }
     var showEditProfileDialog by remember { mutableStateOf(false) }
+    var showAuthBottomSheet by remember { mutableStateOf(false) }
     var vaultDialogMode by remember { mutableStateOf<VaultDialogMode?>(null) }
     var hapticsEnabled by remember { mutableStateOf(true) }
     var morningReminderEnabled by remember { mutableStateOf(true) }
@@ -556,6 +564,175 @@ fun SettingsScreen(
                 Spacer(modifier = Modifier.height(20.dp))
             }
 
+            // ── Section: Sync Sanctuary (Firebase Google & Email Sync) ──
+            item {
+                SettingsSectionHeader(label = "SYNC SANCTUARY", modifier = Modifier.padding(horizontal = 24.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            item {
+                val authState by authViewModel.authState.collectAsState()
+                val isSyncing by authViewModel.isSyncing.collectAsState()
+                val lastSyncedAt by authViewModel.lastSyncedAt.collectAsState()
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(colors.surface)
+                        .border(1.dp, colors.border.copy(alpha = 0.4f), RoundedCornerShape(20.dp))
+                        .padding(16.dp)
+                ) {
+                    when (val state = authState) {
+                        is AuthState.Authenticated -> {
+                            val user = state.user
+                            Column {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(38.dp)
+                                                .clip(CircleShape)
+                                                .background(colors.accentSoft),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Rounded.CloudDone,
+                                                contentDescription = "Synced",
+                                                tint = colors.accent,
+                                                modifier = Modifier.size(20.dp)
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.width(12.dp))
+                                        Column {
+                                            Text(
+                                                text = user.displayName ?: "Sanctuary Member",
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = colors.textPrimary,
+                                                fontSize = 14.sp
+                                            )
+                                            Text(
+                                                text = user.email ?: "Cloud Sync Active",
+                                                color = colors.textSecondary,
+                                                fontSize = 11.sp
+                                            )
+                                        }
+                                    }
+
+                                    // Sync Now Button
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(10.dp))
+                                            .background(colors.accentSoft)
+                                            .formaPressEffect(targetScale = 0.95f) {
+                                                authViewModel.syncNow()
+                                            }
+                                            .padding(horizontal = 10.dp, vertical = 6.dp)
+                                    ) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            if (isSyncing) {
+                                                CircularProgressIndicator(
+                                                    modifier = Modifier.size(11.dp),
+                                                    strokeWidth = 1.5.dp,
+                                                    color = colors.accent
+                                                )
+                                                Spacer(modifier = Modifier.width(5.dp))
+                                            }
+                                            Text(
+                                                text = if (isSyncing) "Syncing..." else "Sync Now",
+                                                fontWeight = FontWeight.Bold,
+                                                color = colors.accent,
+                                                fontSize = 11.sp
+                                            )
+                                        }
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(12.dp))
+                                SettingsDivider()
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = if (lastSyncedAt != null) "Last backed up to cloud" else "Offline-first local cache active",
+                                        color = colors.textTertiary,
+                                        fontSize = 11.sp
+                                    )
+                                    TextButton(
+                                        onClick = { authViewModel.signOut() },
+                                        contentPadding = PaddingValues(0.dp)
+                                    ) {
+                                        Text(
+                                            text = "Sign Out",
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = colors.textSecondary,
+                                            fontSize = 11.sp
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        else -> {
+                            Column {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(38.dp)
+                                            .clip(CircleShape)
+                                            .background(colors.accentSoft),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.CloudSync,
+                                            contentDescription = "Cloud Sync",
+                                            tint = colors.accent,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = "Cloud Backup & Multi-Device Sync",
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = colors.textPrimary,
+                                            fontSize = 14.sp
+                                        )
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Text(
+                                            text = "Sign in with Google or Email to sync rituals across devices.",
+                                            color = colors.textSecondary,
+                                            fontSize = 11.sp,
+                                            lineHeight = 15.sp
+                                        )
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(12.dp))
+
+                                com.habitflow.app.core.designsystem.component.FormaButton(
+                                    text = "Connect Google / Email",
+                                    onClick = { showAuthBottomSheet = true },
+                                    style = com.habitflow.app.core.designsystem.component.FormaButtonStyle.PRIMARY,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(20.dp))
+            }
+
             // ── Section: Data & Mindful Archives ───────────────────────
             item {
                 SettingsSectionHeader(label = "DATA & MINDFUL ARCHIVES", modifier = Modifier.padding(horizontal = 24.dp))
@@ -708,6 +885,21 @@ fun SettingsScreen(
                     }
                 }
             }
+        )
+    }
+
+    val authUiMessage by authViewModel.uiMessage.collectAsState()
+    androidx.compose.runtime.LaunchedEffect(authUiMessage) {
+        authUiMessage?.let { msg ->
+            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+            authViewModel.clearMessage()
+        }
+    }
+
+    if (showAuthBottomSheet) {
+        AuthModalBottomSheet(
+            viewModel = authViewModel,
+            onDismiss = { showAuthBottomSheet = false }
         )
     }
 

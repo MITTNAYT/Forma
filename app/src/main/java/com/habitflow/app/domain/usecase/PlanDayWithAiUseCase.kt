@@ -29,6 +29,11 @@ class PlanDayWithAiUseCase @Inject constructor(
         customPrompt: String = ""
     ): Result {
         return try {
+            val isPro = billingRepository.isPro.first()
+            if (!isPro) {
+                return Result.RequiresPro
+            }
+
             val habits = habitRepository.getAllHabits(includeArchived = false).first()
             val existingItems = timelineRepository.getTimelineItemsForDate(date).first()
 

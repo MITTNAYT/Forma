@@ -63,5 +63,17 @@ abstract class RepositoryModule {
     abstract fun bindDailyReflectionRepository(
         dailyReflectionRepositoryImpl: com.habitflow.app.data.repository.DailyReflectionRepositoryImpl
     ): com.habitflow.app.domain.repository.DailyReflectionRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAuthRepository(
+        authRepositoryImpl: com.habitflow.app.data.repository.AuthRepositoryImpl
+    ): com.habitflow.app.domain.repository.AuthRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSyncRepository(
+        syncRepositoryImpl: com.habitflow.app.data.repository.SyncRepositoryImpl
+    ): com.habitflow.app.domain.repository.SyncRepository
 }
 
