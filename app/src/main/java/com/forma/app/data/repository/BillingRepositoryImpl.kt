@@ -83,9 +83,13 @@ class BillingRepositoryImpl @Inject constructor(
 
     private fun initBillingClient() {
         try {
+            val pendingParams = com.android.billingclient.api.PendingPurchasesParams.newBuilder()
+                .enableOneTimeProducts()
+                .build()
+
             billingClient = BillingClient.newBuilder(context)
                 .setListener(this)
-                .enablePendingPurchases()
+                .enablePendingPurchases(pendingParams)
                 .build()
 
             startBillingConnection()
