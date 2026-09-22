@@ -1,4 +1,4 @@
-﻿package com.habitflow.app.ui.today
+package com.habitflow.app.ui.today
 
 import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
@@ -98,6 +98,10 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import java.util.Locale
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.geometry.Rect
+import com.habitflow.app.ui.today.components.TodayCoachMarksOverlay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -114,6 +118,12 @@ fun TodayScreen(
     val selectedDate by viewModel.selectedDate.collectAsState()
     val daySchedule by viewModel.daySchedule.collectAsState()
     val userName by viewModel.userName.collectAsState()
+    val hasSeenTodayCoachMarks by viewModel.hasSeenTodayCoachMarks.collectAsState()
+
+    var weekStripBounds by remember { mutableStateOf<Rect?>(null) }
+    var ritualPillBounds by remember { mutableStateOf<Rect?>(null) }
+    var aiPlanBounds by remember { mutableStateOf<Rect?>(null) }
+    var addButtonBounds by remember { mutableStateOf<Rect?>(null) }
 
     var showPaywall by remember { mutableStateOf(false) }
     var showDatePickerDialog by remember { mutableStateOf(false) }
@@ -172,122 +182,130 @@ fun TodayScreen(
 
     val focusManager = LocalFocusManager.current
 
-    Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .pointerInput(Unit) {
-                detectTapGestures(onTap = {
-                    focusManager.clearFocus()
-                })
-            },
-        containerColor = colors.background
-    ) { paddingValues ->
-        Box(
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .imePadding()
-        ) {
-            LazyColumn(
+                .pointerInput(Unit) {
+                    detectTapGestures(onTap = {
+                        focusManager.clearFocus()
+                    })
+                },
+            containerColor = colors.background
+        ) { paddingValues ->
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .graphicsLayer {
-                        alpha = contentAlpha.value
-                        translationY = contentOffsetY.value.dp.toPx()
-                    },
-                contentPadding = PaddingValues(bottom = 96.dp)
+                    .padding(paddingValues)
+                    .imePadding()
             ) {
-                // 1. Personalized Header
-                item {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 24.dp, end = 24.dp, top = 20.dp, bottom = 4.dp)
-                    ) {
-                        // Row 1: Date label + primary action only (Morning/Evening ritual)
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .graphicsLayer {
+                            alpha = contentAlpha.value
+                            translationY = contentOffsetY.value.dp.toPx()
+                        },
+                    contentPadding = PaddingValues(bottom = 96.dp)
+                ) {
+                    // 1. Personalized Header
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 24.dp, end = 24.dp, top = 20.dp, bottom = 4.dp)
                         ) {
-                            Text(
-                                text = dateFormatted.uppercase(),
-                                style = FormaTheme.typography.labelSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = colors.accent,
-                                letterSpacing = 1.2.sp,
-                                fontSize = 11.sp
-                            )
-
-                            // Single primary ritual pill (Morning Clarity / Evening Rest)
-                            val currentHour = LocalTime.now().hour
-                            val isEvening = currentHour >= 18 || currentHour < 4
-                            val ritualTitle = if (isEvening) "Evening Rest" else "Morning Clarity"
-                            val ritualIcon = if (isEvening) Icons.Rounded.Spa else Icons.Rounded.AutoAwesome
-
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(colors.accentSoft)
-                                    .border(1.dp, colors.accent.copy(alpha = 0.35f), RoundedCornerShape(12.dp))
-                                    .formaPressEffect(targetScale = 0.92f) {
-                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                        if (isEvening) showEveningSheet = true else showMorningSheet = true
-                                    }
-                                    .padding(horizontal = 10.dp, vertical = 6.dp)
+                            // Row 1: Date label + primary action only (Morning/Evening ritual)
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = ritualIcon,
-                                        contentDescription = ritualTitle,
-                                        tint = colors.accent,
-                                        modifier = Modifier.size(13.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(5.dp))
-                                    Text(
-                                        text = ritualTitle,
-                                        style = FormaTheme.typography.labelSmall,
-                                        fontWeight = FontWeight.Bold,
-                                        color = colors.accent,
-                                        fontSize = 11.sp
-                                    )
+                                Text(
+                                    text = dateFormatted.uppercase(),
+                                    style = FormaTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = colors.accent,
+                                    letterSpacing = 1.2.sp,
+                                    fontSize = 11.sp
+                                )
+
+                                // Single primary ritual pill (Morning Clarity / Evening Rest)
+                                val currentHour = LocalTime.now().hour
+                                val isEvening = currentHour >= 18 || currentHour < 4
+                                val ritualTitle = if (isEvening) "Evening Rest" else "Morning Clarity"
+                                val ritualIcon = if (isEvening) Icons.Rounded.Spa else Icons.Rounded.AutoAwesome
+
+                                Box(
+                                    modifier = Modifier
+                                        .onGloballyPositioned { coordinates ->
+                                            ritualPillBounds = coordinates.boundsInRoot()
+                                        }
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(colors.accentSoft)
+                                        .border(1.dp, colors.accent.copy(alpha = 0.35f), RoundedCornerShape(12.dp))
+                                        .formaPressEffect(targetScale = 0.92f) {
+                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                            if (isEvening) showEveningSheet = true else showMorningSheet = true
+                                        }
+                                        .padding(horizontal = 10.dp, vertical = 6.dp)
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            imageVector = ritualIcon,
+                                            contentDescription = ritualTitle,
+                                            tint = colors.accent,
+                                            modifier = Modifier.size(13.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(5.dp))
+                                        Text(
+                                            text = ritualTitle,
+                                            style = FormaTheme.typography.labelSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = colors.accent,
+                                            fontSize = 11.sp
+                                        )
+                                    }
                                 }
                             }
-                        }
 
-                        Spacer(modifier = Modifier.height(6.dp))
+                            Spacer(modifier = Modifier.height(6.dp))
 
-                        // Row 2: Greeting headline (full width, no competing elements)
-                        Text(
-                            text = "$greeting $userName",
-                            style = FormaTheme.typography.displayMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = colors.textPrimary,
-                            letterSpacing = (-0.6).sp
-                        )
+                            // Row 2: Greeting headline (full width, no competing elements)
+                            Text(
+                                text = "$greeting $userName",
+                                style = FormaTheme.typography.displayMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = colors.textPrimary,
+                                letterSpacing = (-0.6).sp
+                            )
 
-                        Spacer(modifier = Modifier.height(12.dp))
+                            Spacer(modifier = Modifier.height(12.dp))
 
-                        // Row 3: Secondary action pills — compact, equal weight
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            // AI Plan pill
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(colors.surfaceVariant)
-                                    .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
-                                    .formaPressEffect(targetScale = 0.93f) {
-                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                        showAiPresetSheet = true
-                                    }
-                                    .padding(vertical = 9.dp),
-                                contentAlignment = Alignment.Center
+                            // Row 3: Secondary action pills — compact, equal weight
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
+                                // AI Plan pill
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .onGloballyPositioned { coordinates ->
+                                            aiPlanBounds = coordinates.boundsInRoot()
+                                        }
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(colors.surfaceVariant)
+                                        .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
+                                        .formaPressEffect(targetScale = 0.93f) {
+                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                            showAiPresetSheet = true
+                                        }
+                                        .padding(vertical = 9.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(
                                         imageVector = Icons.Rounded.AutoAwesome,
@@ -399,6 +417,9 @@ fun TodayScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .onGloballyPositioned { coordinates ->
+                                weekStripBounds = coordinates.boundsInRoot()
+                            }
                             .padding(horizontal = 16.dp, vertical = 6.dp),
                         horizontalArrangement = Arrangement.spacedBy(5.dp),
                         verticalAlignment = Alignment.CenterVertically
@@ -628,9 +649,14 @@ fun TodayScreen(
                         onQuickAdd = { title, isHabit ->
                             viewModel.quickAddInlineItem(title, isHabit)
                         },
-                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp)
+                        modifier = Modifier
+                            .onGloballyPositioned { coordinates ->
+                                addButtonBounds = coordinates.boundsInRoot()
+                            }
+                            .padding(horizontal = 20.dp, vertical = 6.dp)
                     )
                 }
+
 
                 item { Spacer(modifier = Modifier.height(8.dp)) }
 
@@ -978,7 +1004,20 @@ fun TodayScreen(
             onDismiss = { showVoiceAssistantSheet = false }
         )
     }
+
+    // First-Launch Feature Spotlight / Coach Marks Tour
+    if (!hasSeenTodayCoachMarks) {
+        TodayCoachMarksOverlay(
+            weekStripBounds = weekStripBounds,
+            ritualPillBounds = ritualPillBounds,
+            aiPlanBounds = aiPlanBounds,
+            addButtonBounds = addButtonBounds,
+            onDismiss = { viewModel.dismissCoachMarks() }
+        )
+    }
 }
+}
+
 
 
 @Composable

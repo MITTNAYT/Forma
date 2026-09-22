@@ -6,6 +6,18 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+import java.util.Properties
+import java.io.File
+
+val keystoreProps = Properties().apply {
+    val localFile = rootProject.file("keystore.properties")
+    val userHomeFile = File(System.getProperty("user.home"), "keystore.properties")
+    when {
+        localFile.exists() -> load(localFile.inputStream())
+        userHomeFile.exists() -> load(userHomeFile.inputStream())
+    }
+}
+
 android {
     namespace = "com.habitflow.app"
     compileSdk = 35
@@ -34,11 +46,15 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = System.getenv("KEYSTORE_PATH")?.let { file(it) }
+            storeFile = (keystoreProps["KEYSTORE_PATH"] as? String)?.let { file(it) }
+                ?: System.getenv("KEYSTORE_PATH")?.let { file(it) }
                 ?: rootProject.file("habitflow-release.jks").takeIf { it.exists() }
-            storePassword = System.getenv("KEYSTORE_PASSWORD") ?: ""
-            keyAlias = System.getenv("KEY_ALIAS") ?: ""
-            keyPassword = System.getenv("KEY_PASSWORD") ?: ""
+            storePassword = (keystoreProps["KEYSTORE_PASSWORD"] as? String)
+                ?: System.getenv("KEYSTORE_PASSWORD") ?: ""
+            keyAlias = (keystoreProps["KEY_ALIAS"] as? String)
+                ?: System.getenv("KEY_ALIAS") ?: ""
+            keyPassword = (keystoreProps["KEY_PASSWORD"] as? String)
+                ?: System.getenv("KEY_PASSWORD") ?: ""
         }
     }
 

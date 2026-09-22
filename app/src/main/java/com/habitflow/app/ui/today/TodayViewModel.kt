@@ -65,10 +65,19 @@ class TodayViewModel @Inject constructor(
     val isPro: StateFlow<Boolean> = billingRepository.isPro
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
+    val hasSeenTodayCoachMarks: StateFlow<Boolean> = preferencesRepository.hasSeenTodayCoachMarks
+        .stateIn(viewModelScope, SharingStarted.Eagerly, true)
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val daySchedule: StateFlow<DaySchedule?> = _selectedDate
         .flatMapLatest { date -> getTodayTimelineUseCase(date) }
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
+    fun dismissCoachMarks() {
+        viewModelScope.launch {
+            preferencesRepository.setHasSeenTodayCoachMarks(true)
+        }
+    }
 
     fun selectDate(date: LocalDate) {
         _selectedDate.value = date

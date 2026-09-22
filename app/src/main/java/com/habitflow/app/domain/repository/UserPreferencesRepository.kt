@@ -40,6 +40,7 @@ interface UserPreferencesRepository {
     val notificationsEnabled: Flow<Boolean>
     val dailySummaryTimeMinutes: Flow<Int>
     val isOnboardingCompleted: Flow<Boolean>
+    val hasSeenTodayCoachMarks: Flow<Boolean>
 
     suspend fun setUserName(name: String)
     suspend fun setUserHeadline(headline: String)
@@ -49,4 +50,6 @@ interface UserPreferencesRepository {
     suspend fun setNotificationsEnabled(enabled: Boolean)
     suspend fun setDailySummaryTimeMinutes(minutes: Int)
     suspend fun setOnboardingCompleted(completed: Boolean)
+    suspend fun setHasSeenTodayCoachMarks(seen: Boolean)
 }
+
