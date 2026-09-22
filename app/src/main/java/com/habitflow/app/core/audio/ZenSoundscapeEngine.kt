@@ -57,15 +57,28 @@ class ZenSoundscapeEngine @Inject constructor() {
     }
 
     fun stopSoundscape() {
+        if (activeSoundscape == SoundscapeType.NONE && playbackJob == null) return
         activeSoundscape = SoundscapeType.NONE
-        playbackJob?.cancel()
+        val currentTrack = audioTrack
+        val currentJob = playbackJob
         playbackJob = null
-        try {
-            audioTrack?.pause()
-            audioTrack?.flush()
-            audioTrack?.stop()
-            audioTrack?.release()
-        } catch (_: Exception) {}
+
+        scope.launch {
+            try {
+                // Smooth 200ms fade-out to prevent audio clicking
+                val steps = 10
+                for (i in steps downTo 0) {
+                    val factor = i.toFloat() / steps
+                    currentTrack?.setVolume(currentVolume * factor)
+                    kotlinx.coroutines.delay(20)
+                }
+                currentJob?.cancel()
+                currentTrack?.pause()
+                currentTrack?.flush()
+                currentTrack?.stop()
+                currentTrack?.release()
+            } catch (_: Exception) {}
+        }
         audioTrack = null
     }
 

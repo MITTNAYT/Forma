@@ -1,4 +1,4 @@
-﻿package com.habitflow.app.ui.settings.components
+package com.habitflow.app.ui.settings.components
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -211,21 +211,35 @@ fun ProPaywallBottomSheet(
                 ProFeatureCard(
                     icon = Icons.Rounded.Psychology,
                     title = "AI Day Synthesis",
-                    subtitle = "Generates mindful, realistic daily timelines balancing habits, energy flow, and commitments automatically.",
+                    subtitle = "Powered by Gemini 1.5 Flash. Generates mindful, realistic daily timelines balancing habits, energy flow, and commitments automatically.",
                     badge = "INTELLIGENCE"
+                )
+
+                ProFeatureCard(
+                    icon = Icons.Rounded.AutoAwesome,
+                    title = "Habit Stacking Sequencer",
+                    subtitle = "Chain multi-step morning and evening routines with seamless flow mode and automated timing.",
+                    badge = "RITUALS"
                 )
 
                 ProFeatureCard(
                     icon = Icons.Rounded.Insights,
                     title = "Executive Analytics",
-                    subtitle = "Monthly consistency heatmap, correlation matrices, streak momentum, and detailed focus investment breakdowns.",
+                    subtitle = "365-day consistency heatmaps, streak momentum, and detailed focus investment breakdowns.",
                     badge = "DEEP METRICS"
                 )
 
                 ProFeatureCard(
+                    icon = Icons.Rounded.Spa,
+                    title = "Zen Soundscapes & Binaural Beats",
+                    subtitle = "Procedural audio engine: 432Hz Tibetan Singing Bowl, 10Hz Alpha flow waves, and soothing rain.",
+                    badge = "AUDIO IMMERSION"
+                )
+
+                ProFeatureCard(
                     icon = Icons.Rounded.Palette,
-                    title = "Unlimited Sanctuary",
-                    subtitle = "Unlock all curated visual themes (Espresso, Monochrome, Forest), 1,000+ custom ritual icons, and live widgets.",
+                    title = "Unlimited Sanctuary & Themes",
+                    subtitle = "All curated visual themes (Espresso, Monochrome, Forest, Terracotta), 1,000+ custom ritual icons, and widgets.",
                     badge = "AESTHETICS"
                 )
             }

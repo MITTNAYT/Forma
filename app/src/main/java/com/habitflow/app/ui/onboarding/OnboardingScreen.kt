@@ -20,10 +20,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowForward
 import androidx.compose.material.icons.rounded.CheckCircle
@@ -119,6 +121,17 @@ fun OnboardingScreen(
                     OnboardingStep.CHOOSE_THEME -> {
                         ChooseThemeStep(
                             onSelectTheme = { palette -> viewModel.selectTheme(palette) }
+                        )
+                    }
+                    OnboardingStep.CHOOSE_STARTER_PACK -> {
+                        val selectedPack by viewModel.selectedPack.collectAsState()
+                        val starterHabits by viewModel.starterHabits.collectAsState()
+                        ChooseStarterPackStep(
+                            selectedPack = selectedPack,
+                            starterHabits = starterHabits,
+                            onSelectPack = { viewModel.selectStarterPack(it) },
+                            onToggleHabit = { viewModel.toggleStarterHabit(it) },
+                            onContinue = { viewModel.proceedToGreeting() }
                         )
                     }
                     OnboardingStep.GREETING -> {
@@ -426,6 +439,205 @@ private fun ChooseThemeStep(
 
             Spacer(modifier = Modifier.height(10.dp))
         }
+    }
+}
+
+@Composable
+private fun ChooseStarterPackStep(
+    selectedPack: StarterPackType,
+    starterHabits: List<StarterHabitItem>,
+    onSelectPack: (StarterPackType) -> Unit,
+    onToggleHabit: (Int) -> Unit,
+    onContinue: () -> Unit
+) {
+    val colors = FormaTheme.colors
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "STEP 3 OF 3 • STARTER FOUNDATION",
+            style = FormaTheme.typography.labelSmall,
+            fontWeight = FontWeight.Bold,
+            color = colors.accent,
+            letterSpacing = 1.2.sp,
+            fontSize = 11.sp
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "Choose Your Starter Rituals",
+            style = FormaTheme.typography.headlineLarge,
+            fontWeight = FontWeight.Bold,
+            color = colors.textPrimary,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "Select a foundation pack to start your journey. You can modify or add more habits anytime.",
+            style = FormaTheme.typography.bodyMedium,
+            color = colors.textSecondary,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        // 3 Starter Pack Selector Cards
+        StarterPackType.values().forEach { pack ->
+            val isSelected = pack == selectedPack
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(18.dp))
+                    .background(if (isSelected) colors.accentSoft else colors.surface)
+                    .border(
+                        width = if (isSelected) 1.5.dp else 1.dp,
+                        color = if (isSelected) colors.accent else colors.border.copy(alpha = 0.6f),
+                        shape = RoundedCornerShape(18.dp)
+                    )
+                    .formaPressEffect(targetScale = 0.98f) { onSelectPack(pack) }
+                    .padding(14.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = pack.emoji,
+                        fontSize = 24.sp
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = pack.title,
+                            style = FormaTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = if (isSelected) colors.accent else colors.textPrimary
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = pack.subtitle,
+                            style = FormaTheme.typography.bodySmall,
+                            color = colors.textSecondary,
+                            fontSize = 12.sp
+                        )
+                    }
+                    if (isSelected) {
+                        Icon(
+                            imageVector = Icons.Rounded.CheckCircle,
+                            contentDescription = null,
+                            tint = colors.accent,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        Spacer(modifier = Modifier.height(14.dp))
+
+        // Habit Checklist
+        Text(
+            text = "INCLUDED RITUALS (TAP TO TOGGLE)",
+            style = FormaTheme.typography.labelSmall,
+            fontWeight = FontWeight.Bold,
+            color = colors.textTertiary,
+            letterSpacing = 1.2.sp,
+            fontSize = 11.sp,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        starterHabits.forEachIndexed { index, habit ->
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(colors.surface)
+                    .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(14.dp))
+                    .formaPressEffect(targetScale = 0.98f) { onToggleHabit(index) }
+                    .padding(12.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(22.dp)
+                            .clip(CircleShape)
+                            .background(if (habit.isSelected) colors.accent else colors.surfaceVariant)
+                            .border(1.dp, if (habit.isSelected) colors.accent else colors.border, CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (habit.isSelected) {
+                            Icon(
+                                imageVector = Icons.Rounded.CheckCircle,
+                                contentDescription = null,
+                                tint = colors.onAccent,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = habit.name,
+                            style = FormaTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = if (habit.isSelected) colors.textPrimary else colors.textTertiary
+                        )
+                        if (habit.cueText != null) {
+                            Text(
+                                text = "Stacked cue: ${habit.cueText}",
+                                style = FormaTheme.typography.bodySmall,
+                                color = colors.textSecondary,
+                                fontSize = 11.sp
+                            )
+                        }
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(6.dp))
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Button(
+            onClick = onContinue,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = colors.accent,
+                contentColor = colors.onAccent
+            ),
+            shape = RoundedCornerShape(20.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(54.dp)
+        ) {
+            Text(
+                text = "Continue",
+                style = FormaTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Icon(
+                imageVector = Icons.Rounded.ArrowForward,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 
