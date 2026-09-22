@@ -222,7 +222,7 @@ fun BehanceHabitCard(
                         if (cardData.isWintering) {
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
-                                text = "🍵 Wintering",
+                                text = "Wintering",
                                 style = FormaTheme.typography.labelSmall,
                                 color = colors.accent,
                                 fontSize = 10.sp,

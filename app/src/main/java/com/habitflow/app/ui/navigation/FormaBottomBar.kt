@@ -103,81 +103,61 @@ fun FormaBottomBar(
                     val selected = currentRoute == screen.route
                     val isAddButton = screen == Screen.AddItem
 
-                    if (isAddButton) {
-                        // Central Tactile Add (+) Button refined with matching 16dp rounded geometry
-                        Box(
-                            modifier = Modifier
-                                .size(46.dp)
-                                .shadow(
-                                    elevation = 4.dp,
-                                    shape = RoundedCornerShape(16.dp),
-                                    ambientColor = colors.accent.copy(alpha = 0.20f),
-                                    spotColor = colors.accent.copy(alpha = 0.30f)
-                                )
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(colors.accent)
-                                .border(1.dp, colors.accent.copy(alpha = 0.8f), RoundedCornerShape(16.dp))
-                                .formaPressEffect(targetScale = 0.90f) {
+                    // Spring-animated tab with Apple-style fluid response
+                    val iconScale by animateFloatAsState(
+                        targetValue = if (selected) 1.12f else 1f,
+                        animationSpec = spring(
+                            dampingRatio = 0.78f,
+                            stiffness = 450f
+                        ),
+                        label = "tab_icon_scale"
+                    )
+
+                    val pillBg by animateColorAsState(
+                        targetValue = if (selected) colors.accentSoft else Color.Transparent,
+                        animationSpec = tween(durationMillis = 180),
+                        label = "tab_pill_bg"
+                    )
+
+                    val contentColor by animateColorAsState(
+                        targetValue = if (isAddButton) {
+                            if (selected) colors.accent else colors.textPrimary
+                        } else {
+                            if (selected) colors.accent else colors.textTertiary
+                        },
+                        animationSpec = tween(durationMillis = 180),
+                        label = "tab_content_color"
+                    )
+
+                    // Emil Kowalski rule: Never animate from scale(0)
+                    val dotScale by animateFloatAsState(
+                        targetValue = if (selected) 1f else 0.4f,
+                        animationSpec = spring(
+                            dampingRatio = 0.75f,
+                            stiffness = 500f
+                        ),
+                        label = "dot_scale"
+                    )
+                    val dotAlpha by animateFloatAsState(
+                        targetValue = if (selected) 1f else 0f,
+                        animationSpec = tween(durationMillis = 160),
+                        label = "dot_alpha"
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .size(46.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(pillBg)
+                            .formaPressEffect(targetScale = 0.92f) {
+                                if (isAddButton) {
                                     haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
                                     if (onAddClick != null) {
                                         onAddClick()
                                     } else {
                                         navController.navigate(Screen.AddEditTimelineItem.createRoute())
                                     }
-                                },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Rounded.Add,
-                                contentDescription = "Add New Intention",
-                                tint = colors.onAccent,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                    } else {
-                        // Spring-animated tab with Apple-style fluid response
-                        val iconScale by animateFloatAsState(
-                            targetValue = if (selected) 1.12f else 1f,
-                            animationSpec = spring(
-                                dampingRatio = 0.78f,
-                                stiffness = 450f
-                            ),
-                            label = "tab_icon_scale"
-                        )
-
-                        val pillBg by animateColorAsState(
-                            targetValue = if (selected) colors.accentSoft else Color.Transparent,
-                            animationSpec = tween(durationMillis = 180),
-                            label = "tab_pill_bg"
-                        )
-
-                        val contentColor by animateColorAsState(
-                            targetValue = if (selected) colors.accent else colors.textTertiary,
-                            animationSpec = tween(durationMillis = 180),
-                            label = "tab_content_color"
-                        )
-
-                        // Emil Kowalski rule: Never animate from scale(0)
-                        val dotScale by animateFloatAsState(
-                            targetValue = if (selected) 1f else 0.4f,
-                            animationSpec = spring(
-                                dampingRatio = 0.75f,
-                                stiffness = 500f
-                            ),
-                            label = "dot_scale"
-                        )
-                        val dotAlpha by animateFloatAsState(
-                            targetValue = if (selected) 1f else 0f,
-                            animationSpec = tween(durationMillis = 160),
-                            label = "dot_alpha"
-                        )
-
-                        Box(
-                            modifier = Modifier
-                                .size(46.dp)
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(pillBg)
-                                .formaPressEffect(targetScale = 0.92f) {
+                                } else {
                                     if (currentRoute != screen.route) {
                                         haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
                                         navController.navigate(screen.route) {
@@ -188,41 +168,41 @@ fun FormaBottomBar(
                                             restoreState = true
                                         }
                                     }
-                                },
-                            contentAlignment = Alignment.Center
+                                }
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
                         ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                screen.icon?.let { icon ->
-                                    Icon(
-                                        imageVector = icon,
-                                        contentDescription = screen.title,
-                                        tint = contentColor,
-                                        modifier = Modifier
-                                            .size(22.dp)
-                                            .graphicsLayer {
-                                                scaleX = iconScale
-                                                scaleY = iconScale
-                                            }
-                                    )
-                                }
+                            screen.icon?.let { icon ->
+                                Icon(
+                                    imageVector = icon,
+                                    contentDescription = screen.title,
+                                    tint = contentColor,
+                                    modifier = Modifier
+                                        .size(if (isAddButton) 27.dp else 22.dp)
+                                        .graphicsLayer {
+                                            scaleX = iconScale
+                                            scaleY = iconScale
+                                        }
+                                )
+                            }
 
-                                if (selected) {
-                                    Spacer(modifier = Modifier.height(3.dp))
-                                    Box(
-                                        modifier = Modifier
-                                            .size(4.dp)
-                                            .graphicsLayer {
-                                                scaleX = dotScale
-                                                scaleY = dotScale
-                                                alpha = dotAlpha
-                                            }
-                                            .clip(CircleShape)
-                                            .background(colors.accent)
-                                    )
-                                }
+                            if (selected) {
+                                Spacer(modifier = Modifier.height(3.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .size(4.dp)
+                                        .graphicsLayer {
+                                            scaleX = dotScale
+                                            scaleY = dotScale
+                                            alpha = dotAlpha
+                                        }
+                                        .clip(CircleShape)
+                                        .background(colors.accent)
+                                )
                             }
                         }
                     }

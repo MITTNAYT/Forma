@@ -1,4 +1,4 @@
-﻿package com.habitflow.app.ui.settings
+package com.habitflow.app.ui.settings
 
 import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
@@ -26,31 +26,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Air
 import androidx.compose.material.icons.rounded.Article
-import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Bedtime
 import androidx.compose.material.icons.rounded.Bookmark
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.DarkMode
 import androidx.compose.material.icons.rounded.Edit
-import androidx.compose.material.icons.rounded.Forest
-import androidx.compose.material.icons.rounded.GraphicEq
 import androidx.compose.material.icons.rounded.HelpOutline
 import androidx.compose.material.icons.rounded.LightMode
-import androidx.compose.material.icons.rounded.Notifications
-import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.PhoneAndroid
-import androidx.compose.material.icons.rounded.PlayArrow
-import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material.icons.rounded.Spa
-import androidx.compose.material.icons.rounded.Stop
-import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material.icons.rounded.TrackChanges
 import androidx.compose.material.icons.rounded.Vibration
-import androidx.compose.material.icons.rounded.WaterDrop
-import androidx.compose.material.icons.rounded.Waves
 import androidx.compose.material.icons.rounded.WbSunny
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -109,26 +97,13 @@ fun SettingsScreen(
 
     var showPaywall by remember { mutableStateOf(false) }
     var showEditProfileDialog by remember { mutableStateOf(false) }
-    var showZenSummary by remember { mutableStateOf(false) }
-    var showImportDialog by remember { mutableStateOf(false) }
     var vaultDialogMode by remember { mutableStateOf<VaultDialogMode?>(null) }
-    var importJsonText by remember { mutableStateOf("") }
     var hapticsEnabled by remember { mutableStateOf(true) }
     var morningReminderEnabled by remember { mutableStateOf(true) }
     var eveningReminderEnabled by remember { mutableStateOf(true) }
-    var selectedAmbientSound by remember { mutableStateOf(com.habitflow.app.core.audio.AmbientSound.RAIN) }
-    var isAmbientPlaying by remember { mutableStateOf(false) }
-    var ambientSleepTimerMinutes by remember { androidx.compose.runtime.mutableIntStateOf(30) }
-    var zenSummaryData by remember { mutableStateOf<com.habitflow.app.ui.mindfulness.ZenSummaryData?>(null) }
 
     val userInitial = userName.trim().take(1).uppercase().ifBlank { "A" }
     val haptic = LocalHapticFeedback.current
-
-    androidx.compose.runtime.LaunchedEffect(showZenSummary) {
-        if (showZenSummary) {
-            zenSummaryData = viewModel.getMonthlyZenSummary()
-        }
-    }
 
     Scaffold(containerColor = colors.background) { paddingValues ->
         LazyColumn(
@@ -581,231 +556,7 @@ fun SettingsScreen(
                 Spacer(modifier = Modifier.height(20.dp))
             }
 
-            // ── Section: Background Ambient Soundscapes ─────────────────
-            item {
-                SettingsSectionHeader(label = "BACKGROUND AMBIENT SOUNDSCAPES", modifier = Modifier.padding(horizontal = 24.dp))
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(colors.surface)
-                        .border(1.dp, colors.border.copy(alpha = 0.4f), RoundedCornerShape(20.dp))
-                        .padding(18.dp)
-                ) {
-                    Column {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(40.dp)
-                                        .clip(RoundedCornerShape(12.dp))
-                                        .background(if (isAmbientPlaying) colors.accentSoft else colors.surfaceVariant),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.GraphicEq,
-                                        contentDescription = null,
-                                        tint = if (isAmbientPlaying) colors.accent else colors.textSecondary,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                }
-                                Spacer(modifier = Modifier.width(12.dp))
-                                Column {
-                                    Text(
-                                        text = selectedAmbientSound.displayName,
-                                        style = FormaTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Bold,
-                                        color = colors.textPrimary,
-                                        fontSize = 15.sp
-                                    )
-                                    Text(
-                                        text = selectedAmbientSound.description,
-                                        style = FormaTheme.typography.bodySmall,
-                                        color = colors.textSecondary,
-                                        fontSize = 12.sp,
-                                        maxLines = 1
-                                    )
-                                }
-                            }
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(if (isAmbientPlaying) colors.accent else colors.accentSoft)
-                                    .clickable {
-                                        if (isAmbientPlaying) {
-                                            isAmbientPlaying = false
-                                            viewModel.stopBackgroundSound(context)
-                                        } else {
-                                            isAmbientPlaying = true
-                                            viewModel.playBackgroundSound(context, selectedAmbientSound, ambientSleepTimerMinutes)
-                                        }
-                                    }
-                                    .padding(horizontal = 14.dp, vertical = 9.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = if (isAmbientPlaying) Icons.Rounded.Stop else Icons.Rounded.PlayArrow,
-                                        contentDescription = null,
-                                        tint = if (isAmbientPlaying) Color.White else colors.accent,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                    Text(
-                                        text = if (isAmbientPlaying) "Stop" else "Play",
-                                        style = FormaTheme.typography.labelSmall,
-                                        color = if (isAmbientPlaying) Color.White else colors.accent,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-                        SettingsDivider()
-                        Spacer(modifier = Modifier.height(14.dp))
-
-                        // Sound Selector Grid
-                        Text(
-                            text = "SOUNDSCAPE SELECTION",
-                            style = FormaTheme.typography.labelSmall,
-                            color = colors.textTertiary,
-                            fontSize = 10.sp,
-                            letterSpacing = 0.8.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        val availableSounds = listOf(
-                            Triple(com.habitflow.app.core.audio.AmbientSound.RAIN, Icons.Rounded.WaterDrop, "Rain"),
-                            Triple(com.habitflow.app.core.audio.AmbientSound.KYOTO_BELL, Icons.Rounded.Spa, "Bell"),
-                            Triple(com.habitflow.app.core.audio.AmbientSound.ZEN_DRONE, Icons.Rounded.Waves, "Zen Drone"),
-                            Triple(com.habitflow.app.core.audio.AmbientSound.FOREST_STREAM, Icons.Rounded.Forest, "Stream"),
-                            Triple(com.habitflow.app.core.audio.AmbientSound.BROWN_NOISE, Icons.Rounded.Air, "Brown Flow"),
-                            Triple(com.habitflow.app.core.audio.AmbientSound.WHITE_NOISE, Icons.Rounded.GraphicEq, "White Air")
-                        )
-
-                        // 3 rows of 2 or 2 rows of 3
-                        val chunked = availableSounds.chunked(3)
-                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            chunked.forEach { rowSounds ->
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    rowSounds.forEach { (sound, iconVector, label) ->
-                                        val isSelected = selectedAmbientSound == sound
-                                        Box(
-                                            modifier = Modifier
-                                                .weight(1f)
-                                                .clip(RoundedCornerShape(12.dp))
-                                                .background(if (isSelected) colors.accentSoft else colors.surfaceVariant.copy(alpha = 0.5f))
-                                                .border(
-                                                    1.dp,
-                                                    if (isSelected) colors.accent else Color.Transparent,
-                                                    RoundedCornerShape(12.dp)
-                                                )
-                                                .clickable {
-                                                    selectedAmbientSound = sound
-                                                    if (isAmbientPlaying) {
-                                                        viewModel.playBackgroundSound(context, sound, ambientSleepTimerMinutes)
-                                                    }
-                                                }
-                                                .padding(vertical = 10.dp, horizontal = 6.dp),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Column(
-                                                horizontalAlignment = Alignment.CenterHorizontally,
-                                                verticalArrangement = Arrangement.spacedBy(4.dp)
-                                            ) {
-                                                Icon(
-                                                    imageVector = iconVector,
-                                                    contentDescription = null,
-                                                    tint = if (isSelected) colors.accent else colors.textSecondary,
-                                                    modifier = Modifier.size(18.dp)
-                                                )
-                                                Text(
-                                                    text = label,
-                                                    style = FormaTheme.typography.labelSmall,
-                                                    color = if (isSelected) colors.accent else colors.textPrimary,
-                                                    fontSize = 11.sp,
-                                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                                    maxLines = 1
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        // Sleep Timer Row
-                        Text(
-                            text = "SLEEP TIMER",
-                            style = FormaTheme.typography.labelSmall,
-                            color = colors.textTertiary,
-                            fontSize = 10.sp,
-                            letterSpacing = 0.8.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            listOf(0 to "Continuous", 15 to "15m", 30 to "30m", 60 to "60m").forEach { (mins, label) ->
-                                val isSelected = ambientSleepTimerMinutes == mins
-                                Box(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .clip(RoundedCornerShape(10.dp))
-                                        .background(if (isSelected) colors.accentSoft else colors.surfaceVariant.copy(alpha = 0.5f))
-                                        .border(
-                                            1.dp,
-                                            if (isSelected) colors.accent else Color.Transparent,
-                                            RoundedCornerShape(10.dp)
-                                        )
-                                        .clickable {
-                                            ambientSleepTimerMinutes = mins
-                                            if (isAmbientPlaying) {
-                                                viewModel.playBackgroundSound(context, selectedAmbientSound, mins)
-                                            }
-                                        }
-                                        .padding(vertical = 7.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = label,
-                                        style = FormaTheme.typography.labelSmall,
-                                        color = if (isSelected) colors.accent else colors.textPrimary,
-                                        fontSize = 11.sp,
-                                        fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.height(20.dp))
-            }
-
-            // ── Section: Data & Backup ──────────────────────────────────
+            // ── Section: Data & Mindful Archives ───────────────────────
             item {
                 SettingsSectionHeader(label = "DATA & MINDFUL ARCHIVES", modifier = Modifier.padding(horizontal = 24.dp))
                 Spacer(modifier = Modifier.height(8.dp))
@@ -821,34 +572,10 @@ fun SettingsScreen(
                 ) {
                     Column {
                         SettingsTapRow(
-                            icon = Icons.Rounded.Spa,
-                            title = "Monthly Zen Summary",
-                            subtitle = "View your peace index, rituals & focus hours",
-                            onClick = { showZenSummary = true }
-                        )
-                        SettingsDivider(indent = 50.dp)
-                        SettingsTapRow(
                             icon = Icons.Rounded.Article,
                             title = "Export Markdown Journal",
                             subtitle = "Notion, Obsidian & notes-app ready",
                             onClick = { viewModel.exportMarkdown(context) }
-                        )
-                        SettingsDivider(indent = 50.dp)
-                        SettingsTapRow(
-                            icon = Icons.Rounded.Share,
-                            title = "Export JSON Backup",
-                            subtitle = "Full backup of rituals, reflections & timeline",
-                            onClick = {
-                                viewModel.exportFullBackup { json ->
-                                    val sendIntent = android.content.Intent().apply {
-                                        action = android.content.Intent.ACTION_SEND
-                                        putExtra(android.content.Intent.EXTRA_TEXT, json)
-                                        type = "application/json"
-                                    }
-                                    val shareIntent = android.content.Intent.createChooser(sendIntent, "Export HabitFlow Backup")
-                                    context.startActivity(shareIntent)
-                                }
-                            }
                         )
                         SettingsDivider(indent = 50.dp)
                         SettingsTapRow(
@@ -863,13 +590,6 @@ fun SettingsScreen(
                             title = "Unlock & Restore Encrypted Vault",
                             subtitle = "Decrypt and restore with your master passphrase",
                             onClick = { vaultDialogMode = VaultDialogMode.DECRYPT_RESTORE }
-                        )
-                        SettingsDivider(indent = 50.dp)
-                        SettingsTapRow(
-                            icon = Icons.Rounded.AutoAwesome,
-                            title = "Restore from Plain JSON",
-                            subtitle = "Paste and restore unencrypted HabitFlow JSON",
-                            onClick = { showImportDialog = true }
                         )
                     }
                 }
@@ -966,82 +686,6 @@ fun SettingsScreen(
             containerColor = colors.surface,
             shape = RoundedCornerShape(24.dp)
         )
-    }
-
-    if (showImportDialog) {
-        AlertDialog(
-            onDismissRequest = {
-                showImportDialog = false
-                importJsonText = ""
-            },
-            title = {
-                Text(
-                    text = "Restore HabitFlow Database",
-                    fontWeight = FontWeight.Bold,
-                    color = colors.textPrimary,
-                    fontSize = 18.sp
-                )
-            },
-            text = {
-                Column {
-                    Text(
-                        text = "Paste your exported JSON backup text below to restore your habits, completions, and reflections.",
-                        style = FormaTheme.typography.bodySmall,
-                        color = colors.textSecondary,
-                        fontSize = 12.sp
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-                    OutlinedTextField(
-                        value = importJsonText,
-                        onValueChange = { importJsonText = it },
-                        label = { Text("Backup JSON", color = colors.textSecondary) },
-                        maxLines = 8,
-                        colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = colors.accent,
-                            unfocusedBorderColor = colors.border,
-                            focusedTextColor = colors.textPrimary,
-                            unfocusedTextColor = colors.textPrimary
-                        ),
-                        shape = RoundedCornerShape(14.dp),
-                        modifier = Modifier.fillMaxWidth().height(160.dp)
-                    )
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    if (importJsonText.isNotBlank()) {
-                        viewModel.restoreFullBackup(importJsonText) { success, msg ->
-                            Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
-                            if (success) {
-                                showImportDialog = false
-                                importJsonText = ""
-                            }
-                        }
-                    }
-                }) {
-                    Text("Restore", color = colors.accent, fontWeight = FontWeight.Bold)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = {
-                    showImportDialog = false
-                    importJsonText = ""
-                }) {
-                    Text("Cancel", color = colors.textSecondary)
-                }
-            },
-            containerColor = colors.surface,
-            shape = RoundedCornerShape(24.dp)
-        )
-    }
-
-    if (showZenSummary) {
-        zenSummaryData?.let { summary ->
-            com.habitflow.app.ui.mindfulness.MonthlyZenSummarySheet(
-                summaryData = summary,
-                onDismiss = { showZenSummary = false }
-            )
-        }
     }
 
     vaultDialogMode?.let { mode ->

@@ -123,9 +123,13 @@ fun AddEditTimelineSheet(
     var newSubtaskText by remember { mutableStateOf("") }
     var showAddSubtaskField by remember { mutableStateOf(false) }
 
-    val parsedColor = try {
-        Color(android.graphics.Color.parseColor(uiState.colorTag))
-    } catch (_: Exception) {
+    val parsedColor = if (!uiState.colorTag.isNullOrBlank()) {
+        try {
+            Color(android.graphics.Color.parseColor(uiState.colorTag))
+        } catch (_: Exception) {
+            colors.accent
+        }
+    } else {
         colors.accent
     }
 
@@ -167,7 +171,7 @@ fun AddEditTimelineSheet(
                     modifier = Modifier
                         .size(34.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFFFFEBEE))
+                        .background(Color(0xFFE53935).copy(alpha = 0.12f))
                         .formaPressEffect(targetScale = 0.90f) {
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             viewModel.delete()
@@ -365,6 +369,34 @@ fun AddEditTimelineSheet(
                         .horizontalScroll(rememberScrollState()),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    // Theme Default Accent Bubble
+                    val isThemePicked = uiState.colorTag.isNullOrBlank()
+                    Box(
+                        modifier = Modifier
+                            .size(28.dp)
+                            .clip(CircleShape)
+                            .background(colors.accent)
+                            .border(
+                                width = if (isThemePicked) 2.5.dp else 1.dp,
+                                color = if (isThemePicked) colors.textPrimary else colors.accent.copy(alpha = 0.4f),
+                                shape = CircleShape
+                            )
+                            .formaPressEffect(targetScale = 0.88f) {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                viewModel.setColorTag(null)
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (isThemePicked) {
+                            Icon(
+                                imageVector = Icons.Rounded.Check,
+                                contentDescription = "Theme Accent",
+                                tint = colors.onAccent,
+                                modifier = Modifier.size(14.dp)
+                            )
+                        }
+                    }
+
                     ZenColorPalette.forEach { swatch ->
                         ColorSwatchBubble(
                             hex = swatch.first,

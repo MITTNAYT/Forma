@@ -44,7 +44,7 @@ data class AddEditTimelineUiState(
     val durationMinutes: Int = 30,
     val endTime: String = "09:45",
     val icon: String = "target",
-    val colorTag: String = "#4E6542",
+    val colorTag: String? = null,
     val notes: String = "",
     val subtasks: List<Subtask> = emptyList(),
     val timeOfDay: TimeOfDay = TimeOfDay.MORNING,
@@ -231,7 +231,7 @@ class AddEditTimelineViewModel @Inject constructor(
     }
 
     fun setIcon(icon: String) { _uiState.value = _uiState.value.copy(icon = icon) }
-    fun setColorTag(colorTag: String) { _uiState.value = _uiState.value.copy(colorTag = colorTag) }
+    fun setColorTag(colorTag: String?) { _uiState.value = _uiState.value.copy(colorTag = colorTag?.ifBlank { null }) }
     fun setNotes(notes: String) { _uiState.value = _uiState.value.copy(notes = notes) }
     fun setTimeOfDay(timeOfDay: TimeOfDay) { _uiState.value = _uiState.value.copy(timeOfDay = timeOfDay) }
 
@@ -300,7 +300,7 @@ class AddEditTimelineViewModel @Inject constructor(
                     id = state.id,
                     name = state.title.trim(),
                     icon = state.icon,
-                    colorTag = state.colorTag,
+                    colorTag = state.colorTag ?: "",
                     timeOfDay = state.timeOfDay,
                     energyLevel = state.energyLevel,
                     repeatDays = state.repeatDays,
@@ -327,7 +327,7 @@ class AddEditTimelineViewModel @Inject constructor(
                     startTime = if (state.hasTime) state.startTime else null,
                     endTime = if (state.hasTime) state.endTime else null,
                     icon = state.icon,
-                    colorTag = state.colorTag,
+                    colorTag = state.colorTag ?: "",
                     notes = state.notes.trim(),
                     subtasks = state.subtasks,
                     isRecurring = isRecurring,

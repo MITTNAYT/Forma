@@ -9,7 +9,7 @@ plugins {
 import java.util.Properties
 import java.io.File
 
-val keystoreProps = Properties().apply {
+val keystoreProps: Properties = Properties().apply {
     val localFile = rootProject.file("keystore.properties")
     val userHomeFile = File(System.getProperty("user.home"), "keystore.properties")
     when {
@@ -17,6 +17,13 @@ val keystoreProps = Properties().apply {
         userHomeFile.exists() -> load(userHomeFile.inputStream())
     }
 }
+
+val localProps: Properties = Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) load(f.inputStream())
+}
+val geminiApiKey = (localProps["GEMINI_API_KEY"] as? String)
+    ?: System.getenv("GEMINI_API_KEY") ?: ""
 
 android {
     namespace = "com.habitflow.app"
@@ -28,6 +35,8 @@ android {
         targetSdk = 35
         versionCode = 2
         versionName = "2.0.0"
+
+        buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -104,6 +113,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     packaging {
         resources {

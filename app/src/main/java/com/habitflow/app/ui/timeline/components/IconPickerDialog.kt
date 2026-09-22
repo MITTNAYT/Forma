@@ -1,4 +1,4 @@
-﻿package com.habitflow.app.ui.timeline.components
+package com.habitflow.app.ui.timeline.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -68,17 +68,21 @@ val ZenColorPalette = listOf(
 @Composable
 fun IconPickerDialog(
     selectedIcon: String,
-    selectedColor: String = "#4E6542",
+    selectedColor: String? = null,
     onIconSelected: (String) -> Unit,
-    onColorSelected: ((String) -> Unit)? = null,
+    onColorSelected: ((String?) -> Unit)? = null,
     onDismiss: () -> Unit
 ) {
     val colors = FormaTheme.colors
     val haptic = LocalHapticFeedback.current
     var activeColorHex by remember { mutableStateOf(selectedColor) }
-    val activeColor = try {
-        Color(android.graphics.Color.parseColor(activeColorHex))
-    } catch (_: Exception) {
+    val activeColor = if (!activeColorHex.isNullOrBlank()) {
+        try {
+            Color(android.graphics.Color.parseColor(activeColorHex))
+        } catch (_: Exception) {
+            colors.accent
+        }
+    } else {
         colors.accent
     }
 
@@ -153,6 +157,35 @@ fun IconPickerDialog(
                     .horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
+                // Theme Default Accent Swatch
+                val isThemePicked = activeColorHex.isNullOrBlank()
+                Box(
+                    modifier = Modifier
+                        .size(38.dp)
+                        .clip(CircleShape)
+                        .background(colors.accent)
+                        .border(
+                            width = if (isThemePicked) 2.5.dp else 1.dp,
+                            color = if (isThemePicked) colors.textPrimary else colors.accent.copy(alpha = 0.5f),
+                            shape = CircleShape
+                        )
+                        .formaPressEffect(targetScale = 0.88f) {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            activeColorHex = null
+                            onColorSelected?.invoke(null)
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (isThemePicked) {
+                        Icon(
+                            imageVector = Icons.Rounded.Check,
+                            contentDescription = "Theme Accent",
+                            tint = colors.onAccent,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
+
                 ZenColorPalette.forEach { (hex, name) ->
                     val c = try {
                         Color(android.graphics.Color.parseColor(hex))

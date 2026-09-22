@@ -1,5 +1,6 @@
 package com.habitflow.app.core.ai
 
+import com.habitflow.app.BuildConfig
 import com.habitflow.app.domain.model.EnergyLevel
 import com.habitflow.app.domain.model.Habit
 import com.habitflow.app.domain.model.TimeOfDay
@@ -33,9 +34,15 @@ class GeminiDaySynthesisService @Inject constructor() {
         timelineItems: List<TimelineItem>,
         apiKey: String? = null
     ): AiDaySynthesisResult = withContext(Dispatchers.IO) {
-        if (!apiKey.isNullOrBlank()) {
+        val effectiveKey = apiKey?.ifBlank { null } ?: BuildConfig.GEMINI_API_KEY.ifBlank { null }
+
+        if (!effectiveKey.isNullOrBlank()) {
             try {
-                return@withContext callGeminiApi(userName, currentEnergy, habits, timelineItems, apiKey)
+                return@withContext if (effectiveKey.startsWith("sk-or-")) {
+                    callOpenRouterGeminiApi(userName, currentEnergy, habits, timelineItems, effectiveKey)
+                } else {
+                    callGoogleGeminiApi(userName, currentEnergy, habits, timelineItems, effectiveKey)
+                }
             } catch (_: Exception) {
                 // Graceful fallback to heuristic synthesis on network or auth issue
             }
@@ -43,7 +50,68 @@ class GeminiDaySynthesisService @Inject constructor() {
         return@withContext performHeuristicSynthesis(userName, currentEnergy, habits, timelineItems)
     }
 
-    private fun callGeminiApi(
+    private fun callOpenRouterGeminiApi(
+        userName: String,
+        currentEnergy: EnergyLevel,
+        habits: List<Habit>,
+        timelineItems: List<TimelineItem>,
+        apiKey: String
+    ): AiDaySynthesisResult {
+        val endpoint = "https://openrouter.ai/api/v1/chat/completions"
+        val url = URL(endpoint)
+        val conn = url.openConnection() as HttpURLConnection
+        conn.requestMethod = "POST"
+        conn.setRequestProperty("Content-Type", "application/json")
+        conn.setRequestProperty("Authorization", "Bearer $apiKey")
+        conn.setRequestProperty("HTTP-Referer", "https://forma.app")
+        conn.setRequestProperty("X-Title", "Forma")
+        conn.doOutput = true
+        conn.connectTimeout = 10000
+        conn.readTimeout = 10000
+
+        val habitSummary = habits.joinToString(", ") { "${it.name} (${it.timeOfDay}, energy: ${it.energyLevel})" }
+        val itemSummary = timelineItems.joinToString(", ") { it.title }
+
+        val systemPrompt = "You are Forma AI, a mindful daily flow architect. Synthesize an intentional day plan. Respond ONLY with a valid JSON object matching this schema: {\"suggestedKeystones\": [\"...\", \"...\", \"...\"], \"habitStackRecommendations\": [\"...\"], \"energyCadenceNote\": \"...\", \"zenAffirmation\": \"...\"}"
+        val userPrompt = "User: $userName\nCurrent Energy: $currentEnergy\nToday's Habits: $habitSummary\nToday's Tasks: $itemSummary"
+
+        val requestBody = JSONObject().apply {
+            put("model", "google/gemini-flash-1.5")
+            put("messages", JSONArray().apply {
+                put(JSONObject().apply {
+                    put("role", "system")
+                    put("content", systemPrompt)
+                })
+                put(JSONObject().apply {
+                    put("role", "user")
+                    put("content", userPrompt)
+                })
+            })
+            put("response_format", JSONObject().apply {
+                put("type", "json_object")
+            })
+            put("temperature", 0.3)
+        }
+
+        OutputStreamWriter(conn.outputStream).use { writer ->
+            writer.write(requestBody.toString())
+            writer.flush()
+        }
+
+        if (conn.responseCode in 200..299) {
+            val responseText = BufferedReader(InputStreamReader(conn.inputStream)).use { it.readText() }
+            val jsonRoot = JSONObject(responseText)
+            val choices = jsonRoot.getJSONArray("choices")
+            val firstChoice = choices.getJSONObject(0)
+            val message = firstChoice.getJSONObject("message")
+            val content = message.getString("content")
+            return parseSynthesisJson(content)
+        } else {
+            throw RuntimeException("OpenRouter returned HTTP ${conn.responseCode}")
+        }
+    }
+
+    private fun callGoogleGeminiApi(
         userName: String,
         currentEnergy: EnergyLevel,
         habits: List<Habit>,
@@ -107,33 +175,36 @@ class GeminiDaySynthesisService @Inject constructor() {
             val content = firstCandidate.getJSONObject("content")
             val parts = content.getJSONArray("parts")
             val text = parts.getJSONObject(0).getString("text")
-
-            val parsed = JSONObject(text)
-            val keystones = mutableListOf<String>()
-            val keystonesJson = parsed.optJSONArray("suggestedKeystones")
-            if (keystonesJson != null) {
-                for (i in 0 until keystonesJson.length()) {
-                    keystones.add(keystonesJson.getString(i))
-                }
-            }
-
-            val stacks = mutableListOf<String>()
-            val stacksJson = parsed.optJSONArray("habitStackRecommendations")
-            if (stacksJson != null) {
-                for (i in 0 until stacksJson.length()) {
-                    stacks.add(stacksJson.getString(i))
-                }
-            }
-
-            return AiDaySynthesisResult(
-                suggestedKeystones = if (keystones.isNotEmpty()) keystones else listOf("Protect deep morning focus", "Hydrate and walk midday", "Reflect and unwind at dusk"),
-                habitStackRecommendations = if (stacks.isNotEmpty()) stacks else listOf("Stack high-energy intentions before noon"),
-                energyCadenceNote = parsed.optString("energyCadenceNote", "Honor your natural rhythm with intentional pacing."),
-                zenAffirmation = parsed.optString("zenAffirmation", "In stillness and clarity, purposeful progress unfolds.")
-            )
+            return parseSynthesisJson(text)
         } else {
             throw RuntimeException("Gemini API returned code: ${conn.responseCode}")
         }
+    }
+
+    private fun parseSynthesisJson(text: String): AiDaySynthesisResult {
+        val parsed = JSONObject(text)
+        val keystones = mutableListOf<String>()
+        val keystonesJson = parsed.optJSONArray("suggestedKeystones")
+        if (keystonesJson != null) {
+            for (i in 0 until keystonesJson.length()) {
+                keystones.add(keystonesJson.getString(i))
+            }
+        }
+
+        val stacks = mutableListOf<String>()
+        val stacksJson = parsed.optJSONArray("habitStackRecommendations")
+        if (stacksJson != null) {
+            for (i in 0 until stacksJson.length()) {
+                stacks.add(stacksJson.getString(i))
+            }
+        }
+
+        return AiDaySynthesisResult(
+            suggestedKeystones = if (keystones.isNotEmpty()) keystones else listOf("Protect deep morning focus", "Hydrate and walk midday", "Reflect and unwind at dusk"),
+            habitStackRecommendations = if (stacks.isNotEmpty()) stacks else listOf("Stack high-energy intentions before noon"),
+            energyCadenceNote = parsed.optString("energyCadenceNote", "Honor your natural rhythm with intentional pacing."),
+            zenAffirmation = parsed.optString("zenAffirmation", "In stillness and clarity, purposeful progress unfolds.")
+        )
     }
 
     private fun performHeuristicSynthesis(
