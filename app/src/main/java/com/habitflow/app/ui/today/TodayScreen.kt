@@ -230,41 +230,76 @@ fun TodayScreen(
                                     fontSize = 11.sp
                                 )
 
-                                // Single primary ritual pill (Morning Clarity / Evening Rest)
-                                val currentHour = LocalTime.now().hour
-                                val isEvening = currentHour >= 18 || currentHour < 4
-                                val ritualTitle = if (isEvening) "Evening Rest" else "Morning Clarity"
-                                val ritualIcon = if (isEvening) Icons.Rounded.Spa else Icons.Rounded.AutoAwesome
-
-                                Box(
-                                    modifier = Modifier
-                                        .onGloballyPositioned { coordinates ->
-                                            ritualPillBounds = coordinates.boundsInRoot()
-                                        }
-                                        .clip(RoundedCornerShape(12.dp))
-                                        .background(colors.accentSoft)
-                                        .border(1.dp, colors.accent.copy(alpha = 0.35f), RoundedCornerShape(12.dp))
-                                        .formaPressEffect(targetScale = 0.92f) {
-                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                            if (isEvening) showEveningSheet = true else showMorningSheet = true
-                                        }
-                                        .padding(horizontal = 10.dp, vertical = 6.dp)
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(
-                                            imageVector = ritualIcon,
-                                            contentDescription = ritualTitle,
-                                            tint = colors.accent,
-                                            modifier = Modifier.size(13.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(5.dp))
-                                        Text(
-                                            text = ritualTitle,
-                                            style = FormaTheme.typography.labelSmall,
-                                            fontWeight = FontWeight.Bold,
-                                            color = colors.accent,
-                                            fontSize = 11.sp
-                                        )
+                                    // Quick Flow button (Freeform Pomodoro Focus Session)
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .background(colors.surfaceVariant)
+                                            .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
+                                            .formaPressEffect(targetScale = 0.92f) {
+                                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                                onNavigateToFocusTimer("freeform", "Mindful Focus", 25, false)
+                                            }
+                                            .padding(horizontal = 10.dp, vertical = 6.dp)
+                                    ) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Icon(
+                                                imageVector = Icons.Rounded.Timer,
+                                                contentDescription = "Quick Flow",
+                                                tint = colors.textPrimary,
+                                                modifier = Modifier.size(13.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(5.dp))
+                                            Text(
+                                                text = "Quick Flow",
+                                                style = FormaTheme.typography.labelSmall,
+                                                fontWeight = FontWeight.Bold,
+                                                color = colors.textPrimary,
+                                                fontSize = 11.sp
+                                            )
+                                        }
+                                    }
+
+                                    // Single primary ritual pill (Morning Clarity / Evening Rest)
+                                    val currentHour = LocalTime.now().hour
+                                    val isEvening = currentHour >= 18 || currentHour < 4
+                                    val ritualTitle = if (isEvening) "Evening Rest" else "Morning Clarity"
+                                    val ritualIcon = if (isEvening) Icons.Rounded.Spa else Icons.Rounded.AutoAwesome
+
+                                    Box(
+                                        modifier = Modifier
+                                            .onGloballyPositioned { coordinates ->
+                                                ritualPillBounds = coordinates.boundsInRoot()
+                                            }
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .background(colors.accentSoft)
+                                            .border(1.dp, colors.accent.copy(alpha = 0.35f), RoundedCornerShape(12.dp))
+                                            .formaPressEffect(targetScale = 0.92f) {
+                                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                                if (isEvening) showEveningSheet = true else showMorningSheet = true
+                                            }
+                                            .padding(horizontal = 10.dp, vertical = 6.dp)
+                                    ) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Icon(
+                                                imageVector = ritualIcon,
+                                                contentDescription = ritualTitle,
+                                                tint = colors.accent,
+                                                modifier = Modifier.size(13.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(5.dp))
+                                            Text(
+                                                text = ritualTitle,
+                                                style = FormaTheme.typography.labelSmall,
+                                                fontWeight = FontWeight.Bold,
+                                                color = colors.accent,
+                                                fontSize = 11.sp
+                                            )
+                                        }
                                     }
                                 }
                             }

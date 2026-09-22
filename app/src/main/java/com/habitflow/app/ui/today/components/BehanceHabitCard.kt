@@ -1,4 +1,4 @@
-﻿package com.habitflow.app.ui.today.components
+package com.habitflow.app.ui.today.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
@@ -266,18 +266,33 @@ fun BehanceHabitCard(
                 // Pomodoro Focus Clock Trigger Pill
                 Box(
                     modifier = Modifier
-                        .size(32.dp)
-                        .clip(CircleShape)
+                        .height(34.dp)
+                        .clip(RoundedCornerShape(12.dp))
                         .background(colors.accentSoft)
-                        .clickable { onStartFocus() },
+                        .border(1.dp, colors.accent.copy(alpha = 0.25f), RoundedCornerShape(12.dp))
+                        .formaPressEffect(targetScale = 0.90f) {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onStartFocus()
+                        }
+                        .padding(horizontal = 9.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Timer,
-                        contentDescription = "Start Focus Clock",
-                        tint = colors.accent,
-                        modifier = Modifier.size(17.dp)
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Rounded.Timer,
+                            contentDescription = "Start Focus Clock",
+                            tint = colors.accent,
+                            modifier = Modifier.size(15.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "Focus",
+                            style = FormaTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = colors.accent,
+                            fontSize = 11.sp
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.width(10.dp))

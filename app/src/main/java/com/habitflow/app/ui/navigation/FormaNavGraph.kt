@@ -40,7 +40,6 @@ fun FormaNavGraph(
     // Tab order for directional slide calculation
     val tabRoutes = listOf(
         Screen.Home.route,
-        Screen.Pomodoro.route,
         Screen.AddItem.route,
         Screen.Analysis.route,
         Screen.Settings.route
