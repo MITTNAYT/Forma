@@ -94,12 +94,18 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditTimelineSheet(
+    itemId: String? = null,
+    selectedDate: String? = null,
     onDismiss: () -> Unit,
     viewModel: AddEditTimelineViewModel = hiltViewModel()
 ) {
     val colors = NotionTheme.colors
     val haptic = LocalHapticFeedback.current
     val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(itemId, selectedDate) {
+        viewModel.initialize(itemId, selectedDate)
+    }
 
     var showIconPicker by remember { mutableStateOf(false) }
     var showDatePickerDialog by remember { mutableStateOf(false) }

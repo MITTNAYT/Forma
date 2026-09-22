@@ -46,15 +46,29 @@ fun HabitFlowApp(
                 onOnboardingFinished = { /* StateFlow updates automatically */ }
             )
         } else {
+            var showAddEditSheet by remember { mutableStateOf(false) }
+            var activeEditItemId by remember { mutableStateOf<String?>(null) }
+            var activeSelectedDate by remember { mutableStateOf<String?>(null) }
+
             // True Edge-to-Edge Full Screen Container
             Box(
                 modifier = modifier
                     .fillMaxSize()
                     .background(NotionTheme.colors.background)
             ) {
-                // Navigation Screen Host (fills the full display)
+                // Navigation Screen Host (fills the full display and stays visible)
                 HabitFlowNavGraph(
                     navController = navController,
+                    onOpenAddSheet = { dateStr ->
+                        activeEditItemId = null
+                        activeSelectedDate = dateStr
+                        showAddEditSheet = true
+                    },
+                    onOpenEditSheet = { itemId ->
+                        activeEditItemId = itemId
+                        activeSelectedDate = null
+                        showAddEditSheet = true
+                    },
                     modifier = Modifier.fillMaxSize()
                 )
 
@@ -62,7 +76,27 @@ fun HabitFlowApp(
                 Box(
                     modifier = Modifier.align(Alignment.BottomCenter)
                 ) {
-                    HabitFlowBottomBar(navController = navController)
+                    HabitFlowBottomBar(
+                        navController = navController,
+                        onAddClick = {
+                            activeEditItemId = null
+                            activeSelectedDate = null
+                            showAddEditSheet = true
+                        }
+                    )
+                }
+
+                // In-Place Floating Add/Edit Bottom Sheet (glides over current page without blanking/white background)
+                if (showAddEditSheet) {
+                    com.habitflow.app.ui.timeline.components.AddEditTimelineSheet(
+                        itemId = activeEditItemId,
+                        selectedDate = activeSelectedDate,
+                        onDismiss = {
+                            showAddEditSheet = false
+                            activeEditItemId = null
+                            activeSelectedDate = null
+                        }
+                    )
                 }
             }
         }

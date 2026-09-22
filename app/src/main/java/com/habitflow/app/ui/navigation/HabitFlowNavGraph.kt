@@ -31,6 +31,8 @@ import com.habitflow.app.ui.today.TodayScreen
 @Composable
 fun HabitFlowNavGraph(
     navController: NavHostController,
+    onOpenAddSheet: ((selectedDate: String) -> Unit)? = null,
+    onOpenEditSheet: ((itemId: String) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     // Tab order for directional slide calculation
@@ -66,10 +68,18 @@ fun HabitFlowNavGraph(
         composable(Screen.Home.route) {
             TodayScreen(
                 onNavigateToAddTask = { dateStr ->
-                    navController.navigate(Screen.AddEditTimelineItem.createRoute(selectedDate = dateStr))
+                    if (onOpenAddSheet != null) {
+                        onOpenAddSheet(dateStr)
+                    } else {
+                        navController.navigate(Screen.AddEditTimelineItem.createRoute(selectedDate = dateStr))
+                    }
                 },
                 onNavigateToEditTask = { itemId ->
-                    navController.navigate(Screen.AddEditTimelineItem.createRoute(itemId = itemId))
+                    if (onOpenEditSheet != null) {
+                        onOpenEditSheet(itemId)
+                    } else {
+                        navController.navigate(Screen.AddEditTimelineItem.createRoute(itemId = itemId))
+                    }
                 },
                 onNavigateToHabits = {
                     navController.navigate(Screen.Analysis.route)

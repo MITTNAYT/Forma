@@ -50,6 +50,7 @@ import com.habitflow.app.core.designsystem.motion.formaPressEffect
 @Composable
 fun HabitFlowBottomBar(
     navController: NavController,
+    onAddClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val colors = NotionTheme.colors
@@ -121,7 +122,11 @@ fun HabitFlowBottomBar(
                                 .background(colors.accent)
                                 .formaPressEffect(targetScale = 0.90f) {
                                     haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
-                                    navController.navigate(Screen.AddEditTimelineItem.createRoute())
+                                    if (onAddClick != null) {
+                                        onAddClick()
+                                    } else {
+                                        navController.navigate(Screen.AddEditTimelineItem.createRoute())
+                                    }
                                 },
                             contentAlignment = Alignment.Center
                         ) {

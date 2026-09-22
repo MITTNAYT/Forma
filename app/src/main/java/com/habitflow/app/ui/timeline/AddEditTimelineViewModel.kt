@@ -93,6 +93,18 @@ class AddEditTimelineViewModel @Inject constructor(
         }
     }
 
+    fun initialize(itemId: String?, selectedDate: String?) {
+        if (!itemId.isNullOrBlank()) {
+            loadItem(itemId)
+        } else {
+            val dateToUse = selectedDate ?: com.habitflow.app.core.util.DateUtils.formatDateIso(com.habitflow.app.core.util.DateUtils.today())
+            _uiState.value = AddEditTimelineUiState(
+                date = dateToUse,
+                startDate = dateToUse
+            )
+        }
+    }
+
     private fun loadItem(id: String) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
