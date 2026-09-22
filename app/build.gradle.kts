@@ -44,17 +44,22 @@ android {
         }
     }
 
+    val releaseStoreFile = (keystoreProps["KEYSTORE_PATH"] as? String)?.let { file(it) }
+        ?: System.getenv("KEYSTORE_PATH")?.let { file(it) }
+        ?: rootProject.file("habitflow-release.jks").takeIf { it.exists() }
+    val isReleaseSigningAvailable = releaseStoreFile != null && releaseStoreFile.exists()
+
     signingConfigs {
         create("release") {
-            storeFile = (keystoreProps["KEYSTORE_PATH"] as? String)?.let { file(it) }
-                ?: System.getenv("KEYSTORE_PATH")?.let { file(it) }
-                ?: rootProject.file("habitflow-release.jks").takeIf { it.exists() }
-            storePassword = (keystoreProps["KEYSTORE_PASSWORD"] as? String)
-                ?: System.getenv("KEYSTORE_PASSWORD") ?: ""
-            keyAlias = (keystoreProps["KEY_ALIAS"] as? String)
-                ?: System.getenv("KEY_ALIAS") ?: ""
-            keyPassword = (keystoreProps["KEY_PASSWORD"] as? String)
-                ?: System.getenv("KEY_PASSWORD") ?: ""
+            if (isReleaseSigningAvailable) {
+                storeFile = releaseStoreFile
+                storePassword = (keystoreProps["KEYSTORE_PASSWORD"] as? String)
+                    ?: System.getenv("KEYSTORE_PASSWORD") ?: ""
+                keyAlias = (keystoreProps["KEY_ALIAS"] as? String)
+                    ?: System.getenv("KEY_ALIAS") ?: ""
+                keyPassword = (keystoreProps["KEY_PASSWORD"] as? String)
+                    ?: System.getenv("KEY_PASSWORD") ?: ""
+            }
         }
     }
 
@@ -74,7 +79,11 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = if (isReleaseSigningAvailable) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
             ndk {
                 abiFilters.clear()
                 abiFilters.add("armeabi-v7a")
@@ -85,6 +94,7 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -133,6 +143,9 @@ dependencies {
 
     // DataStore
     implementation(libs.androidx.datastore.preferences)
+
+    // Google Play Billing
+    implementation(libs.play.billing)
 
     // WorkManager
     implementation(libs.androidx.work.runtime.ktx)
