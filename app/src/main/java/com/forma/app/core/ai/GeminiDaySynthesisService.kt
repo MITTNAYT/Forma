@@ -1,4 +1,4 @@
-﻿package com.forma.app.core.ai
+package com.forma.app.core.ai
 
 import com.forma.app.BuildConfig
 import com.forma.app.domain.model.EnergyLevel
@@ -32,10 +32,21 @@ class GeminiDaySynthesisService @Inject constructor() {
         currentEnergy: EnergyLevel,
         habits: List<Habit>,
         timelineItems: List<TimelineItem>,
-        apiKey: String? = null
+        apiKey: String? = null,
+        edgeBackendUrl: String? = null
     ): AiDaySynthesisResult = withContext(Dispatchers.IO) {
-        val effectiveKey = apiKey?.ifBlank { null } ?: BuildConfig.GEMINI_API_KEY.ifBlank { null }
+        // 1. Try Cloudflare Edge Backend if configured
+        val edgeUrl = edgeBackendUrl?.ifBlank { null }
+        if (!edgeUrl.isNullOrBlank()) {
+            try {
+                return@withContext callEdgeBackendApi(userName, currentEnergy, habits, timelineItems, edgeUrl)
+            } catch (_: Exception) {
+                // Fallback to direct client call
+            }
+        }
 
+        // 2. Direct Gemini / OpenRouter API call
+        val effectiveKey = apiKey?.ifBlank { null } ?: BuildConfig.GEMINI_API_KEY.ifBlank { null }
         if (!effectiveKey.isNullOrBlank()) {
             try {
                 return@withContext if (effectiveKey.startsWith("sk-or-")) {
@@ -44,10 +55,63 @@ class GeminiDaySynthesisService @Inject constructor() {
                     callGoogleGeminiApi(userName, currentEnergy, habits, timelineItems, effectiveKey)
                 }
             } catch (_: Exception) {
-                // Graceful fallback to heuristic synthesis on network or auth issue
+                // Graceful fallback to heuristic synthesis
             }
         }
+
+        // 3. Deterministic heuristic synthesis fallback
         return@withContext performHeuristicSynthesis(userName, currentEnergy, habits, timelineItems)
+    }
+
+    private fun callEdgeBackendApi(
+        userName: String,
+        currentEnergy: EnergyLevel,
+        habits: List<Habit>,
+        timelineItems: List<TimelineItem>,
+        edgeBaseUrl: String
+    ): AiDaySynthesisResult {
+        val endpoint = "${edgeBaseUrl.trimEnd('/')}/api/v1/ai/synthesize-day"
+        val url = URL(endpoint)
+        val conn = url.openConnection() as HttpURLConnection
+        conn.requestMethod = "POST"
+        conn.setRequestProperty("Content-Type", "application/json")
+        conn.doOutput = true
+        conn.connectTimeout = 8000
+        conn.readTimeout = 8000
+
+        val requestBody = JSONObject().apply {
+            put("userName", userName)
+            put("currentEnergy", currentEnergy.name)
+            put("habits", JSONArray().apply {
+                habits.forEach { h ->
+                    put(JSONObject().apply {
+                        put("name", h.name)
+                        put("timeOfDay", h.timeOfDay.name)
+                        put("energyLevel", h.energyLevel.name)
+                    })
+                }
+            })
+            put("timelineItems", JSONArray().apply {
+                timelineItems.forEach { t ->
+                    put(JSONObject().apply {
+                        put("title", t.title)
+                        put("time", t.startTime ?: "Anytime")
+                    })
+                }
+            })
+        }
+
+        OutputStreamWriter(conn.outputStream).use { writer ->
+            writer.write(requestBody.toString())
+            writer.flush()
+        }
+
+        if (conn.responseCode in 200..299) {
+            val responseText = BufferedReader(InputStreamReader(conn.inputStream)).use { it.readText() }
+            return parseSynthesisJson(responseText)
+        } else {
+            throw RuntimeException("Edge backend returned HTTP ${conn.responseCode}")
+        }
     }
 
     private fun callOpenRouterGeminiApi(
