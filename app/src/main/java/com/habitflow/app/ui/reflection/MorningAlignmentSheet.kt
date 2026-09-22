@@ -1,4 +1,4 @@
-﻿package com.habitflow.app.ui.reflection
+package com.habitflow.app.ui.reflection
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -18,14 +18,18 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.LightMode
+import androidx.compose.material.icons.rounded.Psychology
 import androidx.compose.material.icons.rounded.WbTwilight
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -65,6 +69,8 @@ fun MorningAlignmentSheet(
     val keystone3 by viewModel.keystone3.collectAsState()
     val energyLevel by viewModel.energyLevel.collectAsState()
     val dailyQuote by viewModel.dailyQuote.collectAsState()
+    val isSynthesizing by viewModel.isSynthesizing.collectAsState()
+    val aiSynthesisResult by viewModel.aiSynthesisResult.collectAsState()
     val focusManager = LocalFocusManager.current
 
     ModalBottomSheet(
@@ -78,6 +84,7 @@ fun MorningAlignmentSheet(
                 .fillMaxWidth()
                 .navigationBarsPadding()
                 .imePadding()
+                .verticalScroll(androidx.compose.foundation.rememberScrollState())
                 .padding(horizontal = 24.dp)
                 .padding(bottom = 32.dp)
         ) {
@@ -173,11 +180,121 @@ fun MorningAlignmentSheet(
                     modifier = Modifier.weight(1f)
                 )
                 EnergyOption(
-                    title = "Deep Drive",
+                    title = "Deep Focus",
                     selected = energyLevel == EnergyLevel.HIGH,
                     onClick = { viewModel.setEnergyLevel(EnergyLevel.HIGH) },
                     modifier = Modifier.weight(1f)
                 )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Gemini 1.5 Flash AI Day Synthesis Action
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(FormaTheme.colors.surface)
+                    .border(1.dp, FormaTheme.colors.accent.copy(alpha = 0.4f), RoundedCornerShape(16.dp))
+                    .clickable(enabled = !isSynthesizing) {
+                        viewModel.synthesizeDayWithAi()
+                    }
+                    .padding(14.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(34.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(FormaTheme.colors.accentSoft),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.AutoAwesome,
+                                contentDescription = null,
+                                tint = FormaTheme.colors.accent,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column {
+                            Text(
+                                text = "Gemini Day Synthesis",
+                                style = FormaTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = FormaTheme.colors.textPrimary,
+                                fontSize = 13.sp
+                            )
+                            Text(
+                                text = if (isSynthesizing) "Synthesizing mindful anchors..." else "Auto-align schedule & habit stacks",
+                                style = FormaTheme.typography.bodySmall,
+                                color = FormaTheme.colors.textSecondary,
+                                fontSize = 11.sp
+                            )
+                        }
+                    }
+
+                    if (isSynthesizing) {
+                        androidx.compose.material3.CircularProgressIndicator(
+                            color = FormaTheme.colors.accent,
+                            modifier = Modifier.size(18.dp),
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text(
+                            text = "Synthesize",
+                            style = FormaTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = FormaTheme.colors.accent,
+                            fontSize = 11.sp
+                        )
+                    }
+                }
+            }
+
+            if (aiSynthesisResult != null) {
+                Spacer(modifier = Modifier.height(10.dp))
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(FormaTheme.colors.accentSoft)
+                        .border(1.dp, FormaTheme.colors.accent.copy(alpha = 0.3f), RoundedCornerShape(14.dp))
+                        .padding(12.dp)
+                ) {
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text(
+                            text = "CADENCE INSIGHT",
+                            style = FormaTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = FormaTheme.colors.accent,
+                            letterSpacing = 1.sp,
+                            fontSize = 10.sp
+                        )
+                        Text(
+                            text = aiSynthesisResult!!.energyCadenceNote,
+                            style = FormaTheme.typography.bodySmall,
+                            color = FormaTheme.colors.textPrimary,
+                            fontSize = 12.sp
+                        )
+                        if (aiSynthesisResult!!.habitStackRecommendations.isNotEmpty()) {
+                            Text(
+                                text = aiSynthesisResult!!.habitStackRecommendations.first(),
+                                style = FormaTheme.typography.bodySmall,
+                                color = FormaTheme.colors.textSecondary,
+                                fontSize = 11.sp
+                            )
+                        }
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(20.dp))

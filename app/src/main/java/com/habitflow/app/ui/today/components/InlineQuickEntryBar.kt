@@ -1,4 +1,4 @@
-﻿package com.habitflow.app.ui.today.components
+package com.habitflow.app.ui.today.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -247,8 +247,8 @@ fun InlineQuickEntryBar(
                     ) {
                         // Quick Type Switcher Chips
                         listOf(
-                            Pair(false, "📌 Single Intention"),
-                            Pair(true, "🌿 Daily Ritual")
+                            Pair(false, "Single Intention"),
+                            Pair(true, "Daily Ritual")
                         ).forEach { (habitOption, label) ->
                             val active = isHabitMode == habitOption
                             Box(

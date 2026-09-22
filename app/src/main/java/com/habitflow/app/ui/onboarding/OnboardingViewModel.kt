@@ -34,10 +34,10 @@ data class StarterHabitItem(
     val isSelected: Boolean = true
 )
 
-enum class StarterPackType(val title: String, val subtitle: String, val emoji: String) {
-    MINDFUL_LIVING("Mindful Living", "Calm mornings, hydration, and peaceful evening rest", "🌿"),
-    DEEP_WORK("Deep Work & Focus", "Unbroken focus blocks, coding cadence, and walks", "💻"),
-    HEALTH_VITALITY("Health & Vitality", "Movement, hydration tracking, and restorative sleep", "🏃")
+enum class StarterPackType(val title: String, val subtitle: String, val iconName: String) {
+    MINDFUL_LIVING("Mindful Living", "Calm mornings, hydration, and peaceful evening rest", "spa"),
+    DEEP_WORK("Deep Work & Focus", "Unbroken focus blocks, coding cadence, and walks", "terminal"),
+    HEALTH_VITALITY("Health & Vitality", "Movement, hydration tracking, and restorative sleep", "fitness_center")
 }
 
 @HiltViewModel

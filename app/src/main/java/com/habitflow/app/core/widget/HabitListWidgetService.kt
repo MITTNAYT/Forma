@@ -105,7 +105,7 @@ class HabitListRemoteViewsFactory(
         val views = RemoteViews(context.packageName, R.layout.widget_habit_list_item)
         views.setTextViewText(R.id.widget_item_title, item.habit.name)
         views.setTextViewText(R.id.widget_item_subtitle, item.subtitle)
-        views.setTextViewText(R.id.widget_item_icon, if (item.isCompleted) "✓" else "🍃")
+        views.setTextViewText(R.id.widget_item_icon, if (item.isCompleted) "✓" else "○")
 
         // Fill-in Intent for clicking the row (Action to toggle completion)
         val fillInIntent = Intent().apply {

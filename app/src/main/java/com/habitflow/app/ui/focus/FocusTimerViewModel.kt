@@ -6,6 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.habitflow.app.core.audio.SoundscapeType
 import com.habitflow.app.core.audio.ZenSoundscapeEngine
 import com.habitflow.app.core.util.DateUtils
+import com.habitflow.app.core.notification.FocusActionBus
+import com.habitflow.app.core.notification.FocusActionEvent
+import com.habitflow.app.core.notification.FocusNotificationManager
 import com.habitflow.app.domain.repository.FocusTrackerRepository
 import com.habitflow.app.domain.repository.TimelineRepository
 import com.habitflow.app.domain.usecase.ToggleHabitCompletionUseCase
@@ -35,7 +38,9 @@ class FocusTimerViewModel @Inject constructor(
     private val focusTrackerRepository: FocusTrackerRepository,
     private val timelineRepository: TimelineRepository,
     private val toggleHabitCompletionUseCase: ToggleHabitCompletionUseCase,
-    val soundscapeEngine: ZenSoundscapeEngine
+    val soundscapeEngine: ZenSoundscapeEngine,
+    private val focusNotificationManager: FocusNotificationManager,
+    private val focusActionBus: FocusActionBus
 ) : ViewModel() {
 
     val itemId: String = savedStateHandle.get<String>("itemId") ?: ""
@@ -68,6 +73,17 @@ class FocusTimerViewModel @Inject constructor(
     private var timerJob: Job? = null
 
     init {
+        // Collect actions from lock screen / notification shade controller
+        viewModelScope.launch {
+            focusActionBus.events.collect { event ->
+                when (event) {
+                    FocusActionEvent.Pause -> pauseTimer()
+                    FocusActionEvent.Resume -> startTimer()
+                    FocusActionEvent.Complete -> finishAndSave {}
+                }
+            }
+        }
+
         // Automatically start focus session gently
         startTimer()
     }
@@ -95,6 +111,13 @@ class FocusTimerViewModel @Inject constructor(
             soundscapeEngine.startSoundscape(_selectedSoundscape.value)
         }
 
+        focusNotificationManager.updateFocusNotification(
+            taskTitle = itemTitle,
+            remainingSeconds = _timeRemainingSeconds.value,
+            totalSeconds = _totalDurationSeconds.value,
+            isRunning = true
+        )
+
         timerJob?.cancel()
         timerJob = viewModelScope.launch {
             while (_isRunning.value && _timeRemainingSeconds.value > 0) {
@@ -102,10 +125,18 @@ class FocusTimerViewModel @Inject constructor(
                 _timeRemainingSeconds.value -= 1
                 _secondsElapsed.value += 1
 
+                focusNotificationManager.updateFocusNotification(
+                    taskTitle = itemTitle,
+                    remainingSeconds = _timeRemainingSeconds.value,
+                    totalSeconds = _totalDurationSeconds.value,
+                    isRunning = true
+                )
+
                 if (_timeRemainingSeconds.value <= 0) {
                     _isRunning.value = false
                     soundscapeEngine.stopSoundscape()
                     soundscapeEngine.playSingingBowlChime(4.0f)
+                    focusNotificationManager.dismissFocusNotification()
                     onTimerCompletedNaturally()
                 }
             }
@@ -116,19 +147,34 @@ class FocusTimerViewModel @Inject constructor(
         _isRunning.value = false
         soundscapeEngine.stopSoundscape()
         timerJob?.cancel()
+
+        focusNotificationManager.updateFocusNotification(
+            taskTitle = itemTitle,
+            remainingSeconds = _timeRemainingSeconds.value,
+            totalSeconds = _totalDurationSeconds.value,
+            isRunning = false
+        )
     }
 
     fun resetTimer() {
         pauseTimer()
         _timeRemainingSeconds.value = _totalDurationSeconds.value
+        focusNotificationManager.dismissFocusNotification()
     }
 
     fun addFiveMinutes() {
         _totalDurationSeconds.value += 300
         _timeRemainingSeconds.value += 300
+        focusNotificationManager.updateFocusNotification(
+            taskTitle = itemTitle,
+            remainingSeconds = _timeRemainingSeconds.value,
+            totalSeconds = _totalDurationSeconds.value,
+            isRunning = _isRunning.value
+        )
     }
 
     private suspend fun onTimerCompletedNaturally() {
+        focusNotificationManager.dismissFocusNotification()
         recordTimeAndMarkComplete()
         _eventFlow.emit(FocusTimerUiEvent.ShowCelebration("Flow session completed! Time recorded."))
         _eventFlow.emit(FocusTimerUiEvent.TimerFinished)
@@ -136,6 +182,7 @@ class FocusTimerViewModel @Inject constructor(
 
     fun finishAndSave(onDone: () -> Unit) {
         pauseTimer()
+        focusNotificationManager.dismissFocusNotification()
         soundscapeEngine.playSingingBowlChime(3.0f)
         viewModelScope.launch {
             recordTimeAndMarkComplete()
@@ -167,6 +214,7 @@ class FocusTimerViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
+        focusNotificationManager.dismissFocusNotification()
         soundscapeEngine.stopSoundscape()
         timerJob?.cancel()
     }

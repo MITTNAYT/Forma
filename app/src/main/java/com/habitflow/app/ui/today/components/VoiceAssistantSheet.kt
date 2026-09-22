@@ -1,4 +1,4 @@
-﻿package com.habitflow.app.ui.today.components
+package com.habitflow.app.ui.today.components
 
 import android.content.Intent
 import android.os.Bundle
@@ -414,7 +414,7 @@ fun VoiceAssistantSheet(
                             if (!gratitude.isNullOrBlank()) {
                                 onSaveGratitude(gratitude)
                             }
-                            Toast.makeText(context, "Rituals logged from speech! 🌿", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Rituals logged from speech.", Toast.LENGTH_SHORT).show()
                             onDismiss()
                         },
                     contentAlignment = Alignment.Center

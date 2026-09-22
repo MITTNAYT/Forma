@@ -32,7 +32,7 @@ class MindfulReminderWorker @AssistedInject constructor(
         createChannel(notificationManager)
 
         val isMorning = type == TYPE_MORNING
-        val title = if (isMorning) "🌅 Morning Alignment" else "🌙 Evening Sanctuary"
+        val title = if (isMorning) "Morning Alignment" else "Evening Sanctuary"
         val message = if (isMorning) {
             "Take a slow breath. Set your keystone intentions for a peaceful day."
         } else {

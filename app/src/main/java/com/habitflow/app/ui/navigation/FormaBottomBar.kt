@@ -104,18 +104,19 @@ fun FormaBottomBar(
                     val isAddButton = screen == Screen.AddItem
 
                     if (isAddButton) {
-                        // Central Tactile Add (+) Button with Emil Kowalski press physics
+                        // Central Tactile Add (+) Button refined with matching 16dp rounded geometry
                         Box(
                             modifier = Modifier
                                 .size(46.dp)
                                 .shadow(
-                                    elevation = 8.dp,
-                                    shape = CircleShape,
-                                    ambientColor = colors.accent.copy(alpha = 0.25f),
-                                    spotColor = colors.accent.copy(alpha = 0.35f)
+                                    elevation = 4.dp,
+                                    shape = RoundedCornerShape(16.dp),
+                                    ambientColor = colors.accent.copy(alpha = 0.20f),
+                                    spotColor = colors.accent.copy(alpha = 0.30f)
                                 )
-                                .clip(CircleShape)
+                                .clip(RoundedCornerShape(16.dp))
                                 .background(colors.accent)
+                                .border(1.dp, colors.accent.copy(alpha = 0.8f), RoundedCornerShape(16.dp))
                                 .formaPressEffect(targetScale = 0.90f) {
                                     haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
                                     if (onAddClick != null) {

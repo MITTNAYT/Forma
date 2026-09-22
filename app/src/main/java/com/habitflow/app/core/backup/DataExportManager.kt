@@ -77,21 +77,21 @@ class DataExportManager @Inject constructor(
         val focusStats = focusTrackerRepository.getFocusTimeStats().first()
 
         val sb = StringBuilder()
-        sb.append("# 🌿 Forma — Personal Mindful Flow Journal\n\n")
+        sb.append("# Forma — Personal Mindful Flow Journal\n\n")
         sb.append("**Exported on:** ${DateUtils.formatDateIso(DateUtils.today())}\n\n")
 
-        sb.append("## 📊 Focus Velocity Summary\n")
+        sb.append("## Focus Velocity Summary\n")
         sb.append("- **This Week:** ${focusStats.thisWeekMinutes / 60}h ${focusStats.thisWeekMinutes % 60}m\n")
         sb.append("- **This Month:** ${focusStats.thisMonthMinutes / 60}h ${focusStats.thisMonthMinutes % 60}m\n")
         sb.append("- **All-Time Focus:** ${focusStats.allTimeMinutes / 60}h ${focusStats.allTimeMinutes % 60}m\n\n")
 
-        sb.append("## 🍃 Active Mindful Rituals (${habits.size})\n")
+        sb.append("## Active Mindful Rituals (${habits.size})\n")
         habits.forEachIndexed { i, h ->
             sb.append("${i + 1}. **${h.name}** — ${h.timeOfDay.name.lowercase().replaceFirstChar { it.uppercase() }}\n")
         }
         sb.append("\n")
 
-        sb.append("## 📅 Recent Intentions & Time Blocks (${timelineItems.size})\n")
+        sb.append("## Recent Intentions & Time Blocks (${timelineItems.size})\n")
         timelineItems.take(20).forEach { item ->
             val status = if (item.completed) "[x]" else "[ ]"
             val time = if (item.startTime != null) "(${item.startTime} - ${item.endTime})" else ""

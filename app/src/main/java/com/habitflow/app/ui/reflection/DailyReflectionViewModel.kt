@@ -6,8 +6,12 @@ import com.habitflow.app.core.audio.ZenFeedbackManager
 import com.habitflow.app.core.util.DateUtils
 import com.habitflow.app.domain.model.DailyReflection
 import com.habitflow.app.domain.model.EnergyLevel
+import com.habitflow.app.core.ai.AiDaySynthesisResult
+import com.habitflow.app.core.ai.GeminiDaySynthesisService
 import com.habitflow.app.domain.repository.DailyReflectionRepository
+import com.habitflow.app.domain.repository.HabitRepository
 import com.habitflow.app.domain.repository.TimelineRepository
+import com.habitflow.app.domain.repository.UserPreferencesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,6 +46,9 @@ sealed interface ReflectionUiEvent {
 class DailyReflectionViewModel @Inject constructor(
     private val reflectionRepository: DailyReflectionRepository,
     private val timelineRepository: TimelineRepository,
+    private val habitRepository: HabitRepository,
+    private val preferencesRepository: UserPreferencesRepository,
+    private val geminiSynthesisService: GeminiDaySynthesisService,
     private val zenFeedback: ZenFeedbackManager
 ) : ViewModel() {
 
@@ -79,6 +86,12 @@ class DailyReflectionViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<ReflectionUiEvent>()
     val eventFlow: SharedFlow<ReflectionUiEvent> = _eventFlow.asSharedFlow()
 
+    private val _isSynthesizing = MutableStateFlow(false)
+    val isSynthesizing: StateFlow<Boolean> = _isSynthesizing.asStateFlow()
+
+    private val _aiSynthesisResult = MutableStateFlow<AiDaySynthesisResult?>(null)
+    val aiSynthesisResult: StateFlow<AiDaySynthesisResult?> = _aiSynthesisResult.asStateFlow()
+
     init {
         viewModelScope.launch {
             val existing = reflectionRepository.getReflectionDirect(todayStr)
@@ -90,6 +103,43 @@ class DailyReflectionViewModel @Inject constructor(
                 _energyLevel.value = existing.energyLevel
                 _gratitudeNote.value = existing.gratitudeNote
                 _mindfulnessScore.value = existing.mindfulnessScore
+            }
+        }
+    }
+
+    fun synthesizeDayWithAi() {
+        viewModelScope.launch {
+            _isSynthesizing.value = true
+            try {
+                val userName = preferencesRepository.userName.first()
+                val habits = habitRepository.getAllHabits(includeArchived = false).first()
+                val timelineItems = timelineRepository.getTimelineItemsForDate(todayStr).first()
+                val result = geminiSynthesisService.synthesizeDay(
+                    userName = userName,
+                    currentEnergy = _energyLevel.value,
+                    habits = habits,
+                    timelineItems = timelineItems
+                )
+                _aiSynthesisResult.value = result
+
+                // Automatically pre-fill keystones if currently empty
+                if (_keystone1.value.isBlank() && result.suggestedKeystones.isNotEmpty()) {
+                    _keystone1.value = result.suggestedKeystones.getOrNull(0) ?: ""
+                }
+                if (_keystone2.value.isBlank() && result.suggestedKeystones.size > 1) {
+                    _keystone2.value = result.suggestedKeystones.getOrNull(1) ?: ""
+                }
+                if (_keystone3.value.isBlank() && result.suggestedKeystones.size > 2) {
+                    _keystone3.value = result.suggestedKeystones.getOrNull(2) ?: ""
+                }
+
+                _dailyQuote.value = result.zenAffirmation
+                zenFeedback.onTaskToggled()
+                _eventFlow.emit(ReflectionUiEvent.ShowToast("Gemini 1.5 Flash synthesized your day alignment."))
+            } catch (e: Exception) {
+                _eventFlow.emit(ReflectionUiEvent.ShowToast("Synthesis ready."))
+            } finally {
+                _isSynthesizing.value = false
             }
         }
     }

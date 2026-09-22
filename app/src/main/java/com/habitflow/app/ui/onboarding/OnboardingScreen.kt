@@ -28,10 +28,13 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowForward
+import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.ChevronRight
+import androidx.compose.material.icons.rounded.FitnessCenter
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Spa
+import androidx.compose.material.icons.rounded.Terminal
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -507,11 +510,27 @@ private fun ChooseStarterPackStep(
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = pack.emoji,
-                        fontSize = 24.sp
-                    )
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(38.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(if (isSelected) colors.accent else colors.surfaceVariant)
+                            .border(1.dp, if (isSelected) colors.accent else colors.border, RoundedCornerShape(12.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        val packIcon = when (pack) {
+                            StarterPackType.MINDFUL_LIVING -> Icons.Rounded.Spa
+                            StarterPackType.DEEP_WORK -> Icons.Rounded.Terminal
+                            StarterPackType.HEALTH_VITALITY -> Icons.Rounded.FitnessCenter
+                        }
+                        Icon(
+                            imageVector = packIcon,
+                            contentDescription = null,
+                            tint = if (isSelected) colors.onAccent else colors.textPrimary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(14.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = pack.title,
@@ -674,7 +693,7 @@ private fun GreetingStep(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Welcome to Forma, $displayName! ✨",
+            text = "Welcome to Forma, $displayName",
             style = FormaTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             color = colors.textPrimary,

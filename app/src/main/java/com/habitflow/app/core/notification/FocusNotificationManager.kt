@@ -102,6 +102,7 @@ class FocusNotificationManager @Inject constructor(
             .setContentIntent(mainPendingIntent)
             .setOngoing(isRunning)
             .setOnlyAlertOnce(true)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setProgress(100, progress, false)
             .addAction(0, toggleActionTitle, togglePendingIntent)
             .addAction(0, "Complete", completePendingIntent)

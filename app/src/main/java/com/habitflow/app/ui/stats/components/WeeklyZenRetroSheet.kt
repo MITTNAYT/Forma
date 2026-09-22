@@ -1,4 +1,4 @@
-﻿package com.habitflow.app.ui.stats.components
+package com.habitflow.app.ui.stats.components
 
 import android.content.Intent
 import androidx.compose.foundation.background
@@ -291,7 +291,7 @@ fun WeeklyZenRetroSheet(
                 text = "Share Weekly Zen Summary",
                 onClick = {
                     val shareText = """
-                        🌿 HabitFlow Weekly Zen Retro (${retro.weekDateRange})
+                        Forma Weekly Focus & Mindful Retro (${retro.weekDateRange})
                         • Consistency Index: ${retro.consistencyScore}%
                         • Rituals Completed: ${retro.totalHabitsCompleted}
                         • Deep Focus Output: ${String.format("%.1fh", retro.totalFocusMinutes / 60f)}

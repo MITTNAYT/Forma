@@ -104,7 +104,7 @@ class AmbientSoundService : Service() {
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("🍃 ${sound.displayName}")
+            .setContentTitle(sound.displayName)
             .setContentText("Forma Ambient Soundscape${timerSubtext}")
             .setSubText("Mindful Audio")
             .setContentIntent(openAppPendingIntent)
