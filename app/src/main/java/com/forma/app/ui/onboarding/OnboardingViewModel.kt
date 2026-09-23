@@ -1,7 +1,8 @@
-﻿package com.forma.app.ui.onboarding
+package com.forma.app.ui.onboarding
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.forma.app.domain.model.Chronotype
 import com.forma.app.domain.model.EnergyLevel
 import com.forma.app.domain.model.Habit
 import com.forma.app.domain.model.TimeOfDay
@@ -19,6 +20,7 @@ import javax.inject.Inject
 enum class OnboardingStep {
     WELCOME,
     ENTER_NAME,
+    CHOOSE_CHRONOTYPE,
     CHOOSE_THEME,
     CHOOSE_STARTER_PACK,
     GREETING
@@ -52,6 +54,9 @@ class OnboardingViewModel @Inject constructor(
     private val _name = MutableStateFlow("")
     val name: StateFlow<String> = _name.asStateFlow()
 
+    private val _selectedChronotype = MutableStateFlow(Chronotype.BIMODAL_NOCTURNAL)
+    val selectedChronotype: StateFlow<Chronotype> = _selectedChronotype.asStateFlow()
+
     private val _selectedPack = MutableStateFlow(StarterPackType.MINDFUL_LIVING)
     val selectedPack: StateFlow<StarterPackType> = _selectedPack.asStateFlow()
 
@@ -72,8 +77,19 @@ class OnboardingViewModel @Inject constructor(
 
     fun submitName() {
         if (_name.value.isNotBlank()) {
-            _step.value = OnboardingStep.CHOOSE_THEME
+            _step.value = OnboardingStep.CHOOSE_CHRONOTYPE
         }
+    }
+
+    fun selectChronotype(chronotype: Chronotype) {
+        _selectedChronotype.value = chronotype
+        viewModelScope.launch {
+            preferencesRepository.setChronotype(chronotype)
+        }
+    }
+
+    fun submitChronotype() {
+        _step.value = OnboardingStep.CHOOSE_THEME
     }
 
     fun selectTheme(palette: PaletteFamily) {

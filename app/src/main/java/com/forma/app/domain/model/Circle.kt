@@ -1,4 +1,4 @@
-﻿package com.forma.app.domain.model
+package com.forma.app.domain.model
 
 data class Circle(
     val id: String,
@@ -46,9 +46,9 @@ data class CircleReaction(
     val timestamp: Long
 )
 
-enum class CircleReactionType(val emoji: String, val label: String) {
-    CALM("🍵", "Send Calm"),
-    PRESENCE("🌿", "Send Presence"),
-    ENERGY("⚡", "Send Energy"),
-    CLAP("👏", "Celebrate")
+enum class CircleReactionType(val iconKey: String, val label: String) {
+    CALM("local_cafe", "Calm"),
+    PRESENCE("spa", "Presence"),
+    ENERGY("bolt", "Energy"),
+    CLAP("thumb_up", "Recognition")
 }

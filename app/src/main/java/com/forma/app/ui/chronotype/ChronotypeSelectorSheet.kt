@@ -37,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.forma.app.core.designsystem.FormaTheme
+import com.forma.app.core.designsystem.icon.FormaIcon
 import com.forma.app.core.designsystem.motion.formaPressEffect
 import com.forma.app.domain.model.ChronoAlignmentReport
 import com.forma.app.domain.model.Chronotype
@@ -149,11 +150,21 @@ fun ChronotypeSelectorSheet(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(
-                                    text = chronotype.animalSymbol,
-                                    fontSize = 26.sp,
-                                    modifier = Modifier.padding(end = 10.dp)
-                                )
+                                Box(
+                                    modifier = Modifier
+                                        .size(38.dp)
+                                        .clip(CircleShape)
+                                        .background(if (isSelected) colors.accentSoft else colors.surfaceVariant),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    FormaIcon(
+                                        iconKey = chronotype.iconKey,
+                                        contentDescription = null,
+                                        tint = if (isSelected) colors.accent else colors.textSecondary,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(12.dp))
                                 Column {
                                     Text(
                                         text = chronotype.displayName,

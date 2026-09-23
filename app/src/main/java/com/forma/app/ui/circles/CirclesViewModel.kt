@@ -1,4 +1,4 @@
-﻿package com.forma.app.ui.circles
+package com.forma.app.ui.circles
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -142,7 +142,7 @@ class CirclesViewModel @Inject constructor(
         viewModelScope.launch {
             sendCircleReactionUseCase(circleId, recipientId, type)
                 .onSuccess {
-                    _uiMessage.value = "${type.emoji} Sent ${type.label}!"
+                    _uiMessage.value = "Sent ${type.label}!"
                 }
                 .onFailure { err ->
                     _uiMessage.value = err.localizedMessage ?: "Reaction failed."

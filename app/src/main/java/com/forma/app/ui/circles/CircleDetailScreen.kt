@@ -1,4 +1,4 @@
-﻿package com.forma.app.ui.circles
+package com.forma.app.ui.circles
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import com.forma.app.core.designsystem.icon.FormaIcon
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.MoreVert
@@ -233,7 +234,7 @@ fun CircleDetailScreen(
                                     color = colors.textPrimary
                                 )
                                 Text(
-                                    text = if (member.currentStreak > 0) "🔥 ${member.currentStreak} day streak" else "🌱 Fresh start",
+                                    text = if (member.currentStreak > 0) "${member.currentStreak} day streak" else "Fresh start",
                                     fontSize = 12.sp,
                                     color = colors.textSecondary
                                 )
@@ -252,7 +253,12 @@ fun CircleDetailScreen(
                                         }
                                         .padding(6.dp)
                                 ) {
-                                    Text(text = reaction.emoji, fontSize = 14.sp)
+                                    FormaIcon(
+                                        iconKey = reaction.iconKey,
+                                        contentDescription = reaction.label,
+                                        tint = colors.accent,
+                                        modifier = Modifier.size(16.dp)
+                                    )
                                 }
                             }
                         }

@@ -73,11 +73,27 @@ class CircadianEnergyEngine @Inject constructor() {
                 val baseline = if (hour in 8..22) 0.38 else 0.15
                 max(baseline, max(morningBurst, afternoonBurst))
             }
+            Chronotype.BIMODAL_NOCTURNAL -> {
+                // Dual-crest: Midday (11:00-15:00) and Nocturnal deep focus (22:00-03:00)
+                val middayPeak = gaussian(hour.toDouble(), peakHour = 13.0, width = 2.2) * 0.90
+                val adjustedHour = if (hour >= 20) (hour - 24).toDouble() else hour.toDouble()
+                val nocturnalPeak = gaussian(adjustedHour, peakHour = 0.5, width = 2.5) * 0.95
+                val baseline = if (hour in 11..15 || hour >= 21 || hour in 0..3) 0.35 else 0.08
+                max(baseline, max(middayPeak, nocturnalPeak))
+            }
         }
         return min(1.0, max(0.05, score)).toFloat()
     }
 
     private fun determineZone(hour: Int, score: Float, chronotype: Chronotype): EnergyZone {
+        if (chronotype == Chronotype.BIMODAL_NOCTURNAL) {
+            return when {
+                score >= 0.75f -> EnergyZone.PEAK_FOCUS
+                score in 0.50f..0.74f -> EnergyZone.CREATIVE_FLOW
+                hour in 4..10 -> EnergyZone.WIND_DOWN
+                else -> EnergyZone.RECHARGE_REST
+            }
+        }
         return when {
             score >= 0.75f -> EnergyZone.PEAK_FOCUS
             score in 0.50f..0.74f -> EnergyZone.CREATIVE_FLOW

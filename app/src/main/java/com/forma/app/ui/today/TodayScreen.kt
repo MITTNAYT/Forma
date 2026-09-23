@@ -1,5 +1,6 @@
 package com.forma.app.ui.today
 
+import com.forma.app.domain.model.Chronotype
 import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
@@ -84,6 +85,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.forma.app.core.designsystem.FormaTheme
 import com.forma.app.core.util.DateUtils
 import com.forma.app.domain.model.TodayScheduleItem
+import com.forma.app.domain.model.TimeOfDay
+import com.forma.app.core.designsystem.icon.FormaIcon
 import com.forma.app.ui.settings.components.ProPaywallBottomSheet
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.imePadding
@@ -141,6 +144,9 @@ fun TodayScreen(
     var showChronotypeSheet by remember { mutableStateOf(false) }
     var showAiStudioSheet by remember { mutableStateOf(false) }
     var selectedDetailItem by remember { mutableStateOf<TodayScheduleItem?>(null) }
+    var editingHabitId by remember { mutableStateOf<String?>(null) }
+    var selectedTimeFilter by remember { mutableStateOf<TimeOfDay?>(null) }
+    var showTemplatesSheet by remember { mutableStateOf(false) }
     var celebrationInfo by remember { mutableStateOf<Pair<String, Int>?>(null) }
     val haptic = LocalHapticFeedback.current
 
@@ -205,6 +211,43 @@ fun TodayScreen(
                     .padding(paddingValues)
                     .imePadding()
             ) {
+                val scheduleItems = daySchedule?.items ?: emptyList()
+                val displayedItems = remember(scheduleItems, selectedTimeFilter, chronotype) {
+                    if (selectedTimeFilter == null) {
+                        scheduleItems
+                    } else {
+                        scheduleItems.filter { item ->
+                            when (item) {
+                                is TodayScheduleItem.HabitItem -> item.habit.timeOfDay == selectedTimeFilter
+                                is TodayScheduleItem.TimelineBlock -> {
+                                    val hour = try {
+                                        item.item.startTime?.let { LocalTime.parse(it).hour } ?: 12
+                                    } catch (_: Exception) { 12 }
+                                    when (selectedTimeFilter) {
+                                        TimeOfDay.MORNING -> if (chronotype == Chronotype.BIMODAL_NOCTURNAL) {
+                                            hour in 22..24 || hour in 0..3
+                                        } else {
+                                            hour in 4..11
+                                        }
+                                        TimeOfDay.AFTERNOON -> if (chronotype == Chronotype.BIMODAL_NOCTURNAL) {
+                                            hour in 11..15
+                                        } else {
+                                            hour in 12..16
+                                        }
+                                        TimeOfDay.EVENING -> if (chronotype == Chronotype.BIMODAL_NOCTURNAL) {
+                                            hour in 15..22
+                                        } else {
+                                            hour in 17..23
+                                        }
+                                        TimeOfDay.ANYTIME -> true
+                                        null -> true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
@@ -533,7 +576,6 @@ fun TodayScreen(
                 item { Spacer(modifier = Modifier.height(10.dp)) }
 
                 // 3. Hero Progress Card Banner
-                val scheduleItems = daySchedule?.items ?: emptyList()
                 val completedCount = scheduleItems.count { it.isCompleted }
 
                 if (daySchedule != null && scheduleItems.isNotEmpty()) {
@@ -657,27 +699,105 @@ fun TodayScreen(
 
                 item { Spacer(modifier = Modifier.height(20.dp)) }
 
-                // 4. Section Label: TODAY'S RITUALS & HABITS
+                item { Spacer(modifier = Modifier.height(16.dp)) }
+
+                // 4. Section Header with "TODAY'S FLOW" + Quick "Templates" action
                 item {
-                    Text(
-                        text = "TODAY'S RITUALS",
-                        style = FormaTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = colors.textTertiary,
-                        letterSpacing = 1.2.sp,
-                        fontSize = 11.sp,
-                        textAlign = TextAlign.Center,
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 8.dp)
-                    )
+                            .padding(horizontal = 24.dp, vertical = 4.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "TODAY'S FLOW",
+                            style = FormaTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = colors.textTertiary,
+                            letterSpacing = 1.2.sp,
+                            fontSize = 11.sp
+                        )
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(colors.surfaceVariant)
+                                .clickable { showTemplatesSheet = true }
+                                .padding(horizontal = 10.dp, vertical = 4.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                FormaIcon(
+                                    iconKey = "sparkles",
+                                    contentDescription = null,
+                                    tint = colors.accent,
+                                    modifier = Modifier.size(13.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = "Templates",
+                                    style = FormaTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = colors.textPrimary,
+                                    fontSize = 11.sp
+                                )
+                            }
+                        }
+                    }
                 }
 
-                item { Spacer(modifier = Modifier.height(4.dp)) }
+                // 5. Minimalist Filter Chips Bar
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState())
+                            .padding(horizontal = 24.dp, vertical = 6.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        TodayFilterChip(
+                            text = "All (${scheduleItems.size})",
+                            isSelected = selectedTimeFilter == null,
+                            onClick = { selectedTimeFilter = null }
+                        )
 
-                // 5. Mindful Habits & Tasks List
+                        if (chronotype == Chronotype.BIMODAL_NOCTURNAL) {
+                            TodayFilterChip(
+                                text = "Midday (11–15)",
+                                isSelected = selectedTimeFilter == TimeOfDay.AFTERNOON,
+                                onClick = { selectedTimeFilter = TimeOfDay.AFTERNOON }
+                            )
+                            TodayFilterChip(
+                                text = "Evening (15–22)",
+                                isSelected = selectedTimeFilter == TimeOfDay.EVENING,
+                                onClick = { selectedTimeFilter = TimeOfDay.EVENING }
+                            )
+                            TodayFilterChip(
+                                text = "Nocturnal (22–03)",
+                                isSelected = selectedTimeFilter == TimeOfDay.MORNING,
+                                onClick = { selectedTimeFilter = TimeOfDay.MORNING }
+                            )
+                            TodayFilterChip(
+                                text = "Anytime",
+                                isSelected = selectedTimeFilter == TimeOfDay.ANYTIME,
+                                onClick = { selectedTimeFilter = TimeOfDay.ANYTIME }
+                            )
+                        } else {
+                            TimeOfDay.entries.forEach { tod ->
+                                TodayFilterChip(
+                                    text = tod.displayName,
+                                    isSelected = selectedTimeFilter == tod,
+                                    onClick = { selectedTimeFilter = tod }
+                                )
+                            }
+                        }
+                    }
+                }
+
+                item { Spacer(modifier = Modifier.height(6.dp)) }
+
+                // 6. Mindful Habits & Tasks List (Filtered)
                 if (daySchedule != null) {
-                    if (scheduleItems.isEmpty()) {
+                    if (displayedItems.isEmpty()) {
                         item {
                             EmptyPeacefulState(
                                 onAddTask = { onNavigateToAddTask(DateUtils.formatDateIso(selectedDate)) }
@@ -685,7 +805,7 @@ fun TodayScreen(
                         }
                     } else {
                         itemsIndexed(
-                            items = scheduleItems,
+                            items = displayedItems,
                             key = { _, item -> item.id },
                             contentType = { _, item -> item.javaClass.simpleName }
                         ) { index, scheduleItem ->
@@ -693,49 +813,49 @@ fun TodayScreen(
                                 item = scheduleItem,
                                 modifier = Modifier.formaStaggeredEntrance(index),
                                 onToggle = {
-                                when (scheduleItem) {
-                                    is TodayScheduleItem.HabitItem -> {
-                                        if (!scheduleItem.isDoneToday) {
-                                            celebrationInfo = Pair(scheduleItem.habit.name, scheduleItem.currentStreak + 1)
+                                    when (scheduleItem) {
+                                        is TodayScheduleItem.HabitItem -> {
+                                            if (!scheduleItem.isDoneToday) {
+                                                celebrationInfo = Pair(scheduleItem.habit.name, scheduleItem.currentStreak + 1)
+                                            }
+                                            viewModel.toggleHabit(scheduleItem)
                                         }
-                                        viewModel.toggleHabit(scheduleItem)
+                                        is TodayScheduleItem.TimelineBlock -> {
+                                            if (!scheduleItem.item.completed) {
+                                                celebrationInfo = Pair(scheduleItem.item.title, 1)
+                                            }
+                                            viewModel.toggleTask(scheduleItem)
+                                        }
                                     }
-                                    is TodayScheduleItem.TimelineBlock -> {
-                                        if (!scheduleItem.item.completed) {
-                                            celebrationInfo = Pair(scheduleItem.item.title, 1)
+                                },
+                                onClick = {
+                                    selectedDetailItem = scheduleItem
+                                },
+                                onStartFocus = {
+                                    when (scheduleItem) {
+                                        is TodayScheduleItem.HabitItem -> {
+                                            val habit = scheduleItem.habit
+                                            val duration = when (habit.timeOfDay) {
+                                                TimeOfDay.MORNING -> 15
+                                                TimeOfDay.AFTERNOON -> 25
+                                                TimeOfDay.EVENING -> 20
+                                                TimeOfDay.ANYTIME -> 20
+                                            }
+                                            onNavigateToFocusTimer(habit.id, habit.name, duration, true)
                                         }
-                                        viewModel.toggleTask(scheduleItem)
+                                        is TodayScheduleItem.TimelineBlock -> {
+                                            val task = scheduleItem.item
+                                            val startParsed = try { task.startTime?.let { LocalTime.parse(it) } } catch (_: Exception) { null }
+                                            val endParsed = try { task.endTime?.let { LocalTime.parse(it) } } catch (_: Exception) { null }
+                                            val duration = if (startParsed != null && endParsed != null) {
+                                                ChronoUnit.MINUTES.between(startParsed, endParsed).toInt().coerceAtLeast(5)
+                                            } else 25
+                                            onNavigateToFocusTimer(task.id, task.title, duration, false)
+                                        }
                                     }
                                 }
-                            },
-                            onClick = {
-                                // Open detailed modal with full info, subtasks, notes, times, edit
-                                selectedDetailItem = scheduleItem
-                            },
-                            onStartFocus = {
-                                when (scheduleItem) {
-                                    is TodayScheduleItem.HabitItem -> {
-                                        val habit = scheduleItem.habit
-                                        val duration = when (habit.timeOfDay) {
-                                            com.forma.app.domain.model.TimeOfDay.MORNING -> 15
-                                            com.forma.app.domain.model.TimeOfDay.AFTERNOON -> 25
-                                            com.forma.app.domain.model.TimeOfDay.EVENING -> 20
-                                            com.forma.app.domain.model.TimeOfDay.ANYTIME -> 20
-                                        }
-                                        onNavigateToFocusTimer(habit.id, habit.name, duration, true)
-                                    }
-                                    is TodayScheduleItem.TimelineBlock -> {
-                                        val task = scheduleItem.item
-                                        val startParsed = try { task.startTime?.let { LocalTime.parse(it) } } catch (_: Exception) { null }
-                                        val endParsed = try { task.endTime?.let { LocalTime.parse(it) } } catch (_: Exception) { null }
-                                        val duration = if (startParsed != null && endParsed != null) {
-                                            ChronoUnit.MINUTES.between(startParsed, endParsed).toInt().coerceAtLeast(5)
-                                        } else 25
-                                        onNavigateToFocusTimer(task.id, task.title, duration, false)
-                                    }
-                                }
-                            }
-                        )
+                            )
+                        }
                     }
                 }
             }
@@ -775,10 +895,13 @@ fun TodayScreen(
                 selectedDetailItem = null
             },
             onEdit = {
+                val currentItem = item
                 selectedDetailItem = null
-                when (item) {
-                    is TodayScheduleItem.HabitItem -> onNavigateToHabits()
-                    is TodayScheduleItem.TimelineBlock -> onNavigateToEditTask(item.item.id)
+                when (currentItem) {
+                    is TodayScheduleItem.HabitItem -> {
+                        editingHabitId = currentItem.habit.id
+                    }
+                    is TodayScheduleItem.TimelineBlock -> onNavigateToEditTask(currentItem.item.id)
                 }
             },
             onStartFocus = {
@@ -1028,6 +1151,24 @@ fun TodayScreen(
         )
     }
 
+    editingHabitId?.let { habitId ->
+        com.forma.app.ui.timeline.components.AddEditTimelineSheet(
+            itemId = habitId,
+            initialCreationType = com.forma.app.ui.timeline.CreationType.HABIT,
+            onDismiss = { editingHabitId = null }
+        )
+    }
+
+    if (showTemplatesSheet) {
+        com.forma.app.ui.habits.components.HabitTemplatesSheet(
+            onAddHabit = { habit ->
+                viewModel.addHabit(habit)
+                showTemplatesSheet = false
+            },
+            onDismiss = { showTemplatesSheet = false }
+        )
+    }
+
     // First-Launch Feature Spotlight / Coach Marks Tour
     if (!hasSeenTodayCoachMarks) {
         TodayCoachMarksOverlay(
@@ -1038,7 +1179,6 @@ fun TodayScreen(
             onDismiss = { viewModel.dismissCoachMarks() }
         )
     }
-}
 }
 
 
@@ -1109,5 +1249,37 @@ fun EmptyPeacefulState(
                 fontSize = 13.sp
             )
         }
+    }
+}
+
+@Composable
+fun TodayFilterChip(
+    text: String,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val colors = FormaTheme.colors
+
+    Box(
+        modifier = modifier
+            .clip(FormaTheme.shapes.extraSmall)
+            .background(if (isSelected) colors.textPrimary else colors.surfaceVariant)
+            .border(
+                1.dp,
+                if (isSelected) androidx.compose.ui.graphics.Color.Transparent else colors.border.copy(alpha = 0.5f),
+                FormaTheme.shapes.extraSmall
+            )
+            .clickable { onClick() }
+            .padding(horizontal = 12.dp, vertical = 6.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = text,
+            style = FormaTheme.typography.labelMedium,
+            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+            color = if (isSelected) colors.surface else colors.textPrimary,
+            fontSize = 12.sp
+        )
     }
 }

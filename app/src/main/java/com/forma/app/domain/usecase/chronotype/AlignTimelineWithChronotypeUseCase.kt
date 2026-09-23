@@ -51,6 +51,7 @@ class AlignTimelineWithChronotypeUseCase @Inject constructor(
                     Chronotype.BEAR -> 11
                     Chronotype.WOLF -> 18
                     Chronotype.DOLPHIN -> 15
+                    Chronotype.BIMODAL_NOCTURNAL -> if (hour < 16) 13 else 23
                 }
                 val bestHourFormatted = String.format("%02d:00", bestHour)
                 recommendations.add(

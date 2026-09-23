@@ -1,4 +1,4 @@
-﻿package com.forma.app.ui.onboarding
+package com.forma.app.ui.onboarding
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -6,7 +6,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.with
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -27,7 +27,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowForward
+import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.ChevronRight
@@ -73,7 +73,9 @@ import com.forma.app.core.designsystem.TerracottaLightBg
 import com.forma.app.core.designsystem.component.FormaButton
 import com.forma.app.core.designsystem.component.FormaButtonStyle
 import com.forma.app.core.designsystem.component.FormaEmblem
+import com.forma.app.core.designsystem.icon.FormaIcon
 import com.forma.app.core.designsystem.motion.formaPressEffect
+import com.forma.app.domain.model.Chronotype
 import com.forma.app.domain.repository.PaletteFamily
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -85,6 +87,7 @@ fun OnboardingScreen(
     val colors = FormaTheme.colors
     val step by viewModel.step.collectAsState()
     val name by viewModel.name.collectAsState()
+    val selectedChronotype by viewModel.selectedChronotype.collectAsState()
     val keyboardController = LocalSoftwareKeyboardController.current
 
     Scaffold(
@@ -100,7 +103,7 @@ fun OnboardingScreen(
             AnimatedContent(
                 targetState = step,
                 transitionSpec = {
-                    (slideInHorizontally { width -> width } + fadeIn()) with
+                    (slideInHorizontally { width -> width } + fadeIn()) togetherWith
                             (slideOutHorizontally { width -> -width } + fadeOut())
                 },
                 label = "onboarding_steps"
@@ -119,6 +122,13 @@ fun OnboardingScreen(
                                 keyboardController?.hide()
                                 viewModel.submitName()
                             }
+                        )
+                    }
+                    OnboardingStep.CHOOSE_CHRONOTYPE -> {
+                        ChooseChronotypeStep(
+                            selectedChronotype = selectedChronotype,
+                            onSelectChronotype = { viewModel.selectChronotype(it) },
+                            onContinue = { viewModel.submitChronotype() }
                         )
                     }
                     OnboardingStep.CHOOSE_THEME -> {
@@ -219,7 +229,7 @@ private fun EnterNameStep(
     ) {
         // Step indicator
         Text(
-            text = "STEP 1 OF 3 • PERSONAL SANCTUARY",
+            text = "STEP 1 OF 4 • PERSONAL SANCTUARY",
             style = FormaTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
             color = colors.accent,
@@ -313,7 +323,171 @@ private fun EnterNameStep(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Icon(
-                imageVector = Icons.Rounded.ArrowForward,
+                imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun ChooseChronotypeStep(
+    selectedChronotype: Chronotype,
+    onSelectChronotype: (Chronotype) -> Unit,
+    onContinue: () -> Unit
+) {
+    val colors = FormaTheme.colors
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "STEP 2 OF 4 • BIOLOGICAL RHYTHM",
+            style = FormaTheme.typography.labelSmall,
+            fontWeight = FontWeight.Bold,
+            color = colors.accent,
+            letterSpacing = 1.2.sp,
+            fontSize = 11.sp
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "Honor your natural rhythm.",
+            style = FormaTheme.typography.headlineLarge,
+            fontWeight = FontWeight.Bold,
+            color = colors.textPrimary,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "Align habits with when your mind and body are naturally primed. Pick your daily cadence:",
+            style = FormaTheme.typography.bodyMedium,
+            color = colors.textSecondary,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Chronotype.entries.forEach { chronotype ->
+            val isSelected = chronotype == selectedChronotype
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp)
+                    .clip(RoundedCornerShape(18.dp))
+                    .background(if (isSelected) colors.surfaceVariant else colors.surface)
+                    .border(
+                        width = if (isSelected) 1.5.dp else 1.dp,
+                        color = if (isSelected) colors.accent else colors.border.copy(alpha = 0.6f),
+                        shape = RoundedCornerShape(18.dp)
+                    )
+                    .formaPressEffect(targetScale = 0.98f) { onSelectChronotype(chronotype) }
+                    .padding(14.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(38.dp)
+                            .clip(CircleShape)
+                            .background(if (isSelected) colors.accentSoft else colors.surfaceVariant),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        FormaIcon(
+                            iconKey = chronotype.iconKey,
+                            contentDescription = null,
+                            tint = if (isSelected) colors.accent else colors.textSecondary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    Column(modifier = Modifier.weight(1f)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = chronotype.displayName,
+                                style = FormaTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = colors.textPrimary,
+                                fontSize = 14.sp
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(if (isSelected) colors.accent else colors.border)
+                                    .padding(horizontal = 5.dp, vertical = 2.dp)
+                            ) {
+                                Text(
+                                    text = chronotype.animalSymbol,
+                                    fontSize = 9.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (isSelected) colors.onAccent else colors.textTertiary,
+                                    letterSpacing = 0.8.sp
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = "Peak: ${chronotype.peakFocusWindow}",
+                            style = FormaTheme.typography.labelSmall,
+                            color = if (isSelected) colors.accent else colors.textTertiary,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 11.sp
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = chronotype.description,
+                            style = FormaTheme.typography.bodySmall,
+                            color = colors.textSecondary,
+                            fontSize = 11.sp,
+                            lineHeight = 15.sp
+                        )
+                    }
+
+                    if (isSelected) {
+                        Icon(
+                            imageVector = Icons.Rounded.CheckCircle,
+                            contentDescription = null,
+                            tint = colors.accent,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Button(
+            onClick = onContinue,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = colors.accent,
+                contentColor = colors.onAccent
+            ),
+            shape = RoundedCornerShape(20.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(54.dp)
+        ) {
+            Text(
+                text = "Continue",
+                style = FormaTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Icon(
+                imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
                 contentDescription = null,
                 modifier = Modifier.size(18.dp)
             )
@@ -332,7 +506,7 @@ private fun ChooseThemeStep(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "STEP 2 OF 3 • PHILOSOPHY & PALETTE",
+            text = "STEP 3 OF 4 • PHILOSOPHY & PALETTE",
             style = FormaTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
             color = colors.accent,
@@ -463,7 +637,7 @@ private fun ChooseStarterPackStep(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "STEP 3 OF 3 • COMMITMENT",
+            text = "STEP 4 OF 4 • DAILY FOUNDATION",
             style = FormaTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
             color = colors.accent,
@@ -651,7 +825,7 @@ private fun ChooseStarterPackStep(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Icon(
-                imageVector = Icons.Rounded.ArrowForward,
+                imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
                 contentDescription = null,
                 modifier = Modifier.size(18.dp)
             )
@@ -753,7 +927,7 @@ private fun GreetingStep(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Icon(
-                imageVector = Icons.Rounded.ArrowForward,
+                imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
                 contentDescription = null,
                 modifier = Modifier.size(18.dp)
             )

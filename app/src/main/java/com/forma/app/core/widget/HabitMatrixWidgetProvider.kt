@@ -1,4 +1,4 @@
-﻿package com.forma.app.core.widget
+package com.forma.app.core.widget
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
@@ -50,7 +50,7 @@ class HabitMatrixWidgetProvider : AppWidgetProvider() {
             val today = DateUtils.today()
             val todayDate = DateUtils.formatDateIso(today)
 
-            var streakText = "🔥 1d streak"
+            var streakText = "1d streak"
             var completionSummary = "Tracking your daily flow"
             var weeklyProgress = 50
 
@@ -80,7 +80,7 @@ class HabitMatrixWidgetProvider : AppWidgetProvider() {
                     // Quick streak estimation
                     val todayComps = habitCompletionDao.getCompletionsForDate(todayDate).first()
                     val streakDays = if (todayComps.isNotEmpty()) (weekCompletionsCount / totalHabits).coerceAtLeast(1) else 0
-                    streakText = "🔥 ${streakDays}d streak"
+                    streakText = "${streakDays}d streak"
                 }
             } catch (_: Exception) {}
 

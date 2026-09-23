@@ -1,4 +1,4 @@
-﻿package com.forma.app.ui.stats
+package com.forma.app.ui.stats
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -32,7 +32,6 @@ import androidx.compose.material.icons.rounded.CheckCircle
 import com.forma.app.ui.analytics.components.MindfulInsightsSheet
 import androidx.compose.material.icons.rounded.ChevronLeft
 import androidx.compose.material.icons.rounded.ChevronRight
-import androidx.compose.material.icons.rounded.LocalFireDepartment
 import androidx.compose.material.icons.rounded.NorthEast
 import androidx.compose.material.icons.rounded.Spa
 import androidx.compose.material.icons.rounded.Star
@@ -479,9 +478,9 @@ fun StatsScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(Icons.Rounded.LocalFireDepartment, contentDescription = null, tint = colors.accent, modifier = Modifier.size(16.dp))
+                                    Icon(Icons.Rounded.AutoGraph, contentDescription = null, tint = colors.accent, modifier = Modifier.size(16.dp))
                                     Spacer(modifier = Modifier.width(6.dp))
-                                    Text(text = "Current Streak", style = FormaTheme.typography.bodySmall, color = colors.textSecondary, fontSize = 12.sp)
+                                    Text(text = "Daily Momentum", style = FormaTheme.typography.bodySmall, color = colors.textSecondary, fontSize = 12.sp)
                                 }
                                 Text(
                                     text = "${currentStats.bestCurrentStreak} days",

@@ -125,6 +125,13 @@ class TodayViewModel @Inject constructor(
         }
     }
 
+    fun addHabit(habit: Habit) {
+        viewModelScope.launch {
+            habitRepository.insertHabit(habit)
+            zenFeedback.onHabitCompleted()
+        }
+    }
+
     fun toggleTask(item: TodayScheduleItem.TimelineBlock) {
         viewModelScope.launch {
             val isNowCompleted = !item.item.completed

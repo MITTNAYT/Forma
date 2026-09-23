@@ -42,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.forma.app.core.designsystem.FormaTheme
+import com.forma.app.core.designsystem.icon.FormaIcon
 import com.forma.app.domain.model.Chronotype
 import com.forma.app.domain.model.EnergyZone
 import com.forma.app.domain.model.HourlyEnergyPoint
@@ -111,11 +112,21 @@ fun CircadianEnergyWaveCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = chronotype.animalSymbol,
-                        fontSize = 20.sp,
-                        modifier = Modifier.padding(end = 8.dp)
-                    )
+                    Box(
+                        modifier = Modifier
+                            .size(34.dp)
+                            .clip(CircleShape)
+                            .background(colors.accentSoft),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        FormaIcon(
+                            iconKey = chronotype.iconKey,
+                            contentDescription = null,
+                            tint = colors.accent,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
                     Column {
                         Text(
                             text = "Circadian Rhythm",
@@ -124,7 +135,7 @@ fun CircadianEnergyWaveCard(
                             fontSize = 11.sp
                         )
                         Text(
-                            text = "${chronotype.name.lowercase().replaceFirstChar { it.uppercase() }} Rhythm • ${String.format("%.0f", energyAnim * 100)}% Energy",
+                            text = "${chronotype.displayName.substringBefore(" (")} Flow • ${String.format("%.0f", energyAnim * 100)}% Energy",
                             style = FormaTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = colors.textPrimary,

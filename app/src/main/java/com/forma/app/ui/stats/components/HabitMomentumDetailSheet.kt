@@ -1,4 +1,4 @@
-﻿package com.forma.app.ui.stats.components
+package com.forma.app.ui.stats.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,7 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.EmojiEvents
-import androidx.compose.material.icons.rounded.LocalFireDepartment
+import androidx.compose.material.icons.rounded.AutoGraph
 import androidx.compose.material.icons.rounded.Loop
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -210,7 +210,7 @@ fun HabitMomentumDetailSheet(
                 ) {
                     Column {
                         Icon(
-                            imageVector = Icons.Rounded.LocalFireDepartment,
+                            imageVector = Icons.Rounded.AutoGraph,
                             contentDescription = null,
                             tint = colors.accent,
                             modifier = Modifier.size(20.dp)

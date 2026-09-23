@@ -8,11 +8,35 @@ import android.content.Intent
 import android.widget.RemoteViews
 import com.forma.app.MainActivity
 import com.forma.app.R
+import com.forma.app.core.chronotype.CircadianEnergyEngine
+import com.forma.app.core.util.DateUtils
+import com.forma.app.data.local.dao.HabitCompletionDao
+import com.forma.app.data.local.dao.HabitDao
+import com.forma.app.domain.model.Chronotype
+import com.forma.app.domain.repository.UserPreferencesRepository
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.runBlocking
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.LocalTime
 import java.util.Date
 import java.util.Locale
 
 class FormaWidgetProvider : AppWidgetProvider() {
+
+    @EntryPoint
+    @InstallIn(SingletonComponent::class)
+    interface FormaWidgetEntryPoint {
+        fun habitDao(): HabitDao
+        fun habitCompletionDao(): HabitCompletionDao
+        fun userPreferencesRepository(): UserPreferencesRepository
+    }
 
     override fun onUpdate(
         context: Context,
@@ -35,6 +59,61 @@ class FormaWidgetProvider : AppWidgetProvider() {
             // Date format
             val dateFormat = SimpleDateFormat("EEE, MMM d", Locale.getDefault())
             views.setTextViewText(R.id.widget_date, dateFormat.format(Date()))
+
+            var statusTitle = "Daily Flow Architecture"
+            var statusSubtitle = "Focus on your highest-leverage ritual today."
+
+            try {
+                val entryPoint = EntryPointAccessors.fromApplication(
+                    context.applicationContext,
+                    FormaWidgetEntryPoint::class.java
+                )
+                val userPrefs = entryPoint.userPreferencesRepository()
+                val habitDao = entryPoint.habitDao()
+                val habitCompletionDao = entryPoint.habitCompletionDao()
+
+                runBlocking(Dispatchers.IO) {
+                    val chronotype = userPrefs.chronotype.firstOrNull() ?: Chronotype.BIMODAL_NOCTURNAL
+                    val currentHour = LocalTime.now().hour
+                    val curve = CircadianEnergyEngine().calculateDailyEnergyCurve(chronotype)
+                    val activePoint = curve.find { it.hour == currentHour }
+                    val zone = activePoint?.zone
+
+                    val todayIso = DateUtils.formatDateIso(DateUtils.today())
+                    val dayOfWeek = LocalDate.now().dayOfWeek.value
+                    val allHabits = habitDao.getActiveHabits().first()
+                    val completions = habitCompletionDao.getCompletionsForDate(todayIso).first()
+                    val completedIds = completions.map { it.habitId }.toSet()
+
+                    val scheduledHabits = allHabits.filter { habit ->
+                        val repeatDays = if (habit.repeatDays.isBlank()) {
+                            emptySet()
+                        } else {
+                            habit.repeatDays.split(",").mapNotNull { it.trim().toIntOrNull() }.toSet()
+                        }
+                        (repeatDays.isEmpty() || repeatDays.contains(dayOfWeek)) && !habit.isWintering
+                    }
+
+                    val total = scheduledHabits.size
+                    val done = scheduledHabits.count { completedIds.contains(it.id) }
+
+                    if (zone != null) {
+                        val zoneTag = zone.displayName.uppercase()
+                        statusTitle = "$zoneTag • ${chronotype.displayName.substringBefore(" (")}"
+                        statusSubtitle = if (total > 0) {
+                            "$done/$total rituals completed • ${zone.subtitle}"
+                        } else {
+                            zone.subtitle
+                        }
+                    } else if (total > 0) {
+                        statusTitle = "Daily Flow ($done/$total)"
+                        statusSubtitle = "$done of $total rituals finished today."
+                    }
+                }
+            } catch (_: Exception) {}
+
+            views.setTextViewText(R.id.widget_status_title, statusTitle)
+            views.setTextViewText(R.id.widget_status_subtitle, statusSubtitle)
 
             // Intent to launch MainActivity on Today
             val todayIntent = Intent(context, MainActivity::class.java).apply {

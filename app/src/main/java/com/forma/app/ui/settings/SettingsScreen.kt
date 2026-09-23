@@ -73,6 +73,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.forma.app.core.designsystem.FormaTheme
+import com.forma.app.core.designsystem.icon.FormaIcon
 import com.forma.app.domain.repository.DarkModeOption
 import com.forma.app.domain.repository.PaletteFamily
 import com.forma.app.ui.settings.components.EncryptedVaultDialog
@@ -764,11 +765,21 @@ fun SettingsScreen(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = chronotype.animalSymbol,
-                                    fontSize = 32.sp,
-                                    modifier = Modifier.padding(end = 12.dp)
-                                )
+                                Box(
+                                    modifier = Modifier
+                                        .size(42.dp)
+                                        .clip(CircleShape)
+                                        .background(colors.accentSoft),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    FormaIcon(
+                                        iconKey = chronotype.iconKey,
+                                        contentDescription = null,
+                                        tint = colors.accent,
+                                        modifier = Modifier.size(22.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(12.dp))
                                 Column {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Text(
