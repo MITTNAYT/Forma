@@ -1,4 +1,4 @@
-﻿package com.forma.app.core.backup
+package com.forma.app.core.backup
 
 import android.content.Context
 import android.content.Intent
@@ -88,6 +88,12 @@ class DataExportManager @Inject constructor(
         sb.append("## Active Mindful Rituals (${habits.size})\n")
         habits.forEachIndexed { i, h ->
             sb.append("${i + 1}. **${h.name}** — ${h.timeOfDay.name.lowercase().replaceFirstChar { it.uppercase() }}\n")
+            if (h.subtasks.isNotEmpty()) {
+                h.subtasks.forEach { st ->
+                    val check = if (st.completed) "[x]" else "[ ]"
+                    sb.append("   - $check ${st.title}\n")
+                }
+            }
         }
         sb.append("\n")
 
@@ -96,6 +102,12 @@ class DataExportManager @Inject constructor(
             val status = if (item.completed) "[x]" else "[ ]"
             val time = if (item.startTime != null) "(${item.startTime} - ${item.endTime})" else ""
             sb.append("- $status **${item.title}** $time\n")
+            if (item.subtasks.isNotEmpty()) {
+                item.subtasks.forEach { st ->
+                    val check = if (st.completed) "[x]" else "[ ]"
+                    sb.append("  - $check ${st.title}\n")
+                }
+            }
             if (item.notes.isNotBlank()) {
                 sb.append("  > *${item.notes}*\n")
             }

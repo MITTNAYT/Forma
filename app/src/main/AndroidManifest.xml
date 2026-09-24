@@ -91,6 +91,10 @@
             android:exported="false" />
 
         <receiver
+            android:name=".core.notification.HabitNotificationActionReceiver"
+            android:exported="false" />
+
+        <receiver
             android:name=".core.notification.TaskAlarmReceiver"
             android:exported="false" />
 

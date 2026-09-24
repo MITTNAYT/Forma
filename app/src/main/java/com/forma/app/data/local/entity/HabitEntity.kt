@@ -1,4 +1,4 @@
-﻿package com.forma.app.data.local.entity
+package com.forma.app.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.Index
@@ -34,10 +34,25 @@ data class HabitEntity(
     val isWintering: Boolean = false,
     val startDate: String? = null,
     val endDate: String? = null,
-    val isIndefinite: Boolean = true
+    val isIndefinite: Boolean = true,
+    val subtasksRaw: String = ""
 ) {
     fun toDomain(): Habit {
         val days = if (repeatDays.isBlank()) emptySet() else repeatDays.split(",").mapNotNull { it.trim().toIntOrNull() }.toSet()
+        val subtasksList = if (subtasksRaw.isBlank()) {
+            emptyList()
+        } else {
+            subtasksRaw.split("|||").mapNotNull { subtaskStr ->
+                val parts = subtaskStr.split(":::")
+                if (parts.size >= 3) {
+                    com.forma.app.domain.model.Subtask(
+                        id = parts[0],
+                        title = parts[1],
+                        completed = parts[2].toBoolean()
+                    )
+                } else null
+            }
+        }
         return Habit(
             id = id,
             name = name,
@@ -56,12 +71,16 @@ data class HabitEntity(
             isWintering = isWintering,
             startDate = startDate,
             endDate = endDate,
-            isIndefinite = isIndefinite
+            isIndefinite = isIndefinite,
+            subtasks = subtasksList
         )
     }
 
     companion object {
         fun fromDomain(habit: Habit): HabitEntity {
+            val encodedSubtasks = habit.subtasks.joinToString("|||") {
+                "${it.id}:::${it.title}:::${it.completed}"
+            }
             return HabitEntity(
                 id = habit.id,
                 name = habit.name,
@@ -80,7 +99,8 @@ data class HabitEntity(
                 isWintering = habit.isWintering,
                 startDate = habit.startDate,
                 endDate = habit.endDate,
-                isIndefinite = habit.isIndefinite
+                isIndefinite = habit.isIndefinite,
+                subtasksRaw = encodedSubtasks
             )
         }
     }

@@ -26,21 +26,29 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Article
+import androidx.compose.material.icons.automirrored.rounded.Article
+import androidx.compose.material.icons.automirrored.rounded.HelpOutline
 import androidx.compose.material.icons.rounded.Bedtime
 import androidx.compose.material.icons.rounded.Bookmark
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.ChevronRight
+import androidx.compose.material.icons.rounded.CloudDone
+import androidx.compose.material.icons.rounded.CloudSync
+import androidx.compose.material.icons.rounded.Cookie
 import androidx.compose.material.icons.rounded.DarkMode
+import androidx.compose.material.icons.rounded.Description
 import androidx.compose.material.icons.rounded.Edit
-import androidx.compose.material.icons.rounded.HelpOutline
 import androidx.compose.material.icons.rounded.LightMode
+import androidx.compose.material.icons.rounded.Payments
 import androidx.compose.material.icons.rounded.PhoneAndroid
+import androidx.compose.material.icons.rounded.Security
+import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material.icons.rounded.Spa
 import androidx.compose.material.icons.rounded.TrackChanges
 import androidx.compose.material.icons.rounded.Vibration
 import androidx.compose.material.icons.rounded.WbSunny
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -57,39 +65,32 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
-import com.forma.app.core.designsystem.motion.formaPressEffect
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.forma.app.core.designsystem.FormaTheme
-import com.forma.app.core.designsystem.icon.FormaIcon
+import com.forma.app.core.designsystem.motion.formaPressEffect
+import com.forma.app.domain.model.AuthState
+import com.forma.app.domain.model.SubscriptionTier
 import com.forma.app.domain.repository.DarkModeOption
 import com.forma.app.domain.repository.PaletteFamily
-import com.forma.app.ui.settings.components.EncryptedVaultDialog
-import com.forma.app.ui.settings.components.ProPaywallBottomSheet
-import androidx.compose.material.icons.rounded.CloudDone
-import androidx.compose.material.icons.rounded.CloudSync
-import androidx.compose.material.icons.rounded.GraphicEq
-import androidx.compose.material3.CircularProgressIndicator
-import com.forma.app.domain.model.AuthState
 import com.forma.app.ui.auth.AuthViewModel
 import com.forma.app.ui.auth.components.AuthModalBottomSheet
-import com.forma.app.ui.habits.HabitsViewModel
-import com.forma.app.ui.habits.components.HabitTemplatesSheet
+import com.forma.app.ui.settings.components.EncryptedVaultDialog
+import com.forma.app.ui.settings.components.LegalPolicyDialog
+import com.forma.app.ui.settings.components.LegalPolicyType
+import com.forma.app.ui.settings.components.NecessaryDataConsentBanner
+import com.forma.app.ui.settings.components.ProPaywallBottomSheet
 import com.forma.app.ui.settings.components.VaultDialogMode
-import com.forma.app.ui.soundscape.SoundscapePlayerSheet
-import com.forma.app.ui.soundscape.SoundscapeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -97,9 +98,7 @@ fun SettingsScreen(
     onNavigateToHabits: () -> Unit,
     onNavigateToStats: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
-    authViewModel: AuthViewModel = hiltViewModel(),
-    soundscapeViewModel: SoundscapeViewModel = hiltViewModel(),
-    habitsViewModel: HabitsViewModel = hiltViewModel()
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val colors = FormaTheme.colors
     val context = LocalContext.current
@@ -110,9 +109,9 @@ fun SettingsScreen(
     val isPro by viewModel.isPro.collectAsState()
     val currentTier by viewModel.currentTier.collectAsState()
     val userName by viewModel.userName.collectAsState()
-    val chronotype by viewModel.chronotype.collectAsState()
     val isBiometricLockEnabled by viewModel.isBiometricLockEnabled.collectAsState()
     val isPrivacyMaskingEnabled by viewModel.isPrivacyMaskingEnabled.collectAsState()
+    val hasConsentedToDataAndCookies by viewModel.hasConsentedToDataAndCookies.collectAsState()
 
     val authState by authViewModel.authState.collectAsState()
     val isSyncing by authViewModel.isSyncing.collectAsState()
@@ -121,10 +120,10 @@ fun SettingsScreen(
     var showPaywall by remember { mutableStateOf(false) }
     var showEditProfileDialog by remember { mutableStateOf(false) }
     var showAuthBottomSheet by remember { mutableStateOf(false) }
-    var showSoundscapeSheet by remember { mutableStateOf(false) }
-    var showTemplatesSheet by remember { mutableStateOf(false) }
-    var showChronotypeSheet by remember { mutableStateOf(false) }
     var vaultDialogMode by remember { mutableStateOf<VaultDialogMode?>(null) }
+    var selectedPolicyType by remember { mutableStateOf<LegalPolicyType?>(null) }
+    var showHelpSupportSheet by remember { mutableStateOf(false) }
+
     var hapticsEnabled by remember { mutableStateOf(true) }
     var morningReminderEnabled by remember { mutableStateOf(true) }
     var eveningReminderEnabled by remember { mutableStateOf(true) }
@@ -147,7 +146,7 @@ fun SettingsScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 20.dp)
+                        .padding(start = 24.dp, end = 24.dp, top = 20.dp, bottom = 12.dp)
                 ) {
                     Text(
                         text = "SETTINGS",
@@ -158,7 +157,7 @@ fun SettingsScreen(
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = "Your Space",
+                        text = "Your Sanctuary",
                         fontWeight = FontWeight.Bold,
                         color = colors.textPrimary,
                         fontSize = 28.sp,
@@ -167,268 +166,219 @@ fun SettingsScreen(
                 }
             }
 
-            // ── Profile Card ────────────────────────────────────────────
+            // ── Necessary Data Consent Banner (If not consented) ─────────
+            item {
+                NecessaryDataConsentBanner(
+                    hasConsented = hasConsentedToDataAndCookies,
+                    onAccept = {
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        viewModel.setConsentToDataAndCookies(true)
+                    },
+                    onReviewPolicies = {
+                        selectedPolicyType = LegalPolicyType.COOKIE_AND_CONSENT_POLICY
+                    }
+                )
+            }
+
+            // ── Card 1: Sanctuary Profile, Membership & Cloud Sync ───────
             item {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 20.dp)
+                        .padding(horizontal = 20.dp, vertical = 6.dp)
                         .clip(RoundedCornerShape(24.dp))
                         .background(colors.surface)
-                        .formaPressEffect(targetScale = 0.98f) { showEditProfileDialog = true }
-                        .padding(horizontal = 18.dp, vertical = 20.dp)
+                        .border(
+                            1.dp,
+                            if (currentTier == SubscriptionTier.LIFETIME_FOUNDER)
+                                Color(0xFFD4AF37).copy(alpha = 0.35f)
+                            else colors.border.copy(alpha = 0.5f),
+                            RoundedCornerShape(24.dp)
+                        )
+                        .padding(18.dp)
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
+                    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                        // 1a. User identity row
                         Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .formaPressEffect(targetScale = 0.98f) { showEditProfileDialog = true },
                             verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.weight(1f)
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            // Avatar with gradient ring
-                            Box(modifier = Modifier.size(56.dp)) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .clip(CircleShape)
-                                        .background(
-                                            Brush.linearGradient(
-                                                colors = listOf(
-                                                    colors.accent,
-                                                    colors.accentMuted
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Box(modifier = Modifier.size(52.dp)) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .clip(CircleShape)
+                                            .background(
+                                                Brush.linearGradient(
+                                                    colors = listOf(colors.accent, colors.accentMuted)
                                                 )
                                             )
-                                        )
-                                )
-                                Box(
-                                    modifier = Modifier
-                                        .size(50.dp)
-                                        .align(Alignment.Center)
-                                        .clip(CircleShape)
-                                        .background(colors.accentSoft),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = userInitial,
-                                        fontWeight = FontWeight.Bold,
-                                        color = colors.accent,
-                                        fontSize = 22.sp
                                     )
+                                    Box(
+                                        modifier = Modifier
+                                            .size(46.dp)
+                                            .align(Alignment.Center)
+                                            .clip(CircleShape)
+                                            .background(colors.accentSoft),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = userInitial,
+                                            fontWeight = FontWeight.Bold,
+                                            color = colors.accent,
+                                            fontSize = 20.sp
+                                        )
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.width(14.dp))
+
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = userName.ifBlank { "Tap to set name" },
+                                        fontWeight = FontWeight.Bold,
+                                        color = colors.textPrimary,
+                                        fontSize = 16.sp,
+                                        letterSpacing = (-0.2).sp
+                                    )
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Box(
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(6.dp))
+                                                .background(
+                                                when (currentTier) {
+                                                    SubscriptionTier.LIFETIME_FOUNDER -> Color(0xFFD4AF37)
+                                                    SubscriptionTier.MONTHLY_PRO -> colors.accent
+                                                    SubscriptionTier.FREE -> colors.accentSoft
+                                                }
+                                                )
+                                                .padding(horizontal = 7.dp, vertical = 2.dp)
+                                        ) {
+                                            Text(
+                                                text = when (currentTier) {
+                                                    SubscriptionTier.LIFETIME_FOUNDER -> "FOUNDER"
+                                                    SubscriptionTier.MONTHLY_PRO -> "PRO"
+                                                    SubscriptionTier.FREE -> "EXPLORER"
+                                                },
+                                                fontWeight = FontWeight.Bold,
+                                                color = when (currentTier) {
+                                                    SubscriptionTier.LIFETIME_FOUNDER -> Color(0xFF2C2411)
+                                                    SubscriptionTier.MONTHLY_PRO -> colors.onAccent
+                                                    SubscriptionTier.FREE -> colors.accent
+                                                },
+                                                fontSize = 9.sp,
+                                                letterSpacing = 0.8.sp
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text(
+                                            text = when (currentTier) {
+                                                SubscriptionTier.LIFETIME_FOUNDER -> "Lifetime Founder"
+                                                SubscriptionTier.MONTHLY_PRO -> "Pro Member"
+                                                SubscriptionTier.FREE -> "Sanctuary Explorer"
+                                            },
+                                            color = colors.textTertiary,
+                                            fontSize = 11.sp
+                                        )
+                                    }
                                 }
                             }
 
-                            Spacer(modifier = Modifier.width(14.dp))
-
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = userName.ifBlank { "Tap to set your name" },
-                                    fontWeight = FontWeight.Bold,
-                                    color = colors.textPrimary,
-                                    fontSize = 17.sp,
-                                    letterSpacing = (-0.2).sp
+                            Box(
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .clip(CircleShape)
+                                    .background(colors.accentSoft),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Edit,
+                                    contentDescription = "Edit Profile",
+                                    tint = colors.accent,
+                                    modifier = Modifier.size(15.dp)
                                 )
-                                Spacer(modifier = Modifier.height(3.dp))
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(RoundedCornerShape(6.dp))
-                                            .background(
-                                                when (currentTier) {
-                                                    com.forma.app.domain.model.SubscriptionTier.LIFETIME_FOUNDER -> androidx.compose.ui.graphics.Color(0xFFD4AF37)
-                                                    com.forma.app.domain.model.SubscriptionTier.MONTHLY_PRO -> colors.accent
-                                                    com.forma.app.domain.model.SubscriptionTier.FREE -> colors.accentSoft
-                                                }
-                                            )
-                                            .padding(horizontal = 7.dp, vertical = 2.dp)
-                                    ) {
-                                        Text(
-                                            text = when (currentTier) {
-                                                com.forma.app.domain.model.SubscriptionTier.LIFETIME_FOUNDER -> "FOUNDER"
-                                                com.forma.app.domain.model.SubscriptionTier.MONTHLY_PRO -> "PRO"
-                                                com.forma.app.domain.model.SubscriptionTier.FREE -> "EXPLORER"
-                                            },
-                                            fontWeight = FontWeight.Bold,
-                                            color = when (currentTier) {
-                                                com.forma.app.domain.model.SubscriptionTier.LIFETIME_FOUNDER -> androidx.compose.ui.graphics.Color(0xFF2C2411)
-                                                com.forma.app.domain.model.SubscriptionTier.MONTHLY_PRO -> colors.onAccent
-                                                com.forma.app.domain.model.SubscriptionTier.FREE -> colors.accent
-                                            },
-                                            fontSize = 9.sp,
-                                            letterSpacing = 0.8.sp
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.width(6.dp))
+                            }
+                        }
+
+                        SettingsDivider()
+
+                        // 1b. Membership tier trigger
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .formaPressEffect(targetScale = 0.98f) {
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    showPaywall = true
+                                },
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(36.dp)
+                                        .clip(RoundedCornerShape(10.dp))
+                                        .background(
+                                            if (currentTier == SubscriptionTier.LIFETIME_FOUNDER)
+                                                Color(0xFFFDF8EA)
+                                            else colors.accentSoft
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Spa,
+                                        contentDescription = null,
+                                        tint = if (currentTier == SubscriptionTier.LIFETIME_FOUNDER)
+                                            Color(0xFFD4AF37)
+                                        else colors.accent,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column {
                                     Text(
                                         text = when (currentTier) {
-                                            com.forma.app.domain.model.SubscriptionTier.LIFETIME_FOUNDER -> "Lifetime Founder"
-                                            com.forma.app.domain.model.SubscriptionTier.MONTHLY_PRO -> "Pro Member"
-                                            com.forma.app.domain.model.SubscriptionTier.FREE -> "Sanctuary Explorer"
+                                            SubscriptionTier.LIFETIME_FOUNDER -> "Lifetime Founder Pass"
+                                            SubscriptionTier.MONTHLY_PRO -> "Forma Pro Active"
+                                            SubscriptionTier.FREE -> "Forma Pro Sanctuary"
                                         },
-                                        color = colors.textTertiary,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = colors.textPrimary,
+                                        fontSize = 13.5.sp
+                                    )
+                                    Text(
+                                        text = when (currentTier) {
+                                            SubscriptionTier.LIFETIME_FOUNDER -> "All present & future features unlocked"
+                                            SubscriptionTier.MONTHLY_PRO -> "Monthly subscription active"
+                                            SubscriptionTier.FREE -> "AI synthesis, deep metrics & unlimited rituals"
+                                        },
+                                        color = colors.textSecondary,
                                         fontSize = 11.sp
                                     )
                                 }
                             }
-                        }
-
-                        Box(
-                            modifier = Modifier
-                                .size(34.dp)
-                                .clip(CircleShape)
-                                .background(colors.accentSoft),
-                            contentAlignment = Alignment.Center
-                        ) {
                             Icon(
-                                imageVector = Icons.Rounded.Edit,
-                                contentDescription = "Edit Name",
-                                tint = colors.accent,
-                                modifier = Modifier.size(15.dp)
+                                imageVector = Icons.Rounded.ChevronRight,
+                                contentDescription = null,
+                                tint = colors.textTertiary,
+                                modifier = Modifier.size(16.dp)
                             )
                         }
-                    }
-                }
 
-                Spacer(modifier = Modifier.height(14.dp))
-            }
+                        SettingsDivider()
 
-            // ── Forma Pro Sanctuary Card (Organic placement below Profile) ──
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp)
-                        .clip(RoundedCornerShape(24.dp))
-                        .background(colors.surface)
-                        .border(
-                            1.2.dp,
-                            if (currentTier == com.forma.app.domain.model.SubscriptionTier.LIFETIME_FOUNDER)
-                                androidx.compose.ui.graphics.Color(0xFFD4AF37).copy(alpha = 0.45f)
-                            else colors.accent.copy(alpha = 0.35f),
-                            RoundedCornerShape(24.dp)
-                        )
-                        .formaPressEffect(targetScale = 0.97f) {
-                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            showPaywall = true
-                        }
-                        .padding(18.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(46.dp)
-                                    .clip(RoundedCornerShape(16.dp))
-                                    .background(
-                                        if (currentTier == com.forma.app.domain.model.SubscriptionTier.LIFETIME_FOUNDER)
-                                            androidx.compose.ui.graphics.Color(0xFFFDF8EA)
-                                        else colors.accentSoft
-                                    ),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Rounded.Spa,
-                                    contentDescription = null,
-                                    tint = if (currentTier == com.forma.app.domain.model.SubscriptionTier.LIFETIME_FOUNDER)
-                                        androidx.compose.ui.graphics.Color(0xFFD4AF37)
-                                    else colors.accent,
-                                    modifier = Modifier.size(22.dp)
-                                )
-                            }
-
-                            Spacer(modifier = Modifier.width(14.dp))
-
-                            Column {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Text(
-                                        text = when (currentTier) {
-                                            com.forma.app.domain.model.SubscriptionTier.LIFETIME_FOUNDER -> "Forma Founder"
-                                            com.forma.app.domain.model.SubscriptionTier.MONTHLY_PRO -> "Forma Pro"
-                                            com.forma.app.domain.model.SubscriptionTier.FREE -> "Forma Pro"
-                                        },
-                                        fontWeight = FontWeight.Bold,
-                                        color = colors.textPrimary,
-                                        fontSize = 16.sp
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(RoundedCornerShape(6.dp))
-                                            .background(
-                                                when (currentTier) {
-                                                    com.forma.app.domain.model.SubscriptionTier.LIFETIME_FOUNDER -> androidx.compose.ui.graphics.Color(0xFFD4AF37)
-                                                    com.forma.app.domain.model.SubscriptionTier.MONTHLY_PRO -> colors.accent
-                                                    com.forma.app.domain.model.SubscriptionTier.FREE -> colors.accent.copy(alpha = 0.14f)
-                                                }
-                                            )
-                                            .padding(horizontal = 6.dp, vertical = 2.dp)
-                                    ) {
-                                        Text(
-                                            text = when (currentTier) {
-                                                com.forma.app.domain.model.SubscriptionTier.LIFETIME_FOUNDER -> "FOUNDER"
-                                                com.forma.app.domain.model.SubscriptionTier.MONTHLY_PRO -> "MONTHLY PRO"
-                                                com.forma.app.domain.model.SubscriptionTier.FREE -> "UPGRADE"
-                                            },
-                                            fontWeight = FontWeight.Bold,
-                                            color = when (currentTier) {
-                                                com.forma.app.domain.model.SubscriptionTier.LIFETIME_FOUNDER -> androidx.compose.ui.graphics.Color(0xFF2C2411)
-                                                com.forma.app.domain.model.SubscriptionTier.MONTHLY_PRO -> colors.onAccent
-                                                com.forma.app.domain.model.SubscriptionTier.FREE -> colors.accent
-                                            },
-                                            fontSize = 9.5.sp,
-                                            letterSpacing = 0.6.sp
-                                        )
-                                    }
-                                }
-                                Spacer(modifier = Modifier.height(3.dp))
-                                Text(
-                                    text = when (currentTier) {
-                                        com.forma.app.domain.model.SubscriptionTier.LIFETIME_FOUNDER -> "Lifetime sanctuary unlocked · All future updates included"
-                                        com.forma.app.domain.model.SubscriptionTier.MONTHLY_PRO -> "Monthly sanctuary active · Full AI synthesis & deep metrics"
-                                        com.forma.app.domain.model.SubscriptionTier.FREE -> "AI day synthesis · Deep analytics · Custom themes"
-                                    },
-                                    color = colors.textSecondary,
-                                    fontSize = 11.5.sp,
-                                    lineHeight = 16.sp
-                                )
-                            }
-                        }
-
-                        Icon(
-                            imageVector = Icons.Rounded.ChevronRight,
-                            contentDescription = null,
-                            tint = colors.accent,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(14.dp))
-            }
-
-            // ── Cloud Backup & Multi-Device Sync Card (Integrated with Account) ──
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(colors.surface)
-                        .border(1.dp, colors.border.copy(alpha = 0.4f), RoundedCornerShape(20.dp))
-                        .padding(16.dp)
-                ) {
-                    when (val state = authState) {
-                        is AuthState.Authenticated -> {
-                            val user = state.user
-                            Column {
+                        // 1c. Cloud Backup & Multi-Device Sync status
+                        when (val state = authState) {
+                            is AuthState.Authenticated -> {
+                                val user = state.user
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     verticalAlignment = Alignment.CenterVertically,
@@ -437,8 +387,8 @@ fun SettingsScreen(
                                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
                                         Box(
                                             modifier = Modifier
-                                                .size(38.dp)
-                                                .clip(CircleShape)
+                                                .size(36.dp)
+                                                .clip(RoundedCornerShape(10.dp))
                                                 .background(colors.accentSoft),
                                             contentAlignment = Alignment.Center
                                         ) {
@@ -446,136 +396,117 @@ fun SettingsScreen(
                                                 imageVector = Icons.Rounded.CloudDone,
                                                 contentDescription = "Synced",
                                                 tint = colors.accent,
-                                                modifier = Modifier.size(20.dp)
+                                                modifier = Modifier.size(18.dp)
                                             )
                                         }
                                         Spacer(modifier = Modifier.width(12.dp))
                                         Column {
                                             Text(
-                                                text = user.displayName ?: "Sanctuary Member",
+                                                text = user.displayName ?: "Cloud Sync Active",
                                                 fontWeight = FontWeight.SemiBold,
                                                 color = colors.textPrimary,
-                                                fontSize = 14.sp
+                                                fontSize = 13.sp
                                             )
                                             Text(
-                                                text = user.email ?: "Cloud Sync Active",
+                                                text = user.email ?: "Encrypted vault synced",
                                                 color = colors.textSecondary,
                                                 fontSize = 11.sp
                                             )
                                         }
                                     }
 
-                                    // Sync Now Button
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(RoundedCornerShape(10.dp))
-                                            .background(colors.accentSoft)
-                                            .formaPressEffect(targetScale = 0.95f) {
-                                                authViewModel.syncNow()
-                                            }
-                                            .padding(horizontal = 10.dp, vertical = 6.dp)
-                                    ) {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            if (isSyncing) {
-                                                CircularProgressIndicator(
-                                                    modifier = Modifier.size(11.dp),
-                                                    strokeWidth = 1.5.dp,
-                                                    color = colors.accent
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Box(
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(8.dp))
+                                                .background(colors.accentSoft)
+                                                .formaPressEffect(targetScale = 0.95f) { authViewModel.syncNow() }
+                                                .padding(horizontal = 9.dp, vertical = 5.dp)
+                                        ) {
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                if (isSyncing) {
+                                                    CircularProgressIndicator(
+                                                        modifier = Modifier.size(10.dp),
+                                                        strokeWidth = 1.5.dp,
+                                                        color = colors.accent
+                                                    )
+                                                    Spacer(modifier = Modifier.width(4.dp))
+                                                }
+                                                Text(
+                                                    text = if (isSyncing) "Syncing..." else "Sync",
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = colors.accent,
+                                                    fontSize = 11.sp
                                                 )
-                                                Spacer(modifier = Modifier.width(5.dp))
                                             }
+                                        }
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        TextButton(
+                                            onClick = { authViewModel.signOut() },
+                                            contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp)
+                                        ) {
                                             Text(
-                                                text = if (isSyncing) "Syncing..." else "Sync Now",
-                                                fontWeight = FontWeight.Bold,
-                                                color = colors.accent,
+                                                text = "Sign Out",
+                                                color = colors.textTertiary,
                                                 fontSize = 11.sp
                                             )
                                         }
                                     }
                                 }
-
-                                Spacer(modifier = Modifier.height(12.dp))
-                                SettingsDivider()
-                                Spacer(modifier = Modifier.height(8.dp))
-
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = if (lastSyncedAt != null) "Last backed up to cloud" else "Offline-first local cache active",
-                                        color = colors.textTertiary,
-                                        fontSize = 11.sp
-                                    )
-                                    TextButton(
-                                        onClick = { authViewModel.signOut() },
-                                        contentPadding = PaddingValues(0.dp)
-                                    ) {
-                                        Text(
-                                            text = "Sign Out",
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = colors.textSecondary,
-                                            fontSize = 11.sp
-                                        )
-                                    }
-                                }
                             }
-                        }
-                        else -> {
-                            Column {
+                            else -> {
                                 Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .formaPressEffect(targetScale = 0.98f) { showAuthBottomSheet = true },
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(38.dp)
-                                            .clip(CircleShape)
-                                            .background(colors.accentSoft),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Rounded.CloudSync,
-                                            contentDescription = "Cloud Sync",
-                                            tint = colors.accent,
-                                            modifier = Modifier.size(20.dp)
-                                        )
+                                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(36.dp)
+                                                .clip(RoundedCornerShape(10.dp))
+                                                .background(colors.accentSoft),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Rounded.CloudSync,
+                                                contentDescription = "Cloud Sync",
+                                                tint = colors.accent,
+                                                modifier = Modifier.size(18.dp)
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.width(12.dp))
+                                        Column {
+                                            Text(
+                                                text = "Cloud Sync & Multi-Device",
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = colors.textPrimary,
+                                                fontSize = 13.5.sp
+                                            )
+                                            Text(
+                                                text = "Optional Google / Email backup for multi-device",
+                                                color = colors.textSecondary,
+                                                fontSize = 11.sp
+                                            )
+                                        }
                                     }
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                    Column(modifier = Modifier.weight(1f)) {
-                                        Text(
-                                            text = "Cloud Backup & Multi-Device Sync",
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = colors.textPrimary,
-                                            fontSize = 14.sp
-                                        )
-                                        Spacer(modifier = Modifier.height(2.dp))
-                                        Text(
-                                            text = "Sign in with Google or Email to sync rituals across devices.",
-                                            color = colors.textSecondary,
-                                            fontSize = 11.sp,
-                                            lineHeight = 15.sp
-                                        )
-                                    }
+                                    Icon(
+                                        imageVector = Icons.Rounded.ChevronRight,
+                                        contentDescription = null,
+                                        tint = colors.textTertiary,
+                                        modifier = Modifier.size(16.dp)
+                                    )
                                 }
-
-                                Spacer(modifier = Modifier.height(12.dp))
-
-                                com.forma.app.core.designsystem.component.FormaButton(
-                                    text = "Connect Google / Email",
-                                    onClick = { showAuthBottomSheet = true },
-                                    style = com.forma.app.core.designsystem.component.FormaButtonStyle.PRIMARY,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
                             }
                         }
                     }
                 }
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(14.dp))
             }
 
-            // ── Section: Appearance ──────────────────────────────────────
+            // ── Card 2: Appearance & Atmosphere ──────────────────────────
             item {
                 SettingsSectionHeader(label = "APPEARANCE & ATMOSPHERE", modifier = Modifier.padding(horizontal = 24.dp))
                 Spacer(modifier = Modifier.height(8.dp))
@@ -700,7 +631,6 @@ fun SettingsScreen(
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
-                                        // Dual swatch (dark + light halves)
                                         Box(
                                             modifier = Modifier
                                                 .size(22.dp)
@@ -740,153 +670,12 @@ fun SettingsScreen(
                         }
                     }
                 }
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(18.dp))
             }
 
-            // ── Section: Circadian Chronotype & Energy ─────────────────
+            // ── Card 3: Gentle Rituals & Haptics ─────────────────────────
             item {
-                SettingsSectionHeader(label = "BIOLOGY & CIRCADIAN CHRONOTYPE", modifier = Modifier.padding(horizontal = 24.dp))
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(colors.surface)
-                        .border(1.dp, colors.border.copy(alpha = 0.4f), RoundedCornerShape(20.dp))
-                        .padding(16.dp)
-                ) {
-                    Column {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(42.dp)
-                                        .clip(CircleShape)
-                                        .background(colors.accentSoft),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    FormaIcon(
-                                        iconKey = chronotype.iconKey,
-                                        contentDescription = null,
-                                        tint = colors.accent,
-                                        modifier = Modifier.size(22.dp)
-                                    )
-                                }
-                                Spacer(modifier = Modifier.width(12.dp))
-                                Column {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Text(
-                                            text = chronotype.displayName,
-                                            fontWeight = FontWeight.Bold,
-                                            color = colors.textPrimary,
-                                            fontSize = 15.sp
-                                        )
-                                        Spacer(modifier = Modifier.width(6.dp))
-                                        Box(
-                                            modifier = Modifier
-                                                .clip(RoundedCornerShape(6.dp))
-                                                .background(colors.accentSoft)
-                                                .padding(horizontal = 6.dp, vertical = 2.dp)
-                                        ) {
-                                            Text(
-                                                text = "ACTIVE",
-                                                fontWeight = FontWeight.Bold,
-                                                color = colors.accent,
-                                                fontSize = 9.sp
-                                            )
-                                        }
-                                    }
-                                    Spacer(modifier = Modifier.height(2.dp))
-                                    Text(
-                                        text = "Peak Focus: ${chronotype.peakFocusWindow}",
-                                        color = colors.accent,
-                                        fontWeight = FontWeight.Medium,
-                                        fontSize = 11.5.sp
-                                    )
-                                }
-                            }
-
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(10.dp))
-                                    .background(colors.accentSoft)
-                                    .formaPressEffect(targetScale = 0.94f) {
-                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                        showChronotypeSheet = true
-                                    }
-                                    .padding(horizontal = 12.dp, vertical = 7.dp)
-                            ) {
-                                Text(
-                                    text = "Change",
-                                    fontWeight = FontWeight.Bold,
-                                    color = colors.accent,
-                                    fontSize = 11.sp
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(10.dp))
-                        Text(
-                            text = chronotype.description,
-                            color = colors.textSecondary,
-                            fontSize = 11.5.sp,
-                            lineHeight = 16.sp
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.height(20.dp))
-            }
-
-            // ── Section: Sanctuary Lock & Privacy ───────────────────────
-            item {
-                SettingsSectionHeader(label = "SANCTUARY LOCK & APP PRIVACY", modifier = Modifier.padding(horizontal = 24.dp))
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(colors.surface)
-                        .border(1.dp, colors.border.copy(alpha = 0.4f), RoundedCornerShape(20.dp))
-                        .padding(16.dp)
-                ) {
-                    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                        SettingsToggleRow(
-                            icon = Icons.Rounded.Spa,
-                            title = "Biometric Sanctuary Lock",
-                            subtitle = "Require fingerprint or face unlock to access private reflections",
-                            checked = isBiometricLockEnabled,
-                            onCheckedChange = { enabled ->
-                                viewModel.setBiometricLockEnabled(enabled)
-                            }
-                        )
-                        SettingsDivider()
-                        SettingsToggleRow(
-                            icon = Icons.Rounded.Bookmark,
-                            title = "App Switcher Screen Masking",
-                            subtitle = "Prevent OS app switcher snapshots from exposing journal entries",
-                            checked = isPrivacyMaskingEnabled,
-                            onCheckedChange = { enabled ->
-                                viewModel.setPrivacyMaskingEnabled(enabled)
-                            }
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.height(20.dp))
-            }
-
-            // ── Section: Notifications & Feel ──────────────────────────
-            item {
-                SettingsSectionHeader(label = "GENTLE NUDGES & PROMPTS", modifier = Modifier.padding(horizontal = 24.dp))
+                SettingsSectionHeader(label = "GENTLE RITUALS & HAPTICS", modifier = Modifier.padding(horizontal = 24.dp))
                 Spacer(modifier = Modifier.height(8.dp))
             }
             item {
@@ -925,18 +714,18 @@ fun SettingsScreen(
                         SettingsToggleRow(
                             icon = Icons.Rounded.Vibration,
                             title = "Spring Haptics",
-                            subtitle = "Micro-vibrations on button taps and habit completions",
+                            subtitle = "Micro-vibrations on button taps and ritual completions",
                             checked = hapticsEnabled,
                             onCheckedChange = { hapticsEnabled = it }
                         )
                     }
                 }
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(18.dp))
             }
 
-            // ── Section: Mindfulness & Sound Sanctuary ─────────────────
+            // ── Card 4: Security & Data Vault ────────────────────────────
             item {
-                SettingsSectionHeader(label = "MINDFULNESS & SOUND SANCTUARY", modifier = Modifier.padding(horizontal = 24.dp))
+                SettingsSectionHeader(label = "SECURITY & DATA VAULT", modifier = Modifier.padding(horizontal = 24.dp))
                 Spacer(modifier = Modifier.height(8.dp))
             }
             item {
@@ -947,70 +736,57 @@ fun SettingsScreen(
                         .clip(RoundedCornerShape(20.dp))
                         .background(colors.surface)
                         .border(1.dp, colors.border.copy(alpha = 0.4f), RoundedCornerShape(20.dp))
-                        .padding(vertical = 4.dp)
+                        .padding(16.dp)
                 ) {
-                    Column {
-                        SettingsTapRow(
+                    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                        SettingsToggleRow(
                             icon = Icons.Rounded.Spa,
-                            title = "Habit & Ritual Templates",
-                            subtitle = "Explore 15+ curated, science-backed rituals for focus, sleep & health",
-                            onClick = { showTemplatesSheet = true }
+                            title = "Biometric Sanctuary Lock",
+                            subtitle = "Require fingerprint or face unlock to access private reflections",
+                            checked = isBiometricLockEnabled,
+                            onCheckedChange = { enabled ->
+                                viewModel.setBiometricLockEnabled(enabled)
+                            }
                         )
-                        SettingsDivider(indent = 50.dp)
-                        SettingsTapRow(
-                            icon = Icons.Rounded.GraphicEq,
-                            title = "Acoustic Sound Sanctuary",
-                            subtitle = "Rain on Cedar, Tibetan Bowls & Alpine Streams",
-                            onClick = { showSoundscapeSheet = true }
+                        SettingsDivider()
+                        SettingsToggleRow(
+                            icon = Icons.Rounded.Bookmark,
+                            title = "App Switcher Screen Masking",
+                            subtitle = "Prevent OS snapshots from exposing habit reflections",
+                            checked = isPrivacyMaskingEnabled,
+                            onCheckedChange = { enabled ->
+                                viewModel.setPrivacyMaskingEnabled(enabled)
+                            }
                         )
-                    }
-                }
-                Spacer(modifier = Modifier.height(20.dp))
-            }
-
-            // ── Section: Data & Mindful Archives ───────────────────────
-            item {
-                SettingsSectionHeader(label = "DATA & MINDFUL ARCHIVES", modifier = Modifier.padding(horizontal = 24.dp))
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(colors.surface)
-                        .padding(vertical = 4.dp)
-                ) {
-                    Column {
+                        SettingsDivider()
                         SettingsTapRow(
-                            icon = Icons.Rounded.Article,
+                            icon = Icons.AutoMirrored.Rounded.Article,
                             title = "Export Markdown Journal",
-                            subtitle = "Notion, Obsidian & notes-app ready",
+                            subtitle = "Notion & Obsidian compatible readable notes",
                             onClick = { viewModel.exportMarkdown(context) }
                         )
-                        SettingsDivider(indent = 50.dp)
+                        SettingsDivider()
                         SettingsTapRow(
                             icon = Icons.Rounded.Bookmark,
                             title = "Export Encrypted Vault (.habitvault)",
-                            subtitle = "Zero-Knowledge AES-256-GCM encrypted backup",
+                            subtitle = "Zero-Knowledge AES-256 client-encrypted archive",
                             onClick = { vaultDialogMode = VaultDialogMode.ENCRYPT_EXPORT }
                         )
-                        SettingsDivider(indent = 50.dp)
+                        SettingsDivider()
                         SettingsTapRow(
                             icon = Icons.Rounded.TrackChanges,
-                            title = "Unlock & Restore Encrypted Vault",
-                            subtitle = "Decrypt and restore with your master passphrase",
+                            title = "Restore Encrypted Vault",
+                            subtitle = "Decrypt and restore with master passphrase",
                             onClick = { vaultDialogMode = VaultDialogMode.DECRYPT_RESTORE }
                         )
                     }
                 }
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(18.dp))
             }
 
-            // ── Section: About ──────────────────────────────────────────
+            // ── Card 5: Digital Sovereignty & Sanctuary Policies ──────────
             item {
-                SettingsSectionHeader(label = "ABOUT", modifier = Modifier.padding(horizontal = 24.dp))
+                SettingsSectionHeader(label = "DIGITAL SOVEREIGNTY & POLICIES", modifier = Modifier.padding(horizontal = 24.dp))
                 Spacer(modifier = Modifier.height(8.dp))
             }
             item {
@@ -1020,40 +796,131 @@ fun SettingsScreen(
                         .padding(horizontal = 20.dp)
                         .clip(RoundedCornerShape(20.dp))
                         .background(colors.surface)
-                        .padding(vertical = 4.dp)
+                        .border(1.dp, colors.border.copy(alpha = 0.4f), RoundedCornerShape(20.dp))
+                        .padding(16.dp)
                 ) {
-                    Column {
+                    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                        // Trust & Offline-First Manifesto Banner
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(14.dp))
+                                .background(colors.accentSoft)
+                                .padding(12.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(34.dp)
+                                        .clip(CircleShape)
+                                        .background(colors.accent),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Shield,
+                                        contentDescription = null,
+                                        tint = colors.onAccent,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column {
+                                    Text(
+                                        text = "Private by Design & Offline-First",
+                                        fontWeight = FontWeight.Bold,
+                                        color = colors.accent,
+                                        fontSize = 12.5.sp
+                                    )
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Text(
+                                        text = "Your habits live locally on this device. We collect only what is strictly necessary to run your sanctuary.",
+                                        style = FormaTheme.typography.bodySmall,
+                                        color = colors.textSecondary,
+                                        fontSize = 11.sp,
+                                        lineHeight = 15.sp
+                                    )
+                                }
+                            }
+                        }
+
+                        // 1. Privacy Policy
                         SettingsTapRow(
-                            icon = Icons.Rounded.HelpOutline,
-                            title = "Help & Support",
-                            subtitle = "FAQs, contact, and feedback",
-                            onClick = {}
+                            icon = Icons.Rounded.Shield,
+                            title = "Privacy Policy",
+                            subtitle = "Zero advertising trackers, strictly local SQLite database",
+                            onClick = { selectedPolicyType = LegalPolicyType.PRIVACY_POLICY }
+                        )
+
+                        SettingsDivider()
+
+                        // 2. Terms of Service
+                        SettingsTapRow(
+                            icon = Icons.Rounded.Description,
+                            title = "Terms & Conditions",
+                            subtitle = "Personal license, digital sovereignty & fair usage",
+                            onClick = { selectedPolicyType = LegalPolicyType.TERMS_AND_CONDITIONS }
+                        )
+
+                        SettingsDivider()
+
+                        // 3. Refund Policy
+                        SettingsTapRow(
+                            icon = Icons.Rounded.Payments,
+                            title = "Refund Policy",
+                            subtitle = "Google Play Store subscriptions & Founder pass guarantee",
+                            onClick = { selectedPolicyType = LegalPolicyType.REFUND_POLICY }
+                        )
+
+                        SettingsDivider()
+
+                        // 4. Cookies & Data Consent
+                        SettingsTapRow(
+                            icon = Icons.Rounded.Cookie,
+                            title = "Cookie & Necessary Data Notice",
+                            subtitle = if (hasConsentedToDataAndCookies) "Zero ad cookies • Strictly necessary storage consented" else "Tap to review essential data permissions",
+                            onClick = { selectedPolicyType = LegalPolicyType.COOKIE_AND_CONSENT_POLICY }
+                        )
+
+                        SettingsDivider()
+
+                        // 5. Help & Sanctuary Guidance
+                        SettingsTapRow(
+                            icon = Icons.AutoMirrored.Rounded.HelpOutline,
+                            title = "Help & Sanctuary Guidance",
+                            subtitle = "Interactive FAQ, tour replay & community support",
+                            onClick = { showHelpSupportSheet = true }
                         )
                     }
                 }
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(18.dp))
             }
 
-            // ── Version label ───────────────────────────────────────────
+            // ── Version & Trust Manifesto Footer ────────────────────────
             item {
-                Box(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 12.dp),
-                    contentAlignment = Alignment.Center
+                        .padding(vertical = 8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Forma  ·  v2.0",
+                        text = "Forma  ·  v2.0  ·  Zero-Knowledge Sanctuary",
                         color = colors.textTertiary,
                         fontSize = 11.sp,
-                        letterSpacing = 1.sp
+                        letterSpacing = 0.8.sp
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = "Strictly necessary data only  ·  Zero ad telemetry",
+                        color = colors.textTertiary.copy(alpha = 0.7f),
+                        fontSize = 9.5.sp
                     )
                 }
             }
         }
     }
 
-    // ── Edit Profile Dialog ─────────────────────────────────────────
+    // ── Edit Profile Dialog with Form Consent Note ──────────────────
     if (showEditProfileDialog) {
         var tempName by remember { mutableStateOf(userName) }
         AlertDialog(
@@ -1067,20 +934,39 @@ fun SettingsScreen(
                 )
             },
             text = {
-                OutlinedTextField(
-                    value = tempName,
-                    onValueChange = { tempName = it },
-                    label = { Text("Name", color = colors.textSecondary) },
-                    singleLine = true,
-                    colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colors.accent,
-                        unfocusedBorderColor = colors.border,
-                        focusedTextColor = colors.textPrimary,
-                        unfocusedTextColor = colors.textPrimary
-                    ),
-                    shape = RoundedCornerShape(14.dp),
-                    modifier = Modifier.fillMaxWidth()
-                )
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(
+                        value = tempName,
+                        onValueChange = { tempName = it },
+                        label = { Text("Name", color = colors.textSecondary) },
+                        singleLine = true,
+                        colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = colors.accent,
+                            unfocusedBorderColor = colors.border,
+                            focusedTextColor = colors.textPrimary,
+                            unfocusedTextColor = colors.textPrimary
+                        ),
+                        shape = RoundedCornerShape(14.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Shield,
+                            contentDescription = null,
+                            tint = colors.accent,
+                            modifier = Modifier.size(13.dp)
+                        )
+                        Text(
+                            text = "Form consent: Stored locally on your device only. Zero telemetry transmitted.",
+                            color = colors.textTertiary,
+                            fontSize = 10.5.sp,
+                            lineHeight = 14.sp
+                        )
+                    }
+                }
             },
             confirmButton = {
                 TextButton(onClick = {
@@ -1100,6 +986,15 @@ fun SettingsScreen(
         )
     }
 
+    // ── Legal Policy Dialog (Privacy, Terms, Refund, Cookie) ────────
+    selectedPolicyType?.let { policyType ->
+        LegalPolicyDialog(
+            policyType = policyType,
+            onDismiss = { selectedPolicyType = null }
+        )
+    }
+
+    // ── Encrypted Vault Dialog ──────────────────────────────────────
     vaultDialogMode?.let { mode ->
         EncryptedVaultDialog(
             mode = mode,
@@ -1138,38 +1033,19 @@ fun SettingsScreen(
         )
     }
 
-    if (showSoundscapeSheet) {
-        SoundscapePlayerSheet(
-            viewModel = soundscapeViewModel,
-            onDismiss = { showSoundscapeSheet = false }
-        )
-    }
-
-    if (showTemplatesSheet) {
-        HabitTemplatesSheet(
-            onAddHabit = { habit ->
-                habitsViewModel.saveHabit(habit)
-                Toast.makeText(context, "Added '${habit.name}' to your sanctuary", Toast.LENGTH_SHORT).show()
-            },
-            onDismiss = { showTemplatesSheet = false }
-        )
-    }
-
-    if (showChronotypeSheet) {
-        val currentChrono by viewModel.chronotype.collectAsState()
-        com.forma.app.ui.chronotype.ChronotypeSelectorSheet(
-            currentChronotype = currentChrono,
-            alignmentReport = null,
-            onSelectChronotype = { newChrono ->
-                viewModel.setChronotype(newChrono)
-                showChronotypeSheet = false
-            },
-            onDismiss = { showChronotypeSheet = false }
-        )
-    }
-
     if (showPaywall) {
         ProPaywallBottomSheet(onDismiss = { showPaywall = false })
+    }
+
+    if (showHelpSupportSheet) {
+        com.forma.app.ui.settings.components.HelpSupportSheet(
+            onDismiss = { showHelpSupportSheet = false },
+            onReplayTour = {
+                showHelpSupportSheet = false
+                viewModel.restartAppTour()
+                onNavigateToHabits()
+            }
+        )
     }
 }
 
@@ -1235,7 +1111,7 @@ private fun SettingsToggleRow(
                     text = title,
                     fontWeight = FontWeight.SemiBold,
                     color = colors.textPrimary,
-                    fontSize = 14.sp
+                    fontSize = 13.5.sp
                 )
                 Text(
                     text = subtitle,
@@ -1270,8 +1146,9 @@ private fun SettingsTapRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .formaPressEffect(targetScale = 0.97f) { onClick() }
-            .padding(horizontal = 16.dp, vertical = 14.dp),
+            .clip(RoundedCornerShape(12.dp))
+            .clickable { onClick() }
+            .padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -1296,7 +1173,7 @@ private fun SettingsTapRow(
                     text = title,
                     fontWeight = FontWeight.SemiBold,
                     color = colors.textPrimary,
-                    fontSize = 14.sp
+                    fontSize = 13.5.sp
                 )
                 Text(
                     text = subtitle,

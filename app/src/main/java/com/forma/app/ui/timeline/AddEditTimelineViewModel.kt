@@ -1,4 +1,4 @@
-﻿package com.forma.app.ui.timeline
+package com.forma.app.ui.timeline
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -164,6 +164,7 @@ class AddEditTimelineViewModel @Inject constructor(
                         reminderHour = (remTime ?: 480) / 60,
                         reminderMinute = (remTime ?: 480) % 60,
                         recurrenceType = "DAILY",
+                        subtasks = habit.subtasks,
                         isEditMode = true,
                         isLoading = false
                     )
@@ -310,12 +311,24 @@ class AddEditTimelineViewModel @Inject constructor(
                     reminderTimeMinutes = remMinutes,
                     stackedCueText = state.stackedCueText.trim().ifEmpty { null },
                     isWintering = state.isWintering,
-                    updatedAt = System.currentTimeMillis()
+                    updatedAt = System.currentTimeMillis(),
+                    subtasks = state.subtasks
                 )
                 if (state.isEditMode) {
                     habitRepository.updateHabit(habit)
                 } else {
                     habitRepository.insertHabit(habit)
+                }
+
+                if (remMinutes != null && !habit.isWintering) {
+                    notificationHelper.scheduleHabitAlarm(
+                        habitId = habit.id,
+                        habitName = habit.name,
+                        habitIcon = habit.icon,
+                        minutesFromMidnight = remMinutes
+                    )
+                } else {
+                    notificationHelper.cancelHabitAlarm(habit.id)
                 }
             } else {
                 // Save as one-time or recurring timeline commitment
@@ -355,6 +368,7 @@ class AddEditTimelineViewModel @Inject constructor(
                 val habit = habitRepository.getHabitById(state.id).first()
                 if (habit != null) {
                     habitRepository.deleteHabit(habit)
+                    notificationHelper.cancelHabitAlarm(habit.id)
                 }
             } else {
                 val item = timelineRepository.getTimelineItemById(state.id).first()

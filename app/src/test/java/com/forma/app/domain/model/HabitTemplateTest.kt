@@ -28,20 +28,21 @@ class HabitTemplateTest {
 
     @Test
     fun toHabit_createsValidHabitWithExpectedProperties() {
-        val template = HabitTemplate.CURATED_TEMPLATES.first { it.id == "morning_sunlight" }
+        val template = HabitTemplate.CURATED_TEMPLATES.first { it.id == "mindful_sunlight_water" }
         val habit = template.toHabit()
 
         assertNotNull(habit.id)
         assertEquals("Morning Sunlight & Hydration", habit.name)
-        assertEquals("sun", habit.icon)
+        assertEquals("spa", habit.icon)
         assertEquals("#D4AF37", habit.colorTag)
         assertEquals(TimeOfDay.MORNING, habit.timeOfDay)
         assertEquals(EnergyLevel.LOW, habit.energyLevel)
         assertEquals(setOf(1, 2, 3, 4, 5, 6, 7), habit.repeatDays)
         assertFalse(habit.archived)
         assertTrue(habit.isIndefinite)
-        assertEquals("After I get out of bed", habit.stackedCueText)
-        assertEquals(8 * 60, habit.reminderTimeMinutes)
+        assertEquals("Immediately after stepping out of bed", habit.stackedCueText)
+        assertEquals(7 * 60, habit.reminderTimeMinutes)
+        assertEquals(2, habit.subtasks.size)
     }
 
     @Test

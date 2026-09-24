@@ -1,4 +1,4 @@
-﻿package com.forma.app.ui.habits
+package com.forma.app.ui.habits
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -139,7 +139,20 @@ class HabitsViewModel @Inject constructor(
 
     fun archiveHabit(habit: Habit) {
         viewModelScope.launch {
-            habitRepository.archiveHabit(habit.id, !habit.archived)
+            val willBeArchived = !habit.archived
+            habitRepository.archiveHabit(habit.id, willBeArchived)
+            if (willBeArchived) {
+                notificationHelper.cancelHabitAlarm(habit.id)
+            } else {
+                habit.reminderTimeMinutes?.let { minutes ->
+                    notificationHelper.scheduleHabitAlarm(
+                        habitId = habit.id,
+                        habitName = habit.name,
+                        habitIcon = habit.icon,
+                        minutesFromMidnight = minutes
+                    )
+                }
+            }
         }
     }
 
@@ -161,6 +174,7 @@ class HabitsViewModel @Inject constructor(
     fun deleteHabit(habit: Habit) {
         viewModelScope.launch {
             habitRepository.deleteHabit(habit)
+            notificationHelper.cancelHabitAlarm(habit.id)
         }
     }
 }

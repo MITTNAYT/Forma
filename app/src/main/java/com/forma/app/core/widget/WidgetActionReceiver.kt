@@ -1,4 +1,4 @@
-﻿package com.forma.app.core.widget
+package com.forma.app.core.widget
 
 import android.appwidget.AppWidgetManager
 import android.content.BroadcastReceiver
@@ -46,26 +46,7 @@ class WidgetActionReceiver : BroadcastReceiver() {
                     ZenFeedbackManager.playTibetanBowl(context)
 
                     // Refresh all widgets
-                    val appWidgetManager = AppWidgetManager.getInstance(context)
-
-                    // 1. Habit List Widget
-                    val listComponent = ComponentName(context, HabitListWidgetProvider::class.java)
-                    val listIds = appWidgetManager.getAppWidgetIds(listComponent)
-                    appWidgetManager.notifyAppWidgetViewDataChanged(listIds, R.id.widget_habit_list_view)
-
-                    // 2. Ensō Ring Widget
-                    val ensoComponent = ComponentName(context, EnsoRingWidgetProvider::class.java)
-                    val ensoIds = appWidgetManager.getAppWidgetIds(ensoComponent)
-                    for (id in ensoIds) {
-                        EnsoRingWidgetProvider.updateAppWidget(context, appWidgetManager, id)
-                    }
-
-                    // 3. Habit Matrix Widget
-                    val matrixComponent = ComponentName(context, HabitMatrixWidgetProvider::class.java)
-                    val matrixIds = appWidgetManager.getAppWidgetIds(matrixComponent)
-                    for (id in matrixIds) {
-                        HabitMatrixWidgetProvider.updateAppWidget(context, appWidgetManager, id)
-                    }
+                    refreshAllWidgets(context)
                 } finally {
                     pendingResult.finish()
                 }
@@ -77,6 +58,38 @@ class WidgetActionReceiver : BroadcastReceiver() {
         const val ACTION_TOGGLE_HABIT = "com.forma.app.action.TOGGLE_HABIT_WIDGET"
         const val EXTRA_HABIT_ID = "extra_habit_id"
         const val EXTRA_DATE = "extra_date"
+
+        fun refreshAllWidgets(context: Context) {
+            try {
+                val appWidgetManager = AppWidgetManager.getInstance(context)
+
+                // 1. Habit List Widget
+                val listComponent = ComponentName(context, HabitListWidgetProvider::class.java)
+                val listIds = appWidgetManager.getAppWidgetIds(listComponent)
+                appWidgetManager.notifyAppWidgetViewDataChanged(listIds, R.id.widget_habit_list_view)
+
+                // 2. Ensō Ring Widget
+                val ensoComponent = ComponentName(context, EnsoRingWidgetProvider::class.java)
+                val ensoIds = appWidgetManager.getAppWidgetIds(ensoComponent)
+                for (id in ensoIds) {
+                    EnsoRingWidgetProvider.updateAppWidget(context, appWidgetManager, id)
+                }
+
+                // 3. Habit Matrix Widget
+                val matrixComponent = ComponentName(context, HabitMatrixWidgetProvider::class.java)
+                val matrixIds = appWidgetManager.getAppWidgetIds(matrixComponent)
+                for (id in matrixIds) {
+                    HabitMatrixWidgetProvider.updateAppWidget(context, appWidgetManager, id)
+                }
+
+                // 4. Forma Hero Widget
+                val formaComponent = ComponentName(context, FormaWidgetProvider::class.java)
+                val formaIds = appWidgetManager.getAppWidgetIds(formaComponent)
+                for (id in formaIds) {
+                    FormaWidgetProvider.updateAppWidget(context, appWidgetManager, id)
+                }
+            } catch (_: Exception) { }
+        }
 
         fun createToggleIntent(context: Context, habitId: String, date: String): Intent {
             return Intent(context, WidgetActionReceiver::class.java).apply {

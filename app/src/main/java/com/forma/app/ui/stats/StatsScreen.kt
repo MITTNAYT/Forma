@@ -73,7 +73,6 @@ import com.forma.app.ui.stats.components.CommitmentDetailSheet
 import com.forma.app.ui.stats.components.HabitMomentumDetailSheet
 import com.forma.app.ui.stats.components.RhythmDayDetailSheet
 import com.forma.app.ui.stats.components.WeeklyZenRetroSheet
-import com.forma.app.ui.stats.components.YearlyParchmentHeatmap
 
 enum class FocusTimeTab(val label: String) {
     WEEK("This Week"),
@@ -135,266 +134,31 @@ fun StatsScreen(
             contentPadding = PaddingValues(top = 16.dp, bottom = 120.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // 1. Hero Consistency Metric Block
+            // ── Clean Header ─────────────────────────────────────────────
             item {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 16.dp)
+                        .padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 14.dp)
                 ) {
-                    // Small label stays
                     Text(
-                        text = "YOUR RHYTHM",
+                        text = "ANALYTICS",
                         style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = colors.textTertiary,
                         letterSpacing = 1.5.sp,
                         fontSize = 11.sp
                     )
-
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    // Hero completion rate — biggest number on screen
-                    Row(
-                        verticalAlignment = Alignment.Bottom
-                    ) {
-                        Text(
-                            text = "$completionRate",
-                            style = FormaTheme.typography.displayLarge,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = colors.accent,
-                            fontSize = 56.sp,
-                            letterSpacing = (-1.5).sp
-                        )
-                        Text(
-                            text = "%",
-                            style = FormaTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = colors.accent.copy(alpha = 0.6f),
-                            modifier = Modifier.padding(bottom = 8.dp, start = 3.dp)
-                        )
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Column(
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        ) {
-                            Text(
-                                text = "overall",
-                                style = FormaTheme.typography.bodySmall,
-                                color = colors.textSecondary
-                            )
-                            Text(
-                                text = "consistency",
-                                style = FormaTheme.typography.bodySmall,
-                                color = colors.textSecondary
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    // Animated progress bar under the big number
-                    val animatedProgress by animateFloatAsState(
-                        targetValue = flowProgress,
-                        animationSpec = tween(durationMillis = 800, easing = FastOutSlowInEasing),
-                        label = "hero_progress"
-                    )
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(5.dp)
-                            .clip(RoundedCornerShape(4.dp))
-                            .background(colors.accentMuted)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth(animatedProgress)
-                                .fillMaxHeight()
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(colors.accent)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(14.dp))
-
-                    // 3-Way Lifetime Telemetry Badges (Completed / Skipped / Missed)
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        // Completed Tile
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(colors.surface)
-                                .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
-                                .padding(vertical = 8.dp, horizontal = 10.dp)
-                        ) {
-                            Column {
-                                Text(
-                                    text = "${currentStats.totalCompletedCount}",
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 16.sp,
-                                    color = colors.accent
-                                )
-                                Text(
-                                    text = "Completed",
-                                    fontSize = 10.5.sp,
-                                    color = colors.textSecondary
-                                )
-                            }
-                        }
-
-                        // Skipped Tile
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(colors.surface)
-                                .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
-                                .padding(vertical = 8.dp, horizontal = 10.dp)
-                        ) {
-                            Column {
-                                Text(
-                                    text = "${currentStats.totalSkippedCount}",
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 16.sp,
-                                    color = colors.textSecondary
-                                )
-                                Text(
-                                    text = "Skipped",
-                                    fontSize = 10.5.sp,
-                                    color = colors.textSecondary
-                                )
-                            }
-                        }
-
-                        // Missed Tile
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(colors.surface)
-                                .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
-                                .padding(vertical = 8.dp, horizontal = 10.dp)
-                        ) {
-                            Column {
-                                Text(
-                                    text = "${currentStats.totalMissedCount}",
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 16.sp,
-                                    color = if (currentStats.totalMissedCount > 0) Color(0xFFC0392B) else colors.textTertiary
-                                )
-                                Text(
-                                    text = "Missed",
-                                    fontSize = 10.5.sp,
-                                    color = colors.textSecondary
-                                )
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    // Secondary context line
+                    Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = "${currentStats.bestCurrentStreak} day current run  ·  ${currentStats.totalActiveHabits} active habits",
-                        style = FormaTheme.typography.bodySmall,
-                        color = colors.textSecondary,
-                        fontSize = 12.sp
+                        text = "Rhythm & Focus",
+                        fontWeight = FontWeight.Bold,
+                        color = colors.textPrimary,
+                        fontSize = 28.sp,
+                        letterSpacing = (-0.8).sp
                     )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Action pills row (Breathwork + Retro + Insights)
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        // Breathwork pill
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(colors.accentSoft)
-                                .border(1.dp, colors.accent.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
-                                .formaPressEffect(targetScale = 0.93f) { showBreathworkSheet = true }
-                                .padding(horizontal = 12.dp, vertical = 8.dp)
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.Rounded.Spa,
-                                    contentDescription = "Breathwork",
-                                    tint = colors.accent,
-                                    modifier = Modifier.size(13.dp)
-                                )
-                                Spacer(modifier = Modifier.width(5.dp))
-                                Text(
-                                    text = "Breathwork",
-                                    style = FormaTheme.typography.labelSmall,
-                                    fontWeight = FontWeight.Bold,
-                                    color = colors.accent,
-                                    fontSize = 12.sp
-                                )
-                            }
-                        }
-
-                        // Weekly Retro pill
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(colors.surfaceVariant)
-                                .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
-                                .formaPressEffect(targetScale = 0.93f) { showWeeklyRetroSheet = true }
-                                .padding(horizontal = 12.dp, vertical = 8.dp)
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.Rounded.AutoAwesome,
-                                    contentDescription = "Weekly Retro",
-                                    tint = colors.textSecondary,
-                                    modifier = Modifier.size(13.dp)
-                                )
-                                Spacer(modifier = Modifier.width(5.dp))
-                                Text(
-                                    text = "Weekly Retro",
-                                    style = FormaTheme.typography.labelSmall,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = colors.textSecondary,
-                                    fontSize = 12.sp
-                                )
-                            }
-                        }
-
-                        // Insights pill
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(colors.surfaceVariant)
-                                .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
-                                .formaPressEffect(targetScale = 0.93f) { showInsightsSheet = true }
-                                .padding(horizontal = 12.dp, vertical = 8.dp)
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.Rounded.AutoGraph,
-                                    contentDescription = "Insights",
-                                    tint = colors.textSecondary,
-                                    modifier = Modifier.size(13.dp)
-                                )
-                                Spacer(modifier = Modifier.width(5.dp))
-                                Text(
-                                    text = "Insights",
-                                    style = FormaTheme.typography.labelSmall,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = colors.textSecondary,
-                                    fontSize = 12.sp
-                                )
-                            }
-                        }
-                    }
                 }
             }
-
-            item { Spacer(modifier = Modifier.height(18.dp)) }
 
             // 1b. Hero Zen Consistency Ring Card
             item {
@@ -522,6 +286,25 @@ fun StatsScreen(
                                 }
                                 Text(
                                     text = "${currentStats.bestAllTimeStreak} days",
+                                    style = FormaTheme.typography.bodyMedium.copy(fontFeatureSettings = "tnum"),
+                                    fontWeight = FontWeight.Bold,
+                                    color = colors.textPrimary,
+                                    fontSize = 13.sp
+                                )
+                            }
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(Icons.Rounded.CheckCircle, contentDescription = null, tint = colors.accent, modifier = Modifier.size(16.dp))
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(text = "Total Completed", style = FormaTheme.typography.bodySmall, color = colors.textSecondary, fontSize = 12.sp)
+                                }
+                                Text(
+                                    text = "${currentStats.totalCompletedCount}",
                                     style = FormaTheme.typography.bodyMedium.copy(fontFeatureSettings = "tnum"),
                                     fontWeight = FontWeight.Bold,
                                     color = colors.textPrimary,
@@ -1068,125 +851,6 @@ fun StatsScreen(
                         }
                     }
                 }
-
-            item { Spacer(modifier = Modifier.height(24.dp)) }
-
-            // 7b. 365-Day Parchment Heatmap Section
-            item {
-                YearlyParchmentHeatmap(
-                    completionsByDate = yearlyCompletions,
-                    modifier = Modifier.padding(horizontal = 20.dp)
-                )
-            }
-
-            // 7c. Habit Correlation Insights Section
-            if (correlations.isNotEmpty()) {
-                item { Spacer(modifier = Modifier.height(24.dp)) }
-
-                item {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 20.dp)
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier.padding(bottom = 12.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Rounded.AutoAwesome,
-                                contentDescription = null,
-                                tint = colors.accent,
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Text(
-                                text = "HABIT SYNERGY & CORRELATIONS",
-                                style = FormaTheme.typography.labelSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = colors.textTertiary,
-                                letterSpacing = 1.2.sp,
-                                fontSize = 11.sp
-                            )
-                        }
-
-                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                            correlations.take(4).forEach { correlation ->
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clip(RoundedCornerShape(20.dp))
-                                        .background(colors.surface)
-                                        .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(20.dp))
-                                        .padding(16.dp)
-                                ) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.SpaceBetween
-                                    ) {
-                                        Row(
-                                            modifier = Modifier.weight(1f),
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                                        ) {
-                                            Box(
-                                                modifier = Modifier
-                                                    .size(42.dp)
-                                                    .clip(RoundedCornerShape(12.dp))
-                                                    .background(colors.accentSoft),
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                FormaIcon(
-                                                    iconKey = correlation.primaryHabitIcon,
-                                                    contentDescription = null,
-                                                    tint = colors.accent,
-                                                    modifier = Modifier.size(20.dp)
-                                                )
-                                            }
-
-                                            Column(modifier = Modifier.weight(1f)) {
-                                                Text(
-                                                    text = "${correlation.primaryHabitName} → ${correlation.correlatedFactor}",
-                                                    style = FormaTheme.typography.titleMedium,
-                                                    fontWeight = FontWeight.Bold,
-                                                    color = colors.textPrimary,
-                                                    fontSize = 14.sp
-                                                )
-                                                Spacer(modifier = Modifier.height(2.dp))
-                                                Text(
-                                                    text = correlation.insightSummary,
-                                                    style = FormaTheme.typography.bodySmall,
-                                                    color = colors.textSecondary,
-                                                    fontSize = 12.sp,
-                                                    lineHeight = 16.sp
-                                                )
-                                            }
-                                        }
-
-                                        Spacer(modifier = Modifier.width(8.dp))
-
-                                        Box(
-                                            modifier = Modifier
-                                                .clip(RoundedCornerShape(10.dp))
-                                                .background(if (correlation.isPositive) colors.accentSoft else colors.surfaceVariant)
-                                                .padding(horizontal = 8.dp, vertical = 4.dp)
-                                        ) {
-                                            Text(
-                                                text = if (correlation.impactPercentage > 0) "+${correlation.impactPercentage}%" else "${correlation.impactPercentage}%",
-                                                style = FormaTheme.typography.labelSmall,
-                                                fontWeight = FontWeight.Bold,
-                                                color = if (correlation.isPositive) colors.accent else colors.textSecondary,
-                                                fontSize = 12.sp
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
 

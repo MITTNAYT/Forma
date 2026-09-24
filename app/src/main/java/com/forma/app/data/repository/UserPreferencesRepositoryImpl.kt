@@ -39,6 +39,7 @@ class UserPreferencesRepositoryImpl @Inject constructor(
         val CHRONOTYPE = stringPreferencesKey("chronotype")
         val IS_BIOMETRIC_LOCK_ENABLED = booleanPreferencesKey("is_biometric_lock_enabled")
         val IS_PRIVACY_MASKING_ENABLED = booleanPreferencesKey("is_privacy_masking_enabled")
+        val HAS_CONSENTED_DATA_COOKIES = booleanPreferencesKey("has_consented_data_cookies")
     }
 
     override val chronotype: Flow<com.forma.app.domain.model.Chronotype> = context.dataStore.data.map { preferences ->
@@ -56,6 +57,10 @@ class UserPreferencesRepositoryImpl @Inject constructor(
 
     override val isPrivacyMaskingEnabled: Flow<Boolean> = context.dataStore.data.map { preferences ->
         preferences[PreferencesKeys.IS_PRIVACY_MASKING_ENABLED] ?: false
+    }
+
+    override val hasConsentedToDataAndCookies: Flow<Boolean> = context.dataStore.data.map { preferences ->
+        preferences[PreferencesKeys.HAS_CONSENTED_DATA_COOKIES] ?: false
     }
 
     override val isOnboardingCompleted: Flow<Boolean> = context.dataStore.data.map { preferences ->
@@ -178,6 +183,12 @@ class UserPreferencesRepositoryImpl @Inject constructor(
     override suspend fun setPrivacyMaskingEnabled(enabled: Boolean) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.IS_PRIVACY_MASKING_ENABLED] = enabled
+        }
+    }
+
+    override suspend fun setConsentToDataAndCookies(consented: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.HAS_CONSENTED_DATA_COOKIES] = consented
         }
     }
 }

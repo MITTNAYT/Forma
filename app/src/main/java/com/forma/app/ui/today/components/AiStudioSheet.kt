@@ -1,4 +1,4 @@
-﻿package com.forma.app.ui.today.components
+package com.forma.app.ui.today.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -132,7 +132,7 @@ fun AiStudioSheet(
     // Rotating mindful loading messages during generation
     val loadingMessages = listOf(
         "Consulting Gemini Intelligence...",
-        "Harmonizing deep focus with circadian rhythm...",
+        "Harmonizing deep focus with daily energy flow...",
         "Structuring realistic timeboxes & checklists...",
         "Crafting keystone habits and micro-rituals..."
     )

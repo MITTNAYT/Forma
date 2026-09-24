@@ -295,7 +295,7 @@ fun HabitTemplatesSheet(
                                             )
                                             Spacer(modifier = Modifier.width(3.dp))
                                             Text(
-                                                text = "${template.durationMinutes}m",
+                                                text = "${template.timeOfDay.displayName} • ${template.durationMinutes}m",
                                                 fontWeight = FontWeight.Medium,
                                                 color = colors.textSecondary,
                                                 fontSize = 10.sp
@@ -370,6 +370,43 @@ fun HabitTemplatesSheet(
                                 fontSize = 12.5.sp,
                                 lineHeight = 17.sp
                             )
+
+                            // Subtask Micro-Steps Preview
+                            if (template.subtasks.isNotEmpty()) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(colors.surfaceVariant.copy(alpha = 0.5f))
+                                        .padding(horizontal = 10.dp, vertical = 6.dp),
+                                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    Text(
+                                        text = "MICRO-STEPS (${template.subtasks.size})",
+                                        fontWeight = FontWeight.Bold,
+                                        color = colors.textTertiary,
+                                        fontSize = 9.sp,
+                                        letterSpacing = 0.8.sp
+                                    )
+                                    template.subtasks.forEach { sub ->
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(4.dp)
+                                                    .clip(CircleShape)
+                                                    .background(colors.accent)
+                                            )
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Text(
+                                                text = sub.title,
+                                                fontSize = 11.5.sp,
+                                                color = colors.textSecondary
+                                            )
+                                        }
+                                    }
+                                }
+                            }
 
                             // Stacked cue if present
                             if (template.stackedCueText != null) {

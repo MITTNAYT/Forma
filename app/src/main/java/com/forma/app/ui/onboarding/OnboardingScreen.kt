@@ -1,7 +1,15 @@
 package com.forma.app.ui.onboarding
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -9,6 +17,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,28 +38,41 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.rounded.AutoAwesome
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.ChevronRight
-import androidx.compose.material.icons.rounded.FitnessCenter
+import androidx.compose.material.icons.rounded.CloudDone
+import androidx.compose.material.icons.rounded.CloudUpload
 import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material.icons.rounded.Security
+import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material.icons.rounded.Spa
 import androidx.compose.material.icons.rounded.Terminal
+import androidx.compose.material.icons.rounded.WorkspacePremium
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -58,36 +80,30 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.forma.app.R
-import com.forma.app.core.designsystem.CoffeeLightAccent
-import com.forma.app.core.designsystem.CoffeeLightBg
 import com.forma.app.core.designsystem.FormaTheme
-import com.forma.app.core.designsystem.LavenderLightAccent
-import com.forma.app.core.designsystem.LavenderLightBg
-import com.forma.app.core.designsystem.MatchaLightAccent
-import com.forma.app.core.designsystem.MatchaLightBg
-import com.forma.app.core.designsystem.MonoLightAccent
-import com.forma.app.core.designsystem.MonoLightBg
-import com.forma.app.core.designsystem.TerracottaLightAccent
-import com.forma.app.core.designsystem.TerracottaLightBg
 import com.forma.app.core.designsystem.component.FormaButton
 import com.forma.app.core.designsystem.component.FormaButtonStyle
 import com.forma.app.core.designsystem.component.FormaEmblem
-import com.forma.app.core.designsystem.icon.FormaIcon
 import com.forma.app.core.designsystem.motion.formaPressEffect
-import com.forma.app.domain.model.Chronotype
+import com.forma.app.domain.model.AuthState
+import com.forma.app.domain.model.SubscriptionTier
 import com.forma.app.domain.repository.PaletteFamily
+import com.forma.app.ui.auth.AuthViewModel
+import com.forma.app.ui.auth.components.AuthModalBottomSheet
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun OnboardingScreen(
     onOnboardingFinished: () -> Unit,
-    viewModel: OnboardingViewModel = hiltViewModel()
+    viewModel: OnboardingViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val colors = FormaTheme.colors
     val step by viewModel.step.collectAsState()
     val name by viewModel.name.collectAsState()
-    val selectedChronotype by viewModel.selectedChronotype.collectAsState()
+    val authState by authViewModel.authState.collectAsState()
+    var showAuthSheet by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
     Scaffold(
@@ -97,7 +113,7 @@ fun OnboardingScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(24.dp),
+                .padding(horizontal = 24.dp, vertical = 16.dp),
             contentAlignment = Alignment.Center
         ) {
             AnimatedContent(
@@ -124,13 +140,6 @@ fun OnboardingScreen(
                             }
                         )
                     }
-                    OnboardingStep.CHOOSE_CHRONOTYPE -> {
-                        ChooseChronotypeStep(
-                            selectedChronotype = selectedChronotype,
-                            onSelectChronotype = { viewModel.selectChronotype(it) },
-                            onContinue = { viewModel.submitChronotype() }
-                        )
-                    }
                     OnboardingStep.CHOOSE_THEME -> {
                         ChooseThemeStep(
                             onSelectTheme = { palette -> viewModel.selectTheme(palette) }
@@ -144,7 +153,27 @@ fun OnboardingScreen(
                             starterHabits = starterHabits,
                             onSelectPack = { viewModel.selectStarterPack(it) },
                             onToggleHabit = { viewModel.toggleStarterHabit(it) },
-                            onContinue = { viewModel.proceedToGreeting() }
+                            onContinue = { viewModel.proceedToCalibration() }
+                        )
+                    }
+                    OnboardingStep.CALIBRATION -> {
+                        CalibrationStep(
+                            name = name,
+                            onProceed = { viewModel.proceedToPaywall() }
+                        )
+                    }
+                    OnboardingStep.PRO_PAYWALL -> {
+                        val currentTier by viewModel.currentTier.collectAsState()
+                        OnboardingPaywallStep(
+                            currentTier = currentTier,
+                            authState = authState,
+                            onOpenAuth = { showAuthSheet = true },
+                            onPurchase = { tier ->
+                                viewModel.purchaseTier(tier) {
+                                    // Proceeds to greeting
+                                }
+                            },
+                            onContinueFree = { viewModel.continueAsFreeExplorer() }
                         )
                     }
                     OnboardingStep.GREETING -> {
@@ -158,13 +187,20 @@ fun OnboardingScreen(
                 }
             }
         }
+
+        if (showAuthSheet) {
+            AuthModalBottomSheet(
+                viewModel = authViewModel,
+                onDismiss = { showAuthSheet = false }
+            )
+        }
     }
 }
 
+// ── Screen 1: Welcome Manifesto ──────────────────────────────────────────
+
 @Composable
-private fun WelcomeStep(
-    onStart: () -> Unit
-) {
+private fun WelcomeStep(onStart: () -> Unit) {
     val colors = FormaTheme.colors
 
     Column(
@@ -172,47 +208,47 @@ private fun WelcomeStep(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // 1. Forma Architectural Emblem centered 80x80dp
         FormaEmblem(
-            size = 80.dp,
+            size = 84.dp,
             animated = true
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(28.dp))
 
-        // 2. Headline: Less noise. More intention.
         Text(
             text = "Less noise. More intention.",
             style = FormaTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             color = colors.textPrimary,
             textAlign = TextAlign.Center,
-            letterSpacing = (-0.6).sp
+            letterSpacing = (-0.8).sp,
+            fontSize = 28.sp
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
-        // 3. Sub-headline: forma is your quiet space to build daily rhythm without the guilt.
         Text(
-            text = "forma is your quiet space to build daily rhythm without the guilt.",
+            text = "Forma is your private sanctuary to cultivate daily rhythm, focus depth, and calm without the guilt.",
             style = FormaTheme.typography.bodyLarge,
             fontWeight = FontWeight.Normal,
             color = colors.textSecondary,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 16.dp)
+            lineHeight = 22.sp,
+            modifier = Modifier.padding(horizontal = 12.dp)
         )
 
-        Spacer(modifier = Modifier.height(48.dp))
+        Spacer(modifier = Modifier.height(44.dp))
 
-        // 4. "Get Started →" button
         FormaButton(
-            text = "Get Started",
+            text = "Begin Sanctuary Journey",
             onClick = onStart,
             style = FormaButtonStyle.PRIMARY,
             modifier = Modifier.fillMaxWidth()
         )
     }
 }
+
+// ── Screen 2: Enter Name & Form Consent ───────────────────────────────────
 
 @Composable
 private fun EnterNameStep(
@@ -227,17 +263,16 @@ private fun EnterNameStep(
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Center
     ) {
-        // Step indicator
         Text(
-            text = "STEP 1 OF 4 • PERSONAL SANCTUARY",
+            text = "SANCTUARY IDENTITY",
             style = FormaTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
             color = colors.accent,
-            letterSpacing = 1.2.sp,
+            letterSpacing = 1.3.sp,
             fontSize = 11.sp
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         Text(
             text = "What should we call you?",
@@ -245,27 +280,26 @@ private fun EnterNameStep(
             fontWeight = FontWeight.Bold,
             color = colors.textPrimary,
             fontSize = 28.sp,
-            lineHeight = 36.sp
+            letterSpacing = (-0.6).sp
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Your name helps personalize your daily greetings and focus sanctuary.",
+            text = "Your name personalizes your daily greetings and reflection records.",
             style = FormaTheme.typography.bodyMedium,
             color = colors.textSecondary,
-            fontSize = 14.sp,
-            lineHeight = 20.sp
+            fontSize = 14.sp
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(28.dp))
 
         OutlinedTextField(
             value = name,
             onValueChange = onNameChange,
             placeholder = {
                 Text(
-                    text = "e.g. Maya or David",
+                    text = "e.g. Alex or Maya",
                     color = colors.textTertiary,
                     style = FormaTheme.typography.bodyLarge
                 )
@@ -299,7 +333,28 @@ private fun EnterNameStep(
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Form Consent & Data Minimization note
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.Shield,
+                contentDescription = null,
+                tint = colors.accent,
+                modifier = Modifier.size(13.dp)
+            )
+            Text(
+                text = "Form consent: Stored locally on your device only. Zero telemetry transmitted.",
+                color = colors.textTertiary,
+                fontSize = 11.sp,
+                lineHeight = 15.sp
+            )
+        }
+
+        Spacer(modifier = Modifier.height(36.dp))
 
         Button(
             onClick = onContinue,
@@ -313,29 +368,29 @@ private fun EnterNameStep(
             shape = RoundedCornerShape(20.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp)
+                .height(54.dp)
         ) {
             Text(
                 text = "Continue",
                 style = FormaTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
+                fontSize = 15.sp
             )
             Spacer(modifier = Modifier.width(8.dp))
             Icon(
                 imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
                 contentDescription = null,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(17.dp)
             )
         }
     }
 }
 
+// ── Screen 3: Choose Atmosphere Palette ──────────────────────────────────
+
 @Composable
-private fun ChooseChronotypeStep(
-    selectedChronotype: Chronotype,
-    onSelectChronotype: (Chronotype) -> Unit,
-    onContinue: () -> Unit
+private fun ChooseThemeStep(
+    onSelectTheme: (PaletteFamily) -> Unit
 ) {
     val colors = FormaTheme.colors
 
@@ -346,263 +401,77 @@ private fun ChooseChronotypeStep(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "STEP 2 OF 4 • BIOLOGICAL RHYTHM",
+            text = "ATMOSPHERE & PALETTE",
             style = FormaTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
             color = colors.accent,
-            letterSpacing = 1.2.sp,
+            letterSpacing = 1.3.sp,
             fontSize = 11.sp
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Honor your natural rhythm.",
+            text = "Choose your color tone",
             style = FormaTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             color = colors.textPrimary,
-            textAlign = TextAlign.Center
+            fontSize = 26.sp,
+            letterSpacing = (-0.6).sp
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(6.dp))
 
         Text(
-            text = "Align habits with when your mind and body are naturally primed. Pick your daily cadence:",
+            text = "Every palette is crafted to reduce eye strain and cultivate presence.",
             style = FormaTheme.typography.bodyMedium,
             color = colors.textSecondary,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            fontSize = 13.5.sp,
+            modifier = Modifier.padding(horizontal = 8.dp)
         )
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Chronotype.entries.forEach { chronotype ->
-            val isSelected = chronotype == selectedChronotype
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp)
-                    .clip(RoundedCornerShape(18.dp))
-                    .background(if (isSelected) colors.surfaceVariant else colors.surface)
-                    .border(
-                        width = if (isSelected) 1.5.dp else 1.dp,
-                        color = if (isSelected) colors.accent else colors.border.copy(alpha = 0.6f),
-                        shape = RoundedCornerShape(18.dp)
-                    )
-                    .formaPressEffect(targetScale = 0.98f) { onSelectChronotype(chronotype) }
-                    .padding(14.dp)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(38.dp)
-                            .clip(CircleShape)
-                            .background(if (isSelected) colors.accentSoft else colors.surfaceVariant),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        FormaIcon(
-                            iconKey = chronotype.iconKey,
-                            contentDescription = null,
-                            tint = if (isSelected) colors.accent else colors.textSecondary,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(12.dp))
-
-                    Column(modifier = Modifier.weight(1f)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = chronotype.displayName,
-                                style = FormaTheme.typography.titleSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = colors.textPrimary,
-                                fontSize = 14.sp
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(4.dp))
-                                    .background(if (isSelected) colors.accent else colors.border)
-                                    .padding(horizontal = 5.dp, vertical = 2.dp)
-                            ) {
-                                Text(
-                                    text = chronotype.animalSymbol,
-                                    fontSize = 9.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (isSelected) colors.onAccent else colors.textTertiary,
-                                    letterSpacing = 0.8.sp
-                                )
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Text(
-                            text = "Peak: ${chronotype.peakFocusWindow}",
-                            style = FormaTheme.typography.labelSmall,
-                            color = if (isSelected) colors.accent else colors.textTertiary,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 11.sp
-                        )
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Text(
-                            text = chronotype.description,
-                            style = FormaTheme.typography.bodySmall,
-                            color = colors.textSecondary,
-                            fontSize = 11.sp,
-                            lineHeight = 15.sp
-                        )
-                    }
-
-                    if (isSelected) {
-                        Icon(
-                            imageVector = Icons.Rounded.CheckCircle,
-                            contentDescription = null,
-                            tint = colors.accent,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Button(
-            onClick = onContinue,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = colors.accent,
-                contentColor = colors.onAccent
-            ),
-            shape = RoundedCornerShape(20.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(54.dp)
-        ) {
-            Text(
-                text = "Continue",
-                style = FormaTheme.typography.labelLarge,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Icon(
-                imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
-                contentDescription = null,
-                modifier = Modifier.size(18.dp)
-            )
-        }
-    }
-}
-
-@Composable
-private fun ChooseThemeStep(
-    onSelectTheme: (PaletteFamily) -> Unit
-) {
-    val colors = FormaTheme.colors
-
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "STEP 3 OF 4 • PHILOSOPHY & PALETTE",
-            style = FormaTheme.typography.labelSmall,
-            fontWeight = FontWeight.Bold,
-            color = colors.accent,
-            letterSpacing = 1.2.sp,
-            fontSize = 11.sp
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = "No streaks. Just presence.",
-            style = FormaTheme.typography.headlineLarge,
-            fontWeight = FontWeight.Bold,
-            color = colors.textPrimary,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = "Focus on showing up, one small ritual at a time. Select your visual sanctuary:",
-            style = FormaTheme.typography.bodyMedium,
-            color = colors.textSecondary,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(28.dp))
-
-        // Theme palette cards
         val palettes = listOf(
-            Triple(PaletteFamily.MATCHA_OAT, "Matcha & Oat", "Botanical sage — calm and grounded"),
-            Triple(PaletteFamily.COFFEE_CREAM, "Espresso & Champagne", "Rich, warm, and sophisticated"),
-            Triple(PaletteFamily.MONOCHROME, "Monochrome", "Pure black and white — OLED-sharp"),
-            Triple(PaletteFamily.TERRACOTTA_SAND, "Terracotta & Sand", "Earthy clay warmth"),
-            Triple(PaletteFamily.LAVENDER_MILK, "Lavender & Milk", "Serene, soft, and dreamy"),
+            Triple(PaletteFamily.MATCHA_OAT, "Matcha & Oat (Signature)", listOf(Color(0xFF4E6542), Color(0xFFEDF3EB))),
+            Triple(PaletteFamily.COFFEE_CREAM, "Espresso & Warm Cream", listOf(Color(0xFF2C221E), Color(0xFFEFE8DE))),
+            Triple(PaletteFamily.TERRACOTTA_SAND, "Terracotta & Desert Sand", listOf(Color(0xFF8D5B4C), Color(0xFFF7EFE8))),
+            Triple(PaletteFamily.LAVENDER_MILK, "Lavender & Chamomile", listOf(Color(0xFF5E548E), Color(0xFFEDE9F5))),
+            Triple(PaletteFamily.MONOCHROME, "Zen Monochrome", listOf(Color(0xFF1E211E), Color(0xFFF0F2EE)))
         )
 
-        palettes.forEach { (palette, name, desc) ->
-            val previewAccent = when (palette) {
-                PaletteFamily.MATCHA_OAT -> MatchaLightAccent
-                PaletteFamily.COFFEE_CREAM, PaletteFamily.WALNUT_ESPRESSO -> CoffeeLightAccent
-                PaletteFamily.MONOCHROME -> MonoLightAccent
-                PaletteFamily.TERRACOTTA_SAND -> TerracottaLightAccent
-                PaletteFamily.LAVENDER_MILK -> LavenderLightAccent
-            }
-            val previewBg = when (palette) {
-                PaletteFamily.MATCHA_OAT -> MatchaLightBg
-                PaletteFamily.COFFEE_CREAM, PaletteFamily.WALNUT_ESPRESSO -> CoffeeLightBg
-                PaletteFamily.MONOCHROME -> MonoLightBg
-                PaletteFamily.TERRACOTTA_SAND -> TerracottaLightBg
-                PaletteFamily.LAVENDER_MILK -> LavenderLightBg
-            }
-
+        palettes.forEach { (palette, name, swatches) ->
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(20.dp))
+                    .clip(RoundedCornerShape(18.dp))
                     .background(colors.surface)
-                    .border(1.dp, colors.border.copy(alpha = 0.7f), RoundedCornerShape(20.dp))
-                    .formaPressEffect(targetScale = 0.97f) { onSelectTheme(palette) }
+                    .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(18.dp))
+                    .formaPressEffect(targetScale = 0.98f) { onSelectTheme(palette) }
                     .padding(16.dp)
             ) {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    // Color preview swatch
-                    Box(
-                        modifier = Modifier
-                            .size(52.dp)
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(previewBg)
-                            .border(1.dp, previewAccent.copy(alpha = 0.3f), RoundedCornerShape(14.dp)),
-                        contentAlignment = Alignment.Center
-                    ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(
                             modifier = Modifier
-                                .size(26.dp)
+                                .size(28.dp)
                                 .clip(CircleShape)
-                                .background(previewAccent)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    Column(modifier = Modifier.weight(1f)) {
+                                .border(1.dp, colors.border.copy(alpha = 0.4f), CircleShape)
+                        ) {
+                            Box(modifier = Modifier.fillMaxSize().background(swatches[0]))
+                            Box(modifier = Modifier.size(14.dp).background(swatches[1]).align(Alignment.BottomEnd))
+                        }
+                        Spacer(modifier = Modifier.width(14.dp))
                         Text(
                             text = name,
-                            style = FormaTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = colors.textPrimary
-                        )
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Text(
-                            text = desc,
-                            style = FormaTheme.typography.bodySmall,
-                            color = colors.textSecondary
+                            fontWeight = FontWeight.SemiBold,
+                            color = colors.textPrimary,
+                            fontSize = 14.sp
                         )
                     }
 
@@ -614,11 +483,12 @@ private fun ChooseThemeStep(
                     )
                 }
             }
-
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }
+
+// ── Screen 4: Persona Starter Packs with Micro-Steps ─────────────────────
 
 @Composable
 private fun ChooseStarterPackStep(
@@ -634,39 +504,39 @@ private fun ChooseStarterPackStep(
         modifier = Modifier
             .fillMaxWidth()
             .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.Start
     ) {
         Text(
-            text = "STEP 4 OF 4 • DAILY FOUNDATION",
+            text = "LIFESTYLE RHYTHM",
             style = FormaTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
             color = colors.accent,
-            letterSpacing = 1.2.sp,
+            letterSpacing = 1.3.sp,
             fontSize = 11.sp
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Where intention takes form.",
+            text = "Select your daily focus",
             style = FormaTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             color = colors.textPrimary,
-            textAlign = TextAlign.Center
+            fontSize = 26.sp,
+            letterSpacing = (-0.6).sp
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(4.dp))
 
         Text(
-            text = "Choose your first ritual for today. You can shape or expand your cadence anytime.",
+            text = "Choose an archetype that matches your current lifestyle and goals.",
             style = FormaTheme.typography.bodyMedium,
             color = colors.textSecondary,
-            textAlign = TextAlign.Center
+            fontSize = 13.sp
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        // 3 Starter Pack Selector Cards
         StarterPackType.values().forEach { pack ->
             val isSelected = pack == selectedPack
             Box(
@@ -676,57 +546,57 @@ private fun ChooseStarterPackStep(
                     .background(if (isSelected) colors.accentSoft else colors.surface)
                     .border(
                         width = if (isSelected) 1.5.dp else 1.dp,
-                        color = if (isSelected) colors.accent else colors.border.copy(alpha = 0.6f),
+                        color = if (isSelected) colors.accent else colors.border.copy(alpha = 0.5f),
                         shape = RoundedCornerShape(18.dp)
                     )
                     .formaPressEffect(targetScale = 0.98f) { onSelectPack(pack) }
                     .padding(14.dp)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         modifier = Modifier
                             .size(38.dp)
                             .clip(RoundedCornerShape(12.dp))
-                            .background(if (isSelected) colors.accent else colors.surfaceVariant)
-                            .border(1.dp, if (isSelected) colors.accent else colors.border, RoundedCornerShape(12.dp)),
+                            .background(if (isSelected) colors.accent else colors.surfaceVariant),
                         contentAlignment = Alignment.Center
                     ) {
-                        val packIcon = when (pack) {
+                        val icon = when (pack) {
                             StarterPackType.MINDFUL_LIVING -> Icons.Rounded.Spa
                             StarterPackType.DEEP_WORK -> Icons.Rounded.Terminal
-                            StarterPackType.HEALTH_VITALITY -> Icons.Rounded.FitnessCenter
+                            StarterPackType.CREATIVE_STUDIO -> Icons.Rounded.AutoAwesome
+                            StarterPackType.ACADEMIC_STUDY -> Icons.Rounded.Person
                         }
                         Icon(
-                            imageVector = packIcon,
+                            imageVector = icon,
                             contentDescription = null,
                             tint = if (isSelected) colors.onAccent else colors.textPrimary,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(19.dp)
                         )
                     }
-                    Spacer(modifier = Modifier.width(14.dp))
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = pack.title,
-                            style = FormaTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold,
-                            color = if (isSelected) colors.accent else colors.textPrimary
+                            color = if (isSelected) colors.accent else colors.textPrimary,
+                            fontSize = 14.5.sp
                         )
-                        Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = pack.subtitle,
-                            style = FormaTheme.typography.bodySmall,
                             color = colors.textSecondary,
-                            fontSize = 12.sp
+                            fontSize = 11.5.sp,
+                            lineHeight = 15.sp
                         )
                     }
+
                     if (isSelected) {
                         Icon(
                             imageVector = Icons.Rounded.CheckCircle,
                             contentDescription = null,
                             tint = colors.accent,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(18.dp)
                         )
                     }
                 }
@@ -736,15 +606,13 @@ private fun ChooseStarterPackStep(
 
         Spacer(modifier = Modifier.height(14.dp))
 
-        // Habit Checklist
         Text(
-            text = "INCLUDED RITUALS (TAP TO TOGGLE)",
+            text = "INCLUDED RITUALS & MICRO-STEPS",
             style = FormaTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
             color = colors.textTertiary,
             letterSpacing = 1.2.sp,
-            fontSize = 11.sp,
-            modifier = Modifier.fillMaxWidth()
+            fontSize = 10.5.sp
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -755,45 +623,51 @@ private fun ChooseStarterPackStep(
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(14.dp))
                     .background(colors.surface)
-                    .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(14.dp))
+                    .border(1.dp, colors.border.copy(alpha = 0.4f), RoundedCornerShape(14.dp))
                     .formaPressEffect(targetScale = 0.98f) { onToggleHabit(index) }
                     .padding(12.dp)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         modifier = Modifier
-                            .size(22.dp)
+                            .size(20.dp)
                             .clip(CircleShape)
-                            .background(if (habit.isSelected) colors.accent else colors.surfaceVariant)
-                            .border(1.dp, if (habit.isSelected) colors.accent else colors.border, CircleShape),
+                            .background(if (habit.isSelected) colors.accent else colors.surfaceVariant),
                         contentAlignment = Alignment.Center
                     ) {
                         if (habit.isSelected) {
                             Icon(
-                                imageVector = Icons.Rounded.CheckCircle,
+                                imageVector = Icons.Rounded.Check,
                                 contentDescription = null,
                                 tint = colors.onAccent,
-                                modifier = Modifier.size(16.dp)
+                                modifier = Modifier.size(13.dp)
                             )
                         }
                     }
 
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(10.dp))
 
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = habit.name,
-                            style = FormaTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            color = if (habit.isSelected) colors.textPrimary else colors.textTertiary
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = habit.name,
+                                fontWeight = FontWeight.SemiBold,
+                                color = if (habit.isSelected) colors.textPrimary else colors.textTertiary,
+                                fontSize = 13.5.sp
+                            )
+                            if (habit.subtasks.isNotEmpty()) {
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = "• ${habit.subtasks.size} steps",
+                                    color = colors.accent,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
                         if (habit.cueText != null) {
                             Text(
-                                text = "Stacked cue: ${habit.cueText}",
-                                style = FormaTheme.typography.bodySmall,
+                                text = "Cue: ${habit.cueText}",
                                 color = colors.textSecondary,
                                 fontSize = 11.sp
                             )
@@ -818,22 +692,580 @@ private fun ChooseStarterPackStep(
                 .height(54.dp)
         ) {
             Text(
-                text = "Continue",
+                text = "Calibrate Sanctuary",
                 style = FormaTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
+                fontSize = 15.sp
             )
             Spacer(modifier = Modifier.width(8.dp))
             Icon(
                 imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
                 contentDescription = null,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(17.dp)
+            )
+        }
+    }
+}
+
+// ── Screen 5: Kinetic Sanctuary Calibration ──────────────────────────────
+
+@Composable
+private fun CalibrationStep(
+    name: String,
+    onProceed: () -> Unit
+) {
+    val colors = FormaTheme.colors
+    var completedStage by remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(Unit) {
+        delay(600)
+        completedStage = 1
+        delay(700)
+        completedStage = 2
+        delay(700)
+        completedStage = 3
+        delay(600)
+        completedStage = 4
+        delay(800)
+        onProceed()
+    }
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Box(
+            modifier = Modifier.size(80.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(
+                progress = { (completedStage / 4f).coerceIn(0.1f, 1f) },
+                strokeWidth = 3.dp,
+                color = colors.accent,
+                trackColor = colors.accentSoft,
+                modifier = Modifier.fillMaxSize()
+            )
+            Icon(
+                imageVector = Icons.Rounded.AutoAwesome,
+                contentDescription = null,
+                tint = colors.accent,
+                modifier = Modifier.size(32.dp)
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(28.dp))
+
+        Text(
+            text = "Calibrating Your Sanctuary",
+            style = FormaTheme.typography.headlineLarge,
+            fontWeight = FontWeight.Bold,
+            color = colors.textPrimary,
+            fontSize = 24.sp,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "Personalizing daily curves and local vault for ${name.ifBlank { "you" }}...",
+            style = FormaTheme.typography.bodyMedium,
+            color = colors.textSecondary,
+            textAlign = TextAlign.Center,
+            fontSize = 13.5.sp
+        )
+
+        Spacer(modifier = Modifier.height(28.dp))
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(20.dp))
+                .background(colors.surface)
+                .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(20.dp))
+                .padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            listOf(
+                "Analyzing circadian rhythm & chronotype...",
+                "Initializing local SQLite zero-knowledge vault...",
+                "Scheduling intentional morning & evening nudges...",
+                "Sanctuary configuration complete."
+            ).forEachIndexed { index, text ->
+                val isDone = completedStage > index
+                val isInProgress = completedStage == index
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(20.dp)
+                            .clip(CircleShape)
+                            .background(
+                                if (isDone) colors.accent
+                                else if (isInProgress) colors.accentSoft
+                                else colors.surfaceVariant
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (isDone) {
+                            Icon(
+                                imageVector = Icons.Rounded.Check,
+                                contentDescription = null,
+                                tint = colors.onAccent,
+                                modifier = Modifier.size(12.dp)
+                            )
+                        } else if (isInProgress) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(10.dp),
+                                strokeWidth = 1.5.dp,
+                                color = colors.accent
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    Text(
+                        text = text,
+                        fontWeight = if (isInProgress || isDone) FontWeight.SemiBold else FontWeight.Normal,
+                        color = if (isDone) colors.textPrimary else if (isInProgress) colors.accent else colors.textTertiary,
+                        fontSize = 13.sp
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(30.dp))
+
+        Button(
+            onClick = onProceed,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = colors.accent,
+                contentColor = colors.onAccent
+            ),
+            shape = RoundedCornerShape(20.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(54.dp)
+        ) {
+            Text(
+                text = "View Sanctuary Pass",
+                style = FormaTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold,
+                fontSize = 15.sp
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Icon(
+                imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
+                contentDescription = null,
+                modifier = Modifier.size(17.dp)
+            )
+        }
     }
 }
+
+// ── Screen 6: Pro Paywall Sanctuary Funnel ────────────────────────────────
+
+@Composable
+private fun OnboardingPaywallStep(
+    currentTier: SubscriptionTier,
+    authState: AuthState,
+    onOpenAuth: () -> Unit,
+    onPurchase: (SubscriptionTier) -> Unit,
+    onContinueFree: () -> Unit
+) {
+    val colors = FormaTheme.colors
+    var selectedTier by remember { mutableStateOf(SubscriptionTier.LIFETIME_FOUNDER) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Gold Founder Badge
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color(0xFFD4AF37).copy(alpha = 0.15f))
+                .border(1.dp, Color(0xFFD4AF37).copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                .padding(horizontal = 12.dp, vertical = 5.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Rounded.WorkspacePremium,
+                    contentDescription = null,
+                    tint = Color(0xFFD4AF37),
+                    modifier = Modifier.size(15.dp)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = "FORMA PRO SANCTUARY",
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFFD4AF37),
+                    letterSpacing = 1.2.sp,
+                    fontSize = 10.sp
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text(
+            text = "Give Form to Your Flow",
+            style = FormaTheme.typography.headlineLarge,
+            fontWeight = FontWeight.Bold,
+            color = colors.textPrimary,
+            fontSize = 26.sp,
+            textAlign = TextAlign.Center,
+            letterSpacing = (-0.6).sp
+        )
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        Text(
+            text = "Full AI Day Synthesis, limitless rituals, and zero-knowledge encrypted cloud sync.",
+            style = FormaTheme.typography.bodyMedium,
+            color = colors.textSecondary,
+            textAlign = TextAlign.Center,
+            fontSize = 13.sp,
+            modifier = Modifier.padding(horizontal = 8.dp)
+        )
+
+        Spacer(modifier = Modifier.height(18.dp))
+
+        // Cloud Sanctuary Account / Sign-Up Card (Option A)
+        if (authState is AuthState.Authenticated) {
+            val user = authState.user
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(18.dp))
+                    .background(colors.accentSoft)
+                    .border(1.dp, colors.accent.copy(alpha = 0.35f), RoundedCornerShape(18.dp))
+                    .padding(14.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.CloudDone,
+                        contentDescription = null,
+                        tint = colors.accent,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Column {
+                        Text(
+                            text = "Cloud Sanctuary Active",
+                            fontWeight = FontWeight.Bold,
+                            color = colors.textPrimary,
+                            fontSize = 13.sp
+                        )
+                        Text(
+                            text = "Linked to ${user.displayName ?: user.email ?: "your account"}",
+                            color = colors.textSecondary,
+                            fontSize = 11.5.sp
+                        )
+                    }
+                }
+            }
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(18.dp))
+                    .background(colors.surface)
+                    .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(18.dp))
+                    .formaPressEffect(targetScale = 0.98f) { onOpenAuth() }
+                    .padding(14.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(colors.accentSoft),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.CloudUpload,
+                                contentDescription = null,
+                                tint = colors.accent,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column {
+                            Text(
+                                text = "Save Sanctuary to Cloud",
+                                fontWeight = FontWeight.SemiBold,
+                                color = colors.textPrimary,
+                                fontSize = 13.sp
+                            )
+                            Text(
+                                text = "Sign up with Google or Email (Optional)",
+                                color = colors.textSecondary,
+                                fontSize = 11.sp
+                            )
+                        }
+                    }
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(colors.accentSoft)
+                            .padding(horizontal = 10.dp, vertical = 5.dp)
+                    ) {
+                        Text(
+                            text = "Sign Up",
+                            fontWeight = FontWeight.Bold,
+                            color = colors.accent,
+                            fontSize = 11.sp
+                        )
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(14.dp))
+
+        // Tier Options
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            // Lifetime Founder Pass
+            val isFounder = selectedTier == SubscriptionTier.LIFETIME_FOUNDER
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(if (isFounder) Color(0xFFFDF8EA) else colors.surface)
+                    .border(
+                        width = if (isFounder) 2.dp else 1.dp,
+                        color = if (isFounder) Color(0xFFD4AF37) else colors.border.copy(alpha = 0.5f),
+                        shape = RoundedCornerShape(20.dp)
+                    )
+                    .formaPressEffect(targetScale = 0.98f) { selectedTier = SubscriptionTier.LIFETIME_FOUNDER }
+                    .padding(16.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "Lifetime Founder Pass",
+                                fontWeight = FontWeight.Bold,
+                                color = if (isFounder) Color(0xFF2C2411) else colors.textPrimary,
+                                fontSize = 15.sp
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(Color(0xFFD4AF37))
+                                    .padding(horizontal = 6.dp, vertical = 2.dp)
+                            ) {
+                                Text(
+                                    text = "BEST VALUE",
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF2C2411),
+                                    fontSize = 8.5.sp,
+                                    letterSpacing = 0.5.sp
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(3.dp))
+                        Text(
+                            text = "Pay once, own forever • All future updates included",
+                            color = if (isFounder) Color(0xFF6B5828) else colors.textSecondary,
+                            fontSize = 11.5.sp
+                        )
+                    }
+
+                    Column(horizontalAlignment = Alignment.End) {
+                        Text(
+                            text = "$19.99",
+                            fontWeight = FontWeight.Bold,
+                            color = if (isFounder) Color(0xFF2C2411) else colors.textPrimary,
+                            fontSize = 17.sp
+                        )
+                        Text(
+                            text = "one-time",
+                            color = colors.textTertiary,
+                            fontSize = 10.sp
+                        )
+                    }
+                }
+            }
+
+            // Monthly Pro Subscription
+            val isMonthly = selectedTier == SubscriptionTier.MONTHLY_PRO
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(if (isMonthly) colors.accentSoft else colors.surface)
+                    .border(
+                        width = if (isMonthly) 2.dp else 1.dp,
+                        color = if (isMonthly) colors.accent else colors.border.copy(alpha = 0.5f),
+                        shape = RoundedCornerShape(20.dp)
+                    )
+                    .formaPressEffect(targetScale = 0.98f) { selectedTier = SubscriptionTier.MONTHLY_PRO }
+                    .padding(16.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "Monthly Pro",
+                                fontWeight = FontWeight.Bold,
+                                color = if (isMonthly) colors.accent else colors.textPrimary,
+                                fontSize = 15.sp
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(colors.accentSoft)
+                                    .padding(horizontal = 6.dp, vertical = 2.dp)
+                            ) {
+                                Text(
+                                    text = "7-DAY TRIAL",
+                                    fontWeight = FontWeight.Bold,
+                                    color = colors.accent,
+                                    fontSize = 8.5.sp,
+                                    letterSpacing = 0.5.sp
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(3.dp))
+                        Text(
+                            text = "Cancel anytime in Google Play • 7 days free",
+                            color = colors.textSecondary,
+                            fontSize = 11.5.sp
+                        )
+                    }
+
+                    Column(horizontalAlignment = Alignment.End) {
+                        Text(
+                            text = "$3.99",
+                            fontWeight = FontWeight.Bold,
+                            color = colors.textPrimary,
+                            fontSize = 17.sp
+                        )
+                        Text(
+                            text = "/ month",
+                            color = colors.textTertiary,
+                            fontSize = 10.sp
+                        )
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(18.dp))
+
+        // Features list
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(18.dp))
+                .background(colors.surface)
+                .border(1.dp, colors.border.copy(alpha = 0.4f), RoundedCornerShape(18.dp))
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            listOf(
+                "Full AI Day Synthesis & Weekly Zen Retrospective",
+                "Unlimited Habits & Micro-Steps Checklists",
+                "Zero-Knowledge AES-256 Encrypted Vault (.habitvault)",
+                "All 5 Artisanal Color Palettes Unlocked",
+                "Multi-Device Cloud Backup & Sync"
+            ).forEach { perk ->
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(18.dp)
+                            .clip(CircleShape)
+                            .background(colors.accentSoft),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Check,
+                            contentDescription = null,
+                            tint = colors.accent,
+                            modifier = Modifier.size(11.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(
+                        text = perk,
+                        color = colors.textPrimary,
+                        fontSize = 12.5.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        // Action CTA
+        Button(
+            onClick = { onPurchase(selectedTier) },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (selectedTier == SubscriptionTier.LIFETIME_FOUNDER) Color(0xFFD4AF37) else colors.accent,
+                contentColor = if (selectedTier == SubscriptionTier.LIFETIME_FOUNDER) Color(0xFF2C2411) else colors.onAccent
+            ),
+            shape = RoundedCornerShape(20.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(54.dp)
+        ) {
+            Text(
+                text = if (selectedTier == SubscriptionTier.LIFETIME_FOUNDER) "Unlock Lifetime Founder" else "Start 7-Day Free Trial",
+                style = FormaTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold,
+                fontSize = 15.sp
+            )
+        }
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        // Free Explorer Fallback
+        TextButton(
+            onClick = onContinueFree,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = "Continue with Free Sanctuary",
+                color = colors.textSecondary,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 13.sp
+            )
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Text(
+            text = "48-Hour Google Play instant refund guarantee • Cancel anytime",
+            color = colors.textTertiary,
+            fontSize = 10.5.sp
+        )
+    }
+}
+
+// ── Screen 7: Final Sanctuary Greeting ───────────────────────────────────
 
 @Composable
 private fun GreetingStep(
@@ -848,10 +1280,9 @@ private fun GreetingStep(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Welcome Sprout Badge
         Box(
             modifier = Modifier
-                .size(80.dp)
+                .size(76.dp)
                 .clip(CircleShape)
                 .background(colors.accentSoft)
                 .border(2.dp, colors.accent.copy(alpha = 0.5f), CircleShape),
@@ -861,7 +1292,7 @@ private fun GreetingStep(
                 imageVector = Icons.Rounded.CheckCircle,
                 contentDescription = null,
                 tint = colors.accent,
-                modifier = Modifier.size(42.dp)
+                modifier = Modifier.size(38.dp)
             )
         }
 
@@ -872,37 +1303,37 @@ private fun GreetingStep(
             style = FormaTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             color = colors.textPrimary,
-            fontSize = 30.sp,
-            textAlign = TextAlign.Center
+            fontSize = 28.sp,
+            textAlign = TextAlign.Center,
+            letterSpacing = (-0.6).sp
         )
 
         Spacer(modifier = Modifier.height(10.dp))
 
         Text(
-            text = "Your personal sanctuary is ready. We've prepared a 100% clean slate so you can give form to habits and focus that truly matter to you.",
+            text = "Your daily sanctuary is initialized. Habits are seeded, timers are calibrated, and your privacy is preserved on-device.",
             style = FormaTheme.typography.bodyMedium,
             color = colors.textSecondary,
             fontSize = 14.sp,
-            lineHeight = 22.sp,
+            lineHeight = 21.sp,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 12.dp)
+            modifier = Modifier.padding(horizontal = 8.dp)
         )
 
         Spacer(modifier = Modifier.height(28.dp))
 
-        // 3 Key Mindful Features
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(20.dp))
                 .background(colors.surface)
-                .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(20.dp))
+                .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(20.dp))
                 .padding(18.dp)
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                BulletRow(text = "Pure Clean Slate — 0 pre-populated clutter")
-                BulletRow(text = "Private Offline Sanctuary — no ads, no trackers")
-                BulletRow(text = "Forma Rhythm Matrix & Tactile Focus Timer")
+                BulletRow(text = "Private Offline Sanctuary — zero ads, zero trackers")
+                BulletRow(text = "Tactile Spring Haptics & Intentional Micro-Steps")
+                BulletRow(text = "Circadian Rhythm Alignment & Evening Peace")
             }
         }
 
@@ -917,19 +1348,19 @@ private fun GreetingStep(
             shape = RoundedCornerShape(20.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp)
+                .height(54.dp)
         ) {
             Text(
-                text = "Enter Forma",
+                text = "Enter Sanctuary",
                 style = FormaTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
+                fontSize = 15.sp
             )
             Spacer(modifier = Modifier.width(8.dp))
             Icon(
                 imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
                 contentDescription = null,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(17.dp)
             )
         }
     }
@@ -939,7 +1370,8 @@ private fun GreetingStep(
 private fun BulletRow(text: String) {
     val colors = FormaTheme.colors
     Row(
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Box(
             modifier = Modifier
@@ -947,10 +1379,9 @@ private fun BulletRow(text: String) {
                 .clip(CircleShape)
                 .background(colors.accent)
         )
-        Spacer(modifier = Modifier.width(10.dp))
         Text(
             text = text,
-            style = FormaTheme.typography.bodySmall,
+            style = FormaTheme.typography.bodyMedium,
             color = colors.textPrimary,
             fontSize = 13.sp
         )
