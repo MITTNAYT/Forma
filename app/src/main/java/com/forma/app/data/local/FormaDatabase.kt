@@ -20,7 +20,7 @@ import com.forma.app.data.local.entity.TimelineItemEntity
         DailyReflectionEntity::class
     ],
     version = 4,
-    exportSchema = false
+    exportSchema = true
 )
 @TypeConverters(Converters::class)
 abstract class FormaDatabase : RoomDatabase() {

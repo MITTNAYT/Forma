@@ -33,18 +33,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.AutoAwesome
-import androidx.compose.material.icons.rounded.Bolt
-import androidx.compose.material.icons.rounded.Brush
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Nature
 import androidx.compose.material.icons.rounded.School
 import androidx.compose.material.icons.rounded.Spa
-import androidx.compose.material.icons.rounded.Timer
-import androidx.compose.material.icons.rounded.LocalFireDepartment
 import androidx.compose.material.icons.rounded.WbSunny
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -109,6 +104,8 @@ import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.geometry.Rect
 import com.forma.app.ui.today.components.TodayCoachMarksOverlay
+import com.forma.app.ui.today.components.EmptyPeacefulState
+import com.forma.app.ui.today.components.TodayFilterChip
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -969,126 +966,10 @@ fun TodayScreen(
     }
 
     if (showAiPresetSheet) {
-        ModalBottomSheet(
-            onDismissRequest = { showAiPresetSheet = false },
-            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-            containerColor = colors.surface,
-            dragHandle = null
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 20.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Rounded.AutoAwesome,
-                            contentDescription = null,
-                            tint = colors.accent,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "PLAN DAY WITH AI",
-                            style = FormaTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = colors.accent,
-                            letterSpacing = 1.2.sp,
-                            fontSize = 11.sp
-                        )
-                    }
-                    IconButton(
-                        onClick = { showAiPresetSheet = false },
-                        modifier = Modifier.size(32.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.Close,
-                            contentDescription = "Close",
-                            tint = colors.textSecondary,
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(14.dp))
-
-                Text(
-                    text = "Select an Architectural Rhythm",
-                    style = FormaTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = colors.textPrimary,
-                    fontSize = 16.sp
-                )
-                Text(
-                    text = "Forma AI will generate energy-balanced time blocks based on your goal.",
-                    style = FormaTheme.typography.bodySmall,
-                    color = colors.textSecondary,
-                    fontSize = 12.sp,
-                    modifier = Modifier.padding(top = 2.dp, bottom = 16.dp)
-                )
-
-                AiPlanPreset.entries.forEach { preset ->
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(18.dp))
-                            .background(colors.surfaceVariant)
-                            .clickable {
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                viewModel.requestAiDayPlan(preset)
-                                showAiPresetSheet = false
-                            }
-                            .padding(16.dp)
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(colors.accentSoft),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = when (preset) {
-                                        AiPlanPreset.DEEP_WORK -> Icons.Rounded.Timer
-                                        AiPlanPreset.HEALTH_BALANCE -> Icons.Rounded.Spa
-                                        AiPlanPreset.EXAM_STUDY -> Icons.Rounded.LocalFireDepartment
-                                        AiPlanPreset.PRODUCTIVITY_SPRINT -> Icons.Rounded.Bolt
-                                        AiPlanPreset.CREATIVE_FLOW -> Icons.Rounded.Brush
-                                        AiPlanPreset.MINDFUL_WEEKEND -> Icons.Rounded.WbSunny
-                                    },
-                                    contentDescription = null,
-                                    tint = colors.accent,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(14.dp))
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = preset.title,
-                                    style = FormaTheme.typography.titleSmall,
-                                    fontWeight = FontWeight.Bold,
-                                    color = colors.textPrimary,
-                                    fontSize = 14.sp
-                                )
-                                Text(
-                                    text = preset.subtitle,
-                                    style = FormaTheme.typography.bodySmall,
-                                    color = colors.textSecondary,
-                                    fontSize = 11.sp
-                                )
-                            }
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(10.dp))
-                }
-            }
-        }
+        com.forma.app.ui.today.components.AiPlanPresetBottomSheet(
+            onSelectPreset = { preset -> viewModel.requestAiDayPlan(preset) },
+            onDismiss = { showAiPresetSheet = false }
+        )
     }
 
     if (showMorningSheet) {
@@ -1177,109 +1058,6 @@ fun TodayScreen(
             aiPlanBounds = aiPlanBounds,
             addButtonBounds = addButtonBounds,
             onDismiss = { viewModel.dismissCoachMarks() }
-        )
-    }
-}
-
-
-
-@Composable
-fun EmptyPeacefulState(
-    onAddTask: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val colors = FormaTheme.colors
-
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Box(
-            modifier = Modifier
-                .size(54.dp)
-                .clip(CircleShape)
-                .background(colors.accentSoft),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Filled.DateRange,
-                contentDescription = null,
-                tint = colors.accent,
-                modifier = Modifier.size(24.dp)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "A clean slate.",
-            style = FormaTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            color = colors.textPrimary,
-            fontSize = 18.sp
-        )
-
-        Spacer(modifier = Modifier.height(6.dp))
-
-        Text(
-            text = "Add a quiet moment to anchor your day.\nTake a breath or create a mindful intention.",
-            style = FormaTheme.typography.bodyMedium,
-            color = colors.textSecondary,
-            textAlign = TextAlign.Center,
-            fontSize = 13.sp
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(20.dp))
-                .background(colors.accent)
-                .clickable { onAddTask() }
-                .padding(horizontal = 20.dp, vertical = 10.dp)
-        ) {
-            Text(
-                text = "+ Add Mindful Ritual",
-                style = FormaTheme.typography.labelSmall,
-                fontWeight = FontWeight.Bold,
-                color = colors.onAccent,
-                fontSize = 13.sp
-            )
-        }
-    }
-}
-
-@Composable
-fun TodayFilterChip(
-    text: String,
-    isSelected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val colors = FormaTheme.colors
-
-    Box(
-        modifier = modifier
-            .clip(FormaTheme.shapes.extraSmall)
-            .background(if (isSelected) colors.textPrimary else colors.surfaceVariant)
-            .border(
-                1.dp,
-                if (isSelected) androidx.compose.ui.graphics.Color.Transparent else colors.border.copy(alpha = 0.5f),
-                FormaTheme.shapes.extraSmall
-            )
-            .clickable { onClick() }
-            .padding(horizontal = 12.dp, vertical = 6.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = text,
-            style = FormaTheme.typography.labelMedium,
-            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-            color = if (isSelected) colors.surface else colors.textPrimary,
-            fontSize = 12.sp
         )
     }
 }

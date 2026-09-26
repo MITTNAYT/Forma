@@ -155,21 +155,7 @@ class ClerkClient @Inject constructor(
             }
         } catch (e: Exception) {
             Log.e(TAG, "Clerk signIn error", e)
-            // Fallback for offline testing or mock environments
-            val fallbackUser = AuthUser(
-                uid = "clerk_usr_${email.hashCode()}",
-                email = email.trim(),
-                displayName = email.substringBefore("@").replaceFirstChar { it.uppercase() },
-                isAnonymous = false,
-                tier = SubscriptionTier.FREE
-            )
-            saveSessionState("mock_client", "mock_session", "mock_jwt", JSONObject().apply {
-                put("id", fallbackUser.uid)
-                put("email", fallbackUser.email)
-                put("name", fallbackUser.displayName)
-            }.toString())
-            _currentUser.value = fallbackUser
-            Result.success(fallbackUser)
+            Result.failure(e)
         }
     }
 
@@ -219,20 +205,7 @@ class ClerkClient @Inject constructor(
             }
         } catch (e: Exception) {
             Log.e(TAG, "Clerk signUp error", e)
-            val fallbackUser = AuthUser(
-                uid = "clerk_usr_${email.hashCode()}",
-                email = email.trim(),
-                displayName = displayName ?: email.substringBefore("@").replaceFirstChar { it.uppercase() },
-                isAnonymous = false,
-                tier = SubscriptionTier.FREE
-            )
-            saveSessionState("mock_client", "mock_session", "mock_jwt", JSONObject().apply {
-                put("id", fallbackUser.uid)
-                put("email", fallbackUser.email)
-                put("name", fallbackUser.displayName)
-            }.toString())
-            _currentUser.value = fallbackUser
-            Result.success(fallbackUser)
+            Result.failure(e)
         }
     }
 
@@ -250,28 +223,12 @@ class ClerkClient @Inject constructor(
                 val user = fetchUserForSession(sessionId, null, null)
                 Result.success(user)
             } else {
-                // Fallback for Google sign in
-                val mockUid = "clerk_goog_${idToken.hashCode()}"
-                val googleUser = AuthUser(
-                    uid = mockUid,
-                    email = "google.user@gmail.com",
-                    displayName = "Mindful Explorer",
-                    isAnonymous = false,
-                    tier = SubscriptionTier.FREE
-                )
-                _currentUser.value = googleUser
-                Result.success(googleUser)
+                val errMsg = parseClerkError(response.body)
+                Result.failure(Exception(errMsg))
             }
         } catch (e: Exception) {
-            val googleUser = AuthUser(
-                uid = "clerk_goog_${idToken.hashCode()}",
-                email = "google.user@gmail.com",
-                displayName = "Mindful Explorer",
-                isAnonymous = false,
-                tier = SubscriptionTier.FREE
-            )
-            _currentUser.value = googleUser
-            Result.success(googleUser)
+            Log.e(TAG, "Clerk Google sign-in error", e)
+            Result.failure(e)
         }
     }
 

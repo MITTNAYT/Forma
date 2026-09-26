@@ -55,7 +55,7 @@ android {
 
         ndk {
             abiFilters.clear()
-            abiFilters.add("armeabi-v7a")
+            abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86_64"))
         }
     }
 
@@ -84,10 +84,6 @@ android {
         debug {
             isMinifyEnabled = false
             isShrinkResources = false
-            ndk {
-                abiFilters.clear()
-                abiFilters.add("armeabi-v7a")
-            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -100,10 +96,6 @@ android {
                 signingConfigs.getByName("release")
             } else {
                 signingConfigs.getByName("debug")
-            }
-            ndk {
-                abiFilters.clear()
-                abiFilters.add("armeabi-v7a")
             }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

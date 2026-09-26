@@ -1,4 +1,4 @@
-﻿package com.forma.app.core.notification
+package com.forma.app.core.notification
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -24,17 +24,24 @@ class BootCompletedReceiver : BroadcastReceiver() {
         if (intent.action == Intent.ACTION_BOOT_COMPLETED ||
             intent.action == "android.intent.action.QUICKBOOT_POWERON"
         ) {
+            val pendingResult = goAsync()
             CoroutineScope(Dispatchers.IO).launch {
-                val habits = habitRepository.getAllHabits(includeArchived = false).first()
-                habits.forEach { habit ->
-                    habit.reminderTimeMinutes?.let { minutes ->
-                        notificationHelper.scheduleHabitAlarm(
-                            habitId = habit.id,
-                            habitName = habit.name,
-                            habitIcon = habit.icon,
-                            minutesFromMidnight = minutes
-                        )
+                try {
+                    val habits = habitRepository.getAllHabits(includeArchived = false).first()
+                    habits.forEach { habit ->
+                        habit.reminderTimeMinutes?.let { minutes ->
+                            notificationHelper.scheduleHabitAlarm(
+                                habitId = habit.id,
+                                habitName = habit.name,
+                                habitIcon = habit.icon,
+                                minutesFromMidnight = minutes
+                            )
+                        }
                     }
+                } catch (e: Exception) {
+                    android.util.Log.e("BootCompletedReceiver", "Failed to reschedule habit alarms on boot", e)
+                } finally {
+                    pendingResult.finish()
                 }
             }
         }

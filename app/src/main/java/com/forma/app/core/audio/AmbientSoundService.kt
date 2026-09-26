@@ -1,4 +1,4 @@
-﻿package com.forma.app.core.audio
+package com.forma.app.core.audio
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -7,6 +7,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
@@ -52,7 +53,16 @@ class AmbientSoundService : Service() {
 
                 activeSound = sound
                 ambientSoundManager.play(sound)
-                startForeground(NOTIFICATION_ID, buildNotification(sound, timerMinutes))
+                val notification = buildNotification(sound, timerMinutes)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    startForeground(
+                        NOTIFICATION_ID,
+                        notification,
+                        ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+                    )
+                } else {
+                    startForeground(NOTIFICATION_ID, notification)
+                }
 
                 sleepTimerJob?.cancel()
                 if (timerMinutes > 0) {
