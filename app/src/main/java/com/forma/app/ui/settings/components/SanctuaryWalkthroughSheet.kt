@@ -115,12 +115,12 @@ fun SanctuaryWalkthroughSheet(
             ),
             TourStep(
                 stepNumber = "04 / 05",
-                badge = "AI STUDIO",
-                title = "Gemini Routine Synthesizer",
-                headline = "From vague ambition to structured blueprint.",
-                description = "Open the AI Studio anytime. Describe your upcoming day or long-term goals in simple words, and Gemini constructs an optimized timeline with timeboxes, checklists, and habits.",
-                highlight = "One-tap curated presets allow you to plan focus sprints or reset days in seconds.",
-                icon = Icons.Rounded.AutoAwesome,
+                badge = "DEEP FOCUS & AUDIO",
+                title = "Ambient Soundscapes & Focus Sprints",
+                headline = "Enter flow states with tailored frequencies.",
+                description = "Pair Pomodoro focus intervals with ambient audio: Rain on Cedar, Binaural Alpha Beats, and White Noise. Block distractions and track focused minutes effortlessly.",
+                highlight = "Each focus session logs mindful minutes and builds continuous daily rhythm.",
+                icon = Icons.Rounded.Schedule,
                 iconColor = Color(0xFFD4AF37) // Warm Gold
             ),
             TourStep(

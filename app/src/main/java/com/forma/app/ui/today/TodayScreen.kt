@@ -136,7 +136,6 @@ fun TodayScreen(
     var showBreathingSheet by remember { mutableStateOf(false) }
     var showGuidedRoutineSheet by remember { mutableStateOf(false) }
     var showJournalSheet by remember { mutableStateOf(false) }
-    var showAiStudioSheet by remember { mutableStateOf(false) }
     var selectedDetailItem by remember { mutableStateOf<TodayScheduleItem?>(null) }
     var editingHabitId by remember { mutableStateOf<String?>(null) }
     var selectedTimeFilter by remember { mutableStateOf<TimeOfDay?>(null) }
@@ -269,47 +268,13 @@ fun TodayScreen(
                                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    // AI Studio pill
-                                    Box(
-                                        modifier = Modifier
-                                            .onGloballyPositioned { coordinates ->
-                                                aiPlanBounds = coordinates.boundsInRoot()
-                                            }
-                                            .clip(RoundedCornerShape(12.dp))
-                                            .background(colors.accentSoft)
-                                            .border(1.dp, colors.accent.copy(alpha = 0.35f), RoundedCornerShape(12.dp))
-                                            .formaPressEffect(targetScale = 0.93f) {
-                                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                                showAiStudioSheet = true
-                                            }
-                                            .padding(horizontal = 10.dp, vertical = 6.dp),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Icon(
-                                                imageVector = Icons.Rounded.AutoAwesome,
-                                                contentDescription = "AI Studio",
-                                                tint = colors.accent,
-                                                modifier = Modifier.size(13.dp)
-                                            )
-                                            Spacer(modifier = Modifier.width(4.dp))
-                                            Text(
-                                                text = "AI Studio",
-                                                style = FormaTheme.typography.labelSmall,
-                                                fontWeight = FontWeight.Bold,
-                                                color = colors.accent,
-                                                fontSize = 11.sp
-                                            )
-                                        }
-                                    }
-
                                     // Calendar icon button
                                     Box(
                                         modifier = Modifier
-                                            .size(32.dp)
-                                            .clip(RoundedCornerShape(10.dp))
+                                            .size(36.dp)
+                                            .clip(RoundedCornerShape(12.dp))
                                             .background(colors.surfaceVariant)
-                                            .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(10.dp))
+                                            .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
                                             .formaPressEffect(targetScale = 0.90f) {
                                                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                                 showDatePickerDialog = true
@@ -320,7 +285,7 @@ fun TodayScreen(
                                             imageVector = Icons.Rounded.CalendarMonth,
                                             contentDescription = "Pick Date",
                                             tint = colors.textSecondary,
-                                            modifier = Modifier.size(15.dp)
+                                            modifier = Modifier.size(17.dp)
                                         )
                                     }
                                 }
@@ -1018,12 +983,6 @@ fun TodayScreen(
         )
     }
 
-    if (showAiStudioSheet) {
-        com.forma.app.ui.today.components.AiStudioSheet(
-            viewModel = viewModel,
-            onDismiss = { showAiStudioSheet = false }
-        )
-    }
 
     editingHabitId?.let { habitId ->
         com.forma.app.ui.timeline.components.AddEditTimelineSheet(

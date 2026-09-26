@@ -435,7 +435,7 @@ private fun ChooseThemeStep(
 
         val palettes = listOf(
             Triple(PaletteFamily.MATCHA_OAT, "Matcha & Oat (Signature)", listOf(Color(0xFF4E6542), Color(0xFFEDF3EB))),
-            Triple(PaletteFamily.COFFEE_CREAM, "Espresso & Warm Cream", listOf(Color(0xFF2C221E), Color(0xFFEFE8DE))),
+            Triple(PaletteFamily.COFFEE_CREAM, "Espresso & Cream", listOf(Color(0xFF5A3926), Color(0xFFD4BFA8))),
             Triple(PaletteFamily.TERRACOTTA_SAND, "Terracotta & Desert Sand", listOf(Color(0xFF8D5B4C), Color(0xFFF7EFE8))),
             Triple(PaletteFamily.LAVENDER_MILK, "Lavender & Chamomile", listOf(Color(0xFF5E548E), Color(0xFFEDE9F5))),
             Triple(PaletteFamily.MONOCHROME, "Zen Monochrome", listOf(Color(0xFF1E211E), Color(0xFFF0F2EE)))

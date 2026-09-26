@@ -29,7 +29,7 @@ enum class SubscriptionTier(
         title = "Forma Pro",
         priceDisplay = "$4.99",
         priceSubtext = "per month · 7-day free trial",
-        badge = "MOST POPULAR",
+        badge = "POPULAR",
         isHighlighted = true,
         trialDays = 7
     ),
@@ -38,7 +38,7 @@ enum class SubscriptionTier(
         title = "Master Architect",
         priceDisplay = "$49.99",
         priceSubtext = "one-time payment · lifetime sovereign guild access",
-        badge = "SOVEREIGN GUILD (SAVE 70%)",
+        badge = "LIFETIME",
         isHighlighted = false,
         trialDays = 0
     );

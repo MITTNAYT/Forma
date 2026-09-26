@@ -453,7 +453,7 @@ fun SettingsScreen(
                         Triple(PaletteFamily.MATCHA_OAT, "Matcha & Oat",
                             listOf(Color(0xFF4E6542), Color(0xFFEDF3EB))),
                         Triple(PaletteFamily.COFFEE_CREAM, "Espresso & Cream",
-                            listOf(Color(0xFF2C221E), Color(0xFFEFE8DE))),
+                            listOf(Color(0xFF5A3926), Color(0xFFD4BFA8))),
                         Triple(PaletteFamily.TERRACOTTA_SAND, "Terracotta & Sand",
                             listOf(Color(0xFFC58A24), Color(0xFFFBF3E0))),
                         Triple(PaletteFamily.LAVENDER_MILK, "Lavender & Chamomile",
@@ -478,7 +478,7 @@ fun SettingsScreen(
 
                             Box(
                                 modifier = Modifier
-                                    .width(135.dp)
+                                    .width(160.dp)
                                     .clip(RoundedCornerShape(14.dp))
                                     .background(cardBg)
                                     .border(if (isChosen) 1.5.dp else 1.dp, borderColor, RoundedCornerShape(14.dp))
@@ -535,10 +535,12 @@ fun SettingsScreen(
                                     Text(
                                         text = name,
                                         style = FormaTheme.typography.bodySmall,
-                                        fontWeight = if (isChosen) FontWeight.Bold else FontWeight.Medium,
+                                        fontWeight = if (isChosen) FontWeight.Bold else FontWeight.SemiBold,
                                         color = if (isChosen) colors.textPrimary else colors.textSecondary,
-                                        fontSize = 12.sp,
-                                        maxLines = 1
+                                        fontSize = 12.5.sp,
+                                        lineHeight = 16.sp,
+                                        maxLines = 2,
+                                        softWrap = true
                                     )
                                 }
                             }

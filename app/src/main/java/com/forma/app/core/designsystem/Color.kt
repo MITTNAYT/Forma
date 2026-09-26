@@ -4,33 +4,33 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 
 // ========================================================
-// 1. ESPRESSO & CHAMPAGNE (PREMIUM DARK ROAST + GOLDEN)
+// 1. ESPRESSO & CREAM (AUTHENTIC RICH BROWN & BEIGE)
 // ========================================================
-// Light (Champagne) Mode – warm ivory base, espresso ink accents
-val CoffeeLightBg = Color(0xFFFAF8F4)             // champagne paper ivory
-val CoffeeLightSurface = Color(0xFFFFFFFF)         // pure white card
-val CoffeeLightSurfaceVariant = Color(0xFFF3EFE7)  // warm champagne tint
-val CoffeeLightBorder = Color(0xFFE8E2D8)          // warm parchment border
-val CoffeeLightAccent = Color(0xFF1A0E06)           // deepest espresso black
-val CoffeeLightAccentMuted = Color(0xFFA89070)     // warm taupe
-val CoffeeLightAccentSoft = Color(0xFFEDE8DE)      // champagne blush
-val CoffeeLightTextPrimary = Color(0xFF0D0804)     // richest espresso ink
-val CoffeeLightTextSecondary = Color(0xFF6B5E52)   // medium warm grey-brown
-val CoffeeLightTextTertiary = Color(0xFF9C9088)    // soft warm grey
-val CoffeeLightOnAccent = Color(0xFFFDF9F2)        // champagne on dark button
+// Light Mode – soft warm beige linen base, rich artisanal espresso brown accents
+val CoffeeLightBg = Color(0xFFF7F3EB)             // warm soft linen beige
+val CoffeeLightSurface = Color(0xFFFCFAF7)         // warm creamy alabaster card
+val CoffeeLightSurfaceVariant = Color(0xFFEFE7DA)  // soft warm oat beige
+val CoffeeLightBorder = Color(0xFFDFD4C4)          // soft toasted beige border
+val CoffeeLightAccent = Color(0xFF5A3926)          // rich artisanal roasted coffee brown
+val CoffeeLightAccentMuted = Color(0xFFB59A84)     // warm latte mocha beige
+val CoffeeLightAccentSoft = Color(0xFFEFE4D6)      // warm beige foam
+val CoffeeLightTextPrimary = Color(0xFF2C1A10)     // deep rich coffee bean brown
+val CoffeeLightTextSecondary = Color(0xFF6E5646)   // warm roasted cocoa brown
+val CoffeeLightTextTertiary = Color(0xFF9E8777)    // soft warm coffee taupe
+val CoffeeLightOnAccent = Color(0xFFFBF8F3)        // warm cream ivory on brown button
 
-// Dark (Espresso) Mode – near-black espresso base, champagne gold accents
-val CoffeeDarkBg = Color(0xFF080604)               // pure espresso – near OLED black
-val CoffeeDarkSurface = Color(0xFF120E0A)          // deep roast card surface
-val CoffeeDarkSurfaceVariant = Color(0xFF1C1610)   // elevated roast
-val CoffeeDarkBorder = Color(0xFF2E2418)           // very dark warm border
-val CoffeeDarkAccent = Color(0xFFC8A84B)           // true champagne gold
-val CoffeeDarkAccentMuted = Color(0xFF4A3820)      // dark muted amber
-val CoffeeDarkAccentSoft = Color(0xFF1E180C)       // very dark amber hint
-val CoffeeDarkTextPrimary = Color(0xFFFDF8EF)      // warm champagne white
-val CoffeeDarkTextSecondary = Color(0xFFBCA88E)    // warm champagne secondary
-val CoffeeDarkTextTertiary = Color(0xFF7A6A5A)     // muted warm tertiary
-val CoffeeDarkOnAccent = Color(0xFF080604)         // espresso on champagne gold
+// Dark Mode – velvety deep espresso brown base, warm creamy beige accents
+val CoffeeDarkBg = Color(0xFF1B140F)               // rich deep espresso roast brown
+val CoffeeDarkSurface = Color(0xFF251C15)          // dark roast coffee card
+val CoffeeDarkSurfaceVariant = Color(0xFF33261D)   // elevated roasted coffee surface
+val CoffeeDarkBorder = Color(0xFF48362A)           // warm roasted brown border
+val CoffeeDarkAccent = Color(0xFFD4BFA8)           // warm elegant creamy beige
+val CoffeeDarkAccentMuted = Color(0xFF755C4A)      // warm mocha brown
+val CoffeeDarkAccentSoft = Color(0xFF2E2018)       // deep espresso shadow
+val CoffeeDarkTextPrimary = Color(0xFFFAF3EB)      // warm creamy linen beige
+val CoffeeDarkTextSecondary = Color(0xFFC7B5A3)    // soft latte beige
+val CoffeeDarkTextTertiary = Color(0xFF8C7869)     // muted warm taupe
+val CoffeeDarkOnAccent = Color(0xFF1B140F)         // deep espresso brown on creamy beige button
 
 // ========================================================
 // 2. MONOCHROME MINIMALIST (BLACK & WHITE)

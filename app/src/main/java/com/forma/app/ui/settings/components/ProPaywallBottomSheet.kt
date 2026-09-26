@@ -186,9 +186,9 @@ fun ProPaywallBottomSheet(
 
             Text(
                 text = if (isPro)
-                    "You have active access as ${currentTier.title}. Every ritual, AI schedule, and soundscape is ready."
+                    "You have active access as ${currentTier.title}. Unlimited rituals, ambient soundscapes, and deep rhythm analytics are unlocked."
                 else
-                    "Your daily habits and timeline are free forever. Upgrade to Pro or Founder for AI synthesis, biometric locks, and acoustic soundscapes.",
+                    "Build up to 3 keystone habits with full offline privacy free forever. Upgrade to Pro or Master Architect for unlimited rituals, focus soundscapes, and artisan palettes.",
                 style = FormaTheme.typography.bodyMedium,
                 color = colors.textSecondary,
                 fontSize = 14.sp,
@@ -218,7 +218,7 @@ fun ProPaywallBottomSheet(
                     headline = "Free Forever",
                     priceTag = "$0",
                     period = "",
-                    subtitle = "3 active habits max · Basic timeline · Offline SQLite",
+                    subtitle = "3 active habits max · Atomic micro-steps · Offline SQLite",
                     onSelect = { selectedTier = SubscriptionTier.FREE }
                 )
 
@@ -230,8 +230,8 @@ fun ProPaywallBottomSheet(
                     headline = "Forma Pro",
                     priceTag = "$4.99",
                     period = "/ month",
-                    subtitle = "7-Day Free Trial · AI Studio · Soundscapes · Cloud Sync",
-                    badge = "MOST POPULAR",
+                    subtitle = "7-Day Free Trial · Unlimited habits · Focus soundscapes · Cloud sync",
+                    badge = "POPULAR",
                     onSelect = { selectedTier = SubscriptionTier.MONTHLY_PRO }
                 )
 
@@ -244,7 +244,7 @@ fun ProPaywallBottomSheet(
                     priceTag = "$49.99",
                     period = "one-time",
                     subtitle = "Pay once · Lifetime access · Guild insignia & Atelier themes",
-                    badge = "SOVEREIGN GUILD",
+                    badge = "LIFETIME",
                     onSelect = { selectedTier = SubscriptionTier.LIFETIME_FOUNDER }
                 )
             }
@@ -266,25 +266,25 @@ fun ProPaywallBottomSheet(
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 when (selectedTier) {
                     SubscriptionTier.FREE -> {
-                        ProFeatureBullet("Up to 3 active keystone habits with streak tracking")
-                        ProFeatureBullet("Day timeline scheduling and intention setting")
-                        ProFeatureBullet("Local offline Room database with private storage")
+                        ProFeatureBullet("Up to 3 active keystone habits with streak & momentum tracking")
+                        ProFeatureBullet("Habit micro-steps, subtask checklists & habit-stacking cues")
+                        ProFeatureBullet("100% private offline-first SQLite database")
                     }
                     SubscriptionTier.MONTHLY_PRO -> {
                         ProFeatureBullet("Unlimited Habits: Create infinite daily rituals and intentions")
-                        ProFeatureBullet("Forma Gemini AI Studio: Autonomous day scheduling & habit architect")
+                        ProFeatureBullet("Focus Soundscapes: Ambient rain, white noise, and focus timer")
                         ProFeatureBullet("Wintering Mode: Freeze streaks and take guilt-free rest days")
-                        ProFeatureBullet("Habit Micro-Steps: Atomic checklists and habit-stacking cues")
-                        ProFeatureBullet("Focus Soundscapes: Ambient audio and Tibetan bowl focus timer")
+                        ProFeatureBullet("Rhythm & Synergy Analytics: Cross-habit correlations and matrix")
                         ProFeatureBullet("Biometric Security: Fingerprint and Face unlock protection")
+                        ProFeatureBullet("Encrypted Cloud Backup: Seamless sync across all devices")
                     }
                     SubscriptionTier.LIFETIME_FOUNDER -> {
-                        ProFeatureBullet("Lifetime Sovereign Guild License: Zero subscriptions, perpetual access")
-                        ProFeatureBullet("Exclusive Atelier Artisan Themes: Unlocked Obsidian & Aureate palettes")
-                        ProFeatureBullet("Master Guild Insignia: Distinguished golden emblem on your sanctuary")
-                        ProFeatureBullet("Priority AI Studio Reasoning: Direct dedicated Gemini synthesis queue")
-                        ProFeatureBullet("Private Atelier Roadmap Voice: Early beta features and architectural voting")
-                        ProFeatureBullet("Includes all current and future Pro features with zero renewal fees")
+                        ProFeatureBullet("Lifetime Sovereign Guild License: One-time payment, zero subscriptions forever")
+                        ProFeatureBullet("Exclusive Atelier Artisan Themes: Unlocked Espresso & Cream, Terracotta, Lavender")
+                        ProFeatureBullet("Master Guild Insignia: Distinguished golden emblem on your sanctuary header")
+                        ProFeatureBullet("VIP Priority Sync: Instant high-speed cloud sync & vault backup")
+                        ProFeatureBullet("Private Atelier Roadmap Voice: Direct input on new architectural releases")
+                        ProFeatureBullet("Perpetual Guarantee: All future Pro updates included with zero renewal fees")
                     }
                 }
             }
@@ -334,13 +334,14 @@ fun ProPaywallBottomSheet(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     ComparisonRow("Active Habits", "3 max", "Unlimited", "Unlimited")
-                    ComparisonRow("Micro-Steps & Cues", "Basic", "Included", "Included")
-                    ComparisonRow("Gemini AI Studio", "Preview", "Included", "Priority Reasoning")
+                    ComparisonRow("Micro-Steps & Cues", "Included", "Included", "Included")
                     ComparisonRow("Wintering Rest Days", "1 / mo", "Unlimited", "Unlimited")
-                    ComparisonRow("Focus Soundscapes", "Basic", "Included", "Included")
-                    ComparisonRow("Atelier Artisan Themes", "None", "Standard", "Exclusive Unlocked")
+                    ComparisonRow("Ambient Soundscapes", "Preview", "Included", "Included")
+                    ComparisonRow("Synergy Analytics", "Basic", "Full Matrix", "Full Deep Matrix")
+                    ComparisonRow("Biometric Lock", "Included", "Included", "Included")
+                    ComparisonRow("Encrypted Cloud Sync", "None", "Included", "VIP Instant")
+                    ComparisonRow("Atelier Artisan Themes", "Standard", "Standard", "Exclusive Unlocked")
                     ComparisonRow("Guild Insignia Badge", "None", "None", "Golden Emblem")
-                    ComparisonRow("Roadmap Voting Voice", "None", "None", "Direct Atelier Access")
                     ComparisonRow("Investment", "Free Forever", "$4.99 / mo", "$49.99 once (No Subs)")
                 }
             }
@@ -583,7 +584,9 @@ private fun TierSelectionCard(
                             fontWeight = FontWeight.Bold,
                             color = colors.onAccent,
                             fontSize = 9.5.sp,
-                            letterSpacing = 0.6.sp
+                            letterSpacing = 0.6.sp,
+                            maxLines = 1,
+                            softWrap = false
                         )
                     }
                 }
