@@ -45,6 +45,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.style.TextDecoration
 import com.forma.app.core.designsystem.FormaTheme
 import com.forma.app.core.designsystem.motion.FormaMotion
 import com.forma.app.core.designsystem.motion.formaPressEffect
@@ -65,7 +66,8 @@ fun BehanceHabitCard(
     onToggle: () -> Unit,
     onClick: () -> Unit,
     onStartFocus: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    index: Int = 0
 ) {
     val colors = FormaTheme.colors
     val haptic = LocalHapticFeedback.current
@@ -171,6 +173,9 @@ fun BehanceHabitCard(
         onToggle()
     }
 
+    val formattedIndex = String.format("%02d", index + 1)
+    val isHero = (index == 0 && !isDone)
+
     // Warm Clean Card with GPU-accelerated press and scale
     Box(
         modifier = modifier
@@ -182,7 +187,11 @@ fun BehanceHabitCard(
             .padding(horizontal = 20.dp, vertical = 6.dp)
             .clip(RoundedCornerShape(22.dp))
             .background(colors.surface)
-            .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(22.dp))
+            .border(
+                width = if (isHero) 1.2.dp else 1.dp,
+                color = if (isHero) colors.accent.copy(alpha = 0.55f) else colors.border.copy(alpha = 0.6f),
+                shape = RoundedCornerShape(22.dp)
+            )
             .formaPressEffect(targetScale = 0.975f) { onClick() }
             .padding(horizontal = 16.dp, vertical = 14.dp)
     ) {
@@ -213,24 +222,37 @@ fun BehanceHabitCard(
 
                 Spacer(modifier = Modifier.width(14.dp))
 
-                // Title and Subtitle
+                // Title and Subtitle with Editorial Hierarchy
                 Column(modifier = Modifier.weight(1f)) {
+                    // Editorial Index & Badge
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.padding(bottom = 2.dp)
                     ) {
                         Text(
-                            text = title,
-                            style = FormaTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = if (isDone || cardData.isWintering) colors.textSecondary else colors.textPrimary,
-                            fontSize = 15.sp,
-                            lineHeight = 20.sp,
-                            letterSpacing = (-0.2).sp,
-                            maxLines = 2,
-                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-                            modifier = Modifier.weight(1f)
+                            text = formattedIndex,
+                            style = FormaTheme.typography.labelSmall,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = if (isHero) colors.accent else colors.textTertiary,
+                            fontSize = 11.sp,
+                            letterSpacing = 0.8.sp
                         )
+
+                        if (isHero) {
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "HERO FLOW",
+                                style = FormaTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = colors.accent,
+                                fontSize = 9.sp,
+                                letterSpacing = 0.8.sp,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(colors.accentSoft)
+                                    .padding(horizontal = 5.dp, vertical = 1.dp)
+                            )
+                        }
 
                         if (cardData.isWintering) {
                             Spacer(modifier = Modifier.width(6.dp))
@@ -246,6 +268,19 @@ fun BehanceHabitCard(
                             )
                         }
                     }
+
+                    Text(
+                        text = title,
+                        style = FormaTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = if (isDone || cardData.isWintering) colors.textSecondary else colors.textPrimary,
+                        fontSize = 15.sp,
+                        lineHeight = 20.sp,
+                        letterSpacing = (-0.2).sp,
+                        textDecoration = if (isDone) TextDecoration.LineThrough else TextDecoration.None,
+                        maxLines = 2,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                    )
 
                     Spacer(modifier = Modifier.height(3.dp))
 

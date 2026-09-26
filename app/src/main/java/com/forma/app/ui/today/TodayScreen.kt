@@ -249,18 +249,22 @@ fun TodayScreen(
                                 .fillMaxWidth()
                                 .padding(start = 24.dp, end = 24.dp, top = 20.dp, bottom = 4.dp)
                         ) {
-                            // Row 1: Date label on left + sleek AI Studio & Calendar Picker on right
+                            // Row 1: Date & Week metadata on left + sleek AI Studio & Calendar Picker on right
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
+                                val weekOfYear = try {
+                                    selectedDate.get(java.time.temporal.IsoFields.WEEK_OF_WEEK_BASED_YEAR)
+                                } catch (_: Exception) { 1 }
+                                val dateShortFormatted = selectedDate.format(DateTimeFormatter.ofPattern("d MMM", Locale.getDefault())).uppercase()
                                 Text(
-                                    text = dateFormatted.uppercase(),
+                                    text = "$dateShortFormatted · WEEK $weekOfYear",
                                     style = FormaTheme.typography.labelSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = colors.accent,
-                                    letterSpacing = 1.2.sp,
+                                    letterSpacing = 1.4.sp,
                                     fontSize = 11.sp
                                 )
 
@@ -327,20 +331,50 @@ fun TodayScreen(
 
                             Spacer(modifier = Modifier.height(10.dp))
 
-                            // Row 2: Greeting headline & microcopy
+                            // Row 2: Swiss Editorial "TODAY" headline + Refined Progress Badge
+                            val completedCount = scheduleItems.count { it.isCompleted }
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "TODAY",
+                                    style = FormaTheme.typography.displayLarge.copy(
+                                        fontWeight = FontWeight.ExtraBold,
+                                        fontSize = 32.sp,
+                                        letterSpacing = (-1.2).sp
+                                    ),
+                                    color = colors.textPrimary
+                                )
+
+                                if (scheduleItems.isNotEmpty()) {
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(colors.accentSoft)
+                                            .border(1.dp, colors.accent.copy(alpha = 0.35f), RoundedCornerShape(8.dp))
+                                            .padding(horizontal = 9.dp, vertical = 4.dp)
+                                    ) {
+                                        Text(
+                                            text = "$completedCount OF ${scheduleItems.size} DONE",
+                                            fontWeight = FontWeight.Bold,
+                                            color = colors.accent,
+                                            fontSize = 10.sp,
+                                            letterSpacing = 0.6.sp
+                                        )
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(3.dp))
+
+                            // Greeting subtext
                             Text(
-                                text = "$greeting $userName",
-                                style = FormaTheme.typography.displayMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = colors.textPrimary,
-                                letterSpacing = (-0.6).sp
-                            )
-                            Spacer(modifier = Modifier.height(2.dp))
-                            Text(
-                                text = "Start gently. What does today need from you?",
+                                text = if (userName.isNotBlank()) "$greeting $userName" else greeting,
                                 style = FormaTheme.typography.bodySmall,
                                 color = colors.textSecondary,
-                                fontSize = 12.sp
+                                fontSize = 13.sp
                             )
                         }
                     }
@@ -714,6 +748,7 @@ fun TodayScreen(
                         ) { index, scheduleItem ->
                             BehanceHabitCard(
                                 item = scheduleItem,
+                                index = index,
                                 modifier = Modifier.formaStaggeredEntrance(index),
                                 onToggle = {
                                     when (scheduleItem) {
@@ -762,7 +797,6 @@ fun TodayScreen(
                     }
                 }
             }
-        }
 
             // Top Floating Dynamic Streak Island
             DynamicStreakIsland(
@@ -774,6 +808,7 @@ fun TodayScreen(
             )
         }
     }
+}
 
     // Detail Bottom Sheet Modal
     selectedDetailItem?.let { item ->

@@ -5,50 +5,75 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Soft Ambient Cast Shadow for Base Disc -->
+    <!-- 1. Soft Ambient Cast Shadow beneath the Ceramic Disc -->
+    <path
+        android:fillColor="#0D24120A"
+        android:pathData="M 54,28 A 30,30 0 1,1 53.99,28 Z" />
     <path
         android:fillColor="#152B381A"
-        android:pathData="M 54.6,26.8 A 29,29 0 1,1 54.59,26.8 Z" />
+        android:pathData="M 54,27 A 29,29 0 1,1 53.99,27 Z" />
     <path
-        android:fillColor="#222B381A"
-        android:pathData="M 54.3,25.8 A 29,29 0 1,1 54.29,25.8 Z" />
+        android:fillColor="#1E2B381A"
+        android:pathData="M 54,26 A 28.5,28.5 0 1,1 53.99,26 Z" />
 
-    <!-- 1. Outer Elevated Base Disc (Warm Clean White/Cream) -->
+    <!-- 2. Tactile Ceramic Stone Disc Pressed into Sand (Warm Ivory-Stone #FAF8F2) -->
     <path
-        android:fillColor="#FDFCFA"
-        android:strokeColor="#E4E8DF"
-        android:strokeWidth="0.8"
-        android:pathData="M 54,25 A 29,29 0 1,1 53.99,25 Z" />
+        android:fillColor="#FAF8F2"
+        android:strokeColor="#E3E6DC"
+        android:strokeWidth="1.0"
+        android:pathData="M 54,25.5 A 28.5,28.5 0 1,1 53.99,25.5 Z" />
 
-    <!-- 2. Outer Sculptural Olive Arc (Matching Attached User Logo) -->
+    <!-- 3. Debossed Outer Groove (Soft Shadow & Bevel Relief) -->
     <path
-        android:strokeColor="#4E612B"
-        android:strokeWidth="6.8"
+        android:strokeColor="#E2E5DC"
+        android:strokeWidth="1.2"
+        android:pathData="M 54,29 A 25,25 0 1,1 53.99,29 Z" />
+
+    <!-- 4. Architectural "F" & Infinite Daily Loop - Debossed Shadow Layer (Top/Left inner shadow) -->
+    <!-- Continuous Mobius / Infinity loop forming an architectural "F" -->
+    <path
+        android:strokeColor="#1F2812"
+        android:strokeWidth="7.0"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
-        android:pathData="M 60.2,30.8 A 23.8,23.8 0 1,0 74.6,65.9" />
+        android:pathData="M 38,39 L 66,39 C 73,39 73,53 64,56 L 44,63 C 36,66 36,73 44,73 C 54,73 68,64 70,55" />
 
-    <!-- Soft Cast Shadow for Middle Raised Disc -->
-    <path
-        android:fillColor="#182B381A"
-        android:pathData="M 54.4,38 A 17,17 0 1,1 54.39,38 Z" />
-
-    <!-- 3. Middle Raised Disc (Pure Clean White Plateau) -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:strokeColor="#E6EAE2"
-        android:strokeWidth="0.8"
-        android:pathData="M 54,37 A 17,17 0 1,1 53.99,37 Z" />
-
-    <!-- 4. Middle Olive Ring (Full Concentric Ring) -->
+    <!-- 5. Architectural Glyph - Organic Matcha Olive Enamelled Glaze Core (#4E612B) -->
     <path
         android:strokeColor="#4E612B"
-        android:strokeWidth="3.8"
-        android:pathData="M 54,43.5 A 10.5,10.5 0 1,1 53.99,43.5 Z" />
+        android:strokeWidth="5.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M 38,39 L 66,39 C 73,39 73,53 64,56 L 44,63 C 36,66 36,73 44,73 C 54,73 68,64 70,55" />
 
-    <!-- 5. Center Olive Solid Core Dot -->
+    <!-- 6. Architectural "F" Cross-Bar (Middle Horizontal Enameled Arm) -->
+    <path
+        android:strokeColor="#1F2812"
+        android:strokeWidth="5.5"
+        android:strokeLineCap="round"
+        android:pathData="M 38,49 L 55,49" />
+    <path
+        android:strokeColor="#4E612B"
+        android:strokeWidth="4.2"
+        android:strokeLineCap="round"
+        android:pathData="M 38,49 L 55,49" />
+
+    <!-- 7. Specular Glaze Highlight along top spine of the loop -->
+    <path
+        android:strokeColor="#6E8541"
+        android:strokeWidth="1.2"
+        android:strokeLineCap="round"
+        android:pathData="M 40,38 L 65,38" />
+
+    <!-- 8. Focal Matcha Core Dot (Center Anchor of Ritual) -->
+    <path
+        android:fillColor="#2D3B16"
+        android:pathData="M 54,53.5 A 3.6,3.6 0 1,1 53.99,53.5 Z" />
     <path
         android:fillColor="#4E612B"
-        android:pathData="M 54,49.8 A 4.2,4.2 0 1,1 53.99,49.8 Z" />
+        android:pathData="M 54,53 A 3.2,3.2 0 1,1 53.99,53 Z" />
+    <path
+        android:fillColor="#8BA657"
+        android:pathData="M 53.4,52.2 A 1.0,1.0 0 1,1 53.39,52.2 Z" />
 
 </vector>
