@@ -43,4 +43,9 @@ interface BillingRepository {
      * For debugging / legacy compatibility: directly set pro status.
      */
     suspend fun setProStatus(isPro: Boolean)
+
+    /**
+     * Launch official Google Play billing checkout flow on an Activity.
+     */
+    fun launchBillingFlow(activity: android.app.Activity, tier: SubscriptionTier): Result<Boolean>
 }

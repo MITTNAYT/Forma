@@ -128,6 +128,8 @@ android {
 
     testOptions {
         unitTests.all { testTask ->
+            testTask.maxParallelForks = 1
+            testTask.maxHeapSize = "512m"
             testTask.jvmArgs(
                 "-Djdk.attach.allowAttachSelf=true",
                 "-XX:+EnableDynamicAgentLoading"

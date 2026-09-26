@@ -1,6 +1,8 @@
 package com.forma.app.data.repository
 
+import android.app.Activity
 import android.content.Context
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -10,13 +12,17 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
+import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesUpdatedListener
+import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryPurchasesParams
 import com.forma.app.domain.model.SubscriptionTier
 import com.forma.app.domain.repository.BillingRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -98,11 +104,14 @@ class BillingRepositoryImpl @Inject constructor(
         }
     }
 
+    private val productDetailsMap = ConcurrentHashMap<String, ProductDetails>()
+
     private fun startBillingConnection(onConnected: (() -> Unit)? = null) {
         billingClient?.startConnection(object : BillingClientStateListener {
             override fun onBillingSetupFinished(billingResult: BillingResult) {
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                     isClientConnected = true
+                    queryProductDetails()
                     queryActivePurchases()
                     onConnected?.invoke()
                 } else {
@@ -114,6 +123,36 @@ class BillingRepositoryImpl @Inject constructor(
                 isClientConnected = false
             }
         })
+    }
+
+    private fun queryProductDetails() {
+        val client = billingClient ?: return
+        if (!isClientConnected) return
+
+        val productList = listOf(
+            QueryProductDetailsParams.Product.newBuilder()
+                .setProductId(PRODUCT_PRO_MONTHLY)
+                .setProductType(BillingClient.ProductType.SUBS)
+                .build(),
+            QueryProductDetailsParams.Product.newBuilder()
+                .setProductId(PRODUCT_PRO_LIFETIME)
+                .setProductType(BillingClient.ProductType.INAPP)
+                .build()
+        )
+        val params = QueryProductDetailsParams.newBuilder()
+            .setProductList(productList)
+            .build()
+
+        client.queryProductDetailsAsync(params) { billingResult, productDetailsList ->
+            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                productDetailsList.forEach { details ->
+                    productDetailsMap[details.productId] = details
+                }
+                Log.d("BillingRepository", "Loaded product details for ${productDetailsList.size} products")
+            } else {
+                Log.w("BillingRepository", "Failed querying product details: ${billingResult.debugMessage}")
+            }
+        }
     }
 
     private fun queryActivePurchases() {
@@ -210,5 +249,46 @@ class BillingRepositoryImpl @Inject constructor(
     override suspend fun setProStatus(isPro: Boolean) {
         val targetTier = if (isPro) SubscriptionTier.LIFETIME_FOUNDER else SubscriptionTier.FREE
         setSubscriptionTier(targetTier)
+    }
+
+    override fun launchBillingFlow(activity: Activity, tier: SubscriptionTier): Result<Boolean> {
+        val client = billingClient ?: return Result.failure(IllegalStateException("Billing client not initialized"))
+        if (!isClientConnected) return Result.failure(IllegalStateException("Google Play Billing not connected"))
+
+        val productId = when (tier) {
+            SubscriptionTier.MONTHLY_PRO -> PRODUCT_PRO_MONTHLY
+            SubscriptionTier.LIFETIME_FOUNDER -> PRODUCT_PRO_LIFETIME
+            SubscriptionTier.FREE -> return Result.failure(IllegalArgumentException("Cannot purchase Free tier"))
+        }
+
+        val details = productDetailsMap[productId]
+            ?: return Result.failure(IllegalStateException("Product details for $productId not available from Play Store. Ensure products are configured in Google Play Console."))
+
+        val productParamsList = if (details.productType == BillingClient.ProductType.SUBS) {
+            val offerToken = details.subscriptionOfferDetails?.firstOrNull()?.offerToken ?: ""
+            listOf(
+                BillingFlowParams.ProductDetailsParams.newBuilder()
+                    .setProductDetails(details)
+                    .setOfferToken(offerToken)
+                    .build()
+            )
+        } else {
+            listOf(
+                BillingFlowParams.ProductDetailsParams.newBuilder()
+                    .setProductDetails(details)
+                    .build()
+            )
+        }
+
+        val billingFlowParams = BillingFlowParams.newBuilder()
+            .setProductDetailsParamsList(productParamsList)
+            .build()
+
+        val billingResult = client.launchBillingFlow(activity, billingFlowParams)
+        return if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+            Result.success(true)
+        } else {
+            Result.failure(Exception("Google Play billing flow error: ${billingResult.debugMessage} (code ${billingResult.responseCode})"))
+        }
     }
 }
