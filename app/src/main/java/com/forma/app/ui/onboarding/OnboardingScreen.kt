@@ -1059,7 +1059,7 @@ private fun OnboardingPaywallStep(
                     Column(modifier = Modifier.weight(1f)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                text = "Lifetime Founder Pass",
+                                text = "Master Architect Pass",
                                 fontWeight = FontWeight.Bold,
                                 color = if (isFounder) Color(0xFF2C2411) else colors.textPrimary,
                                 fontSize = 15.sp

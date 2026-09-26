@@ -35,6 +35,7 @@ import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.Link
 import androidx.compose.material.icons.rounded.NightsStay
 import androidx.compose.material.icons.rounded.Notifications
@@ -127,6 +128,7 @@ fun AddEditTimelineSheet(
     var showHabitReminderTimePicker by remember { mutableStateOf(false) }
     var newSubtaskText by remember { mutableStateOf("") }
     var showAddSubtaskField by remember { mutableStateOf(false) }
+    var showDeleteConfirmDialog by remember { mutableStateOf(false) }
 
     val parsedColor = if (!uiState.colorTag.isNullOrBlank()) {
         try {
@@ -138,10 +140,14 @@ fun AddEditTimelineSheet(
         colors.accent
     }
 
+    val context = androidx.compose.ui.platform.LocalContext.current
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collect { event ->
             when (event) {
                 is AddEditTimelineEvent.Saved, is AddEditTimelineEvent.Deleted -> onDismiss()
+                is AddEditTimelineEvent.ShowToast -> {
+                    android.widget.Toast.makeText(context, event.message, android.widget.Toast.LENGTH_LONG).show()
+                }
             }
         }
     }
@@ -170,29 +176,7 @@ fun AddEditTimelineSheet(
             if (uiState.creationType == CreationType.HABIT) "New Habit" else "New Intention"
         },
         subtitle = if (uiState.creationType == CreationType.HABIT) "Unlimited recurring habit & streak tracking" else "Focused single-day intention",
-        trailingAction = {
-            if (uiState.isEditMode) {
-                Box(
-                    modifier = Modifier
-                        .size(34.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFFE53935).copy(alpha = 0.12f))
-                        .formaPressEffect(targetScale = 0.90f) {
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            viewModel.delete()
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Delete,
-                        contentDescription = "Delete",
-                        tint = Color(0xFFE53935),
-                        modifier = Modifier.size(17.dp)
-                    )
-                }
-                Spacer(modifier = Modifier.width(6.dp))
-            }
-        }
+        trailingAction = null
     ) {
         // 1. Top Mode Switcher (Habit vs Task)
         Box(
@@ -1153,7 +1137,7 @@ fun AddEditTimelineSheet(
 
         Spacer(modifier = Modifier.height(14.dp))
 
-        // 4b. Shared Micro-Steps & Subtasks Checklist Builder
+        // 4b. Shared Micro-Steps & Subtasks Checklist Builder (Intention Section Design)
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -1177,163 +1161,169 @@ fun AddEditTimelineSheet(
                         fontSize = 10.5.sp
                     )
 
-                    // Clear, visible, high-contrast Add Micro-Step Pill
-                    Box(
+                    if (uiState.subtasks.isNotEmpty()) {
+                        Text(
+                            text = "${uiState.subtasks.size} steps",
+                            style = FormaTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
+                            fontWeight = FontWeight.Bold,
+                            color = colors.textSecondary,
+                            fontSize = 10.5.sp
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Existing steps displayed in Intention-Style rows
+                uiState.subtasks.forEachIndexed { index, subtask ->
+                    Row(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(parsedColor.copy(alpha = 0.14f))
-                            .border(1.dp, parsedColor.copy(alpha = 0.40f), RoundedCornerShape(10.dp))
-                            .formaPressEffect(targetScale = 0.92f) {
-                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                showAddSubtaskField = true
-                            }
-                            .padding(horizontal = 10.dp, vertical = 5.dp)
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(colors.surfaceVariant.copy(alpha = 0.35f))
+                            .border(1.dp, colors.border.copy(alpha = 0.35f), RoundedCornerShape(12.dp))
+                            .padding(horizontal = 12.dp, vertical = 9.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Rounded.Add,
-                                contentDescription = null,
-                                tint = parsedColor,
-                                modifier = Modifier.size(13.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
+                        // Numbered Index Badge matching KeystoneInput
+                        Box(
+                            modifier = Modifier
+                                .size(24.dp)
+                                .clip(CircleShape)
+                                .background(parsedColor.copy(alpha = 0.14f)),
+                            contentAlignment = Alignment.Center
+                        ) {
                             Text(
-                                text = if (uiState.creationType == CreationType.HABIT) "Add Micro-Step" else "Add Step",
+                                text = "${index + 1}",
                                 style = FormaTheme.typography.labelSmall.copy(
+                                    fontFeatureSettings = "tnum",
                                     platformStyle = PlatformTextStyle(includeFontPadding = false)
                                 ),
-                                color = parsedColor,
                                 fontWeight = FontWeight.Bold,
+                                color = parsedColor,
                                 fontSize = 11.sp
                             )
                         }
-                    }
-                }
 
-                if (uiState.subtasks.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(10.dp))
-                    uiState.subtasks.forEach { subtask ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(20.dp)
-                                    .clip(CircleShape)
-                                    .background(if (subtask.completed) parsedColor else colors.surfaceVariant)
-                                    .border(1.dp, if (subtask.completed) parsedColor else colors.border, CircleShape)
-                                    .clickable { viewModel.toggleSubtask(subtask.id) },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                if (subtask.completed) {
-                                    Icon(Icons.Rounded.Check, null, tint = Color.White, modifier = Modifier.size(12.dp))
-                                }
-                            }
+                        Spacer(modifier = Modifier.width(10.dp))
 
-                            Spacer(modifier = Modifier.width(10.dp))
-
-                            Text(
-                                text = subtask.title,
-                                style = FormaTheme.typography.bodyMedium,
-                                color = if (subtask.completed) colors.textTertiary else colors.textPrimary,
-                                modifier = Modifier.weight(1f),
-                                fontSize = 13.5.sp
-                            )
-
-                            IconButton(
-                                onClick = { viewModel.removeSubtask(subtask.id) },
-                                modifier = Modifier.size(24.dp)
-                            ) {
-                                Icon(Icons.Rounded.Close, null, tint = colors.textTertiary, modifier = Modifier.size(14.dp))
-                            }
-                        }
-                    }
-                } else if (!showAddSubtaskField) {
-                    // Prominent Empty-State Callout Button
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(parsedColor.copy(alpha = 0.08f))
-                            .border(1.dp, parsedColor.copy(alpha = 0.30f), RoundedCornerShape(14.dp))
-                            .formaPressEffect(targetScale = 0.96f) {
-                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                showAddSubtaskField = true
-                            }
-                            .padding(vertical = 12.dp, horizontal = 14.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Rounded.AddCircleOutline,
-                                contentDescription = null,
-                                tint = parsedColor,
-                                modifier = Modifier.size(17.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = if (uiState.creationType == CreationType.HABIT) "+ Add First Micro-Step..." else "+ Add First Step...",
-                                style = FormaTheme.typography.bodyMedium.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    platformStyle = PlatformTextStyle(includeFontPadding = false)
-                                ),
-                                color = parsedColor,
-                                fontSize = 13.sp
-                            )
-                        }
-                    }
-                }
-
-                if (showAddSubtaskField) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        OutlinedTextField(
-                            value = newSubtaskText,
-                            onValueChange = { newSubtaskText = it },
-                            placeholder = {
-                                Text(
-                                    if (uiState.creationType == CreationType.HABIT) "Enter micro-step (e.g. Fill water bottle)..." else "Enter milestone step...",
-                                    style = FormaTheme.typography.bodyMedium.copy(
-                                        fontSize = 12.sp,
-                                        platformStyle = PlatformTextStyle(includeFontPadding = false)
-                                    ),
-                                    color = colors.textTertiary
-                                )
-                            },
-                            singleLine = true,
-                            shape = RoundedCornerShape(12.dp),
-                            modifier = Modifier.weight(1f),
-                            textStyle = FormaTheme.typography.bodyMedium.copy(
-                                fontSize = 13.sp,
+                        Text(
+                            text = subtask.title,
+                            style = FormaTheme.typography.bodyMedium.copy(
                                 platformStyle = PlatformTextStyle(includeFontPadding = false)
                             ),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = parsedColor,
-                                unfocusedBorderColor = colors.border.copy(alpha = 0.6f),
-                                focusedTextColor = colors.textPrimary,
-                                unfocusedTextColor = colors.textPrimary,
-                                cursorColor = parsedColor
-                            )
+                            color = if (subtask.completed) colors.textTertiary else colors.textPrimary,
+                            textDecoration = if (subtask.completed) androidx.compose.ui.text.style.TextDecoration.LineThrough else androidx.compose.ui.text.style.TextDecoration.None,
+                            modifier = Modifier.weight(1f),
+                            fontSize = 13.5.sp
                         )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        FormaButton(
-                            text = "Add",
-                            onClick = {
+
+                        IconButton(
+                            onClick = { viewModel.removeSubtask(subtask.id) },
+                            modifier = Modifier.size(24.dp)
+                        ) {
+                            Icon(Icons.Rounded.Close, null, tint = colors.textTertiary, modifier = Modifier.size(14.dp))
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                // KeystoneInput-style permanent inline entry row
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(colors.surfaceVariant.copy(alpha = 0.35f))
+                        .border(1.dp, if (newSubtaskText.isNotBlank()) parsedColor else colors.border.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clip(CircleShape)
+                            .background(parsedColor.copy(alpha = 0.12f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Add,
+                            contentDescription = null,
+                            tint = parsedColor,
+                            modifier = Modifier.size(14.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    BasicTextField(
+                        value = newSubtaskText,
+                        onValueChange = { newSubtaskText = it },
+                        modifier = Modifier.weight(1f),
+                        singleLine = true,
+                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                            capitalization = androidx.compose.ui.text.input.KeyboardCapitalization.Sentences,
+                            imeAction = androidx.compose.ui.text.input.ImeAction.Done
+                        ),
+                        keyboardActions = androidx.compose.foundation.text.KeyboardActions(
+                            onDone = {
                                 if (newSubtaskText.isNotBlank()) {
                                     viewModel.addSubtask(newSubtaskText)
                                     newSubtaskText = ""
-                                    showAddSubtaskField = false
                                 }
-                            },
-                            style = FormaButtonStyle.SOFT_PILL
-                        )
+                            }
+                        ),
+                        textStyle = FormaTheme.typography.bodyMedium.copy(
+                            fontSize = 13.sp,
+                            platformStyle = PlatformTextStyle(includeFontPadding = false),
+                            color = colors.textPrimary
+                        ),
+                        cursorBrush = SolidColor(parsedColor),
+                        decorationBox = { innerTextField ->
+                            Box(contentAlignment = Alignment.CenterStart) {
+                                if (newSubtaskText.isEmpty()) {
+                                    Text(
+                                        text = if (uiState.creationType == CreationType.HABIT)
+                                            "Add micro-step (e.g. Fill water bottle)..."
+                                        else
+                                            "Add milestone step...",
+                                        style = FormaTheme.typography.bodyMedium.copy(
+                                            fontSize = 13.sp,
+                                            platformStyle = PlatformTextStyle(includeFontPadding = false)
+                                        ),
+                                        color = colors.textSecondary.copy(alpha = 0.6f)
+                                    )
+                                }
+                                innerTextField()
+                            }
+                        }
+                    )
+
+                    if (newSubtaskText.isNotBlank()) {
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(parsedColor)
+                                .formaPressEffect(targetScale = 0.92f) {
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    viewModel.addSubtask(newSubtaskText)
+                                    newSubtaskText = ""
+                                }
+                                .padding(horizontal = 9.dp, vertical = 4.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "Add",
+                                style = FormaTheme.typography.labelSmall.copy(
+                                    platformStyle = PlatformTextStyle(includeFontPadding = false)
+                                ),
+                                fontWeight = FontWeight.Bold,
+                                color = colors.onAccent,
+                                fontSize = 11.sp
+                            )
+                        }
                     }
                 }
             }
@@ -1396,6 +1386,46 @@ fun AddEditTimelineSheet(
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        if (uiState.isEditMode) {
+            val destructiveColor = Color(0xFFB84A39) // Warm architectural terracotta rust
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(destructiveColor.copy(alpha = 0.08f))
+                    .border(1.dp, destructiveColor.copy(alpha = 0.25f), RoundedCornerShape(16.dp))
+                    .formaPressEffect(targetScale = 0.97f) {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        showDeleteConfirmDialog = true
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.DeleteOutline,
+                        contentDescription = null,
+                        tint = destructiveColor,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = if (uiState.creationType == CreationType.HABIT) "Delete Ritual" else "Delete Intention",
+                        style = FormaTheme.typography.bodyMedium.copy(
+                            platformStyle = PlatformTextStyle(includeFontPadding = false)
+                        ),
+                        fontWeight = FontWeight.SemiBold,
+                        color = destructiveColor,
+                        fontSize = 14.sp
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(14.dp))
+        }
+
         // 6. Action Save & Cancel Row
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -1421,6 +1451,55 @@ fun AddEditTimelineSheet(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
+    }
+
+    // Delete Confirmation Dialog styled with Forma Bauhaus aesthetics
+    if (showDeleteConfirmDialog) {
+        val destructiveColor = Color(0xFFB84A39)
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showDeleteConfirmDialog = false },
+            containerColor = colors.surface,
+            title = {
+                Text(
+                    text = if (uiState.creationType == CreationType.HABIT) "Delete Ritual?" else "Delete Intention?",
+                    style = FormaTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = colors.textPrimary
+                )
+            },
+            text = {
+                Text(
+                    text = "Are you sure you want to remove '${uiState.title}'? This will delete associated micro-steps from your sanctuary.",
+                    style = FormaTheme.typography.bodyMedium,
+                    color = colors.textSecondary
+                )
+            },
+            confirmButton = {
+                androidx.compose.material3.TextButton(
+                    onClick = {
+                        showDeleteConfirmDialog = false
+                        viewModel.delete()
+                    }
+                ) {
+                    Text(
+                        text = "Delete",
+                        fontWeight = FontWeight.Bold,
+                        color = destructiveColor
+                    )
+                }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(
+                    onClick = { showDeleteConfirmDialog = false }
+                ) {
+                    Text(
+                        text = "Cancel",
+                        fontWeight = FontWeight.SemiBold,
+                        color = colors.textSecondary
+                    )
+                }
+            }
+        )
     }
 
     // Icon & Color Picker Dialog

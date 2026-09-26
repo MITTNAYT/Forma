@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -150,6 +151,12 @@ class TodayViewModel @Inject constructor(
 
     fun addHabit(habit: Habit) {
         viewModelScope.launch {
+            val isProActive = billingRepository.isPro.first()
+            val activeCount = habitRepository.getAllHabits().first().count { !it.archived }
+            if (!isProActive && activeCount >= 3) {
+                _eventFlow.emit(TodayUiEvent.ShowToast("Free Sanctuary limit: up to 3 keystone habits. Upgrade to Pro for unlimited rituals."))
+                return@launch
+            }
             habitRepository.insertHabit(habit)
             zenFeedback.onHabitCompleted()
         }
@@ -338,6 +345,12 @@ class TodayViewModel @Inject constructor(
         viewModelScope.launch {
             val dateIso = DateUtils.formatDateIso(_selectedDate.value)
             if (isHabit) {
+                val isProActive = billingRepository.isPro.first()
+                val activeCount = habitRepository.getAllHabits().first().count { !it.archived }
+                if (!isProActive && activeCount >= 3) {
+                    _eventFlow.emit(TodayUiEvent.ShowToast("Free Sanctuary limit: up to 3 keystone habits. Upgrade to Pro for unlimited rituals."))
+                    return@launch
+                }
                 val newHabit = Habit(
                     name = title.trim(),
                     icon = "target",

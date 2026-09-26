@@ -670,45 +670,122 @@ fun TodayScreen(
                     }
                 }
 
-                // 5. Minimalist Filter Chips Bar with Smooth Transitions
+                // 5. Unified Integrated Segmented Control (All, Morning, Afternoon, Evening together with zero scroll)
                 item {
-                    Row(
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .horizontalScroll(rememberScrollState())
-                            .padding(horizontal = 20.dp, vertical = 6.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            .padding(horizontal = 20.dp, vertical = 6.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(colors.surface)
+                            .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(14.dp))
+                            .padding(3.dp)
                     ) {
-                        TodayFilterChip(
-                            text = "All",
-                            badgeCount = scheduleItems.size,
-                            isSelected = selectedTimeFilter == null,
-                            onClick = { selectedTimeFilter = null }
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(3.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            val filters = listOf<Pair<String, TimeOfDay?>>(
+                                "All" to null,
+                                "Morning" to TimeOfDay.MORNING,
+                                "Afternoon" to TimeOfDay.AFTERNOON,
+                                "Evening" to TimeOfDay.EVENING
+                            )
 
-                        TimeOfDay.entries.filter { it != TimeOfDay.ANYTIME }.forEach { tod ->
-                            val countForTod = scheduleItems.count { item ->
-                                when (item) {
-                                    is TodayScheduleItem.HabitItem -> item.habit.timeOfDay == tod
-                                    is TodayScheduleItem.TimelineBlock -> {
-                                        val hour = try {
-                                            item.item.startTime?.let { java.time.LocalTime.parse(it).hour } ?: 12
-                                        } catch (_: Exception) { 12 }
-                                        when (tod) {
-                                            TimeOfDay.MORNING -> hour in 4..11
-                                            TimeOfDay.AFTERNOON -> hour in 12..16
-                                            TimeOfDay.EVENING -> hour in 17..23
-                                            TimeOfDay.ANYTIME -> true
+                            filters.forEach { (label, tod) ->
+                                val isSelected = selectedTimeFilter == tod
+                                val countForTod = if (tod == null) {
+                                    scheduleItems.size
+                                } else {
+                                    scheduleItems.count { item ->
+                                        when (item) {
+                                            is TodayScheduleItem.HabitItem -> item.habit.timeOfDay == tod
+                                            is TodayScheduleItem.TimelineBlock -> {
+                                                val hour = try {
+                                                    item.item.startTime?.let { java.time.LocalTime.parse(it).hour } ?: 12
+                                                } catch (_: Exception) { 12 }
+                                                when (tod) {
+                                                    TimeOfDay.MORNING -> hour in 4..11
+                                                    TimeOfDay.AFTERNOON -> hour in 12..16
+                                                    TimeOfDay.EVENING -> hour in 17..23
+                                                    TimeOfDay.ANYTIME -> true
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                val segBg by animateColorAsState(
+                                    targetValue = if (isSelected) colors.accent else Color.Transparent,
+                                    animationSpec = tween(180),
+                                    label = "seg_bg_$label"
+                                )
+                                val segFg by animateColorAsState(
+                                    targetValue = if (isSelected) colors.onAccent else colors.textSecondary,
+                                    animationSpec = tween(180),
+                                    label = "seg_fg_$label"
+                                )
+                                val badgeBg by animateColorAsState(
+                                    targetValue = if (isSelected) colors.onAccent.copy(alpha = 0.22f) else colors.accentSoft,
+                                    animationSpec = tween(180),
+                                    label = "seg_badge_bg_$label"
+                                )
+                                val badgeFg by animateColorAsState(
+                                    targetValue = if (isSelected) colors.onAccent else colors.accent,
+                                    animationSpec = tween(180),
+                                    label = "seg_badge_fg_$label"
+                                )
+
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(36.dp)
+                                        .clip(RoundedCornerShape(11.dp))
+                                        .background(segBg)
+                                        .formaPressEffect(targetScale = 0.95f) {
+                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                            selectedTimeFilter = tod
+                                        },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.Center
+                                    ) {
+                                        Text(
+                                            text = label,
+                                            style = FormaTheme.typography.labelSmall.copy(
+                                                platformStyle = androidx.compose.ui.text.PlatformTextStyle(includeFontPadding = false)
+                                            ),
+                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                            color = segFg,
+                                            fontSize = 11.5.sp,
+                                            maxLines = 1
+                                        )
+                                        if (countForTod > 0) {
+                                            Spacer(modifier = Modifier.width(3.dp))
+                                            Box(
+                                                modifier = Modifier
+                                                    .clip(CircleShape)
+                                                    .background(badgeBg)
+                                                    .padding(horizontal = 4.dp, vertical = 1.dp)
+                                            ) {
+                                                Text(
+                                                    text = "$countForTod",
+                                                    style = FormaTheme.typography.labelSmall.copy(
+                                                        fontFeatureSettings = "tnum",
+                                                        platformStyle = androidx.compose.ui.text.PlatformTextStyle(includeFontPadding = false)
+                                                    ),
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = badgeFg,
+                                                    fontSize = 9.sp
+                                                )
+                                            }
                                         }
                                     }
                                 }
                             }
-                            TodayFilterChip(
-                                text = tod.displayName,
-                                badgeCount = if (countForTod > 0) countForTod else null,
-                                isSelected = selectedTimeFilter == tod,
-                                onClick = { selectedTimeFilter = tod }
-                            )
                         }
                     }
                 }

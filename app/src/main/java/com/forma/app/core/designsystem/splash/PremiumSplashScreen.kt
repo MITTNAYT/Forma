@@ -136,7 +136,7 @@ fun PremiumSplashScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = "ARCHITECTURE OF HABIT",
+                        text = "WHERE INTENTION TAKES FORM",
                         fontWeight = FontWeight.SemiBold,
                         color = colors.accent,
                         letterSpacing = 2.4.sp,

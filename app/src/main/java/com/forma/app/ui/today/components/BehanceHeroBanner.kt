@@ -140,6 +140,7 @@ fun BehanceHeroBanner(
                 Spacer(modifier = Modifier.width(14.dp))
 
                 // Concentric Radial Progress Indicator
+                val emptyTrackColor = colors.accent.copy(alpha = 0.12f)
                 Box(
                     modifier = Modifier.size(52.dp),
                     contentAlignment = Alignment.Center
@@ -147,7 +148,7 @@ fun BehanceHeroBanner(
                     CircularProgressIndicator(
                         progress = { 1f },
                         modifier = Modifier.size(52.dp),
-                        color = colors.surfaceVariant,
+                        color = emptyTrackColor,
                         strokeWidth = 5.dp
                     )
                     CircularProgressIndicator(
@@ -179,7 +180,7 @@ fun BehanceHeroBanner(
                 for (i in 0 until barCount) {
                     val isDoneBar = i < completedCount
                     val barColor by animateColorAsState(
-                        targetValue = if (isDoneBar) colors.accent else colors.surfaceVariant,
+                        targetValue = if (isDoneBar) colors.accent else colors.accent.copy(alpha = 0.12f),
                         label = "fuel_bar_$i"
                     )
                     Box(

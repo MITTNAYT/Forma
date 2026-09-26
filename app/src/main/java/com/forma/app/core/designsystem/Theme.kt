@@ -20,7 +20,9 @@ import com.forma.app.domain.repository.DarkModeOption
 import com.forma.app.domain.repository.PaletteFamily
 import com.forma.app.domain.repository.ThemeMode
 
-val LocalFormaColors = staticCompositionLocalOf { MatchaLightColorScheme }
+import androidx.compose.runtime.compositionLocalOf
+
+val LocalFormaColors = compositionLocalOf { MatchaLightColorScheme }
 val LocalNotionColors = LocalFormaColors
 
 object FormaTheme {
@@ -50,8 +52,8 @@ object NotionTheme {
 @Composable
 fun animatedStructuredColorScheme(target: StructuredColorScheme): StructuredColorScheme {
     val animSpec = tween<Color>(
-        durationMillis = 300,
-        easing = FastOutSlowInEasing
+        durationMillis = 380,
+        easing = androidx.compose.animation.core.CubicBezierEasing(0.2f, 0f, 0.2f, 1f)
     )
 
     val background by animateColorAsState(target.background, animSpec, label = "th_bg")
@@ -106,7 +108,7 @@ fun FormaTheme(
         PaletteFamily.LAVENDER_MILK -> if (isDark) LavenderDarkColorScheme else LavenderLightColorScheme
     }
 
-    // Coordinated 300ms color transition provider (eliminates snapping, white flashes & flicker)
+    // Coordinated 380ms color transition provider (eliminates snapping, white flashes & flicker)
     val animatedColors = animatedStructuredColorScheme(targetColors)
 
     val view = LocalView.current
@@ -123,10 +125,41 @@ fun FormaTheme(
         }
     }
 
+    val m3ColorScheme = if (isDark) {
+        androidx.compose.material3.darkColorScheme(
+            primary = animatedColors.accent,
+            onPrimary = animatedColors.onAccent,
+            primaryContainer = animatedColors.accentSoft,
+            onPrimaryContainer = animatedColors.accent,
+            background = animatedColors.background,
+            onBackground = animatedColors.textPrimary,
+            surface = animatedColors.surface,
+            onSurface = animatedColors.textPrimary,
+            surfaceVariant = animatedColors.surfaceVariant,
+            onSurfaceVariant = animatedColors.textSecondary,
+            outline = animatedColors.border
+        )
+    } else {
+        androidx.compose.material3.lightColorScheme(
+            primary = animatedColors.accent,
+            onPrimary = animatedColors.onAccent,
+            primaryContainer = animatedColors.accentSoft,
+            onPrimaryContainer = animatedColors.accent,
+            background = animatedColors.background,
+            onBackground = animatedColors.textPrimary,
+            surface = animatedColors.surface,
+            onSurface = animatedColors.textPrimary,
+            surfaceVariant = animatedColors.surfaceVariant,
+            onSurfaceVariant = animatedColors.textSecondary,
+            outline = animatedColors.border
+        )
+    }
+
     CompositionLocalProvider(
         LocalFormaColors provides animatedColors
     ) {
         MaterialTheme(
+            colorScheme = m3ColorScheme,
             typography = FormaTypography,
             shapes = FormaShapes,
             content = content

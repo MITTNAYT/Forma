@@ -234,7 +234,7 @@ fun SettingsScreen(
                                 ) {
                                     Text(
                                         text = when (currentTier) {
-                                            SubscriptionTier.LIFETIME_FOUNDER -> "FOUNDER"
+                                            SubscriptionTier.LIFETIME_FOUNDER -> "MASTER ARCHITECT"
                                             SubscriptionTier.MONTHLY_PRO -> "PRO"
                                             SubscriptionTier.FREE -> "FREE"
                                         },
@@ -265,7 +265,7 @@ fun SettingsScreen(
                     SettingsTapRow(
                         icon = Icons.Rounded.Spa,
                         title = when (currentTier) {
-                            SubscriptionTier.LIFETIME_FOUNDER -> "Lifetime Founder Pass"
+                            SubscriptionTier.LIFETIME_FOUNDER -> "Master Architect Pass"
                             SubscriptionTier.MONTHLY_PRO -> "Pro Active"
                             SubscriptionTier.FREE -> "Upgrade to Pro"
                         },

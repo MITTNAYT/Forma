@@ -10,6 +10,7 @@ import com.forma.app.domain.model.Habit
 import com.forma.app.domain.model.Subtask
 import com.forma.app.domain.model.TimeOfDay
 import com.forma.app.domain.model.TimelineItem
+import com.forma.app.domain.repository.BillingRepository
 import com.forma.app.domain.repository.HabitRepository
 import com.forma.app.domain.repository.TimelineRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -66,12 +67,14 @@ data class AddEditTimelineUiState(
 sealed interface AddEditTimelineEvent {
     object Saved : AddEditTimelineEvent
     object Deleted : AddEditTimelineEvent
+    data class ShowToast(val message: String) : AddEditTimelineEvent
 }
 
 @HiltViewModel
 class AddEditTimelineViewModel @Inject constructor(
     private val timelineRepository: TimelineRepository,
     private val habitRepository: HabitRepository,
+    private val billingRepository: BillingRepository,
     private val notificationHelper: NotificationHelper,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -292,6 +295,15 @@ class AddEditTimelineViewModel @Inject constructor(
 
         viewModelScope.launch {
             if (state.creationType == CreationType.HABIT) {
+                if (!state.isEditMode) {
+                    val isPro = billingRepository.isPro.first()
+                    val activeHabitsCount = habitRepository.getAllHabits().first().count { !it.archived }
+                    if (!isPro && activeHabitsCount >= 3) {
+                        _eventFlow.emit(AddEditTimelineEvent.ShowToast("Free Sanctuary limit: up to 3 keystone habits. Upgrade to Pro for unlimited rituals."))
+                        return@launch
+                    }
+                }
+
                 // Save as recurring habit with complete attributes
                 val remMinutes = if (state.hasReminder) {
                     state.reminderHour * 60 + state.reminderMinute

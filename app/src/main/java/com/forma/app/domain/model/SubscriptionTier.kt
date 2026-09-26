@@ -19,7 +19,7 @@ enum class SubscriptionTier(
         id = "free",
         title = "Sanctuary Explorer",
         priceDisplay = "$0",
-        priceSubtext = "Free Forever",
+        priceSubtext = "Free Forever · 3 Habits Max",
         badge = "STARTER",
         isHighlighted = false,
         trialDays = 0
@@ -35,10 +35,10 @@ enum class SubscriptionTier(
     ),
     LIFETIME_FOUNDER(
         id = "lifetime_founder",
-        title = "Forma Founder",
+        title = "Master Architect",
         priceDisplay = "$49.99",
-        priceSubtext = "one-time payment · lifetime access",
-        badge = "BEST VALUE (SAVE 70%)",
+        priceSubtext = "one-time payment · lifetime sovereign guild access",
+        badge = "SOVEREIGN GUILD (SAVE 70%)",
         isHighlighted = false,
         trialDays = 0
     );

@@ -218,7 +218,7 @@ fun ProPaywallBottomSheet(
                     headline = "Free Forever",
                     priceTag = "$0",
                     period = "",
-                    subtitle = "5 active habits · Basic timeline · Offline SQLite",
+                    subtitle = "3 active habits max · Basic timeline · Offline SQLite",
                     onSelect = { selectedTier = SubscriptionTier.FREE }
                 )
 
@@ -235,16 +235,16 @@ fun ProPaywallBottomSheet(
                     onSelect = { selectedTier = SubscriptionTier.MONTHLY_PRO }
                 )
 
-                // Lifetime Founder Card
+                // Lifetime Founder (Master Architect) Card
                 TierSelectionCard(
                     tier = SubscriptionTier.LIFETIME_FOUNDER,
                     isSelected = selectedTier == SubscriptionTier.LIFETIME_FOUNDER,
                     isCurrent = currentTier == SubscriptionTier.LIFETIME_FOUNDER,
-                    headline = "Forma Founder",
+                    headline = "Master Architect",
                     priceTag = "$49.99",
                     period = "one-time",
-                    subtitle = "Pay once · Lifetime access · Founder VIP badge",
-                    badge = "SAVE 70%",
+                    subtitle = "Pay once · Lifetime access · Guild insignia & Atelier themes",
+                    badge = "SOVEREIGN GUILD",
                     onSelect = { selectedTier = SubscriptionTier.LIFETIME_FOUNDER }
                 )
             }
@@ -266,25 +266,25 @@ fun ProPaywallBottomSheet(
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 when (selectedTier) {
                     SubscriptionTier.FREE -> {
-                        ProFeatureBullet("Up to 5 active daily habits with streak tracking")
+                        ProFeatureBullet("Up to 3 active keystone habits with streak tracking")
                         ProFeatureBullet("Day timeline scheduling and intention setting")
                         ProFeatureBullet("Local offline Room database with private storage")
                     }
                     SubscriptionTier.MONTHLY_PRO -> {
                         ProFeatureBullet("Unlimited Habits: Create infinite daily rituals and intentions")
-                        ProFeatureBullet("Forma Gemini AI Studio: Autonomous day scheduling & goal breakdown")
+                        ProFeatureBullet("Forma Gemini AI Studio: Autonomous day scheduling & habit architect")
                         ProFeatureBullet("Wintering Mode: Freeze streaks and take guilt-free rest days")
                         ProFeatureBullet("Habit Micro-Steps: Atomic checklists and habit-stacking cues")
                         ProFeatureBullet("Focus Soundscapes: Ambient audio and Tibetan bowl focus timer")
                         ProFeatureBullet("Biometric Security: Fingerprint and Face unlock protection")
                     }
                     SubscriptionTier.LIFETIME_FOUNDER -> {
-                        ProFeatureBullet("Permanent Full Access: Own all current and future Pro features forever")
-                        ProFeatureBullet("Founder Badge: Distinctive gold profile designation")
-                        ProFeatureBullet("Forma Gemini AI Studio: Full access with zero monthly subscriptions")
-                        ProFeatureBullet("Wintering Mode: Unlimited streak freeze protection")
-                        ProFeatureBullet("Encrypted Local Vault Backup and Markdown journal export")
-                        ProFeatureBullet("All future updates and improvements included with zero renewal fees")
+                        ProFeatureBullet("Lifetime Sovereign Guild License: Zero subscriptions, perpetual access")
+                        ProFeatureBullet("Exclusive Atelier Artisan Themes: Unlocked Obsidian & Aureate palettes")
+                        ProFeatureBullet("Master Guild Insignia: Distinguished golden emblem on your sanctuary")
+                        ProFeatureBullet("Priority AI Studio Reasoning: Direct dedicated Gemini synthesis queue")
+                        ProFeatureBullet("Private Atelier Roadmap Voice: Early beta features and architectural voting")
+                        ProFeatureBullet("Includes all current and future Pro features with zero renewal fees")
                     }
                 }
             }
@@ -333,14 +333,15 @@ fun ProPaywallBottomSheet(
                         .padding(14.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    ComparisonRow("Active Habits", "5 max", "Unlimited", "Unlimited")
+                    ComparisonRow("Active Habits", "3 max", "Unlimited", "Unlimited")
                     ComparisonRow("Micro-Steps & Cues", "Basic", "Included", "Included")
-                    ComparisonRow("Gemini AI Studio", "Preview", "Included", "Included")
+                    ComparisonRow("Gemini AI Studio", "Preview", "Included", "Priority Reasoning")
                     ComparisonRow("Wintering Rest Days", "1 / mo", "Unlimited", "Unlimited")
                     ComparisonRow("Focus Soundscapes", "Basic", "Included", "Included")
-                    ComparisonRow("Biometric Lock", "Optional", "Included", "Included")
-                    ComparisonRow("Founder Badge", "None", "None", "Exclusive Gold")
-                    ComparisonRow("Investment", "Free Forever", "$4.99 / mo", "$49.99 once")
+                    ComparisonRow("Atelier Artisan Themes", "None", "Standard", "Exclusive Unlocked")
+                    ComparisonRow("Guild Insignia Badge", "None", "None", "Golden Emblem")
+                    ComparisonRow("Roadmap Voting Voice", "None", "None", "Direct Atelier Access")
+                    ComparisonRow("Investment", "Free Forever", "$4.99 / mo", "$49.99 once (No Subs)")
                 }
             }
 
@@ -354,7 +355,7 @@ fun ProPaywallBottomSheet(
                 isCurrentSelection -> "Current Active Plan"
                 selectedTier == SubscriptionTier.FREE -> "Continue with Free Sanctuary"
                 selectedTier == SubscriptionTier.MONTHLY_PRO -> "Start 7-Day Free Trial • $4.99/mo"
-                selectedTier == SubscriptionTier.LIFETIME_FOUNDER -> "Unlock Lifetime Founder • $49.99"
+                selectedTier == SubscriptionTier.LIFETIME_FOUNDER -> "Become Master Architect • $49.99"
                 else -> "Upgrade Sanctuary"
             }
 
