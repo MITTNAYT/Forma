@@ -125,6 +125,15 @@ android {
         checkReleaseBuilds = false
         abortOnError = false
     }
+
+    testOptions {
+        unitTests.all { testTask ->
+            testTask.jvmArgs(
+                "-Djdk.attach.allowAttachSelf=true",
+                "-XX:+EnableDynamicAgentLoading"
+            )
+        }
+    }
 }
 
 dependencies {
