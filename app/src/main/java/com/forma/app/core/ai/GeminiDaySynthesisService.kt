@@ -118,14 +118,14 @@ class GeminiDaySynthesisService @Inject constructor() {
         timelineItems: List<TimelineItem>,
         apiKey: String
     ): AiDaySynthesisResult {
-        val endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$apiKey"
+        val endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$apiKey"
         val url = URL(endpoint)
         val conn = url.openConnection() as HttpURLConnection
         conn.requestMethod = "POST"
         conn.setRequestProperty("Content-Type", "application/json")
         conn.doOutput = true
-        conn.connectTimeout = 8000
-        conn.readTimeout = 8000
+        conn.connectTimeout = 10000
+        conn.readTimeout = 10000
 
         val habitSummary = habits.joinToString(", ") { "${it.name} (${it.timeOfDay}, energy: ${it.energyLevel})" }
         val itemSummary = timelineItems.joinToString(", ") { it.title }

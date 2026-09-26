@@ -1,4 +1,4 @@
-﻿package com.forma.app.domain.model
+package com.forma.app.domain.model
 
 import androidx.compose.runtime.Immutable
 
@@ -13,7 +13,8 @@ sealed interface TodayScheduleItem {
         val habit: Habit,
         val isDoneToday: Boolean,
         val currentStreak: Int,
-        val completionId: String? = null
+        val completionId: String? = null,
+        val isSkippedToday: Boolean = false
     ) : TodayScheduleItem {
         override val id: String = "habit_${habit.id}"
         override val sortKey: String = when (habit.timeOfDay) {

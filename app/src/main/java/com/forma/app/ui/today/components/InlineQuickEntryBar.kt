@@ -1,4 +1,4 @@
-﻿package com.forma.app.ui.today.components
+package com.forma.app.ui.today.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -53,6 +53,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -174,7 +175,9 @@ fun InlineQuickEntryBar(
                     textStyle = FormaTheme.typography.bodyMedium.copy(
                         color = colors.textPrimary,
                         fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
+                        platformStyle = PlatformTextStyle(includeFontPadding = false),
+                        lineHeight = 20.sp
                     ),
                     cursorBrush = SolidColor(colors.accent),
                     singleLine = true,
@@ -191,7 +194,10 @@ fun InlineQuickEntryBar(
                             if (text.isEmpty()) {
                                 Text(
                                     text = if (isHabitMode) "Add recurring daily ritual..." else placeholder,
-                                    style = FormaTheme.typography.bodyMedium,
+                                    style = FormaTheme.typography.bodyMedium.copy(
+                                        platformStyle = PlatformTextStyle(includeFontPadding = false),
+                                        lineHeight = 20.sp
+                                    ),
                                     color = colors.textTertiary,
                                     fontSize = 14.sp
                                 )

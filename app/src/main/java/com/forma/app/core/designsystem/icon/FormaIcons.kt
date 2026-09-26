@@ -88,7 +88,35 @@ object FormaIcons {
             "home", "house", "sanctuary" -> Icons.Rounded.Home
             "flag", "milestone" -> Icons.Rounded.Flag
             "bookmark", "save" -> Icons.Rounded.Bookmark
-            else -> Icons.Rounded.CheckCircle
+            else -> getVectorForTitle(key)
+        }
+    }
+
+    fun getVector(key: String, title: String): ImageVector {
+        val trimmed = key.trim().lowercase()
+        if (trimmed.isNotBlank() && trimmed != "check" && trimmed != "default") {
+            val vec = getVector(trimmed)
+            if (vec != Icons.Rounded.Spa) return vec
+        }
+        return getVectorForTitle(title)
+    }
+
+    private fun getVectorForTitle(title: String): ImageVector {
+        val t = title.lowercase()
+        return when {
+            t.contains("code") || t.contains("dev") || t.contains("program") -> Icons.Rounded.Code
+            t.contains("focus") || t.contains("deep") || t.contains("study") -> Icons.Rounded.Psychology
+            t.contains("read") || t.contains("book") -> Icons.Rounded.MenuBook
+            t.contains("water") || t.contains("drink") || t.contains("hydrat") -> Icons.Rounded.WaterDrop
+            t.contains("walk") || t.contains("step") -> Icons.Rounded.DirectionsWalk
+            t.contains("run") || t.contains("jog") -> Icons.Rounded.DirectionsRun
+            t.contains("gym") || t.contains("workout") || t.contains("fit") -> Icons.Rounded.FitnessCenter
+            t.contains("meditat") || t.contains("zen") || t.contains("breathe") -> Icons.Rounded.SelfImprovement
+            t.contains("write") || t.contains("journal") || t.contains("note") -> Icons.Rounded.Edit
+            t.contains("sleep") || t.contains("bed") || t.contains("night") -> Icons.Rounded.Bedtime
+            t.contains("sun") || t.contains("morning") -> Icons.Rounded.WbSunny
+            t.contains("coffee") || t.contains("tea") -> Icons.Rounded.Coffee
+            else -> Icons.Rounded.Spa
         }
     }
 
@@ -143,7 +171,7 @@ fun FormaIcon(
     tint: Color = Color.Unspecified
 ) {
     Icon(
-        imageVector = FormaIcons.getVector(iconKey),
+        imageVector = FormaIcons.getVector(iconKey, contentDescription ?: ""),
         contentDescription = contentDescription,
         tint = tint,
         modifier = modifier

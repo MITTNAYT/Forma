@@ -50,19 +50,16 @@ fun FormaNavGraph(
         startDestination = Screen.Home.route,
         modifier = modifier,
         enterTransition = {
-            fadeIn(animationSpec = tween(180, easing = LinearOutSlowInEasing)) +
-            scaleIn(initialScale = 0.985f, animationSpec = tween(180, easing = FastOutSlowInEasing))
+            fadeIn(animationSpec = tween(durationMillis = 140, easing = LinearOutSlowInEasing))
         },
         exitTransition = {
-            fadeOut(animationSpec = tween(140, easing = FastOutSlowInEasing)) +
-            scaleOut(targetScale = 1.01f, animationSpec = tween(140, easing = FastOutSlowInEasing))
+            fadeOut(animationSpec = tween(durationMillis = 110, easing = FastOutSlowInEasing))
         },
         popEnterTransition = {
-            fadeIn(animationSpec = tween(160, easing = LinearOutSlowInEasing)) +
-            scaleIn(initialScale = 0.985f, animationSpec = tween(160, easing = FastOutSlowInEasing))
+            fadeIn(animationSpec = tween(durationMillis = 140, easing = LinearOutSlowInEasing))
         },
         popExitTransition = {
-            fadeOut(animationSpec = tween(120, easing = FastOutSlowInEasing))
+            fadeOut(animationSpec = tween(durationMillis = 110, easing = FastOutSlowInEasing))
         }
     ) {
         // Tab 1: Home (Forma Minimal Dashboard)

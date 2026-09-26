@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AcUnit
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Close
@@ -30,6 +31,7 @@ import androidx.compose.material.icons.rounded.Repeat
 import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material.icons.rounded.Sensors
 import androidx.compose.material.icons.rounded.Share
+import androidx.compose.material.icons.rounded.SkipNext
 import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -37,25 +39,29 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.runtime.rememberCoroutineScope
-import com.forma.app.core.designsystem.motion.formaPressEffect
-import com.forma.app.core.share.MilestoneCardExporter
-import kotlinx.coroutines.launch
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.forma.app.core.designsystem.FormaTheme
 import com.forma.app.core.designsystem.icon.FormaIcon
+import com.forma.app.core.designsystem.motion.formaPressEffect
+import com.forma.app.core.share.MilestoneCardExporter
 import com.forma.app.domain.model.Subtask
 import com.forma.app.domain.model.TodayScheduleItem
+import kotlinx.coroutines.launch
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -70,7 +76,8 @@ fun HabitTaskDetailBottomSheet(
     onEdit: () -> Unit,
     onStartFocus: () -> Unit,
     onToggleSubtask: (subtaskId: String) -> Unit = {},
-    onTogglePause: () -> Unit = {}
+    onTogglePause: () -> Unit = {},
+    onSkipHabit: () -> Unit = {}
 ) {
     val colors = FormaTheme.colors
     val context = LocalContext.current
@@ -112,7 +119,9 @@ fun HabitTaskDetailBottomSheet(
                 notes = habit.stackedCueText ?: "",
                 streakCount = item.currentStreak,
                 isWintering = habit.isWintering,
-                canPause = true
+                canPause = true,
+                isHabit = true,
+                isSkipped = item.isSkippedToday
             )
         }
         is TodayScheduleItem.TimelineBlock -> {
@@ -138,7 +147,9 @@ fun HabitTaskDetailBottomSheet(
                 notes = task.notes,
                 streakCount = 0,
                 isWintering = false,
-                canPause = false
+                canPause = false,
+                isHabit = false,
+                isSkipped = false
             )
         }
     }
@@ -146,11 +157,13 @@ fun HabitTaskDetailBottomSheet(
     val title = details.title
     val iconKey = details.iconKey
     val subtitle = details.subtitle
-    val isDone = details.isDone
     val repeatLabel = details.repeatLabel
-    val subtasks = details.subtasks
     val notes = details.notes
     val streakCount = details.streakCount
+
+    // ── Zero Latency Optimistic In-Memory State ──────────────────────────
+    var localIsDone by remember(details.isDone) { mutableStateOf(details.isDone) }
+    var localSubtasks by remember(details.subtasks) { mutableStateOf(details.subtasks) }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -159,8 +172,8 @@ fun HabitTaskDetailBottomSheet(
         dragHandle = {
             Box(
                 modifier = Modifier
-                    .padding(vertical = 10.dp)
-                    .width(38.dp)
+                    .padding(vertical = 12.dp)
+                    .width(36.dp)
                     .height(4.dp)
                     .clip(CircleShape)
                     .background(colors.border)
@@ -172,29 +185,29 @@ fun HabitTaskDetailBottomSheet(
                 .fillMaxWidth()
                 .navigationBarsPadding()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 8.dp)
+                .padding(horizontal = 24.dp, vertical = 6.dp)
         ) {
-            // 1. Header with Icon, Status Pill & Flexible Layout
+            // ── 1. Top Header Row (Icon, Title, Instant Completion Halo) ───
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row(
-                    modifier = Modifier.weight(1f),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f)
                 ) {
                     Box(
                         modifier = Modifier
                             .size(52.dp)
                             .clip(RoundedCornerShape(16.dp))
-                            .background(colors.accentSoft),
+                            .background(if (localIsDone) colors.accentSoft else colors.surfaceVariant),
                         contentAlignment = Alignment.Center
                     ) {
                         FormaIcon(
                             iconKey = iconKey,
                             contentDescription = title,
-                            tint = colors.accent,
+                            tint = if (localIsDone) colors.accent else colors.textPrimary,
                             modifier = Modifier.size(26.dp)
                         )
                     }
@@ -202,37 +215,24 @@ fun HabitTaskDetailBottomSheet(
                     Spacer(modifier = Modifier.width(14.dp))
 
                     Column(modifier = Modifier.weight(1f)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = if (item is TodayScheduleItem.HabitItem) "HABIT RITUAL" else "COMMITTED TASK",
-                                style = FormaTheme.typography.labelSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = colors.accent,
-                                letterSpacing = 1.2.sp,
-                                fontSize = 10.sp
-                            )
-                            if (details.isWintering) {
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Text(
-                                    text = "Resting",
-                                    fontWeight = FontWeight.Bold,
-                                    color = colors.accent,
-                                    fontSize = 10.sp,
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(6.dp))
-                                        .background(colors.accentSoft)
-                                        .padding(horizontal = 6.dp, vertical = 2.dp)
-                                )
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = title,
-                            style = FormaTheme.typography.headlineMedium,
+                            style = FormaTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
-                            color = colors.textPrimary,
-                            fontSize = 20.sp,
-                            maxLines = 2,
+                            color = if (localIsDone) colors.textSecondary else colors.textPrimary,
+                            textDecoration = if (localIsDone) TextDecoration.LineThrough else TextDecoration.None,
+                            fontSize = 18.sp,
+                            lineHeight = 23.sp
+                        )
+                        Spacer(modifier = Modifier.height(3.dp))
+                        Text(
+                            text = if (details.isWintering) "Rest Sanctuary • Streak Preserved"
+                            else if (details.isSkipped) "Skipped for Today • Rest Freely"
+                            else subtitle,
+                            style = FormaTheme.typography.bodySmall,
+                            color = colors.textSecondary,
+                            fontSize = 12.sp,
+                            maxLines = 1,
                             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                         )
                     }
@@ -240,65 +240,85 @@ fun HabitTaskDetailBottomSheet(
 
                 Spacer(modifier = Modifier.width(12.dp))
 
-                // Checkbox status toggle with subtle halo
+                // Checkbox status toggle with subtle halo (Instant frame 0 feedback)
                 Box(
                     modifier = Modifier
                         .size(40.dp)
                         .clip(CircleShape)
-                        .background(if (isDone) colors.accent else colors.surfaceVariant)
-                        .border(1.dp, if (isDone) colors.accent else colors.border.copy(alpha = 0.5f), CircleShape)
+                        .background(if (localIsDone) colors.accent else if (details.isWintering) colors.accentSoft else colors.surfaceVariant)
+                        .border(1.5.dp, if (localIsDone || details.isWintering) colors.accent else colors.border.copy(alpha = 0.6f), CircleShape)
                         .formaPressEffect(targetScale = 0.88f) {
+                            localIsDone = !localIsDone
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             onToggleComplete()
                         },
                     contentAlignment = Alignment.Center
                 ) {
-                    if (isDone) {
+                    if (localIsDone) {
                         Icon(
                             imageVector = Icons.Rounded.Check,
-                            contentDescription = "Done",
+                            contentDescription = "Completed",
                             tint = colors.onAccent,
-                            modifier = Modifier.size(22.dp)
+                            modifier = Modifier.size(20.dp)
+                        )
+                    } else if (details.isWintering) {
+                        Icon(
+                            imageVector = Icons.Rounded.AcUnit,
+                            contentDescription = "Wintering - Streak Preserved",
+                            tint = colors.accent,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Rounded.Check,
+                            contentDescription = "Tap to Complete",
+                            tint = colors.textTertiary.copy(alpha = 0.35f),
+                            modifier = Modifier.size(18.dp)
                         )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(18.dp))
 
-            // 2. Bento Card: Rhythm & Flow Cadence
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            // ── 2. Full-Width Schedule Card ──────────────────────────────
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(18.dp))
+                    .background(colors.surfaceVariant.copy(alpha = 0.45f))
+                    .border(1.dp, colors.border.copy(alpha = 0.35f), RoundedCornerShape(18.dp))
+                    .padding(14.dp)
             ) {
-                // Time & Frequency Tile
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(colors.surfaceVariant.copy(alpha = 0.5f))
-                        .border(1.dp, colors.border.copy(alpha = 0.4f), RoundedCornerShape(16.dp))
-                        .padding(14.dp)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Rounded.Schedule,
-                                contentDescription = null,
-                                tint = colors.accent,
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(
-                                text = "SCHEDULE",
-                                style = FormaTheme.typography.labelSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = colors.textTertiary,
-                                fontSize = 10.sp,
-                                letterSpacing = 0.8.sp
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(6.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(38.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(colors.accentSoft),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Schedule,
+                            contentDescription = null,
+                            tint = colors.accent,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "SCHEDULE & CADENCE",
+                            style = FormaTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = colors.textTertiary,
+                            fontSize = 10.sp,
+                            letterSpacing = 0.8.sp
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = subtitle,
                             style = FormaTheme.typography.titleMedium,
@@ -306,7 +326,6 @@ fun HabitTaskDetailBottomSheet(
                             color = colors.textPrimary,
                             fontSize = 13.5.sp
                         )
-                        Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = repeatLabel,
                             style = FormaTheme.typography.bodySmall,
@@ -315,109 +334,131 @@ fun HabitTaskDetailBottomSheet(
                         )
                     }
                 }
+            }
 
-                // Momentum & Share Poster Tile (If Habit)
-                if (item is TodayScheduleItem.HabitItem) {
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(colors.surfaceVariant.copy(alpha = 0.5f))
-                            .border(1.dp, colors.border.copy(alpha = 0.4f), RoundedCornerShape(16.dp))
-                            .padding(14.dp)
+            // ── 3. Dedicated Momentum & Share Poster Card (If Habit) ─────
+            if (item is TodayScheduleItem.HabitItem) {
+                Spacer(modifier = Modifier.height(10.dp))
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(18.dp))
+                        .background(colors.surfaceVariant.copy(alpha = 0.45f))
+                        .border(1.dp, colors.border.copy(alpha = 0.35f), RoundedCornerShape(18.dp))
+                        .padding(14.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Column {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(42.dp)
+                                    .clip(RoundedCornerShape(13.dp))
+                                    .background(colors.accentSoft),
+                                contentAlignment = Alignment.Center
                             ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.LocalFireDepartment,
-                                        contentDescription = null,
-                                        tint = colors.accent,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Text(
-                                        text = "MOMENTUM",
-                                        style = FormaTheme.typography.labelSmall,
-                                        fontWeight = FontWeight.Bold,
-                                        color = colors.textTertiary,
-                                        fontSize = 10.sp,
-                                        letterSpacing = 0.8.sp
-                                    )
-                                }
+                                Icon(
+                                    imageVector = Icons.Rounded.LocalFireDepartment,
+                                    contentDescription = null,
+                                    tint = colors.accent,
+                                    modifier = Modifier.size(22.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Column {
+                                Text(
+                                    text = "MOMENTUM & STREAK",
+                                    style = FormaTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = colors.textTertiary,
+                                    fontSize = 10.sp,
+                                    letterSpacing = 0.8.sp
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = "$streakCount Days Streak",
+                                    style = FormaTheme.typography.titleMedium.copy(fontFeatureSettings = "tnum"),
+                                    fontWeight = FontWeight.Bold,
+                                    color = colors.textPrimary,
+                                    fontSize = 15.sp
+                                )
+                                Text(
+                                    text = if (streakCount > 0) "Active mindful flow • Continuous progress"
+                                    else "Start day 1 today • Every milestone begins here",
+                                    style = FormaTheme.typography.bodySmall,
+                                    color = colors.textSecondary,
+                                    fontSize = 11.5.sp
+                                )
+                            }
+                        }
 
-                                // Share Poster Pill
-                                Box(
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .background(colors.accentSoft)
-                                        .formaPressEffect(targetScale = 0.92f) {
-                                            scope.launch {
-                                                val result = MilestoneCardExporter.generateAndShareMilestone(
-                                                    context = context,
-                                                    habitTitle = title,
-                                                    streakDays = streakCount.coerceAtLeast(1)
-                                                )
-                                                result.onSuccess { intent -> context.startActivity(intent) }
-                                            }
-                                        }
-                                        .padding(horizontal = 7.dp, vertical = 3.dp)
-                                ) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(
-                                            imageVector = Icons.Rounded.Share,
-                                            contentDescription = "Share",
-                                            tint = colors.accent,
-                                            modifier = Modifier.size(11.dp)
+                        Spacer(modifier = Modifier.width(10.dp))
+
+                        // Generous Apple Pill Share Action Button (Zero text wrapping!)
+                        Box(
+                            modifier = Modifier
+                                .height(34.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(colors.accentSoft)
+                                .border(1.dp, colors.accent.copy(alpha = 0.30f), RoundedCornerShape(10.dp))
+                                .formaPressEffect(targetScale = 0.92f) {
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    scope.launch {
+                                        val result = MilestoneCardExporter.generateAndShareMilestone(
+                                            context = context,
+                                            habitTitle = title,
+                                            streakDays = streakCount.coerceAtLeast(1)
                                         )
-                                        Spacer(modifier = Modifier.width(3.dp))
-                                        Text(
-                                            text = "Share",
-                                            fontWeight = FontWeight.Bold,
-                                            color = colors.accent,
-                                            fontSize = 10.5.sp
-                                        )
+                                        result.onSuccess { intent -> context.startActivity(intent) }
                                     }
                                 }
+                                .padding(horizontal = 10.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Share,
+                                    contentDescription = "Share Milestone",
+                                    tint = colors.accent,
+                                    modifier = Modifier.size(13.dp)
+                                )
+                                Spacer(modifier = Modifier.width(5.dp))
+                                Text(
+                                    text = "Share Card",
+                                    style = FormaTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = colors.accent,
+                                    fontSize = 11.sp
+                                )
                             }
-                            Spacer(modifier = Modifier.height(6.dp))
-                            Text(
-                                text = "$streakCount Days",
-                                style = FormaTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = colors.textPrimary,
-                                fontSize = 14.sp
-                            )
-                            Spacer(modifier = Modifier.height(2.dp))
-                            Text(
-                                text = if (streakCount > 0) "Active mindful flow" else "Start day 1 today",
-                                style = FormaTheme.typography.bodySmall,
-                                color = colors.textSecondary,
-                                fontSize = 11.5.sp
-                            )
                         }
                     }
                 }
             }
 
-            // 2.5 Pause / Rest Mode (Wintering) for Habits
+            // ── 4. Wintering Mode Sanctuary Rest ─────────────────────────
             if (details.canPause) {
                 Spacer(modifier = Modifier.height(10.dp))
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(if (details.isWintering) colors.accentSoft else colors.surfaceVariant.copy(alpha = 0.5f))
+                        .clip(RoundedCornerShape(18.dp))
+                        .background(if (details.isWintering) colors.accentSoft.copy(alpha = 0.65f) else colors.surface)
                         .border(
-                            1.dp,
-                            if (details.isWintering) colors.accent else colors.border.copy(alpha = 0.4f),
-                            RoundedCornerShape(16.dp)
+                            width = 1.dp,
+                            color = if (details.isWintering) colors.accent.copy(alpha = 0.50f) else colors.border.copy(alpha = 0.50f),
+                            shape = RoundedCornerShape(18.dp)
                         )
-                        .formaPressEffect(targetScale = 0.98f) { onTogglePause() }
+                        .formaPressEffect(targetScale = 0.98f) {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onTogglePause()
+                        }
                         .padding(14.dp)
                 ) {
                     Row(
@@ -428,46 +469,52 @@ fun HabitTaskDetailBottomSheet(
                         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
                             Box(
                                 modifier = Modifier
-                                    .size(34.dp)
-                                    .clip(CircleShape)
-                                    .background(if (details.isWintering) colors.accent else colors.surface),
+                                    .size(36.dp)
+                                    .clip(RoundedCornerShape(11.dp))
+                                    .background(if (details.isWintering) colors.accent else colors.surfaceVariant),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
-                                    imageVector = if (details.isWintering) Icons.Rounded.PlayArrow else Icons.Rounded.Pause,
+                                    imageVector = Icons.Rounded.AcUnit,
                                     contentDescription = null,
-                                    tint = if (details.isWintering) colors.onAccent else colors.textSecondary,
-                                    modifier = Modifier.size(16.dp)
+                                    tint = if (details.isWintering) colors.onAccent else colors.accent,
+                                    modifier = Modifier.size(18.dp)
                                 )
                             }
                             Spacer(modifier = Modifier.width(12.dp))
                             Column {
                                 Text(
-                                    text = if (details.isWintering) "Rest Mode Active" else "Pause Ritual (Vacation / Sick)",
-                                    fontWeight = FontWeight.SemiBold,
+                                    text = "Wintering & Rest Mode",
+                                    fontWeight = FontWeight.Bold,
                                     color = if (details.isWintering) colors.accent else colors.textPrimary,
-                                    fontSize = 13.sp
+                                    fontSize = 13.5.sp
                                 )
                                 Text(
-                                    text = if (details.isWintering) "Tap to unpause and resume daily rhythm" else "Take a guilt-free rest without breaking momentum",
+                                    text = if (details.isWintering)
+                                        "Hibernating · Streak is frozen & protected"
+                                    else
+                                        "Guilt-free pause for recovery. Streak never breaks",
                                     color = colors.textSecondary,
-                                    fontSize = 11.sp
+                                    fontSize = 11.5.sp,
+                                    lineHeight = 15.sp
                                 )
                             }
                         }
+
+                        Spacer(modifier = Modifier.width(8.dp))
 
                         // Status indicator pill
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(8.dp))
                                 .background(if (details.isWintering) colors.accent else colors.surfaceVariant)
-                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                                .padding(horizontal = 8.dp, vertical = 5.dp)
                         ) {
                             Text(
-                                text = if (details.isWintering) "PAUSED" else "ACTIVE",
+                                text = if (details.isWintering) "FROZEN" else "AWAKE",
                                 fontWeight = FontWeight.Bold,
                                 color = if (details.isWintering) colors.onAccent else colors.textTertiary,
-                                fontSize = 9.5.sp,
+                                fontSize = 10.sp,
                                 letterSpacing = 0.6.sp
                             )
                         }
@@ -475,11 +522,11 @@ fun HabitTaskDetailBottomSheet(
                 }
             }
 
-            // 3. Subtasks / Micro-Steps Checklist with Progress
-            if (subtasks.isNotEmpty()) {
+            // ── 5. Subtasks / Micro-Steps Checklist (Instant Ticking) ────
+            if (localSubtasks.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(18.dp))
-                val doneSubtasks = subtasks.count { it.completed }
-                val progressFraction = doneSubtasks.toFloat() / subtasks.size.toFloat()
+                val doneSubtasks = localSubtasks.count { it.completed }
+                val progressFraction = doneSubtasks.toFloat() / localSubtasks.size.toFloat()
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -495,7 +542,7 @@ fun HabitTaskDetailBottomSheet(
                         fontSize = 11.sp
                     )
                     Text(
-                        text = "$doneSubtasks of ${subtasks.size} done",
+                        text = "$doneSubtasks of ${localSubtasks.size} done",
                         style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = colors.accent,
@@ -525,7 +572,7 @@ fun HabitTaskDetailBottomSheet(
                 Spacer(modifier = Modifier.height(10.dp))
 
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    subtasks.forEach { subtask ->
+                    localSubtasks.forEach { subtask ->
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -533,6 +580,10 @@ fun HabitTaskDetailBottomSheet(
                                 .background(colors.surfaceVariant.copy(alpha = 0.4f))
                                 .border(1.dp, colors.border.copy(alpha = 0.25f), RoundedCornerShape(12.dp))
                                 .formaPressEffect(targetScale = 0.97f) {
+                                    // Immediate in-memory flip (0ms latency)
+                                    localSubtasks = localSubtasks.map {
+                                        if (it.id == subtask.id) it.copy(completed = !it.completed) else it
+                                    }
                                     haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                     onToggleSubtask(subtask.id)
                                 }
@@ -569,7 +620,7 @@ fun HabitTaskDetailBottomSheet(
                 }
             }
 
-            // 4. Notes & Habit Cue
+            // ── 6. Notes & Habit Anchor ─────────────────────────────────
             if (notes.isNotBlank()) {
                 Spacer(modifier = Modifier.height(18.dp))
                 Text(
@@ -599,9 +650,45 @@ fun HabitTaskDetailBottomSheet(
                 }
             }
 
-            Spacer(modifier = Modifier.height(26.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            // 5. Action Buttons (Pomodoro Focus & Edit)
+            // ── 7. Skip Habit Action (Guilt-Free Streak Protection) ───────
+            if (details.isHabit && !localIsDone) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(44.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(colors.surfaceVariant.copy(alpha = 0.5f))
+                        .border(1.dp, colors.border.copy(alpha = 0.4f), RoundedCornerShape(16.dp))
+                        .formaPressEffect(targetScale = 0.97f) {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onDismiss()
+                            onSkipHabit()
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Rounded.SkipNext,
+                            contentDescription = "Skip for today",
+                            tint = colors.textSecondary,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "Skip for Today • Streak Preserved",
+                            style = FormaTheme.typography.labelSmall,
+                            fontWeight = FontWeight.SemiBold,
+                            color = colors.textSecondary,
+                            fontSize = 12.sp
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+
+            // ── 8. Action Buttons (Focus & Edit) ──────────────────────────
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -685,7 +772,9 @@ private data class HabitTaskDetails(
     val notes: String,
     val streakCount: Int,
     val isWintering: Boolean = false,
-    val canPause: Boolean = false
+    val canPause: Boolean = false,
+    val isHabit: Boolean = false,
+    val isSkipped: Boolean = false
 )
 
 private fun formatDetailTiming(startTimeStr: String?, endTimeStr: String?): String {

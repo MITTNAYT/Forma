@@ -1,4 +1,4 @@
-﻿package com.forma.app.data.repository
+package com.forma.app.data.repository
 
 import com.forma.app.BuildConfig
 import com.forma.app.domain.model.AiGenerationResult
@@ -205,47 +205,58 @@ class AiPlannerRepositoryImpl @Inject constructor() : AiPlannerRepository {
         existingItems: List<TimelineItem>,
         preset: AiPlanPreset?
     ): Result<AiGenerationResult> {
-        val endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$apiKey"
+        val endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$apiKey"
         val url = URL(endpoint)
         val conn = url.openConnection() as HttpURLConnection
         conn.requestMethod = "POST"
         conn.setRequestProperty("Content-Type", "application/json")
+        conn.setRequestProperty("x-goog-api-key", apiKey)
         conn.doOutput = true
-        conn.connectTimeout = 10000
-        conn.readTimeout = 10000
+        conn.connectTimeout = 14000
+        conn.readTimeout = 14000
 
         val habitNames = habits.joinToString { "${it.name} (${it.timeOfDay})" }
         val prompt = """
-            You are Forma AI, a mindful daily flow architect.
-            Plan a structured schedule for date $date with theme '${preset?.title ?: "Custom Plan"}'.
-            User instructions: ${userPrompt.ifBlank { "Create an optimal flow with deep work, health, and mindful habits" }}
-            Active habits: $habitNames.
-            Return ONLY a valid JSON object matching this schema:
+            You are Forma AI, a mindful daily flow and habit architect.
+            Schedule date: $date
+            Theme: '${preset?.title ?: "Mindful Flow"}'
+            Active user habits: $habitNames
+
+            CRITICAL USER REQUEST:
+            "${userPrompt.ifBlank { "Create an optimal mindful day flow balancing deep focus, wellness, and restorative breaks" }}"
+
+            INSTRUCTIONS:
+            1. UNDERSTAND AND HONOR THE USER'S EXACT INTENT:
+               - If the user specifies tasks, study sessions, workouts, appointments, or meetings with times (e.g., "gym at 4pm", "chemistry exam study", "meeting at 10am"), YOU MUST include them in "tasks" at those times.
+               - If the user is asking for habits, routine ideas, or behavioral change (e.g. "habits to boost focus and reduce evening stress"), provide 3 to 5 thoughtful habits in "suggestedHabits" with complementary flow routines in "tasks".
+               - If the user asks to break down a goal or ambition, generate concrete, progressive milestone tasks in "tasks" and foundational micro-habits in "suggestedHabits".
+            2. For each task, provide realistic start/end times ("HH:mm"), concise action notes, and 2-3 practical subtask check-items.
+            3. Return ONLY a single valid JSON object strictly matching this schema with NO markdown code blocks:
             {
-              "title": "Title of the day plan",
-              "summary": "1-2 sentence mindful overview of the day",
+              "title": "Title of the day plan or habit protocol",
+              "summary": "1-2 sentence mindful overview directly responding to the user's input",
               "tasks": [
                 {
                   "title": "Task title",
                   "startTime": "09:00",
                   "endTime": "10:30",
-                  "icon": "computer",
+                  "icon": "computer|menu_book|fitness_center|spa|self_improvement|bolt|timer|wb_sunny",
                   "colorTag": "#4E6542",
-                  "notes": "Action notes",
+                  "notes": "Action notes or instructions",
                   "subtasks": ["step 1", "step 2"]
                 }
               ],
               "suggestedHabits": [
                 {
                   "name": "Habit name",
-                  "timeOfDay": "MORNING",
-                  "icon": "target",
-                  "energyLevel": "MEDIUM",
-                  "category": "Mindfulness",
+                  "timeOfDay": "MORNING|AFTERNOON|EVENING",
+                  "icon": "target|spa|wb_sunny|menu_book|fitness_center",
+                  "energyLevel": "HIGH|MEDIUM|LOW",
+                  "category": "Mindfulness|Health|Focus|Learning",
                   "targetStreak": 21
                 }
               ],
-              "tips": ["tip 1", "tip 2"]
+              "tips": ["Mindful coaching tip 1", "Mindful coaching tip 2"]
             }
         """.trimIndent()
 
@@ -280,7 +291,13 @@ class AiPlannerRepositoryImpl @Inject constructor() : AiPlannerRepository {
             val rawText = parts.getJSONObject(0).getString("text")
             return parseComprehensiveJson(rawText, date)
         } else {
-            return Result.failure(Exception("Gemini API HTTP ${conn.responseCode}"))
+            val errStreamText = try {
+                conn.errorStream?.bufferedReader()?.use { it.readText() } ?: "HTTP ${conn.responseCode}"
+            } catch (_: Exception) {
+                "HTTP ${conn.responseCode}"
+            }
+            android.util.Log.e("AiPlanner", "Gemini API failed: $errStreamText")
+            return Result.failure(Exception("Gemini API error: $errStreamText"))
         }
     }
 
@@ -291,7 +308,15 @@ class AiPlannerRepositoryImpl @Inject constructor() : AiPlannerRepository {
                 .replace("```", "")
                 .trim()
 
-            val root = JSONObject(cleanJson)
+            val jsonStart = cleanJson.indexOf('{')
+            val jsonEnd = cleanJson.lastIndexOf('}')
+            val normalizedJson = if (jsonStart != -1 && jsonEnd != -1 && jsonEnd > jsonStart) {
+                cleanJson.substring(jsonStart, jsonEnd + 1)
+            } else {
+                cleanJson
+            }
+
+            val root = JSONObject(normalizedJson)
             val title = root.optString("title", "Forma Daily Flow")
             val summary = root.optString("summary", "Mindfully crafted daily agenda tailored to your goals.")
 
@@ -379,6 +404,103 @@ class AiPlannerRepositoryImpl @Inject constructor() : AiPlannerRepository {
         val tasks = mutableListOf<TimelineItem>()
         val suggestedHabits = mutableListOf<Habit>()
         val tips = mutableListOf<String>()
+
+        val trimmedPrompt = prompt.trim()
+
+        if (trimmedPrompt.isNotBlank() && trimmedPrompt.length > 3) {
+            // Intelligent heuristic parser for user-entered input
+            val segments = trimmedPrompt.split(Regex("[,;\\n]+|\\band\\b", RegexOption.IGNORE_CASE))
+                .map { it.trim().trim('.', '!', '?') }
+                .filter { it.isNotBlank() && it.length > 2 }
+
+            var currentHour = 9
+            segments.forEach { segment ->
+                val lower = segment.lowercase()
+                val icon = when {
+                    lower.contains("gym") || lower.contains("workout") || lower.contains("train") || lower.contains("run") -> "fitness_center"
+                    lower.contains("read") || lower.contains("book") || lower.contains("study") || lower.contains("exam") -> "menu_book"
+                    lower.contains("code") || lower.contains("dev") || lower.contains("work") || lower.contains("meeting") || lower.contains("build") -> "computer"
+                    lower.contains("meditat") || lower.contains("breathe") || lower.contains("walk") || lower.contains("relax") -> "spa"
+                    lower.contains("water") || lower.contains("drink") || lower.contains("hydrate") -> "water_drop"
+                    else -> "bolt"
+                }
+
+                // Detect explicit time if specified (e.g., "at 4pm", "10am", "14:00")
+                var taskStart = String.format("%02d:00", (currentHour % 24))
+                var taskEnd = String.format("%02d:45", (currentHour % 24))
+
+                val time12Match = Regex("(\\d{1,2})(?::(\\d{2}))?\\s*(am|pm)", RegexOption.IGNORE_CASE).find(segment)
+                if (time12Match != null) {
+                    val rawH = time12Match.groupValues[1].toIntOrNull() ?: 9
+                    val rawM = time12Match.groupValues[2].toIntOrNull() ?: 0
+                    val isPm = time12Match.groupValues[3].equals("pm", ignoreCase = true)
+                    val h24 = when {
+                        isPm && rawH < 12 -> rawH + 12
+                        !isPm && rawH == 12 -> 0
+                        else -> rawH
+                    }
+                    taskStart = String.format("%02d:%02d", h24, rawM)
+                    taskEnd = String.format("%02d:%02d", (h24 + 1) % 24, rawM)
+                }
+
+                tasks.add(
+                    TimelineItem(
+                        id = UUID.randomUUID().toString(),
+                        title = segment.replaceFirstChar { it.uppercase() },
+                        date = date,
+                        startTime = taskStart,
+                        endTime = taskEnd,
+                        icon = icon,
+                        colorTag = when (icon) {
+                            "fitness_center" -> "#C58A24"
+                            "menu_book" -> "#4E6542"
+                            "spa" -> "#7C6BA1"
+                            else -> "#2C221E"
+                        },
+                        notes = "Scheduled from user flow intention.",
+                        subtasks = listOf(
+                            Subtask(title = "Prepare materials & start", completed = false),
+                            Subtask(title = "Complete core objective", completed = false)
+                        ),
+                        reminderMinutesBefore = 10
+                    )
+                )
+
+                currentHour = (currentHour + 2) % 22
+            }
+
+            suggestedHabits.add(
+                Habit(
+                    id = UUID.randomUUID().toString(),
+                    name = "Prime Mindset for ${segments.firstOrNull()?.take(20) ?: "Focus"}",
+                    icon = "target",
+                    colorTag = "#C58A24",
+                    timeOfDay = TimeOfDay.MORNING,
+                    energyLevel = EnergyLevel.HIGH
+                )
+            )
+            suggestedHabits.add(
+                Habit(
+                    id = UUID.randomUUID().toString(),
+                    name = "Evening Review & Reset",
+                    icon = "spa",
+                    colorTag = "#4E6542",
+                    timeOfDay = TimeOfDay.EVENING,
+                    energyLevel = EnergyLevel.LOW
+                )
+            )
+
+            tips.add("Focus on 1 intentional block at a time to maintain high cognitive cadence.")
+            tips.add("Schedule 5 minutes of mindful breath between demanding transitions.")
+
+            return AiGenerationResult(
+                title = "Flow: ${segments.firstOrNull()?.take(24) ?: "Intentional Day"}",
+                summary = "Tailored schedule constructed directly from your custom plan intentions.",
+                tasks = tasks,
+                suggestedHabits = suggestedHabits,
+                tips = tips
+            )
+        }
 
         val effectivePreset = preset ?: AiPlanPreset.DEEP_WORK
 

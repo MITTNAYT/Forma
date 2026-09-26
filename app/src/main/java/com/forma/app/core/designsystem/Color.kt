@@ -1,4 +1,4 @@
-﻿package com.forma.app.core.designsystem
+package com.forma.app.core.designsystem
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
@@ -87,31 +87,31 @@ val MatchaDarkTextTertiary = Color(0xFF677864)
 val MatchaDarkOnAccent = Color(0xFF0E140D)
 
 // ========================================================
-// 4. TERRACOTTA & SAND (EARTHY CLAY)
+// 4. TERRACOTTA & DESERT SAND (BURNED GOLD & WARM DUNES)
 // ========================================================
-val TerracottaLightBg = Color(0xFFFBF6F2)
-val TerracottaLightSurface = Color(0xFFFFFFFF)
-val TerracottaLightSurfaceVariant = Color(0xFFF7ECE4)
-val TerracottaLightBorder = Color(0xFFEEDCCF)
-val TerracottaLightAccent = Color(0xFFC25E38)
-val TerracottaLightAccentMuted = Color(0xFFFCDDCE)
-val TerracottaLightAccentSoft = Color(0xFFFEECE3)
-val TerracottaLightTextPrimary = Color(0xFF2B1D19)
-val TerracottaLightTextSecondary = Color(0xFF7E6B65)
-val TerracottaLightTextTertiary = Color(0xFFAA9891)
-val TerracottaLightOnAccent = Color(0xFFFFFFFF)
+val TerracottaLightBg = Color(0xFFFAF7F0)             // warm sunlit dune ivory
+val TerracottaLightSurface = Color(0xFFFFFFFF)        // pure crisp architectural card
+val TerracottaLightSurfaceVariant = Color(0xFFF5EEDB) // soft sand tint
+val TerracottaLightBorder = Color(0xFFE6DBC6)         // warm sandstone border
+val TerracottaLightAccent = Color(0xFFC58A24)         // radiant burned gold desert sand
+val TerracottaLightAccentMuted = Color(0xFFECD5A5)    // soft golden dune glow
+val TerracottaLightAccentSoft = Color(0xFFFBF3E0)     // delicate burned sand blush
+val TerracottaLightTextPrimary = Color(0xFF241A0E)    // deep burned earth espresso
+val TerracottaLightTextSecondary = Color(0xFF73614C)  // warm desert taupe
+val TerracottaLightTextTertiary = Color(0xFFA1907C)   // soft dune stone grey
+val TerracottaLightOnAccent = Color(0xFFFFFFFF)       // crisp white on burned gold
 
-val TerracottaDarkBg = Color(0xFF140D0A)
-val TerracottaDarkSurface = Color(0xFF1E1410)
-val TerracottaDarkSurfaceVariant = Color(0xFF2C1E18)
-val TerracottaDarkBorder = Color(0xFF3D2A22)
-val TerracottaDarkAccent = Color(0xFFE07A52)
-val TerracottaDarkAccentMuted = Color(0xFF523326)
-val TerracottaDarkAccentSoft = Color(0xFF331E16)
-val TerracottaDarkTextPrimary = Color(0xFFFDF5F0)
-val TerracottaDarkTextSecondary = Color(0xFFBBA49D)
-val TerracottaDarkTextTertiary = Color(0xFF7F6A64)
-val TerracottaDarkOnAccent = Color(0xFF140D0A)
+val TerracottaDarkBg = Color(0xFF110D08)              // deep desert oasis night
+val TerracottaDarkSurface = Color(0xFF1A140D)         // dark sandstone card
+val TerracottaDarkSurfaceVariant = Color(0xFF251D13)  // elevated dune night card
+val TerracottaDarkBorder = Color(0xFF382B1C)          // warm sandstone border
+val TerracottaDarkAccent = Color(0xFFE5A738)          // glowing burned gold sand
+val TerracottaDarkAccentMuted = Color(0xFF5E4216)     // rich deep amber gold
+val TerracottaDarkAccentSoft = Color(0xFF2B1F0D)      // deep burned gold shadow
+val TerracottaDarkTextPrimary = Color(0xFFFDF9F2)     // warm dune moonlight ivory
+val TerracottaDarkTextSecondary = Color(0xFFBEAEA0)   // soft desert sand secondary
+val TerracottaDarkTextTertiary = Color(0xFF7A6D60)    // muted sandstone tertiary
+val TerracottaDarkOnAccent = Color(0xFF110D08)        // deep espresso on glowing gold
 
 // ========================================================
 // 5. LAVENDER & CHAMOMILE (SERENE PASTEL)

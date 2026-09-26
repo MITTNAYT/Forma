@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Forma" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/notion_light_bg</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:navigationBarColor">@color/notion_light_bg</item>
+        <!-- Silence system launcher icon pop so Forma's custom opening animation plays seamlessly -->
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_splash_transparent</item>
+        <item name="android:windowSplashScreenBackground">@color/notion_light_bg</item>
+        <item name="android:windowSplashScreenAnimationDuration">0</item>
+    </style>
+</resources>

@@ -1,4 +1,4 @@
-﻿package com.forma.app.ui.reflection
+package com.forma.app.ui.reflection
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -416,6 +416,11 @@ private fun KeystoneInput(
             capitalization = androidx.compose.ui.text.input.KeyboardCapitalization.Sentences,
             autoCorrectEnabled = true,
             imeAction = ImeAction.Done
+        ),
+        textStyle = FormaTheme.typography.bodyMedium.copy(
+            fontSize = 13.sp,
+            platformStyle = androidx.compose.ui.text.PlatformTextStyle(includeFontPadding = false),
+            color = FormaTheme.colors.textPrimary
         ),
         keyboardActions = KeyboardActions(onDone = { onDone() }),
         colors = OutlinedTextFieldDefaults.colors(

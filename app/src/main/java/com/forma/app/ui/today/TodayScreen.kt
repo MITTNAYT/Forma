@@ -221,7 +221,7 @@ fun TodayScreen(
                                         TimeOfDay.MORNING -> hour in 4..11
                                         TimeOfDay.AFTERNOON -> hour in 12..16
                                         TimeOfDay.EVENING -> hour in 17..23
-                                        TimeOfDay.ANYTIME -> true
+                                        TimeOfDay.ANYTIME -> false
                                         null -> true
                                     }
                                 }
@@ -244,7 +244,7 @@ fun TodayScreen(
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(start = 24.dp, end = 24.dp, top = 20.dp, bottom = 4.dp)
+                                .padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 4.dp)
                         ) {
                             // Row 1: Date & Week metadata on left + sleek AI Studio & Calendar Picker on right
                             Row(
@@ -258,7 +258,7 @@ fun TodayScreen(
                                 val dateShortFormatted = selectedDate.format(DateTimeFormatter.ofPattern("d MMM", Locale.getDefault())).uppercase()
                                 Text(
                                     text = "$dateShortFormatted · WEEK $weekOfYear",
-                                    style = FormaTheme.typography.labelSmall,
+                                    style = FormaTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
                                     fontWeight = FontWeight.Bold,
                                     color = colors.accent,
                                     letterSpacing = 1.4.sp,
@@ -354,11 +354,15 @@ fun TodayScreen(
                                             .padding(horizontal = 9.dp, vertical = 4.dp)
                                     ) {
                                         Text(
-                                            text = "$completedCount OF ${scheduleItems.size} DONE",
+                                            text = "$completedCount of ${scheduleItems.size} done",
+                                            style = FormaTheme.typography.labelSmall.copy(
+                                                fontFeatureSettings = "tnum",
+                                                platformStyle = androidx.compose.ui.text.PlatformTextStyle(includeFontPadding = false)
+                                            ),
                                             fontWeight = FontWeight.Bold,
                                             color = colors.accent,
                                             fontSize = 10.sp,
-                                            letterSpacing = 0.6.sp
+                                            letterSpacing = 0.3.sp
                                         )
                                     }
                                 }
@@ -384,8 +388,8 @@ fun TodayScreen(
                             .onGloballyPositioned { coordinates ->
                                 weekStripBounds = coordinates.boundsInRoot()
                             }
-                            .padding(horizontal = 16.dp, vertical = 6.dp),
-                        horizontalArrangement = Arrangement.spacedBy(5.dp),
+                            .padding(horizontal = 20.dp, vertical = 6.dp),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         weekDays.forEach { date ->
@@ -441,7 +445,7 @@ fun TodayScreen(
 
                                     Text(
                                         text = dayNum,
-                                        style = FormaTheme.typography.titleMedium,
+                                        style = FormaTheme.typography.titleMedium.copy(fontFeatureSettings = "tnum"),
                                         fontWeight = FontWeight.Bold,
                                         color = textColor,
                                         fontSize = 16.sp,
@@ -510,43 +514,6 @@ fun TodayScreen(
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(
                                         text = "Breathe",
-                                        style = FormaTheme.typography.labelSmall,
-                                        fontWeight = FontWeight.Bold,
-                                        color = colors.textPrimary,
-                                        fontSize = 12.sp
-                                    )
-                                }
-                            }
-
-                            // Daily Reflection Pill (Morning / Evening)
-                            val currentHour = LocalTime.now().hour
-                            val isEvening = currentHour >= 18 || currentHour < 4
-                            val reflectTitle = if (isEvening) "Evening" else "Reflect"
-                            val reflectIcon = if (isEvening) Icons.Rounded.Spa else Icons.Rounded.WbSunny
-
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .clip(RoundedCornerShape(14.dp))
-                                    .background(colors.surface)
-                                    .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(14.dp))
-                                    .formaPressEffect(targetScale = 0.95f) {
-                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                        if (isEvening) showEveningSheet = true else showMorningSheet = true
-                                    }
-                                    .padding(vertical = 10.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = reflectIcon,
-                                        contentDescription = reflectTitle,
-                                        tint = colors.accent,
-                                        modifier = Modifier.size(15.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(5.dp))
-                                    Text(
-                                        text = reflectTitle,
                                         style = FormaTheme.typography.labelSmall,
                                         fontWeight = FontWeight.Bold,
                                         color = colors.textPrimary,
@@ -633,16 +600,20 @@ fun TodayScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 24.dp, vertical = 6.dp),
+                            .padding(horizontal = 20.dp, vertical = 6.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             Text(
                                 text = "TODAY'S FLOW",
-                                style = FormaTheme.typography.labelSmall,
+                                style = FormaTheme.typography.labelSmall.copy(
+                                    platformStyle = androidx.compose.ui.text.PlatformTextStyle(includeFontPadding = false)
+                                ),
                                 fontWeight = FontWeight.Bold,
-                                color = colors.textTertiary,
+                                color = colors.accent,
                                 letterSpacing = 1.3.sp,
                                 fontSize = 11.sp
                             )
@@ -655,11 +626,15 @@ fun TodayScreen(
                                         .padding(horizontal = 7.dp, vertical = 2.dp)
                                 ) {
                                     Text(
-                                        text = "$completedCount/${scheduleItems.size} DONE",
+                                        text = "$completedCount/${scheduleItems.size}",
+                                        style = FormaTheme.typography.labelSmall.copy(
+                                            fontFeatureSettings = "tnum",
+                                            platformStyle = androidx.compose.ui.text.PlatformTextStyle(includeFontPadding = false)
+                                        ),
                                         fontWeight = FontWeight.Bold,
                                         color = colors.accent,
-                                        fontSize = 9.5.sp,
-                                        letterSpacing = 0.5.sp
+                                        fontSize = 10.sp,
+                                        letterSpacing = 0.3.sp
                                     )
                                 }
                             }
@@ -701,7 +676,7 @@ fun TodayScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .horizontalScroll(rememberScrollState())
-                            .padding(horizontal = 24.dp, vertical = 6.dp),
+                            .padding(horizontal = 20.dp, vertical = 6.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         TodayFilterChip(
@@ -711,15 +686,26 @@ fun TodayScreen(
                             onClick = { selectedTimeFilter = null }
                         )
 
-                        TimeOfDay.entries.forEach { tod ->
+                        TimeOfDay.entries.filter { it != TimeOfDay.ANYTIME }.forEach { tod ->
                             val countForTod = scheduleItems.count { item ->
                                 when (item) {
                                     is TodayScheduleItem.HabitItem -> item.habit.timeOfDay == tod
-                                    is TodayScheduleItem.TimelineBlock -> true
+                                    is TodayScheduleItem.TimelineBlock -> {
+                                        val hour = try {
+                                            item.item.startTime?.let { java.time.LocalTime.parse(it).hour } ?: 12
+                                        } catch (_: Exception) { 12 }
+                                        when (tod) {
+                                            TimeOfDay.MORNING -> hour in 4..11
+                                            TimeOfDay.AFTERNOON -> hour in 12..16
+                                            TimeOfDay.EVENING -> hour in 17..23
+                                            TimeOfDay.ANYTIME -> true
+                                        }
+                                    }
                                 }
                             }
                             TodayFilterChip(
                                 text = tod.displayName,
+                                badgeCount = if (countForTod > 0) countForTod else null,
                                 isSelected = selectedTimeFilter == tod,
                                 onClick = { selectedTimeFilter = tod }
                             )
@@ -746,7 +732,7 @@ fun TodayScreen(
                             BehanceHabitCard(
                                 item = scheduleItem,
                                 index = index,
-                                modifier = Modifier.formaStaggeredEntrance(index),
+                                modifier = Modifier,
                                 onToggle = {
                                     when (scheduleItem) {
                                         is TodayScheduleItem.HabitItem -> {
@@ -787,6 +773,16 @@ fun TodayScreen(
                                             } else 25
                                             onNavigateToFocusTimer(task.id, task.title, duration, false)
                                         }
+                                    }
+                                },
+                                onSkip = {
+                                    if (scheduleItem is TodayScheduleItem.HabitItem) {
+                                        viewModel.skipHabit(scheduleItem.habit.id, scheduleItem.habit.name)
+                                    }
+                                },
+                                onUnskip = {
+                                    if (scheduleItem is TodayScheduleItem.HabitItem) {
+                                        viewModel.unskipHabit(scheduleItem.habit.id)
                                     }
                                 }
                             )
@@ -872,6 +868,11 @@ fun TodayScreen(
             onTogglePause = {
                 if (item is TodayScheduleItem.HabitItem) {
                     viewModel.toggleHabitPause(item.habit)
+                }
+            },
+            onSkipHabit = {
+                if (item is TodayScheduleItem.HabitItem) {
+                    viewModel.skipHabit(item.habit.id, item.habit.name)
                 }
             }
         )

@@ -4,12 +4,10 @@ import androidx.compose.runtime.Immutable
 import java.util.UUID
 
 enum class HabitTemplateCategory(val displayName: String, val icon: String) {
-    STUDENTS_SCHOLARS("Students & Study", "book"),
-    WRITERS_THINKERS("Writers & Readers", "feather"),
-    CREATORS_DESIGNERS("Creators & Studio", "sparkles"),
-    DEVELOPERS_MAKERS("Coders & Builders", "zap"),
-    MINDFUL_LIVING("Mindful Living", "spa"),
-    EVENING_UNWIND("Evening Wind-down", "moon")
+    ESSENTIALS("Daily Essentials", "sun"),
+    HEALTH_BODY("Health & Body", "gym"),
+    FOCUS_WORK("Focus & Work", "target"),
+    MIND_REST("Mind & Rest", "spa")
 }
 
 @Immutable
@@ -19,12 +17,12 @@ data class HabitTemplate(
     val description: String,
     val category: HabitTemplateCategory,
     val icon: String = "target",
-    val colorTag: String = "#4E6542",
+    val colorTag: String = "#C58A24", // Warm Terracotta / Sand Gold
     val timeOfDay: TimeOfDay = TimeOfDay.ANYTIME,
     val energyLevel: EnergyLevel = EnergyLevel.MEDIUM,
     val durationMinutes: Int = 15,
     val reminderTimeMinutes: Int? = null,
-    val scienceNote: String,
+    val simpleBenefit: String,
     val stackedCueText: String? = null,
     val subtasks: List<Subtask> = emptyList()
 ) {
@@ -49,405 +47,245 @@ data class HabitTemplate(
 
     companion object {
         val CURATED_TEMPLATES: List<HabitTemplate> = listOf(
-            // ── Students & Study ─────────────────────────────────────────
+            // ── 1. Daily Essentials ──────────────────────────────────────
             HabitTemplate(
-                id = "student_active_recall",
-                title = "Active Recall & Flashcards",
-                description = "Self-test on today's most demanding concepts without referencing notes.",
-                category = HabitTemplateCategory.STUDENTS_SCHOLARS,
-                icon = "book",
-                colorTag = "#4E6542", // Matcha Green
-                timeOfDay = TimeOfDay.AFTERNOON,
-                energyLevel = EnergyLevel.HIGH,
-                durationMinutes = 25,
-                reminderTimeMinutes = 16 * 60 + 30, // 4:30 PM
-                scienceNote = "Testing effect: Retrieval practice produces ~50% stronger synaptic memory traces than passive re-reading.",
-                stackedCueText = "After arriving back from afternoon classes",
-                subtasks = listOf(
-                    Subtask(title = "Open deck for today's hardest lecture", completed = false),
-                    Subtask(title = "Attempt recall without peeking at answers", completed = false),
-                    Subtask(title = "Tag 3 concepts for professor office hours", completed = false)
-                )
-            ),
-            HabitTemplate(
-                id = "student_pomodoro_study",
-                title = "Deep Study Sprint (45m)",
-                description = "Single-subject uninterrupted focus block in full airplane mode.",
-                category = HabitTemplateCategory.STUDENTS_SCHOLARS,
-                icon = "target",
-                colorTag = "#8D5B4C", // Terracotta
-                timeOfDay = TimeOfDay.MORNING,
-                energyLevel = EnergyLevel.HIGH,
-                durationMinutes = 45,
-                reminderTimeMinutes = 10 * 60, // 10:00 AM
-                scienceNote = "Ultradian rhythm research proves cognitive focus peaks in 45-minute continuous blocks.",
-                stackedCueText = "After sitting down at library desk",
-                subtasks = listOf(
-                    Subtask(title = "Phone placed in bag on silent", completed = false),
-                    Subtask(title = "Define 1 specific assignment milestone", completed = false),
-                    Subtask(title = "45m unbroken practice problem solving", completed = false)
-                )
-            ),
-            HabitTemplate(
-                id = "student_lecture_preview",
-                title = "Pre-Lecture Primer (15m)",
-                description = "Skim syllabus outlines and key headings before class begins.",
-                category = HabitTemplateCategory.STUDENTS_SCHOLARS,
-                icon = "feather",
-                colorTag = "#D4AF37", // Warm Gold
+                id = "essentials_morning_water",
+                title = "Morning Hydration (500ml)",
+                description = "Drink a large glass of clean water right after getting out of bed.",
+                category = HabitTemplateCategory.ESSENTIALS,
+                icon = "water",
+                colorTag = "#4A7C59", // Sage Green
                 timeOfDay = TimeOfDay.MORNING,
                 energyLevel = EnergyLevel.LOW,
-                durationMinutes = 15,
-                reminderTimeMinutes = 8 * 60 + 30, // 8:30 AM
-                scienceNote = "Cognitive schema priming activates neural frameworks to encode lecture concepts faster.",
-                stackedCueText = "15 minutes before lecture hall doors open",
+                durationMinutes = 2,
+                reminderTimeMinutes = 7 * 60 + 30,
+                simpleBenefit = "Rehydrates brain and organs after 8 hours of sleep.",
+                stackedCueText = "Right after stepping out of bed",
                 subtasks = listOf(
-                    Subtask(title = "Skim lecture slide headings", completed = false),
-                    Subtask(title = "Jot down 2 questions to listen for", completed = false)
+                    Subtask(title = "Pour 500ml fresh water", completed = false),
+                    Subtask(title = "Drink fully before coffee or breakfast", completed = false)
                 )
             ),
             HabitTemplate(
-                id = "student_spaced_review",
-                title = "Spaced Repetition Review (20m)",
-                description = "Clear your daily flashcard queue before evening wind-down.",
-                category = HabitTemplateCategory.STUDENTS_SCHOLARS,
-                icon = "sparkles",
-                colorTag = "#5E548E", // Lavender
-                timeOfDay = TimeOfDay.EVENING,
-                energyLevel = EnergyLevel.MEDIUM,
-                durationMinutes = 20,
-                reminderTimeMinutes = 20 * 60, // 8:00 PM
-                scienceNote = "Ebbinghaus curve: Reviewing before sleep consolidates memories into long-term neocortex.",
-                stackedCueText = "After finishing dinner",
-                subtasks = listOf(
-                    Subtask(title = "Complete pending review queue", completed = false),
-                    Subtask(title = "Review difficult deck cards once more", completed = false)
-                )
-            ),
-
-            // ── Writers & Readers ────────────────────────────────────────
-            HabitTemplate(
-                id = "writer_morning_pages",
-                title = "Morning Pages (Stream of Consciousness)",
-                description = "Write longhand or blank-screen thoughts to empty mental clutter before the day begins.",
-                category = HabitTemplateCategory.WRITERS_THINKERS,
-                icon = "feather",
-                colorTag = "#8D5B4C", // Terracotta
-                timeOfDay = TimeOfDay.MORNING,
-                energyLevel = EnergyLevel.LOW,
-                durationMinutes = 25,
-                reminderTimeMinutes = 7 * 60 + 30, // 7:30 AM
-                scienceNote = "Silences the internal critic by writing before the analytical left hemisphere fully asserts control.",
-                stackedCueText = "With morning coffee or tea",
-                subtasks = listOf(
-                    Subtask(title = "Open blank page without distractions", completed = false),
-                    Subtask(title = "Write 3 unedited pages of thought", completed = false),
-                    Subtask(title = "Underline 1 seed idea for drafting", completed = false)
-                )
-            ),
-            HabitTemplate(
-                id = "writer_draft_sprint",
-                title = "Deep Writing Sprint (500 Words)",
-                description = "Uncompromising drafting sprint on your article, manuscript, or chapter.",
-                category = HabitTemplateCategory.WRITERS_THINKERS,
-                icon = "target",
-                colorTag = "#2C221E", // Espresso
-                timeOfDay = TimeOfDay.MORNING,
-                energyLevel = EnergyLevel.HIGH,
-                durationMinutes = 60,
-                reminderTimeMinutes = 9 * 60 + 30, // 9:30 AM
-                scienceNote = "Separating generative drafting from critical editing doubles creative output and flow states.",
-                stackedCueText = "After closing email and browser tabs",
-                subtasks = listOf(
-                    Subtask(title = "All research tabs closed", completed = false),
-                    Subtask(title = "Draft 500 new words minimum", completed = false),
-                    Subtask(title = "Save file without line-editing", completed = false)
-                )
-            ),
-            HabitTemplate(
-                id = "writer_paper_reading",
-                title = "Paper Book Reading (20 Pages)",
-                description = "Immerse in literary fiction, essays, or philosophy printed on physical paper.",
-                category = HabitTemplateCategory.WRITERS_THINKERS,
-                icon = "book",
-                colorTag = "#D4AF37", // Warm Gold
-                timeOfDay = TimeOfDay.EVENING,
-                energyLevel = EnergyLevel.LOW,
-                durationMinutes = 30,
-                reminderTimeMinutes = 21 * 60 + 30, // 9:30 PM
-                scienceNote = "Reading physical paper reduces cortisol by 68% and improves sentence cadence internalization.",
-                stackedCueText = "After entering bedroom reading chair",
-                subtasks = listOf(
-                    Subtask(title = "Dim overhead lights to warm amber", completed = false),
-                    Subtask(title = "Read 20 uninterrupted physical pages", completed = false),
-                    Subtask(title = "Annotate one resonant sentence", completed = false)
-                )
-            ),
-            HabitTemplate(
-                id = "writer_idea_capture",
-                title = "Commonplace Book & Note Filing",
-                description = "Synthesize daily observations, overheard dialogue, and quotes into your archive.",
-                category = HabitTemplateCategory.WRITERS_THINKERS,
-                icon = "sparkles",
-                colorTag = "#4E6542", // Matcha Green
-                timeOfDay = TimeOfDay.AFTERNOON,
-                energyLevel = EnergyLevel.LOW,
-                durationMinutes = 15,
-                reminderTimeMinutes = 17 * 60, // 5:00 PM
-                scienceNote = "Luhmann's slip-box principle: Genuine original thinking emerges from cross-pollinating captured notes.",
-                stackedCueText = "At the close of the afternoon workday",
-                subtasks = listOf(
-                    Subtask(title = "Review quick memos and bookmarks", completed = false),
-                    Subtask(title = "File key ideas into permanent archive", completed = false)
-                )
-            ),
-
-            // ── Creators & Studio ────────────────────────────────────────
-            HabitTemplate(
-                id = "creator_visual_audit",
-                title = "Visual Inspiration & Taste Audit",
-                description = "Curate reference design, typography, color palettes, and lighting choices.",
-                category = HabitTemplateCategory.CREATORS_DESIGNERS,
-                icon = "sparkles",
-                colorTag = "#5E548E", // Lavender
-                timeOfDay = TimeOfDay.MORNING,
-                energyLevel = EnergyLevel.LOW,
-                durationMinutes = 15,
-                reminderTimeMinutes = 10 * 60, // 10:00 AM
-                scienceNote = "Input calibrates output: Deliberate exposure to world-class craft directly elevates design sensibility.",
-                stackedCueText = "Before opening studio canvas",
-                subtasks = listOf(
-                    Subtask(title = "Collect 3 exemplary design references", completed = false),
-                    Subtask(title = "Analyze typography and layout decisions", completed = false)
-                )
-            ),
-            HabitTemplate(
-                id = "creator_studio_block",
-                title = "Studio Craft Block (90m)",
-                description = "Deep creative flow: illustration, Figma design system, photography, or video editing.",
-                category = HabitTemplateCategory.CREATORS_DESIGNERS,
-                icon = "target",
-                colorTag = "#8D5B4C", // Terracotta
-                timeOfDay = TimeOfDay.AFTERNOON,
-                energyLevel = EnergyLevel.HIGH,
-                durationMinutes = 90,
-                reminderTimeMinutes = 14 * 60, // 2:00 PM
-                scienceNote = "Reaching flow state in visual arts requires at least 45 minutes of unbroken immersion.",
-                stackedCueText = "After afternoon matcha or espresso",
-                subtasks = listOf(
-                    Subtask(title = "Prepare canvas & moodboard palette", completed = false),
-                    Subtask(title = "Sprint on core composition / layout", completed = false),
-                    Subtask(title = "Export work-in-progress snapshot", completed = false)
-                )
-            ),
-            HabitTemplate(
-                id = "creator_publish_share",
-                title = "Ship & Share Process (Build in Public)",
-                description = "Document one technique, layout iteration, or design decision publicly.",
-                category = HabitTemplateCategory.CREATORS_DESIGNERS,
-                icon = "feather",
-                colorTag = "#D4AF37", // Warm Gold
+                id = "essentials_daily_walk",
+                title = "Daily 20-Minute Walk",
+                description = "Get outside, move your legs, and clear mental fog.",
+                category = HabitTemplateCategory.ESSENTIALS,
+                icon = "walk",
+                colorTag = "#C58A24", // Terracotta
                 timeOfDay = TimeOfDay.AFTERNOON,
                 energyLevel = EnergyLevel.MEDIUM,
                 durationMinutes = 20,
-                reminderTimeMinutes = 17 * 60 + 30, // 5:30 PM
-                scienceNote = "Sharing creative processes compounds authority and builds genuine audience resonance.",
-                stackedCueText = "After concluding studio sprint",
+                reminderTimeMinutes = 12 * 60 + 30,
+                simpleBenefit = "Boosts cardiovascular flow and lifts daily mood.",
+                stackedCueText = "After finishing lunch",
                 subtasks = listOf(
-                    Subtask(title = "Select 1 clean work-in-progress visual", completed = false),
-                    Subtask(title = "Write 2 sentences explaining the design rationale", completed = false)
+                    Subtask(title = "Put on comfortable walking shoes", completed = false),
+                    Subtask(title = "Walk without scrolling on phone", completed = false)
                 )
             ),
             HabitTemplate(
-                id = "creator_workspace_reset",
-                title = "Studio Reset & File Hygiene",
-                description = "Organize project artboards, name layers, and clear physical desk.",
-                category = HabitTemplateCategory.CREATORS_DESIGNERS,
-                icon = "spa",
-                colorTag = "#4E6542", // Matcha Green
-                timeOfDay = TimeOfDay.EVENING,
-                energyLevel = EnergyLevel.LOW,
-                durationMinutes = 10,
-                reminderTimeMinutes = 18 * 60 + 30, // 6:30 PM
-                scienceNote = "Clear, clutter-free physical and digital workspaces drastically reduce morning creative friction.",
-                stackedCueText = "Before stepping away from studio desk",
-                subtasks = listOf(
-                    Subtask(title = "Name and group all open layers", completed = false),
-                    Subtask(title = "Backup project to cloud vault", completed = false),
-                    Subtask(title = "Wipe desk surface clean", completed = false)
-                )
-            ),
-
-            // ── Coders & Builders ────────────────────────────────────────
-            HabitTemplate(
-                id = "dev_clean_code_flow",
-                title = "Deep Coding Block (90m)",
-                description = "Write core feature logic and tests without Slack, emails, or meetings.",
-                category = HabitTemplateCategory.DEVELOPERS_MAKERS,
-                icon = "zap",
-                colorTag = "#2C221E", // Espresso
-                timeOfDay = TimeOfDay.MORNING,
-                energyLevel = EnergyLevel.HIGH,
-                durationMinutes = 90,
-                reminderTimeMinutes = 10 * 60 + 30, // 10:30 AM
-                scienceNote = "Research shows software engineers lose ~23 minutes of mental stack context per interruption.",
-                stackedCueText = "After morning standup and backlog check",
-                subtasks = listOf(
-                    Subtask(title = "Pull latest main & branch out", completed = false),
-                    Subtask(title = "Write unit test / spec outline", completed = false),
-                    Subtask(title = "Implement clean, modular solution", completed = false),
-                    Subtask(title = "Run test suite to verify green", completed = false)
-                )
-            ),
-            HabitTemplate(
-                id = "dev_pr_review",
-                title = "Thoughtful PR Review & Mentorship",
-                description = "Review teammate code for architecture, test coverage, and edge cases.",
-                category = HabitTemplateCategory.DEVELOPERS_MAKERS,
-                icon = "target",
-                colorTag = "#4E6542", // Matcha Green
-                timeOfDay = TimeOfDay.AFTERNOON,
-                energyLevel = EnergyLevel.MEDIUM,
-                durationMinutes = 30,
-                reminderTimeMinutes = 15 * 60, // 3:00 PM
-                scienceNote = "Thorough peer reviews catch 60% of architectural regressions before production staging.",
-                stackedCueText = "Mid-afternoon code review window",
-                subtasks = listOf(
-                    Subtask(title = "Read PR description & understand requirement", completed = false),
-                    Subtask(title = "Inspect diff for performance & edge cases", completed = false),
-                    Subtask(title = "Leave constructive, kind feedback", completed = false)
-                )
-            ),
-            HabitTemplate(
-                id = "dev_tech_reading",
-                title = "Daily Architecture / Tech Reading",
-                description = "Read official SDK release notes, RFCs, or engineering deep-dives.",
-                category = HabitTemplateCategory.DEVELOPERS_MAKERS,
+                id = "essentials_read_15m",
+                title = "Daily Reading (15 Pages)",
+                description = "Read a book for 15 quiet, undistracted minutes.",
+                category = HabitTemplateCategory.ESSENTIALS,
                 icon = "book",
-                colorTag = "#D4AF37", // Warm Gold
-                timeOfDay = TimeOfDay.MORNING,
-                energyLevel = EnergyLevel.LOW,
-                durationMinutes = 15,
-                reminderTimeMinutes = 8 * 60 + 45, // 8:45 AM
-                scienceNote = "Daily 15-minute technical reading keeps skills ahead of rapid framework evolution.",
-                stackedCueText = "Before writing the first line of code",
-                subtasks = listOf(
-                    Subtask(title = "Read 1 engineering post or release note", completed = false),
-                    Subtask(title = "Note 1 design pattern to adopt", completed = false)
-                )
-            ),
-            HabitTemplate(
-                id = "dev_git_hygiene",
-                title = "Git Hygiene & Staging Clean Up",
-                description = "Commit clean staged diffs, push branch, and leave tomorrow's TODO anchor.",
-                category = HabitTemplateCategory.DEVELOPERS_MAKERS,
-                icon = "sparkles",
-                colorTag = "#5E548E", // Lavender
+                colorTag = "#8D5B4C", // Cedar Wood
                 timeOfDay = TimeOfDay.EVENING,
                 energyLevel = EnergyLevel.LOW,
-                durationMinutes = 10,
-                reminderTimeMinutes = 17 * 60 + 45, // 5:45 PM
-                scienceNote = "Leaving an explicit TODO anchor comment reduces cognitive restart friction tomorrow morning.",
-                stackedCueText = "Before closing terminal and IDE",
-                subtasks = listOf(
-                    Subtask(title = "Commit cleanly formatted changes", completed = false),
-                    Subtask(title = "Push branch to remote", completed = false),
-                    Subtask(title = "Write 1 TODO comment where to resume", completed = false)
-                )
-            ),
-
-            // ── Mindful Living ───────────────────────────────────────────
-            HabitTemplate(
-                id = "mindful_sunlight_water",
-                title = "Morning Sunlight & Hydration",
-                description = "Drink 500ml water and view natural outdoor daylight for 10-15 minutes.",
-                category = HabitTemplateCategory.MINDFUL_LIVING,
-                icon = "spa",
-                colorTag = "#D4AF37", // Warm Gold
-                timeOfDay = TimeOfDay.MORNING,
-                energyLevel = EnergyLevel.LOW,
                 durationMinutes = 15,
-                reminderTimeMinutes = 7 * 60, // 7:00 AM
-                scienceNote = "Triggers natural morning cortisol pulse and sets master circadian clock for deep night sleep.",
-                stackedCueText = "Immediately after stepping out of bed",
+                reminderTimeMinutes = 21 * 60,
+                simpleBenefit = "Expands knowledge and calms the nervous system.",
+                stackedCueText = "Before going to sleep",
                 subtasks = listOf(
-                    Subtask(title = "Drink 500ml room temp water with sea salt", completed = false),
-                    Subtask(title = "10 minutes natural daylight outside", completed = false)
+                    Subtask(title = "Open current book", completed = false),
+                    Subtask(title = "Read 15 pages in peace", completed = false)
                 )
             ),
             HabitTemplate(
-                id = "mindful_box_breathing",
-                title = "Midday Box Breathing (4-4-4-4)",
-                description = "Inhale 4s, Hold 4s, Exhale 4s, Hold 4s for 5 continuous calm cycles.",
-                category = HabitTemplateCategory.MINDFUL_LIVING,
-                icon = "sparkles",
-                colorTag = "#4E6542", // Matcha Green
-                timeOfDay = TimeOfDay.AFTERNOON,
+                id = "essentials_plan_tomorrow",
+                title = "Plan Tomorrow Tonight",
+                description = "Write down your top 3 priorities for tomorrow before bed.",
+                category = HabitTemplateCategory.ESSENTIALS,
+                icon = "journal",
+                colorTag = "#D4AF37", // Warm Gold
+                timeOfDay = TimeOfDay.EVENING,
                 energyLevel = EnergyLevel.LOW,
                 durationMinutes = 5,
-                reminderTimeMinutes = 13 * 60 + 30, // 1:30 PM
-                scienceNote = "Downregulates autonomic nervous system, balancing heart rate variability.",
-                stackedCueText = "When noticing midday tension or after lunch",
+                reminderTimeMinutes = 21 * 60 + 45,
+                simpleBenefit = "Wake up with instant clarity instead of morning anxiety.",
+                stackedCueText = "Right before evening brush",
                 subtasks = listOf(
-                    Subtask(title = "Sit tall with unclenched jaw", completed = false),
-                    Subtask(title = "Complete 5 rounds of 4-4-4-4 breathing", completed = false)
-                )
-            ),
-            HabitTemplate(
-                id = "mindful_nature_walk",
-                title = "Post-Lunch Nature Walk",
-                description = "15-minute unhurried walk in green space or fresh air without headphones.",
-                category = HabitTemplateCategory.MINDFUL_LIVING,
-                icon = "heart",
-                colorTag = "#8D5B4C", // Terracotta
-                timeOfDay = TimeOfDay.AFTERNOON,
-                energyLevel = EnergyLevel.MEDIUM,
-                durationMinutes = 15,
-                reminderTimeMinutes = 14 * 60 + 30, // 2:30 PM
-                scienceNote = "Blunts postprandial glucose spikes by up to 30% and stimulates divergent creative problem-solving.",
-                stackedCueText = "After clearing lunch dishes",
-                subtasks = listOf(
-                    Subtask(title = "Phone left in pocket on silent", completed = false),
-                    Subtask(title = "Notice 3 natural details in surroundings", completed = false)
+                    Subtask(title = "Identify top 3 tasks for tomorrow", completed = false),
+                    Subtask(title = "Close laptop and set morning alarms", completed = false)
                 )
             ),
 
-            // ── Evening Wind-down ────────────────────────────────────────
+            // ── 2. Health & Body ─────────────────────────────────────────
             HabitTemplate(
-                id = "evening_digital_sunset",
-                title = "Digital Sunset & Warm Lighting",
-                description = "Switch off work screens 60m before sleep; switch room to warm amber lighting.",
-                category = HabitTemplateCategory.EVENING_UNWIND,
-                icon = "moon",
-                colorTag = "#5E548E", // Lavender
-                timeOfDay = TimeOfDay.EVENING,
+                id = "health_morning_sunlight",
+                title = "Morning Sunlight (10m)",
+                description = "Step outside for 10 minutes of natural outdoor light.",
+                category = HabitTemplateCategory.HEALTH_BODY,
+                icon = "sun",
+                colorTag = "#C58A24", // Warm Terracotta
+                timeOfDay = TimeOfDay.MORNING,
                 energyLevel = EnergyLevel.LOW,
-                durationMinutes = 45,
-                reminderTimeMinutes = 21 * 60 + 30, // 9:30 PM
-                scienceNote = "Preserves natural melatonin secretion and prevents REM sleep fragmentation.",
-                stackedCueText = "When 9:30 PM evening chime sounds",
+                durationMinutes = 10,
+                reminderTimeMinutes = 8 * 60,
+                simpleBenefit = "Calibrates circadian rhythm for all-day energy.",
+                stackedCueText = "Within 30 minutes of waking up",
                 subtasks = listOf(
-                    Subtask(title = "Shut work laptop and screens", completed = false),
-                    Subtask(title = "Switch ambient lighting to warm amber", completed = false),
-                    Subtask(title = "Set phone on bedside charger", completed = false)
+                    Subtask(title = "Step out into natural light", completed = false),
+                    Subtask(title = "Breathe deeply for 10 minutes", completed = false)
                 )
             ),
             HabitTemplate(
-                id = "evening_gratitude_journal",
-                title = "Three Graces Gratitude Reflection",
-                description = "Write down 3 specific, sensory moments that brought genuine gratitude today.",
-                category = HabitTemplateCategory.EVENING_UNWIND,
-                icon = "feather",
-                colorTag = "#D4AF37", // Warm Gold
+                id = "health_daily_stretch",
+                title = "Quick Mobility Stretch",
+                description = "5 to 10 minutes of gentle spinal, hip, and neck movement.",
+                category = HabitTemplateCategory.HEALTH_BODY,
+                icon = "zen",
+                colorTag = "#4E6542", // Forest Matcha
+                timeOfDay = TimeOfDay.MORNING,
+                energyLevel = EnergyLevel.MEDIUM,
+                durationMinutes = 10,
+                reminderTimeMinutes = 8 * 60 + 15,
+                simpleBenefit = "Prevents back stiffness and improves posture.",
+                stackedCueText = "After morning water",
+                subtasks = listOf(
+                    Subtask(title = "Cat-cow spinal stretches", completed = false),
+                    Subtask(title = "Hip flexor and hamstring release", completed = false)
+                )
+            ),
+            HabitTemplate(
+                id = "health_workout_session",
+                title = "Daily Workout or Gym",
+                description = "30 to 45 minutes of strength training, running, or movement.",
+                category = HabitTemplateCategory.HEALTH_BODY,
+                icon = "gym",
+                colorTag = "#E65100", // Dynamic Flame
+                timeOfDay = TimeOfDay.AFTERNOON,
+                energyLevel = EnergyLevel.HIGH,
+                durationMinutes = 40,
+                reminderTimeMinutes = 17 * 60,
+                simpleBenefit = "Builds physical longevity and mental resilience.",
+                stackedCueText = "At the end of workday",
+                subtasks = listOf(
+                    Subtask(title = "Change into athletic gear", completed = false),
+                    Subtask(title = "Complete 35m training session", completed = false),
+                    Subtask(title = "Cool down & hydrate", completed = false)
+                )
+            ),
+            HabitTemplate(
+                id = "health_caffeine_cutoff",
+                title = "No Caffeine After 2 PM",
+                description = "Switch to water or herbal tea in the afternoon.",
+                category = HabitTemplateCategory.HEALTH_BODY,
+                icon = "spa",
+                colorTag = "#5E548E", // Slate Violet
+                timeOfDay = TimeOfDay.AFTERNOON,
+                energyLevel = EnergyLevel.LOW,
+                durationMinutes = 1,
+                reminderTimeMinutes = 14 * 60,
+                simpleBenefit = "Protects restorative deep sleep architecture.",
+                stackedCueText = "When 2:00 PM arrives",
+                subtasks = listOf(
+                    Subtask(title = "Switch from coffee to water or herbal tea", completed = false)
+                )
+            ),
+
+            // ── 3. Focus & Work ──────────────────────────────────────────
+            HabitTemplate(
+                id = "focus_deep_work_block",
+                title = "90-Minute Deep Work Block",
+                description = "Single-task focus on your most important project with phone silenced.",
+                category = HabitTemplateCategory.FOCUS_WORK,
+                icon = "target",
+                colorTag = "#2B5329", // Deep Pine
+                timeOfDay = TimeOfDay.MORNING,
+                energyLevel = EnergyLevel.HIGH,
+                durationMinutes = 90,
+                reminderTimeMinutes = 9 * 60 + 30,
+                simpleBenefit = "Accomplishes more in 90m than 6 hours of distracted multitasking.",
+                stackedCueText = "When sitting down at work desk",
+                subtasks = listOf(
+                    Subtask(title = "Place phone on silent out of sight", completed = false),
+                    Subtask(title = "Close email and chat tabs", completed = false),
+                    Subtask(title = "Complete 90m uninterrupted focus block", completed = false)
+                )
+            ),
+            HabitTemplate(
+                id = "focus_clean_desk",
+                title = "Desk & Workspace Reset",
+                description = "Clear coffee mugs, paper clutter, and desktop windows.",
+                category = HabitTemplateCategory.FOCUS_WORK,
+                icon = "work",
+                colorTag = "#7D7463", // Sandstone
                 timeOfDay = TimeOfDay.EVENING,
                 energyLevel = EnergyLevel.LOW,
-                durationMinutes = 10,
-                reminderTimeMinutes = 22 * 60, // 10:00 PM
-                scienceNote = "Cognitive reframing before sleep reduces pre-sleep autonomic arousal and accelerates sleep onset.",
-                stackedCueText = "After getting into bed",
+                durationMinutes = 5,
+                reminderTimeMinutes = 18 * 60,
+                simpleBenefit = "A clean physical space creates instant mental calm.",
+                stackedCueText = "At the end of your workday",
                 subtasks = listOf(
-                    Subtask(title = "Note 3 sensory moments of gratitude", completed = false),
-                    Subtask(title = "Release any unfinished tasks for tomorrow", completed = false)
+                    Subtask(title = "Clear mugs and trash from desk", completed = false),
+                    Subtask(title = "Close all browser tabs from today", completed = false)
+                )
+            ),
+
+            // ── 4. Mind & Rest ───────────────────────────────────────────
+            HabitTemplate(
+                id = "mind_5m_breath",
+                title = "5-Minute Quiet Meditation",
+                description = "Sit quietly, close your eyes, and focus purely on your breath.",
+                category = HabitTemplateCategory.MIND_REST,
+                icon = "zen",
+                colorTag = "#3D5A80", // Slate Indigo
+                timeOfDay = TimeOfDay.MORNING,
+                energyLevel = EnergyLevel.LOW,
+                durationMinutes = 5,
+                reminderTimeMinutes = 8 * 60,
+                simpleBenefit = "Lowers cortisol and trains intentional attention.",
+                stackedCueText = "Before opening morning notifications",
+                subtasks = listOf(
+                    Subtask(title = "Sit in comfortable posture", completed = false),
+                    Subtask(title = "5 minutes of steady box breathing", completed = false)
+                )
+            ),
+            HabitTemplate(
+                id = "mind_gratitude_journal",
+                title = "Evening Gratitude (3 Items)",
+                description = "Write down 3 small things that went well or you appreciated today.",
+                category = HabitTemplateCategory.MIND_REST,
+                icon = "journal",
+                colorTag = "#C58A24", // Warm Terracotta
+                timeOfDay = TimeOfDay.EVENING,
+                energyLevel = EnergyLevel.LOW,
+                durationMinutes = 5,
+                reminderTimeMinutes = 21 * 60 + 30,
+                simpleBenefit = "Rewires attention toward abundance and contentment.",
+                stackedCueText = "When winding down in bed",
+                subtasks = listOf(
+                    Subtask(title = "Jot down 3 specific things you appreciated today", completed = false)
+                )
+            ),
+            HabitTemplate(
+                id = "mind_screen_sunset",
+                title = "Digital Sunset at 10 PM",
+                description = "Put phones and screens away 1 hour before sleeping.",
+                category = HabitTemplateCategory.MIND_REST,
+                icon = "moon",
+                colorTag = "#4A4E69", // Twilight Navy
+                timeOfDay = TimeOfDay.EVENING,
+                energyLevel = EnergyLevel.LOW,
+                durationMinutes = 1,
+                reminderTimeMinutes = 22 * 60,
+                simpleBenefit = "Allows natural melatonin to release for rapid sleep onset.",
+                stackedCueText = "1 hour before sleep target",
+                subtasks = listOf(
+                    Subtask(title = "Place phone on charger across the room", completed = false),
+                    Subtask(title = "Dim bedroom lights", completed = false)
                 )
             )
         )

@@ -1,4 +1,4 @@
-﻿package com.forma.app.core.designsystem.splash
+package com.forma.app.core.designsystem.splash
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.CubicBezierEasing
@@ -57,25 +57,15 @@ fun PremiumSplashScreen(
     val wordmarkY       = remember { Animatable(14f) }
     val tracking        = remember { Animatable(12f) }
     val taglineAlpha    = remember { Animatable(0f) }
-    val dividerAlpha    = remember { Animatable(0f) }
-    val dividerWidth    = remember { Animatable(0f) }
 
     LaunchedEffect(Unit) {
-        // Subtle haptic cue as the emblem settles and ripple radiates
-        delay(1150)
+        // Subtle haptic cue as the Bauhaus F settles and ripple radiates
+        delay(980)
         try {
             haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
         } catch (_: Exception) {}
 
-        // Divider hairline sweeps in
-        launch { dividerAlpha.animateTo(1f, tween(300)) }
-        launch {
-            dividerWidth.animateTo(
-                targetValue = 48f,
-                animationSpec = tween(400, easing = FastOutSlowInEasing)
-            )
-        }
-        delay(120)
+        delay(80)
 
         // FORMA wordmark rises
         launch { wordmarkAlpha.animateTo(1f, tween(400, easing = FastOutSlowInEasing)) }
@@ -126,20 +116,9 @@ fun PremiumSplashScreen(
                 pearlColor = colors.onAccent
             )
 
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(36.dp))
 
-            // Precision hairline divider
-            Box(
-                modifier = Modifier
-                    .width(dividerWidth.value.dp)
-                    .height(1.dp)
-                    .clip(RoundedCornerShape(0.5.dp))
-                    .background(colors.accent.copy(alpha = 0.45f * dividerAlpha.value))
-            )
-
-            Spacer(modifier = Modifier.height(18.dp))
-
-            // FORMA Wordmark
+            // FORMA Wordmark & Slogan (Pure Bauhaus Typography — No Lines or Dashes)
             Box(
                 modifier = Modifier
                     .alpha(wordmarkAlpha.value)
@@ -148,43 +127,22 @@ fun PremiumSplashScreen(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = "FORMA",
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.ExtraBold,
                         color = colors.textPrimary,
                         letterSpacing = tracking.value.sp,
-                        fontSize = 26.sp
+                        fontSize = 28.sp
                     )
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                    // Tagline row
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
+                    Text(
+                        text = "ARCHITECTURE OF HABIT",
+                        fontWeight = FontWeight.SemiBold,
+                        color = colors.accent,
+                        letterSpacing = 2.4.sp,
+                        fontSize = 11.sp,
                         modifier = Modifier.alpha(taglineAlpha.value)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .width(14.dp)
-                                .height(0.8.dp)
-                                .clip(RoundedCornerShape(0.4.dp))
-                                .background(colors.accent.copy(alpha = 0.5f))
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "Where intention takes form.",
-                            fontWeight = FontWeight.Medium,
-                            color = colors.accent,
-                            letterSpacing = 1.6.sp,
-                            fontSize = 11.5.sp
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Box(
-                            modifier = Modifier
-                                .width(14.dp)
-                                .height(0.8.dp)
-                                .clip(RoundedCornerShape(0.4.dp))
-                                .background(colors.accent.copy(alpha = 0.5f))
-                        )
-                    }
+                    )
                 }
             }
         }

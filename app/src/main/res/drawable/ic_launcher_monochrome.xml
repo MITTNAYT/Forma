@@ -8,30 +8,22 @@
     <!-- Elevated Base Disc -->
     <path
         android:fillColor="#000000"
-        android:fillAlpha="0.10"
+        android:fillAlpha="0.12"
         android:strokeColor="#000000"
         android:strokeWidth="1.0"
         android:strokeAlpha="0.30"
         android:pathData="M 54,25.5 A 28.5,28.5 0 1,1 53.99,25.5 Z" />
 
-    <!-- Architectural "F" & Infinite Daily Loop -->
-    <path
-        android:strokeColor="#000000"
-        android:strokeWidth="6.0"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round"
-        android:pathData="M 38,39 L 66,39 C 73,39 73,53 64,56 L 44,63 C 36,66 36,73 44,73 C 54,73 68,64 70,55" />
-
-    <!-- Architectural "F" Cross-Bar -->
-    <path
-        android:strokeColor="#000000"
-        android:strokeWidth="4.5"
-        android:strokeLineCap="round"
-        android:pathData="M 38,49 L 55,49" />
-
-    <!-- Focal Dot -->
+    <!-- Bauhaus Architectural "F" Monogram -->
     <path
         android:fillColor="#000000"
-        android:pathData="M 54,53 A 3.2,3.2 0 1,1 53.99,53 Z" />
+        android:fillAlpha="0.95"
+        android:pathData="M 41,35 L 69,35 A 3,3 0 0 1 72,38 L 72,42 A 3,3 0 0 1 69,45 L 51,45 L 51,50 L 61,50 A 3,3 0 0 1 64,53 L 64,56 A 3,3 0 0 1 61,59 L 51,59 L 51,70 A 3,3 0 0 1 48,73 L 41,73 A 3,3 0 0 1 38,70 L 38,38 A 3,3 0 0 1 41,35 Z" />
+
+    <!-- Focal Balance Dot in Open Quadrant -->
+    <path
+        android:fillColor="#000000"
+        android:fillAlpha="0.95"
+        android:pathData="M 61,68 A 2.0,2.0 0 1,1 60.99,68 Z" />
 
 </vector>

@@ -1,4 +1,4 @@
-﻿package com.forma.app.core.designsystem.component
+package com.forma.app.core.designsystem.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -50,7 +50,7 @@ fun StreakBadge(
         }
         Text(
             text = "$streakCount",
-            style = FormaTheme.typography.labelSmall,
+            style = FormaTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
             color = if (streakCount > 0) com.forma.app.core.designsystem.ObsidianBlackBg else colors.textSecondary
         )
     }

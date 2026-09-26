@@ -1,4 +1,4 @@
-﻿package com.forma.app.ui.reflection
+package com.forma.app.ui.reflection
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -177,6 +177,11 @@ fun EveningReflectionSheet(
                 keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
                     capitalization = androidx.compose.ui.text.input.KeyboardCapitalization.Sentences,
                     autoCorrectEnabled = true
+                ),
+                textStyle = FormaTheme.typography.bodyMedium.copy(
+                    fontSize = 13.sp,
+                    platformStyle = androidx.compose.ui.text.PlatformTextStyle(includeFontPadding = false),
+                    color = FormaTheme.colors.textPrimary
                 ),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = FormaTheme.colors.accent,

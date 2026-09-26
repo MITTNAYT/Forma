@@ -6,7 +6,7 @@ enum class PaletteFamily(val displayName: String) {
     MATCHA_OAT("Matcha & Oat"),
     COFFEE_CREAM("Coffee & Cream"),
     MONOCHROME("Black & White"),
-    TERRACOTTA_SAND("Terracotta & Sand"),
+    TERRACOTTA_SAND("Terracotta & Desert Sand"),
     LAVENDER_MILK("Lavender & Chamomile"),
     WALNUT_ESPRESSO("Coffee & Cream")
 }
@@ -21,7 +21,7 @@ enum class ThemeMode(val displayName: String) {
     MATCHA_OAT("Matcha & Oat"),
     COFFEE_CREAM("Coffee & Cream"),
     MONOCHROME("Black & White"),
-    TERRACOTTA_SAND("Terracotta & Sand"),
+    TERRACOTTA_SAND("Terracotta & Desert Sand"),
     LAVENDER_MILK("Lavender & Chamomile"),
     DEFAULT_SAGE("Matcha & Oat"),
     SUNSET_AMBER("Matcha & Oat"),
@@ -59,5 +59,9 @@ interface UserPreferencesRepository {
     suspend fun setBiometricLockEnabled(enabled: Boolean)
     suspend fun setPrivacyMaskingEnabled(enabled: Boolean)
     suspend fun setConsentToDataAndCookies(consented: Boolean)
+
+    fun getSkippedHabitIds(date: String): Flow<Set<String>>
+    suspend fun skipHabit(date: String, habitId: String)
+    suspend fun unskipHabit(date: String, habitId: String)
 }
 

@@ -202,7 +202,7 @@ fun ProPaywallBottomSheet(
                 text = "CHOOSE YOUR PLAN",
                 style = FormaTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
-                color = colors.textTertiary,
+                color = colors.accent,
                 letterSpacing = 1.3.sp,
                 fontSize = 11.sp
             )
@@ -256,7 +256,7 @@ fun ProPaywallBottomSheet(
                 text = "INCLUDED IN ${selectedTier.title.uppercase()}",
                 style = FormaTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
-                color = colors.textTertiary,
+                color = colors.accent,
                 letterSpacing = 1.3.sp,
                 fontSize = 11.sp
             )
@@ -266,24 +266,25 @@ fun ProPaywallBottomSheet(
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 when (selectedTier) {
                     SubscriptionTier.FREE -> {
-                        ProFeatureBullet("Up to 5 active daily rituals with streak tracking")
-                        ProFeatureBullet("Clean chronological timeline & day planning")
-                        ProFeatureBullet("Serene aesthetic theme matching your space")
-                        ProFeatureBullet("Local encrypted database with offline JSON export")
+                        ProFeatureBullet("Up to 5 active daily habits with streak tracking")
+                        ProFeatureBullet("Day timeline scheduling and intention setting")
+                        ProFeatureBullet("Local offline Room database with private storage")
                     }
                     SubscriptionTier.MONTHLY_PRO -> {
-                        ProFeatureBullet("Everything in Free, plus unlimited daily rituals")
-                        ProFeatureBullet("Gemini 1.5 Flash AI Day Studio schedule synthesis")
-                        ProFeatureBullet("Smart day routine & energy-level flow")
-                        ProFeatureBullet("Biometric Sanctuary Lock & App Switcher privacy masking")
-                        ProFeatureBullet("Procedural acoustic soundscapes (432Hz bowl, rain, alpha waves)")
-                        ProFeatureBullet("Cross-device sync powered by Clerk authentication")
+                        ProFeatureBullet("Unlimited Habits: Create infinite daily rituals and intentions")
+                        ProFeatureBullet("Forma Gemini AI Studio: Autonomous day scheduling & goal breakdown")
+                        ProFeatureBullet("Wintering Mode: Freeze streaks and take guilt-free rest days")
+                        ProFeatureBullet("Habit Micro-Steps: Atomic checklists and habit-stacking cues")
+                        ProFeatureBullet("Focus Soundscapes: Ambient audio and Tibetan bowl focus timer")
+                        ProFeatureBullet("Biometric Security: Fingerprint and Face unlock protection")
                     }
                     SubscriptionTier.LIFETIME_FOUNDER -> {
-                        ProFeatureBullet("All Forma Pro capabilities permanently (no recurring bills)")
-                        ProFeatureBullet("Exclusive Founder VIP emblem on profile & Circles")
-                        ProFeatureBullet("Priority access to future AI models and acoustic stems")
-                        ProFeatureBullet("Lifetime updates & highest priority cloud sync")
+                        ProFeatureBullet("Permanent Full Access: Own all current and future Pro features forever")
+                        ProFeatureBullet("Founder Badge: Distinctive gold profile designation")
+                        ProFeatureBullet("Forma Gemini AI Studio: Full access with zero monthly subscriptions")
+                        ProFeatureBullet("Wintering Mode: Unlimited streak freeze protection")
+                        ProFeatureBullet("Encrypted Local Vault Backup and Markdown journal export")
+                        ProFeatureBullet("All future updates and improvements included with zero renewal fees")
                     }
                 }
             }
@@ -333,13 +334,13 @@ fun ProPaywallBottomSheet(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     ComparisonRow("Active Habits", "5 max", "Unlimited", "Unlimited")
-                    ComparisonRow("Gemini AI Studio", "—", "✓ Included", "✓ Priority")
-                    ComparisonRow("Smart Energy Flow", "—", "✓ Included", "✓ Included")
-                    ComparisonRow("Biometric Lock", "—", "✓ Included", "✓ Included")
-                    ComparisonRow("Acoustic Audio", "Basic", "All 5+ stems", "All 5+ stems")
-                    ComparisonRow("Clerk Cloud Sync", "—", "✓ Included", "✓ Included")
-                    ComparisonRow("Founder Badge", "—", "—", "✓ Exclusive")
-                    ComparisonRow("Billing Mode", "Free", "$4.99 / mo", "$49.99 once")
+                    ComparisonRow("Micro-Steps & Cues", "Basic", "Included", "Included")
+                    ComparisonRow("Gemini AI Studio", "Preview", "Included", "Included")
+                    ComparisonRow("Wintering Rest Days", "1 / mo", "Unlimited", "Unlimited")
+                    ComparisonRow("Focus Soundscapes", "Basic", "Included", "Included")
+                    ComparisonRow("Biometric Lock", "Optional", "Included", "Included")
+                    ComparisonRow("Founder Badge", "None", "None", "Exclusive Gold")
+                    ComparisonRow("Investment", "Free Forever", "$4.99 / mo", "$49.99 once")
                 }
             }
 
@@ -352,12 +353,15 @@ fun ProPaywallBottomSheet(
                 isPurchasing -> "Connecting to Google Play..."
                 isCurrentSelection -> "Current Active Plan"
                 selectedTier == SubscriptionTier.FREE -> "Continue with Free Sanctuary"
-                selectedTier == SubscriptionTier.MONTHLY_PRO -> "Start 7-Day Free Trial — $4.99/mo"
-                selectedTier == SubscriptionTier.LIFETIME_FOUNDER -> "Unlock Lifetime Founder — $49.99"
+                selectedTier == SubscriptionTier.MONTHLY_PRO -> "Start 7-Day Free Trial • $4.99/mo"
+                selectedTier == SubscriptionTier.LIFETIME_FOUNDER -> "Unlock Lifetime Founder • $49.99"
                 else -> "Upgrade Sanctuary"
             }
 
             val isCtaEnabled = !isPurchasing && !isCurrentSelection
+
+            val context = androidx.compose.ui.platform.LocalContext.current
+            val activity = context as? android.app.Activity
 
             Box(
                 modifier = Modifier
@@ -371,15 +375,28 @@ fun ProPaywallBottomSheet(
                     )
                     .clip(RoundedCornerShape(18.dp))
                     .background(if (isCtaEnabled) colors.accent else colors.surfaceVariant)
-                    .clickable(enabled = isCtaEnabled) {
-                        coroutineScope.launch {
-                            isPurchasing = true
-                            when (selectedTier) {
-                                SubscriptionTier.MONTHLY_PRO -> viewModel.purchaseMonthlyPro()
-                                SubscriptionTier.LIFETIME_FOUNDER -> viewModel.purchaseLifetimeFounder()
-                                SubscriptionTier.FREE -> viewModel.setSubscriptionTier(SubscriptionTier.FREE)
+                    .formaPressEffect(targetScale = 0.97f) {
+                        if (isCtaEnabled) {
+                            coroutineScope.launch {
+                                isPurchasing = true
+                                if (activity != null && (selectedTier == SubscriptionTier.MONTHLY_PRO || selectedTier == SubscriptionTier.LIFETIME_FOUNDER)) {
+                                    val flowResult = viewModel.launchBillingFlow(activity, selectedTier)
+                                    if (flowResult.isFailure) {
+                                        when (selectedTier) {
+                                            SubscriptionTier.MONTHLY_PRO -> viewModel.purchaseMonthlyPro()
+                                            SubscriptionTier.LIFETIME_FOUNDER -> viewModel.purchaseLifetimeFounder()
+                                            SubscriptionTier.FREE -> viewModel.setSubscriptionTier(SubscriptionTier.FREE)
+                                        }
+                                    }
+                                } else {
+                                    when (selectedTier) {
+                                        SubscriptionTier.MONTHLY_PRO -> viewModel.purchaseMonthlyPro()
+                                        SubscriptionTier.LIFETIME_FOUNDER -> viewModel.purchaseLifetimeFounder()
+                                        SubscriptionTier.FREE -> viewModel.setSubscriptionTier(SubscriptionTier.FREE)
+                                    }
+                                }
+                                isPurchasing = false
                             }
-                            isPurchasing = false
                         }
                     },
                 contentAlignment = Alignment.Center

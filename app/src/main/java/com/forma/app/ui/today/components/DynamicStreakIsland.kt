@@ -1,4 +1,4 @@
-﻿package com.forma.app.ui.today.components
+package com.forma.app.ui.today.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -140,7 +140,7 @@ fun DynamicStreakIsland(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 text = "${streakCount.coerceAtLeast(1)}-Day Flow Streak",
-                                style = FormaTheme.typography.titleMedium,
+                                style = FormaTheme.typography.titleMedium.copy(fontFeatureSettings = "tnum"),
                                 fontWeight = FontWeight.Bold,
                                 color = colors.textPrimary,
                                 fontSize = 14.sp

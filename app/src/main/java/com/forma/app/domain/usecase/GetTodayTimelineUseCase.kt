@@ -1,4 +1,4 @@
-﻿package com.forma.app.domain.usecase
+package com.forma.app.domain.usecase
 
 import com.forma.app.core.util.DateUtils
 import com.forma.app.domain.model.DaySchedule
@@ -13,7 +13,8 @@ import javax.inject.Inject
 class GetTodayTimelineUseCase @Inject constructor(
     private val habitRepository: HabitRepository,
     private val timelineRepository: TimelineRepository,
-    private val calculateStreakUseCase: CalculateStreakUseCase
+    private val calculateStreakUseCase: CalculateStreakUseCase,
+    private val preferencesRepository: com.forma.app.domain.repository.UserPreferencesRepository
 ) {
     operator fun invoke(date: LocalDate): Flow<DaySchedule> {
         val dateIso = DateUtils.formatDateIso(date)
@@ -22,8 +23,9 @@ class GetTodayTimelineUseCase @Inject constructor(
         return combine(
             habitRepository.getAllHabits(includeArchived = false),
             habitRepository.getAllCompletions(),
-            timelineRepository.getTimelineItemsForDate(dateIso)
-        ) { habits, allCompletions, timelineItems ->
+            timelineRepository.getTimelineItemsForDate(dateIso),
+            preferencesRepository.getSkippedHabitIds(dateIso)
+        ) { habits, allCompletions, timelineItems, skippedHabitIds ->
 
             val completionsByHabit = allCompletions.groupBy { it.habitId }
             val completedDatesByHabit = completionsByHabit.mapValues { (_, list) -> list.map { it.date }.toSet() }
@@ -42,12 +44,14 @@ class GetTodayTimelineUseCase @Inject constructor(
                 val completedDates = completedDatesByHabit[habit.id] ?: emptySet()
                 val currentStreak = calculateStreakUseCase.calculateCurrentStreak(habit, completedDates, date)
                 val isDone = completedHabitIds.contains(habit.id)
+                val isSkipped = skippedHabitIds.contains(habit.id)
 
                 TodayScheduleItem.HabitItem(
                     habit = habit,
                     isDoneToday = isDone,
                     currentStreak = currentStreak,
-                    completionId = completionsMap[habit.id]?.id
+                    completionId = completionsMap[habit.id]?.id,
+                    isSkippedToday = isSkipped
                 )
             }
 

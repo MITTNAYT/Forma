@@ -1,4 +1,4 @@
-﻿package com.forma.app.ui.focus
+package com.forma.app.ui.focus
 
 import android.widget.Toast
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -256,7 +256,7 @@ fun FocusTimerScreen(
                     ) {
                         Text(
                             text = formattedTime,
-                            style = FormaTheme.typography.headlineLarge,
+                            style = FormaTheme.typography.headlineLarge.copy(fontFeatureSettings = "tnum"),
                             fontWeight = FontWeight.Bold,
                             color = colors.textPrimary,
                             fontSize = timeFontSize,

@@ -1,7 +1,8 @@
-﻿package com.forma.app.core.designsystem.component
+package com.forma.app.core.designsystem.component
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
@@ -18,16 +19,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.RoundRect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.StrokeJoin
-import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -36,14 +38,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
- * FormaEmblem – The Physical Tactile Concentric Zen Logo of Forma.
+ * FormaEmblem – Bauhaus Architectural "F" Emblem.
  *
- * Modeled after the sculptural layered concentric relief emblem:
- * 1. Elevated Base Disc (Warm Off-White with soft cast shadow)
- * 2. Outer Sculptural Olive Arc (~280° sweep with rounded caps)
- * 3. Elevated Middle Disc (Clean White raised plateau with cast shadow)
- * 4. Concentric Middle Olive Ring
- * 5. Center Solid Olive Core Dot
+ * Embodying the Bauhaus philosophy ("Form follows function"):
+ * - A tactile ceramic stone disc foundation
+ * - A vertical structural habit spine (the consistency column)
+ * - Two cantilevered horizontal beams forming the architectural "F"
+ * - A golden-ratio focal balance point
+ * - Tactile ambient shadows, subtle bevels, and living spring assembly
  */
 @Composable
 fun FormaEmblem(
@@ -75,33 +77,32 @@ fun FormaEmblem(
         ),
         label = "auraAlpha"
     )
-    val centerPebblePulse by infiniteTransition.animateFloat(
-        initialValue = 0.98f,
-        targetValue = 1.03f,
+    val focalDotPulse by infiniteTransition.animateFloat(
+        initialValue = 0.96f,
+        targetValue = 1.04f,
         animationSpec = infiniteRepeatable(
             animation = tween(durationMillis = 2800, easing = CubicBezierEasing(0.4f, 0f, 0.6f, 1f)),
             repeatMode = RepeatMode.Reverse
         ),
-        label = "pebblePulse"
+        label = "focalPulse"
     )
 
-    // ── Opening Animation Sequence ─────────────────────────────────
+    // ── Bauhaus Architectural Assembly Sequence ─────────────────────
     val discScale = remember { Animatable(if (animated) 0.82f else 1f) }
     val discAlpha = remember { Animatable(if (animated) 0f else 1f) }
-    val centerDotScale = remember { Animatable(if (animated) 0f else 1f) }
-    val middleRingScale = remember { Animatable(if (animated) 0f else 1f) }
-    val arcDrawProgress = remember { Animatable(if (animated) 0f else 1f) }
-    val arcTipAlpha = remember { Animatable(if (animated) 0f else 0f) }
+    val columnProgress = remember { Animatable(if (animated) 0f else 1f) }
+    val topBeamProgress = remember { Animatable(if (animated) 0f else 1f) }
+    val midBeamProgress = remember { Animatable(if (animated) 0f else 1f) }
+    val focalDotScale = remember { Animatable(if (animated) 0f else 1f) }
+    val specularAlpha = remember { Animatable(if (animated) 0f else 0.8f) }
     val rippleRadius = remember { Animatable(0f) }
     val rippleAlpha = remember { Animatable(0f) }
     val settleScale = remember { Animatable(1f) }
 
     if (animated) {
         LaunchedEffect(Unit) {
-            // 1. Base discs rise with soft spring
-            launch {
-                discAlpha.animateTo(1f, tween(350))
-            }
+            // 1. Ceramic Foundation Disc rises
+            launch { discAlpha.animateTo(1f, tween(320)) }
             launch {
                 discScale.animateTo(
                     targetValue = 1f,
@@ -112,10 +113,46 @@ fun FormaEmblem(
                 )
             }
 
-            // 2. Center dot blossoms
-            delay(150)
+            // 2. Vertical Architectural Column erects from foundation
+            delay(100)
             launch {
-                centerDotScale.animateTo(
+                columnProgress.animateTo(
+                    targetValue = 1f,
+                    animationSpec = tween(
+                        durationMillis = 420,
+                        easing = CubicBezierEasing(0.18f, 0.0f, 0.15f, 1.0f)
+                    )
+                )
+            }
+
+            // 3. Top Cantilever Beam glides in horizontally
+            delay(180)
+            launch {
+                topBeamProgress.animateTo(
+                    targetValue = 1f,
+                    animationSpec = spring(
+                        dampingRatio = 0.68f,
+                        stiffness = Spring.StiffnessLow
+                    )
+                )
+            }
+
+            // 4. Mid Horizontal Beam slides in (staggered)
+            delay(120)
+            launch {
+                midBeamProgress.animateTo(
+                    targetValue = 1f,
+                    animationSpec = spring(
+                        dampingRatio = 0.68f,
+                        stiffness = Spring.StiffnessLow
+                    )
+                )
+            }
+
+            // 5. Focal Balance Pebble blossoms
+            delay(140)
+            launch {
+                focalDotScale.animateTo(
                     targetValue = 1f,
                     animationSpec = spring(
                         dampingRatio = Spring.DampingRatioMediumBouncy,
@@ -124,47 +161,26 @@ fun FormaEmblem(
                 )
             }
 
-            // 3. Middle ring blossoms
-            delay(120)
+            // 6. Specular Glaze Highlight & Architectural Micro-Ripple
+            delay(160)
             launch {
-                middleRingScale.animateTo(
-                    targetValue = 1f,
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessLow
-                    )
-                )
+                specularAlpha.animateTo(1f, tween(200))
+                delay(120)
+                specularAlpha.animateTo(0.75f, tween(300))
             }
-
-            // 4. Outer sculptural arc sweeps around circumference
-            delay(180)
             launch {
-                arcTipAlpha.animateTo(1f, tween(180))
-                arcDrawProgress.animateTo(
-                    targetValue = 1f,
-                    animationSpec = tween(
-                        durationMillis = 1150,
-                        easing = CubicBezierEasing(0.22f, 0.0f, 0.18f, 1f)
-                    )
-                )
-                arcTipAlpha.animateTo(0f, tween(200))
-            }
-
-            // 5. Zen water ripple radiates from center when arc concludes
-            delay(1150)
-            launch {
-                rippleAlpha.animateTo(0.45f, tween(100))
+                rippleAlpha.animateTo(0.40f, tween(100))
                 launch {
-                    rippleRadius.animateTo(1f, tween(750, easing = CubicBezierEasing(0.15f, 0f, 0.25f, 1f)))
+                    rippleRadius.animateTo(1f, tween(650, easing = FastOutSlowInEasing))
                 }
-                delay(220)
-                rippleAlpha.animateTo(0f, tween(480))
+                delay(180)
+                rippleAlpha.animateTo(0f, tween(420))
             }
 
-            // 6. Gentle settling breath
+            // 7. Tactile settle breath
             launch {
                 settleScale.animateTo(
-                    targetValue = 1.025f,
+                    targetValue = 1.02f,
                     animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessLow)
                 )
                 settleScale.animateTo(
@@ -184,6 +200,7 @@ fun FormaEmblem(
             val h = this.size.height
             val cx = w / 2f
             val cy = h / 2f
+            val unit = w / 108f
 
             val overallScale = settleScale.value * discScale.value
             val globalAlpha = discAlpha.value
@@ -206,202 +223,246 @@ fun FormaEmblem(
                     center = Offset(cx, cy)
                 )
 
-                // ── 2. Expanding Zen Ripple ────────────────────────────
+                // ── 2. Expanding Architectural Ripple ──────────────────
                 if (rippleAlpha.value > 0f) {
                     val rr = w * 0.46f * rippleRadius.value
                     drawCircle(
-                        color = glyphColor.copy(alpha = rippleAlpha.value * 0.5f),
+                        color = glyphColor.copy(alpha = rippleAlpha.value * 0.45f),
                         radius = rr.coerceAtLeast(1f),
                         center = Offset(cx, cy),
                         style = Stroke(width = w * 0.015f)
                     )
                 }
 
-                // ── 3. Base Elevated White Disc ────────────────────────
+                // ── 3. Base Elevated Ceramic Stone Disc ────────────────
                 val baseDiscRadius = w * 0.40f
-                // Soft directional shadow (downward-right)
+                // Directional Ambient Shadow
                 drawCircle(
                     brush = Brush.radialGradient(
                         colors = listOf(
-                            Color.Black.copy(alpha = 0.11f * globalAlpha),
-                            Color.Black.copy(alpha = 0.03f * globalAlpha),
+                            Color.Black.copy(alpha = 0.12f * globalAlpha),
+                            Color.Black.copy(alpha = 0.035f * globalAlpha),
                             Color.Transparent
                         ),
                         center = Offset(cx + w * 0.02f, cy + h * 0.035f),
-                        radius = baseDiscRadius * 1.12f
+                        radius = baseDiscRadius * 1.14f
                     ),
                     radius = baseDiscRadius * 1.08f,
                     center = Offset(cx + w * 0.02f, cy + h * 0.035f)
                 )
-                // Base Disc Body
+                // Disc Surface
                 drawCircle(
                     color = discBaseColor.copy(alpha = globalAlpha),
                     radius = baseDiscRadius,
                     center = Offset(cx, cy)
                 )
-                // Subtle tactile rim
+                // Tactile Bevel Rim
                 drawCircle(
                     color = Color.Black.copy(alpha = 0.05f * globalAlpha),
                     radius = baseDiscRadius,
                     center = Offset(cx, cy),
                     style = Stroke(width = 1f)
                 )
+                // Debossed Outer Circular Groove
+                drawCircle(
+                    color = Color.Black.copy(alpha = 0.035f * globalAlpha),
+                    radius = baseDiscRadius * 0.88f,
+                    center = Offset(cx, cy),
+                    style = Stroke(width = 1.2f)
+                )
 
-                // ── 4. Outer Sculptural Olive Arc ──────────────────────
-                // Arc covers ~280° from ~-75° (top right) sweeping counter-clockwise to ~+25° (bottom right)
-                val arcRadius = w * 0.325f
-                val arcStrokeWidth = w * 0.092f
+                // ── 4. Bauhaus Architectural "F" Coordinates ───────────
+                // Scaled to 108-unit grid
+                val colLeft = 38f * unit
+                val colRight = 51f * unit
+                val colTop = 35f * unit
+                val colBottom = 73f * unit
+                val colWidth = colRight - colLeft
+                val colHeight = colBottom - colTop
+                val cornerR = 3f * unit
 
-                val startAngle = -75f
-                val sweepAngle = -280f
+                val topBeamLeft = 38f * unit
+                val topBeamRight = 72f * unit
+                val topBeamTop = 35f * unit
+                val topBeamBottom = 45f * unit
 
-                val arcPath = Path().apply {
-                    arcTo(
-                        rect = Rect(
-                            left = cx - arcRadius,
-                            top = cy - arcRadius,
-                            right = cx + arcRadius,
-                            bottom = cy + arcRadius
-                        ),
-                        startAngleDegrees = startAngle,
-                        sweepAngleDegrees = sweepAngle,
-                        forceMoveTo = true
+                val midBeamLeft = 38f * unit
+                val midBeamRight = 64f * unit
+                val midBeamTop = 50f * unit
+                val midBeamBottom = 59f * unit
+
+                val focalCenterX = 61f * unit
+                val focalCenterY = 68f * unit
+                val focalRadius = 2.0f * unit
+
+                // Cast Shadow of Bauhaus "F" onto Disc
+                val shadowOffset = Offset(1.5f * unit, 2.5f * unit)
+                val fullFPath = Path().apply {
+                    addRoundRect(
+                        RoundRect(
+                            rect = Rect(colLeft, colTop, colRight, colBottom),
+                            topLeft = CornerRadius(cornerR, cornerR),
+                            topRight = CornerRadius(0f, 0f),
+                            bottomRight = CornerRadius(cornerR, cornerR),
+                            bottomLeft = CornerRadius(cornerR, cornerR)
+                        )
+                    )
+                    addRoundRect(
+                        RoundRect(
+                            rect = Rect(colLeft, topBeamTop, topBeamRight, topBeamBottom),
+                            topLeft = CornerRadius(cornerR, cornerR),
+                            topRight = CornerRadius(cornerR, cornerR),
+                            bottomRight = CornerRadius(cornerR, cornerR),
+                            bottomLeft = CornerRadius(0f, 0f)
+                        )
+                    )
+                    addRoundRect(
+                        RoundRect(
+                            rect = Rect(colLeft, midBeamTop, midBeamRight, midBeamBottom),
+                            topLeft = CornerRadius(0f, 0f),
+                            topRight = CornerRadius(cornerR, cornerR),
+                            bottomRight = CornerRadius(cornerR, cornerR),
+                            bottomLeft = CornerRadius(0f, 0f)
+                        )
                     )
                 }
 
-                val pathMeasure = PathMeasure()
-                pathMeasure.setPath(arcPath, false)
-                val totalLength = pathMeasure.length
-                val drawLength = totalLength * arcDrawProgress.value
-
-                if (drawLength > 0f) {
-                    val currentSegment = Path()
-                    pathMeasure.getSegment(0f, drawLength, currentSegment, true)
-
-                    // Arc subtle drop shadow onto base disc
+                // Draw Cast Shadow
+                withTransform({
+                    translate(shadowOffset.x, shadowOffset.y)
+                }) {
                     drawPath(
-                        path = currentSegment,
-                        color = Color.Black.copy(alpha = 0.12f * globalAlpha),
-                        style = Stroke(
-                            width = arcStrokeWidth,
-                            cap = StrokeCap.Round,
-                            join = StrokeJoin.Round
-                        )
+                        path = fullFPath,
+                        color = Color.Black.copy(alpha = 0.10f * globalAlpha * columnProgress.value)
                     )
+                }
 
-                    // Main Olive Arc Body
-                    drawPath(
-                        path = currentSegment,
-                        color = glyphColor.copy(alpha = globalAlpha),
-                        style = Stroke(
-                            width = arcStrokeWidth,
-                            cap = StrokeCap.Round,
-                            join = StrokeJoin.Round
+                // ── 5. Vertical Architectural Column (Habit Spine) ─────
+                val currentColHeight = colHeight * columnProgress.value
+                if (currentColHeight > 0f) {
+                    val clipCol = Path().apply {
+                        addRect(
+                            Rect(
+                                left = colLeft - 1f,
+                                top = colBottom - currentColHeight,
+                                right = colRight + 1f,
+                                bottom = colBottom + 1f
+                            )
                         )
-                    )
-
-                    // Luminous leading tip during draw
-                    if (arcTipAlpha.value > 0f && drawLength < totalLength) {
-                        val pos = pathMeasure.getPosition(drawLength)
-                        drawArcTip(
-                            center = pos,
-                            strokeWidth = arcStrokeWidth,
-                            glyphColor = glyphColor,
-                            pearlColor = pearlColor,
-                            alpha = arcTipAlpha.value
+                    }
+                    clipPath(clipCol) {
+                        // Deep foundation bevel layer
+                        drawRoundRect(
+                            color = Color.Black.copy(alpha = 0.18f * globalAlpha),
+                            topLeft = Offset(colLeft, colTop + 0.8f * unit),
+                            size = Size(colWidth, colHeight),
+                            cornerRadius = CornerRadius(cornerR, cornerR)
+                        )
+                        // Column body
+                        drawRoundRect(
+                            color = glyphColor.copy(alpha = globalAlpha),
+                            topLeft = Offset(colLeft, colTop),
+                            size = Size(colWidth, colHeight),
+                            cornerRadius = CornerRadius(cornerR, cornerR)
                         )
                     }
                 }
 
-                // ── 5. Elevated Middle White Disc ──────────────────────
-                val midDiscRadius = w * 0.232f
-                // Middle Disc Drop Shadow
-                drawCircle(
-                    brush = Brush.radialGradient(
-                        colors = listOf(
-                            Color.Black.copy(alpha = 0.13f * globalAlpha),
-                            Color.Black.copy(alpha = 0.04f * globalAlpha),
-                            Color.Transparent
-                        ),
-                        center = Offset(cx + w * 0.015f, cy + h * 0.025f),
-                        radius = midDiscRadius * 1.15f
-                    ),
-                    radius = midDiscRadius * 1.12f,
-                    center = Offset(cx + w * 0.015f, cy + h * 0.025f)
-                )
-                // Middle Disc Body
-                drawCircle(
-                    color = discBaseColor.copy(alpha = globalAlpha),
-                    radius = midDiscRadius,
-                    center = Offset(cx, cy)
-                )
-                // Middle Disc Rim
-                drawCircle(
-                    color = Color.Black.copy(alpha = 0.05f * globalAlpha),
-                    radius = midDiscRadius,
-                    center = Offset(cx, cy),
-                    style = Stroke(width = 1f)
-                )
-
-                // ── 6. Middle Concentric Olive Ring ────────────────────
-                val ringRadius = (w * 0.142f) * middleRingScale.value
-                val ringStrokeWidth = w * 0.054f
-                if (ringRadius > 0f) {
-                    drawCircle(
-                        color = glyphColor.copy(alpha = globalAlpha * middleRingScale.value.coerceIn(0f, 1f)),
-                        radius = ringRadius,
-                        center = Offset(cx, cy),
-                        style = Stroke(width = ringStrokeWidth)
-                    )
+                // ── 6. Top Cantilever Beam ─────────────────────────────
+                val currentTopBeamWidth = (topBeamRight - colLeft) * topBeamProgress.value
+                if (currentTopBeamWidth > 0f) {
+                    val topClip = Path().apply {
+                        addRect(
+                            Rect(
+                                left = colLeft,
+                                top = topBeamTop - 1f,
+                                right = colLeft + currentTopBeamWidth + 1f,
+                                bottom = topBeamBottom + 1f
+                            )
+                        )
+                    }
+                    clipPath(topClip) {
+                        // Top beam foundation shadow
+                        drawRoundRect(
+                            color = Color.Black.copy(alpha = 0.16f * globalAlpha),
+                            topLeft = Offset(colLeft, topBeamTop + 0.8f * unit),
+                            size = Size(topBeamRight - colLeft, topBeamBottom - topBeamTop),
+                            cornerRadius = CornerRadius(cornerR, cornerR)
+                        )
+                        // Top beam body
+                        drawRoundRect(
+                            color = glyphColor.copy(alpha = globalAlpha),
+                            topLeft = Offset(colLeft, topBeamTop),
+                            size = Size(topBeamRight - colLeft, topBeamBottom - topBeamTop),
+                            cornerRadius = CornerRadius(cornerR, cornerR)
+                        )
+                        // Specular glazed edge highlight
+                        if (specularAlpha.value > 0f) {
+                            drawLine(
+                                color = pearlColor.copy(alpha = 0.40f * specularAlpha.value * globalAlpha),
+                                start = Offset(colLeft + 2f * unit, topBeamTop + 1.2f * unit),
+                                end = Offset(topBeamRight - 3f * unit, topBeamTop + 1.2f * unit),
+                                strokeWidth = 1.0f * unit,
+                                cap = StrokeCap.Round
+                            )
+                        }
+                    }
                 }
 
-                // ── 7. Center Solid Olive Core Dot ─────────────────────
-                val centerDotRadius = (w * 0.056f) * centerDotScale.value * centerPebblePulse
-                if (centerDotRadius > 0f) {
+                // ── 7. Middle Cantilever Beam ──────────────────────────
+                val currentMidBeamWidth = (midBeamRight - colLeft) * midBeamProgress.value
+                if (currentMidBeamWidth > 0f) {
+                    val midClip = Path().apply {
+                        addRect(
+                            Rect(
+                                left = colLeft,
+                                top = midBeamTop - 1f,
+                                right = colLeft + currentMidBeamWidth + 1f,
+                                bottom = midBeamBottom + 1f
+                            )
+                        )
+                    }
+                    clipPath(midClip) {
+                        // Mid beam foundation shadow
+                        drawRoundRect(
+                            color = Color.Black.copy(alpha = 0.16f * globalAlpha),
+                            topLeft = Offset(colLeft, midBeamTop + 0.8f * unit),
+                            size = Size(midBeamRight - colLeft, midBeamBottom - midBeamTop),
+                            cornerRadius = CornerRadius(cornerR, cornerR)
+                        )
+                        // Mid beam body
+                        drawRoundRect(
+                            color = glyphColor.copy(alpha = globalAlpha),
+                            topLeft = Offset(colLeft, midBeamTop),
+                            size = Size(midBeamRight - colLeft, midBeamBottom - midBeamTop),
+                            cornerRadius = CornerRadius(cornerR, cornerR)
+                        )
+                    }
+                }
+
+                // ── 8. Golden Ratio Focal Balance Pebble ───────────────
+                val currentFocalR = focalRadius * focalDotScale.value * focalDotPulse
+                if (currentFocalR > 0f) {
+                    // Pebble shadow
                     drawCircle(
-                        color = glyphColor.copy(alpha = globalAlpha * centerDotScale.value.coerceIn(0f, 1f)),
-                        radius = centerDotRadius,
-                        center = Offset(cx, cy)
+                        color = Color.Black.copy(alpha = 0.20f * globalAlpha),
+                        radius = currentFocalR * 1.15f,
+                        center = Offset(focalCenterX + 0.4f * unit, focalCenterY + 0.6f * unit)
+                    )
+                    // Pebble body
+                    drawCircle(
+                        color = glyphColor.copy(alpha = globalAlpha),
+                        radius = currentFocalR,
+                        center = Offset(focalCenterX, focalCenterY)
+                    )
+                    // Pebble jewel specular highlight
+                    drawCircle(
+                        color = pearlColor.copy(alpha = 0.65f * globalAlpha),
+                        radius = currentFocalR * 0.38f,
+                        center = Offset(focalCenterX - currentFocalR * 0.28f, focalCenterY - currentFocalR * 0.28f)
                     )
                 }
             }
         }
     }
-}
-
-/** Draws the mindful luminous tip leading the arc stroke. */
-private fun DrawScope.drawArcTip(
-    center: Offset,
-    strokeWidth: Float,
-    glyphColor: Color,
-    pearlColor: Color,
-    alpha: Float
-) {
-    val r = strokeWidth * 0.55f
-    // Outer halo
-    drawCircle(
-        brush = Brush.radialGradient(
-            colors = listOf(
-                glyphColor.copy(alpha = alpha * 0.5f),
-                Color.Transparent
-            ),
-            center = center,
-            radius = r * 2.6f
-        ),
-        radius = r * 2.6f,
-        center = center
-    )
-    // Inner core
-    drawCircle(
-        color = pearlColor.copy(alpha = alpha),
-        radius = r * 0.75f,
-        center = center
-    )
-    // Ring definition
-    drawCircle(
-        color = glyphColor.copy(alpha = alpha),
-        radius = r * 0.75f,
-        center = center,
-        style = Stroke(width = strokeWidth * 0.12f)
-    )
 }

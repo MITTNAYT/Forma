@@ -171,7 +171,9 @@ fun HabitsScreen(
                         modifier = Modifier.weight(1f),
                         textStyle = FormaTheme.typography.bodyMedium.copy(
                             color = colors.textPrimary,
-                            fontSize = 14.sp
+                            fontSize = 14.sp,
+                            platformStyle = androidx.compose.ui.text.PlatformTextStyle(includeFontPadding = false),
+                            lineHeight = 20.sp
                         ),
                         singleLine = true,
                         cursorBrush = androidx.compose.ui.graphics.SolidColor(colors.accent),
@@ -183,15 +185,20 @@ fun HabitsScreen(
                             onSearch = { focusManager.clearFocus() }
                         ),
                         decorationBox = { innerTextField ->
-                            if (uiState.searchQuery.isEmpty()) {
-                                Text(
-                                    text = "Search habits, intentions, or tags...",
-                                    style = FormaTheme.typography.bodyMedium,
-                                    color = colors.textTertiary,
-                                    fontSize = 13.5.sp
-                                )
+                            Box(contentAlignment = Alignment.CenterStart) {
+                                if (uiState.searchQuery.isEmpty()) {
+                                    Text(
+                                        text = "Search habits, intentions, or tags...",
+                                        style = FormaTheme.typography.bodyMedium.copy(
+                                            platformStyle = androidx.compose.ui.text.PlatformTextStyle(includeFontPadding = false),
+                                            lineHeight = 20.sp
+                                        ),
+                                        color = colors.textTertiary,
+                                        fontSize = 14.sp
+                                    )
+                                }
+                                innerTextField()
                             }
-                            innerTextField()
                         }
                     )
                     if (uiState.searchQuery.isNotEmpty()) {

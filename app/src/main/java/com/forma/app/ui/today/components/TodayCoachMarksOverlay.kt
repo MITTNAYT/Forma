@@ -391,7 +391,7 @@ fun TodayCoachMarksOverlay(
 
                         // Next / Start action button
                         FormaButton(
-                            text = if (stepIndex == totalSteps - 1) "Enter Sanctuary ✨" else "Got it →",
+                            text = if (stepIndex == totalSteps - 1) "Enter Sanctuary" else "Got it →",
                             style = FormaButtonStyle.PRIMARY,
                             onClick = {
                                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)

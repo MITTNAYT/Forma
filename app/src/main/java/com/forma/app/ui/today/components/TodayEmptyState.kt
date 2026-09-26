@@ -1,9 +1,13 @@
 package com.forma.app.ui.today.components
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -116,15 +120,28 @@ fun TodayFilterChip(
 
     val bg by animateColorAsState(
         targetValue = if (isSelected) colors.accent else colors.surfaceVariant,
+        animationSpec = tween(durationMillis = 180),
         label = "chip_bg"
     )
     val textColor by animateColorAsState(
         targetValue = if (isSelected) colors.onAccent else colors.textPrimary,
+        animationSpec = tween(durationMillis = 180),
         label = "chip_text"
     )
     val borderColor by animateColorAsState(
-        targetValue = if (isSelected) colors.accent else colors.border.copy(alpha = 0.45f),
+        targetValue = if (isSelected) colors.accent else colors.border.copy(alpha = 0.40f),
+        animationSpec = tween(durationMillis = 180),
         label = "chip_border"
+    )
+    val badgeBg by animateColorAsState(
+        targetValue = if (isSelected) colors.onAccent.copy(alpha = 0.22f) else colors.accentSoft,
+        animationSpec = tween(durationMillis = 180),
+        label = "badge_bg"
+    )
+    val badgeTextColor by animateColorAsState(
+        targetValue = if (isSelected) colors.onAccent else colors.accent,
+        animationSpec = tween(durationMillis = 180),
+        label = "badge_text"
     )
 
     Box(
@@ -132,38 +149,54 @@ fun TodayFilterChip(
             .clip(RoundedCornerShape(12.dp))
             .background(bg)
             .border(1.dp, borderColor, RoundedCornerShape(12.dp))
-            .formaPressEffect(targetScale = 0.93f) {
+            .formaPressEffect(targetScale = 0.94f) {
                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 onClick()
             }
-            .padding(horizontal = 14.dp, vertical = 7.dp),
+            .padding(horizontal = 13.dp, vertical = 7.dp),
         contentAlignment = Alignment.Center
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
             Text(
                 text = text,
-                style = FormaTheme.typography.labelSmall,
-                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                style = FormaTheme.typography.labelSmall.copy(
+                    platformStyle = PlatformTextStyle(includeFontPadding = false),
+                    lineHeight = 14.sp
+                ),
+                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
                 color = textColor,
-                fontSize = 12.sp
+                fontSize = 12.5.sp
             )
             if (badgeCount != null && badgeCount > 0) {
-                Spacer(modifier = Modifier.width(5.dp))
+                Spacer(modifier = Modifier.width(6.dp))
                 Box(
                     modifier = Modifier
-                        .size(16.dp)
-                        .clip(CircleShape)
-                        .background(if (isSelected) colors.onAccent.copy(alpha = 0.25f) else colors.accentSoft),
+                        .height(18.dp)
+                        .defaultMinSize(minWidth = 18.dp)
+                        .clip(RoundedCornerShape(9.dp))
+                        .background(badgeBg)
+                        .padding(horizontal = 5.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = badgeCount.toString(),
-                        fontWeight = FontWeight.Bold,
-                        color = if (isSelected) colors.onAccent else colors.accent,
-                        fontSize = 9.sp
+                        style = TextStyle(
+                            fontFamily = FormaTheme.typography.labelSmall.fontFamily,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFeatureSettings = "tnum",
+                            platformStyle = PlatformTextStyle(includeFontPadding = false),
+                            lineHeight = 10.sp,
+                            textAlign = TextAlign.Center
+                        ),
+                        color = badgeTextColor
                     )
                 }
             }
         }
     }
 }
+

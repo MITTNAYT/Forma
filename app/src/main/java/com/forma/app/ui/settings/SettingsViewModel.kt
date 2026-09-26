@@ -316,6 +316,10 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun launchBillingFlow(activity: android.app.Activity, tier: com.forma.app.domain.model.SubscriptionTier): Result<Boolean> {
+        return billingRepository.launchBillingFlow(activity, tier)
+    }
+
     fun toggleProStatus(isPro: Boolean) {
         viewModelScope.launch {
             billingRepository.setProStatus(isPro)

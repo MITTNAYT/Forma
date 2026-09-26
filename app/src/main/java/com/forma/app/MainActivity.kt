@@ -24,6 +24,11 @@ class MainActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            splashScreen.setOnExitAnimationListener { splashScreenView ->
+                splashScreenView.remove()
+            }
+        }
         enableEdgeToEdge()
 
         setContent {

@@ -31,7 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-medium"
-            android:text="🔥 7d streak"
+            android:text="7d streak"
             android:textColor="@color/notion_text_primary_light"
             android:textSize="11sp" />
     </LinearLayout>

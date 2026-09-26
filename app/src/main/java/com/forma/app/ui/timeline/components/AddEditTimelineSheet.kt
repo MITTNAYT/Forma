@@ -23,9 +23,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AcUnit
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.AddCircleOutline
 import androidx.compose.material.icons.rounded.Bolt
 import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.Check
@@ -54,6 +58,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TimeInput
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -291,64 +296,78 @@ fun AddEditTimelineSheet(
 
                     Spacer(modifier = Modifier.width(12.dp))
 
-                    // Title Input
-                    TextField(
-                        value = uiState.title,
-                        onValueChange = { viewModel.setTitle(it) },
-                        placeholder = {
-                            Text(
-                                text = if (uiState.creationType == CreationType.HABIT) "Name your daily habit..." else "What is the intention?",
-                                style = FormaTheme.typography.titleMedium,
-                                color = colors.textTertiary,
-                                fontSize = 15.sp
-                            )
-                        },
-                        trailingIcon = {
-                            AnimatedVisibility(
-                                visible = uiState.title.isNotBlank(),
-                                enter = fadeIn(),
-                                exit = fadeOut()
-                            ) {
-                                IconButton(
-                                    onClick = {
-                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                        viewModel.setTitle("")
-                                    },
-                                    modifier = Modifier.size(28.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Close,
-                                        contentDescription = "Clear text",
-                                        tint = colors.textTertiary,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                }
-                            }
-                        },
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(
-                            capitalization = KeyboardCapitalization.Sentences,
-                            autoCorrectEnabled = true,
-                            keyboardType = KeyboardType.Text,
-                            imeAction = ImeAction.Next
-                        ),
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            focusedTextColor = colors.textPrimary,
-                            unfocusedTextColor = colors.textPrimary,
-                            cursorColor = parsedColor
-                        ),
-                        textStyle = FormaTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp
-                        ),
+                    // Title Input with perfectly aligned cursor and font metrics
+                    Row(
                         modifier = Modifier
                             .weight(1f)
-                            .onFocusChanged { isTitleFocused = it.isFocused }
-                    )
+                            .height(48.dp)
+                            .padding(horizontal = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        BasicTextField(
+                            value = uiState.title,
+                            onValueChange = { viewModel.setTitle(it) },
+                            singleLine = true,
+                            cursorBrush = SolidColor(parsedColor),
+                            keyboardOptions = KeyboardOptions(
+                                capitalization = KeyboardCapitalization.Sentences,
+                                autoCorrectEnabled = true,
+                                keyboardType = KeyboardType.Text,
+                                imeAction = ImeAction.Next
+                            ),
+                            textStyle = FormaTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp,
+                                platformStyle = PlatformTextStyle(includeFontPadding = false),
+                                color = colors.textPrimary,
+                                lineHeight = 20.sp
+                            ),
+                            modifier = Modifier
+                                .weight(1f)
+                                .onFocusChanged { isTitleFocused = it.isFocused },
+                            decorationBox = { innerTextField ->
+                                Box(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentAlignment = Alignment.CenterStart
+                                ) {
+                                    if (uiState.title.isEmpty()) {
+                                        Text(
+                                            text = if (uiState.creationType == CreationType.HABIT) "Name your daily habit..." else "What is the intention?",
+                                            style = FormaTheme.typography.titleMedium.copy(
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 16.sp,
+                                                platformStyle = PlatformTextStyle(includeFontPadding = false),
+                                                lineHeight = 20.sp
+                                            ),
+                                            color = colors.textTertiary
+                                        )
+                                    }
+                                    innerTextField()
+                                }
+                            }
+                        )
+
+                        AnimatedVisibility(
+                            visible = uiState.title.isNotBlank(),
+                            enter = fadeIn(),
+                            exit = fadeOut()
+                        ) {
+                            IconButton(
+                                onClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    viewModel.setTitle("")
+                                },
+                                modifier = Modifier.size(28.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Close,
+                                    contentDescription = "Clear text",
+                                    tint = colors.textTertiary,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                        }
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(14.dp))
@@ -358,7 +377,7 @@ fun AddEditTimelineSheet(
                     text = "COLOR ACCENT",
                     style = FormaTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
-                    color = colors.textTertiary,
+                    color = colors.accent,
                     letterSpacing = 1.sp,
                     fontSize = 10.sp
                 )
@@ -456,7 +475,7 @@ fun AddEditTimelineSheet(
                         text = "TIME OF DAY",
                         style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
-                        color = colors.textTertiary,
+                        color = colors.accent,
                         letterSpacing = 1.2.sp,
                         fontSize = 10.5.sp
                     )
@@ -519,7 +538,7 @@ fun AddEditTimelineSheet(
                         text = "ENERGY PROFILE",
                         style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
-                        color = colors.textTertiary,
+                        color = colors.accent,
                         letterSpacing = 1.2.sp,
                         fontSize = 10.5.sp
                     )
@@ -597,7 +616,7 @@ fun AddEditTimelineSheet(
                             text = "REPEAT DAYS",
                             style = FormaTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
-                            color = colors.textTertiary,
+                            color = colors.accent,
                             letterSpacing = 1.2.sp,
                             fontSize = 10.5.sp
                         )
@@ -696,7 +715,7 @@ fun AddEditTimelineSheet(
                             text = "HABIT STACKING CUE (OPTIONAL)",
                             style = FormaTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
-                            color = colors.textTertiary,
+                            color = colors.accent,
                             letterSpacing = 1.2.sp,
                             fontSize = 10.5.sp
                         )
@@ -710,8 +729,11 @@ fun AddEditTimelineSheet(
                         placeholder = {
                             Text(
                                 text = "e.g. After I brew morning coffee, I will...",
-                                color = colors.textTertiary,
-                                fontSize = 13.sp
+                                style = FormaTheme.typography.bodyMedium.copy(
+                                    fontSize = 13.sp,
+                                    platformStyle = PlatformTextStyle(includeFontPadding = false)
+                                ),
+                                color = colors.textTertiary
                             )
                         },
                         singleLine = true,
@@ -722,9 +744,13 @@ fun AddEditTimelineSheet(
                             focusedContainerColor = colors.surfaceVariant.copy(alpha = 0.3f),
                             unfocusedContainerColor = colors.surfaceVariant.copy(alpha = 0.3f),
                             focusedTextColor = colors.textPrimary,
-                            unfocusedTextColor = colors.textPrimary
+                            unfocusedTextColor = colors.textPrimary,
+                            cursorColor = parsedColor
                         ),
-                        textStyle = FormaTheme.typography.bodyMedium.copy(fontSize = 13.5.sp),
+                        textStyle = FormaTheme.typography.bodyMedium.copy(
+                            fontSize = 13.5.sp,
+                            platformStyle = PlatformTextStyle(includeFontPadding = false)
+                        ),
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -825,8 +851,12 @@ fun AddEditTimelineSheet(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(22.dp))
-                    .background(colors.surface)
-                    .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(22.dp))
+                    .background(if (uiState.isWintering) colors.accentSoft.copy(alpha = 0.5f) else colors.surface)
+                    .border(
+                        width = 1.dp,
+                        color = if (uiState.isWintering) colors.accent.copy(alpha = 0.45f) else colors.border.copy(alpha = 0.6f),
+                        shape = RoundedCornerShape(22.dp)
+                    )
                     .padding(16.dp)
             ) {
                 Row(
@@ -840,37 +870,62 @@ fun AddEditTimelineSheet(
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(36.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(Color(0xFFE0F7FA)),
+                                .size(38.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(if (uiState.isWintering) colors.accent else colors.accentSoft),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Rounded.AcUnit,
                                 contentDescription = null,
-                                tint = Color(0xFF00838F),
-                                modifier = Modifier.size(18.dp)
+                                tint = if (uiState.isWintering) colors.onAccent else colors.accent,
+                                modifier = Modifier.size(19.dp)
                             )
                         }
 
                         Spacer(modifier = Modifier.width(12.dp))
 
                         Column {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = "Wintering Mode",
+                                    style = FormaTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (uiState.isWintering) colors.accent else colors.textPrimary,
+                                    fontSize = 14.5.sp
+                                )
+                                if (uiState.isWintering) {
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(6.dp))
+                                            .background(colors.accent)
+                                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                                    ) {
+                                        Text(
+                                            text = "FROZEN",
+                                            fontWeight = FontWeight.Bold,
+                                            color = colors.onAccent,
+                                            fontSize = 9.sp,
+                                            letterSpacing = 0.5.sp
+                                        )
+                                    }
+                                }
+                            }
                             Text(
-                                text = "Wintering Mode",
-                                style = FormaTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = colors.textPrimary,
-                                fontSize = 14.5.sp
-                            )
-                            Text(
-                                text = "Mindfully freeze streaks during recovery or illness",
+                                text = if (uiState.isWintering)
+                                    "Streak is mindfully frozen & protected from breaking"
+                                else
+                                    "Mindfully freeze streaks during recovery, travel, or illness",
                                 style = FormaTheme.typography.bodySmall,
                                 color = colors.textSecondary,
-                                fontSize = 12.sp
+                                fontSize = 12.sp,
+                                lineHeight = 16.sp
                             )
                         }
                     }
+
+                    Spacer(modifier = Modifier.width(8.dp))
 
                     Switch(
                         checked = uiState.isWintering,
@@ -879,8 +934,10 @@ fun AddEditTimelineSheet(
                             viewModel.setIsWintering(it)
                         },
                         colors = SwitchDefaults.colors(
-                            checkedThumbColor = Color.White,
-                            checkedTrackColor = Color(0xFF00838F)
+                            checkedThumbColor = colors.onAccent,
+                            checkedTrackColor = colors.accent,
+                            uncheckedThumbColor = colors.textTertiary,
+                            uncheckedTrackColor = colors.surfaceVariant
                         )
                     )
                 }
@@ -980,7 +1037,7 @@ fun AddEditTimelineSheet(
                             text = "SCHEDULE DATE",
                             style = FormaTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
-                            color = colors.textTertiary,
+                            color = colors.accent,
                             letterSpacing = 1.2.sp,
                             fontSize = 10.5.sp
                         )
@@ -1115,22 +1172,42 @@ fun AddEditTimelineSheet(
                         text = if (uiState.creationType == CreationType.HABIT) "HABIT MICRO-STEPS & CHECKLIST" else "MILESTONES & SUBTASKS",
                         style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
-                        color = colors.textTertiary,
+                        color = colors.accent,
                         letterSpacing = 1.2.sp,
                         fontSize = 10.5.sp
                     )
 
-                    Text(
-                        text = if (uiState.creationType == CreationType.HABIT) "+ Add Micro-Step" else "+ Add Step",
-                        style = FormaTheme.typography.labelSmall,
-                        color = parsedColor,
-                        fontWeight = FontWeight.Bold,
+                    // Clear, visible, high-contrast Add Micro-Step Pill
+                    Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .clickable { showAddSubtaskField = true }
-                            .padding(horizontal = 6.dp, vertical = 2.dp),
-                        fontSize = 11.sp
-                    )
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(parsedColor.copy(alpha = 0.14f))
+                            .border(1.dp, parsedColor.copy(alpha = 0.40f), RoundedCornerShape(10.dp))
+                            .formaPressEffect(targetScale = 0.92f) {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                showAddSubtaskField = true
+                            }
+                            .padding(horizontal = 10.dp, vertical = 5.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Rounded.Add,
+                                contentDescription = null,
+                                tint = parsedColor,
+                                modifier = Modifier.size(13.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = if (uiState.creationType == CreationType.HABIT) "Add Micro-Step" else "Add Step",
+                                style = FormaTheme.typography.labelSmall.copy(
+                                    platformStyle = PlatformTextStyle(includeFontPadding = false)
+                                ),
+                                color = parsedColor,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 11.sp
+                            )
+                        }
+                    }
                 }
 
                 if (uiState.subtasks.isNotEmpty()) {
@@ -1174,6 +1251,41 @@ fun AddEditTimelineSheet(
                             }
                         }
                     }
+                } else if (!showAddSubtaskField) {
+                    // Prominent Empty-State Callout Button
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(parsedColor.copy(alpha = 0.08f))
+                            .border(1.dp, parsedColor.copy(alpha = 0.30f), RoundedCornerShape(14.dp))
+                            .formaPressEffect(targetScale = 0.96f) {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                showAddSubtaskField = true
+                            }
+                            .padding(vertical = 12.dp, horizontal = 14.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Rounded.AddCircleOutline,
+                                contentDescription = null,
+                                tint = parsedColor,
+                                modifier = Modifier.size(17.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = if (uiState.creationType == CreationType.HABIT) "+ Add First Micro-Step..." else "+ Add First Step...",
+                                style = FormaTheme.typography.bodyMedium.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    platformStyle = PlatformTextStyle(includeFontPadding = false)
+                                ),
+                                color = parsedColor,
+                                fontSize = 13.sp
+                            )
+                        }
+                    }
                 }
 
                 if (showAddSubtaskField) {
@@ -1188,16 +1300,26 @@ fun AddEditTimelineSheet(
                             placeholder = {
                                 Text(
                                     if (uiState.creationType == CreationType.HABIT) "Enter micro-step (e.g. Fill water bottle)..." else "Enter milestone step...",
-                                    fontSize = 12.sp,
+                                    style = FormaTheme.typography.bodyMedium.copy(
+                                        fontSize = 12.sp,
+                                        platformStyle = PlatformTextStyle(includeFontPadding = false)
+                                    ),
                                     color = colors.textTertiary
                                 )
                             },
                             singleLine = true,
                             shape = RoundedCornerShape(12.dp),
                             modifier = Modifier.weight(1f),
+                            textStyle = FormaTheme.typography.bodyMedium.copy(
+                                fontSize = 13.sp,
+                                platformStyle = PlatformTextStyle(includeFontPadding = false)
+                            ),
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = parsedColor,
-                                unfocusedBorderColor = colors.border.copy(alpha = 0.6f)
+                                unfocusedBorderColor = colors.border.copy(alpha = 0.6f),
+                                focusedTextColor = colors.textPrimary,
+                                unfocusedTextColor = colors.textPrimary,
+                                cursorColor = parsedColor
                             )
                         )
                         Spacer(modifier = Modifier.width(6.dp))
@@ -1233,7 +1355,7 @@ fun AddEditTimelineSheet(
                     text = "NOTES & REFLECTIONS (OPTIONAL)",
                     style = FormaTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
-                    color = colors.textTertiary,
+                    color = colors.accent,
                     letterSpacing = 1.2.sp,
                     fontSize = 10.5.sp
                 )
@@ -1241,7 +1363,16 @@ fun AddEditTimelineSheet(
                 OutlinedTextField(
                     value = uiState.notes,
                     onValueChange = { viewModel.setNotes(it) },
-                    placeholder = { Text("Add any intentions, reminders, or mindful notes...", color = colors.textTertiary, fontSize = 13.sp) },
+                    placeholder = {
+                        Text(
+                            text = "Add any intentions, reminders, or mindful notes...",
+                            style = FormaTheme.typography.bodyMedium.copy(
+                                fontSize = 13.sp,
+                                platformStyle = PlatformTextStyle(includeFontPadding = false)
+                            ),
+                            color = colors.textTertiary
+                        )
+                    },
                     minLines = 2,
                     maxLines = 4,
                     shape = RoundedCornerShape(14.dp),
@@ -1251,9 +1382,13 @@ fun AddEditTimelineSheet(
                         focusedContainerColor = colors.surfaceVariant.copy(alpha = 0.3f),
                         unfocusedContainerColor = colors.surfaceVariant.copy(alpha = 0.3f),
                         focusedTextColor = colors.textPrimary,
-                        unfocusedTextColor = colors.textPrimary
+                        unfocusedTextColor = colors.textPrimary,
+                        cursorColor = parsedColor
                     ),
-                    textStyle = FormaTheme.typography.bodyMedium.copy(fontSize = 13.sp),
+                    textStyle = FormaTheme.typography.bodyMedium.copy(
+                        fontSize = 13.sp,
+                        platformStyle = PlatformTextStyle(includeFontPadding = false)
+                    ),
                     modifier = Modifier.fillMaxWidth()
                 )
             }

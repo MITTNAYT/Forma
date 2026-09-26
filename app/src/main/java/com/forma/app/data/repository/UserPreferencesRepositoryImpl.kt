@@ -191,5 +191,26 @@ class UserPreferencesRepositoryImpl @Inject constructor(
             preferences[PreferencesKeys.HAS_CONSENTED_DATA_COOKIES] = consented
         }
     }
+
+    override fun getSkippedHabitIds(date: String): Flow<Set<String>> = context.dataStore.data.map { preferences ->
+        val key = androidx.datastore.preferences.core.stringSetPreferencesKey("skipped_habits_$date")
+        preferences[key] ?: emptySet()
+    }
+
+    override suspend fun skipHabit(date: String, habitId: String) {
+        val key = androidx.datastore.preferences.core.stringSetPreferencesKey("skipped_habits_$date")
+        context.dataStore.edit { preferences ->
+            val current = preferences[key] ?: emptySet()
+            preferences[key] = current + habitId
+        }
+    }
+
+    override suspend fun unskipHabit(date: String, habitId: String) {
+        val key = androidx.datastore.preferences.core.stringSetPreferencesKey("skipped_habits_$date")
+        context.dataStore.edit { preferences ->
+            val current = preferences[key] ?: emptySet()
+            preferences[key] = current - habitId
+        }
+    }
 }
 

@@ -91,6 +91,7 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun signInWithEmail(email: String, password: String): Result<AuthUser> {
         val trimmedEmail = email.trim()
+        var lastError: Exception? = null
 
         // 1. Try Firebase Auth
         val auth = firebaseAuth
@@ -108,21 +109,18 @@ class AuthRepositoryImpl @Inject constructor(
                     )
                     return Result.success(authUser)
                 }
-            } catch (_: Exception) { }
+            } catch (e: Exception) {
+                lastError = e
+            }
         }
 
         // 2. Try Clerk Client
         val clerkResult = clerkClient.signInWithEmail(trimmedEmail, password)
         if (clerkResult.isSuccess) return clerkResult
 
-        // 3. Resilient Sanctuary Profile Fallback (Never strand user with security validation failures)
-        val fallbackUser = AuthUser(
-            uid = "forma_usr_${trimmedEmail.hashCode()}",
-            email = trimmedEmail,
-            displayName = trimmedEmail.substringBefore("@").replaceFirstChar { it.uppercase() },
-            isAnonymous = false
-        )
-        return Result.success(fallbackUser)
+        // 3. Return the actual error so the user sees actionable feedback
+        val errorMessage = friendlyAuthError(lastError ?: clerkResult.exceptionOrNull())
+        return Result.failure(Exception(errorMessage))
     }
 
     override suspend fun signUpWithEmail(
@@ -132,6 +130,7 @@ class AuthRepositoryImpl @Inject constructor(
     ): Result<AuthUser> {
         val trimmedEmail = email.trim()
         val finalName = displayName?.trim()?.ifBlank { null } ?: trimmedEmail.substringBefore("@").replaceFirstChar { it.uppercase() }
+        var lastError: Exception? = null
 
         // 1. Try Firebase Auth
         val auth = firebaseAuth
@@ -156,21 +155,18 @@ class AuthRepositoryImpl @Inject constructor(
                     )
                     return Result.success(authUser)
                 }
-            } catch (_: Exception) { }
+            } catch (e: Exception) {
+                lastError = e
+            }
         }
 
         // 2. Try Clerk Client
         val clerkResult = clerkClient.signUpWithEmail(trimmedEmail, password, finalName)
         if (clerkResult.isSuccess) return clerkResult
 
-        // 3. Resilient Sanctuary Profile Fallback
-        val fallbackUser = AuthUser(
-            uid = "forma_usr_${trimmedEmail.hashCode()}",
-            email = trimmedEmail,
-            displayName = finalName,
-            isAnonymous = false
-        )
-        return Result.success(fallbackUser)
+        // 3. Return the actual error so the user sees actionable feedback
+        val errorMessage = friendlyAuthError(lastError ?: clerkResult.exceptionOrNull())
+        return Result.failure(Exception(errorMessage))
     }
 
     override suspend fun sendPasswordReset(email: String): Result<Unit> {
@@ -192,5 +188,27 @@ class AuthRepositoryImpl @Inject constructor(
             firebaseAuth?.signOut()
         } catch (_: Exception) { }
         return Result.success(Unit)
+    }
+
+    /** Map Firebase/Clerk exceptions to user-friendly messages. */
+    private fun friendlyAuthError(e: Throwable?): String {
+        val msg = e?.message?.lowercase() ?: return "Authentication failed. Check your connection and try again."
+        return when {
+            "no user record" in msg || "user-not-found" in msg ->
+                "No account found with this email. Try creating a new one."
+            "password is invalid" in msg || "wrong-password" in msg ->
+                "Incorrect password. Please try again or reset it."
+            "email address is badly formatted" in msg || "invalid-email" in msg ->
+                "Please enter a valid email address."
+            "email address is already in use" in msg || "email-already-in-use" in msg ->
+                "An account with this email already exists. Try signing in."
+            "password should be at least" in msg || "weak-password" in msg ->
+                "Password is too weak. Use at least 6 characters."
+            "network" in msg || "timeout" in msg ->
+                "Network error. Please check your connection."
+            "too-many-requests" in msg || "unusual activity" in msg ->
+                "Too many attempts. Please wait a moment and try again."
+            else -> e.localizedMessage ?: "Authentication failed. Please try again."
+        }
     }
 }

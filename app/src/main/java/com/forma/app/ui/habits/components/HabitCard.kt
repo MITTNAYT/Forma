@@ -1,6 +1,8 @@
 package com.forma.app.ui.habits.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,8 +48,24 @@ fun HabitCard(
     val colors = FormaTheme.colors
     val dayNames = listOf("M", "T", "W", "T", "F", "S", "S")
 
+    val habitAccent = androidx.compose.runtime.remember(habit.colorTag) {
+        try {
+            if (!habit.colorTag.isNullOrBlank()) {
+                Color(android.graphics.Color.parseColor(habit.colorTag))
+            } else null
+        } catch (_: Exception) {
+            null
+        }
+    } ?: colors.accent
+
     FormaCard(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .then(
+                if (!habit.colorTag.isNullOrBlank()) {
+                    Modifier.border(1.dp, habitAccent.copy(alpha = 0.30f), FormaTheme.shapes.small)
+                } else Modifier
+            ),
         shape = FormaTheme.shapes.small,
         onClick = onEdit
     ) {
@@ -65,13 +83,21 @@ fun HabitCard(
                         modifier = Modifier
                             .size(38.dp)
                             .clip(FormaTheme.shapes.extraSmall)
-                            .background(if (habit.isWintering) Color(0xFFE3EBE7) else colors.surfaceVariant),
+                            .background(
+                                if (habit.isWintering) colors.accentSoft 
+                                else habitAccent.copy(alpha = 0.14f)
+                            )
+                            .border(
+                                1.dp,
+                                habitAccent.copy(alpha = 0.30f),
+                                FormaTheme.shapes.extraSmall
+                            ),
                         contentAlignment = Alignment.Center
                     ) {
                         com.forma.app.core.designsystem.icon.FormaIcon(
                             iconKey = habit.icon,
                             contentDescription = habit.name,
-                            tint = if (habit.isWintering) Color(0xFF6B8780) else colors.textPrimary,
+                            tint = if (habit.isWintering) colors.accent else habitAccent,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -92,22 +118,26 @@ fun HabitCard(
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Box(
                                     modifier = Modifier
-                                        .clip(FormaTheme.shapes.extraSmall)
-                                        .background(Color(0xFFE1EAE6))
+                                        .clip(RoundedCornerShape(6.dp))
+                                        .background(colors.accentSoft)
+                                        .border(1.dp, colors.accent.copy(alpha = 0.25f), RoundedCornerShape(6.dp))
                                         .padding(horizontal = 6.dp, vertical = 2.dp)
                                 ) {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Icon(
                                             imageVector = Icons.Rounded.AcUnit,
                                             contentDescription = null,
-                                            tint = Color(0xFF4A7268),
+                                            tint = colors.accent,
                                             modifier = Modifier.size(10.dp)
                                         )
                                         Spacer(modifier = Modifier.width(3.dp))
                                         Text(
                                             text = "Wintering",
-                                            style = FormaTheme.typography.labelSmall,
-                                            color = Color(0xFF4A7268),
+                                            style = FormaTheme.typography.labelSmall.copy(
+                                                platformStyle = androidx.compose.ui.text.PlatformTextStyle(includeFontPadding = false),
+                                                fontFeatureSettings = "tnum"
+                                            ),
+                                            color = colors.accent,
                                             fontSize = 9.5.sp,
                                             fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
                                         )
@@ -144,7 +174,7 @@ fun HabitCard(
                                 Text(
                                     text = " • ${habit.subtasks.size} steps",
                                     style = FormaTheme.typography.labelSmall,
-                                    color = colors.accent,
+                                    color = habitAccent,
                                     fontSize = 11.sp
                                 )
                             }
@@ -169,7 +199,7 @@ fun HabitCard(
                         Icon(
                             imageVector = Icons.Rounded.AcUnit,
                             contentDescription = if (habit.isWintering) "Resume Habit" else "Freeze / Wintering Mode",
-                            tint = if (habit.isWintering) Color(0xFF4A7268) else colors.textTertiary.copy(alpha = 0.6f),
+                            tint = if (habit.isWintering) colors.accent else colors.textTertiary.copy(alpha = 0.6f),
                             modifier = Modifier.size(16.dp)
                         )
                     }
@@ -206,13 +236,19 @@ fun HabitCard(
                             modifier = Modifier
                                 .size(20.dp)
                                 .clip(FormaTheme.shapes.extraSmall)
-                                .background(if (isScheduled) colors.textPrimary else colors.surfaceVariant),
+                                .background(
+                                    if (isScheduled) {
+                                        if (!habit.colorTag.isNullOrBlank()) habitAccent else colors.textPrimary
+                                    } else colors.surfaceVariant
+                                ),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = dayNames[i - 1],
                                 style = FormaTheme.typography.labelSmall,
-                                color = if (isScheduled) colors.surface else colors.textTertiary,
+                                color = if (isScheduled) {
+                                    if (!habit.colorTag.isNullOrBlank()) colors.onAccent else colors.surface
+                                } else colors.textTertiary,
                                 fontSize = 9.sp
                             )
                         }

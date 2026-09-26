@@ -1,4 +1,4 @@
-﻿package com.forma.app.ui.today.components
+package com.forma.app.ui.today.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -89,7 +89,7 @@ fun BehanceHeroBanner(
                         text = "DAILY FLOW VELOCITY",
                         style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
-                        color = colors.textTertiary,
+                        color = colors.accent,
                         letterSpacing = 1.2.sp,
                         fontSize = 10.sp
                     )

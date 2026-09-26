@@ -131,6 +131,23 @@ class TodayViewModel @Inject constructor(
         }
     }
 
+    fun skipHabit(habitId: String, habitName: String = "Habit") {
+        viewModelScope.launch {
+            zenFeedback.onTaskToggled()
+            val dateIso = DateUtils.formatDateIso(_selectedDate.value)
+            preferencesRepository.skipHabit(dateIso, habitId)
+            _eventFlow.emit(TodayUiEvent.ShowToast("$habitName skipped today. Streak preserved."))
+        }
+    }
+
+    fun unskipHabit(habitId: String) {
+        viewModelScope.launch {
+            zenFeedback.onTaskToggled()
+            val dateIso = DateUtils.formatDateIso(_selectedDate.value)
+            preferencesRepository.unskipHabit(dateIso, habitId)
+        }
+    }
+
     fun addHabit(habit: Habit) {
         viewModelScope.launch {
             habitRepository.insertHabit(habit)

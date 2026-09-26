@@ -146,7 +146,7 @@ fun FormaBottomBar(
 
                     Box(
                         modifier = Modifier
-                            .size(46.dp)
+                            .size(width = 54.dp, height = 48.dp)
                             .clip(RoundedCornerShape(16.dp))
                             .background(pillBg)
                             .formaPressEffect(targetScale = 0.92f) {
@@ -172,38 +172,34 @@ fun FormaBottomBar(
                             },
                         contentAlignment = Alignment.Center
                     ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            screen.icon?.let { icon ->
-                                Icon(
-                                    imageVector = icon,
-                                    contentDescription = screen.title,
-                                    tint = contentColor,
-                                    modifier = Modifier
-                                        .size(if (isAddButton) 27.dp else 22.dp)
-                                        .graphicsLayer {
-                                            scaleX = iconScale
-                                            scaleY = iconScale
-                                        }
-                                )
-                            }
+                        screen.icon?.let { icon ->
+                            Icon(
+                                imageVector = icon,
+                                contentDescription = screen.title,
+                                tint = contentColor,
+                                modifier = Modifier
+                                    .size(if (isAddButton) 26.dp else 22.dp)
+                                    .graphicsLayer {
+                                        scaleX = iconScale
+                                        scaleY = iconScale
+                                    }
+                            )
+                        }
 
-                            if (selected) {
-                                Spacer(modifier = Modifier.height(3.dp))
-                                Box(
-                                    modifier = Modifier
-                                        .size(4.dp)
-                                        .graphicsLayer {
-                                            scaleX = dotScale
-                                            scaleY = dotScale
-                                            alpha = dotAlpha
-                                        }
-                                        .clip(CircleShape)
-                                        .background(colors.accent)
-                                )
-                            }
+                        if (!isAddButton) {
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.BottomCenter)
+                                    .padding(bottom = 5.dp)
+                                    .size(4.dp)
+                                    .graphicsLayer {
+                                        scaleX = dotScale
+                                        scaleY = dotScale
+                                        alpha = dotAlpha
+                                    }
+                                    .clip(CircleShape)
+                                    .background(colors.accent)
+                            )
                         }
                     }
                 }

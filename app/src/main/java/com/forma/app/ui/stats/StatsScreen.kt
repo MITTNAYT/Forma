@@ -350,7 +350,7 @@ fun StatsScreen(
                                         .height(38.dp)
                                         .clip(RoundedCornerShape(16.dp))
                                         .background(bg)
-                                        .clickable { selectedTimeTab = tab },
+                                        .formaPressEffect(targetScale = 0.95f) { selectedTimeTab = tab },
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
