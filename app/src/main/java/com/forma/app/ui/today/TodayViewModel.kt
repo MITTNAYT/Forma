@@ -92,6 +92,12 @@ class TodayViewModel @Inject constructor(
         }
     }
 
+    fun restartCoachMarks() {
+        viewModelScope.launch {
+            preferencesRepository.setHasSeenTodayCoachMarks(false)
+        }
+    }
+
     fun selectDate(date: LocalDate) {
         _selectedDate.value = date
     }
@@ -170,6 +176,30 @@ class TodayViewModel @Inject constructor(
             timelineRepository.updateTimelineItem(
                 item.copy(subtasks = updatedSubtasks, completed = allDone)
             )
+        }
+    }
+
+    fun toggleHabitSubtask(habit: Habit, subtaskId: String) {
+        viewModelScope.launch {
+            val updatedSubtasks = habit.subtasks.map {
+                if (it.id == subtaskId) it.copy(completed = !it.completed) else it
+            }
+            val allDone = updatedSubtasks.isNotEmpty() && updatedSubtasks.all { it.completed }
+            if (allDone) {
+                zenFeedback.onHabitCompleted()
+            } else {
+                zenFeedback.onTaskToggled()
+            }
+            val updatedHabit = habit.copy(subtasks = updatedSubtasks)
+            habitRepository.updateHabit(updatedHabit)
+        }
+    }
+
+    fun toggleHabitPause(habit: Habit) {
+        viewModelScope.launch {
+            val updated = habit.copy(isWintering = !habit.isWintering)
+            habitRepository.updateHabit(updated)
+            zenFeedback.onTaskToggled()
         }
     }
 

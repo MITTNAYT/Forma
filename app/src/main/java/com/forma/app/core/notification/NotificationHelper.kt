@@ -1,4 +1,4 @@
-﻿package com.forma.app.core.notification
+package com.forma.app.core.notification
 
 import android.app.AlarmManager
 import android.app.NotificationChannel
@@ -61,6 +61,32 @@ class NotificationHelper @Inject constructor(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        val completeIntent = Intent(context, HabitNotificationActionReceiver::class.java).apply {
+            action = HabitNotificationActionReceiver.ACTION_COMPLETE
+            putExtra(HabitNotificationActionReceiver.EXTRA_HABIT_ID, habitId)
+            putExtra(HabitNotificationActionReceiver.EXTRA_HABIT_NAME, habitName)
+            putExtra(HabitNotificationActionReceiver.EXTRA_HABIT_ICON, habitIcon)
+        }
+        val completePendingIntent = PendingIntent.getBroadcast(
+            context,
+            (habitId + "_complete").hashCode(),
+            completeIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val snoozeIntent = Intent(context, HabitNotificationActionReceiver::class.java).apply {
+            action = HabitNotificationActionReceiver.ACTION_SNOOZE
+            putExtra(HabitNotificationActionReceiver.EXTRA_HABIT_ID, habitId)
+            putExtra(HabitNotificationActionReceiver.EXTRA_HABIT_NAME, habitName)
+            putExtra(HabitNotificationActionReceiver.EXTRA_HABIT_ICON, habitIcon)
+        }
+        val snoozePendingIntent = PendingIntent.getBroadcast(
+            context,
+            (habitId + "_snooze").hashCode(),
+            snoozeIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
         val notification = NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_HABITS_ID)
             .setSmallIcon(R.drawable.ic_stat_leaf)
             .setContentTitle(habitName)
@@ -68,6 +94,8 @@ class NotificationHelper @Inject constructor(
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
+            .addAction(R.drawable.ic_stat_leaf, "✓ Done", completePendingIntent)
+            .addAction(R.drawable.ic_stat_leaf, "+ 15m Snooze", snoozePendingIntent)
             .build()
 
         try {
@@ -111,6 +139,7 @@ class NotificationHelper @Inject constructor(
             putExtra("HABIT_ID", habitId)
             putExtra("HABIT_NAME", habitName)
             putExtra("HABIT_ICON", habitIcon)
+            putExtra("MINUTES_FROM_MIDNIGHT", minutesFromMidnight)
         }
 
         val pendingIntent = PendingIntent.getBroadcast(
@@ -124,23 +153,57 @@ class NotificationHelper @Inject constructor(
             set(Calendar.HOUR_OF_DAY, minutesFromMidnight / 60)
             set(Calendar.MINUTE, minutesFromMidnight % 60)
             set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
             if (before(Calendar.getInstance())) {
                 add(Calendar.DATE, 1)
             }
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            alarmManager.setExactAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                calendar.timeInMillis,
-                pendingIntent
-            )
-        } else {
-            alarmManager.setExact(
-                AlarmManager.RTC_WAKEUP,
-                calendar.timeInMillis,
-                pendingIntent
-            )
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (alarmManager.canScheduleExactAlarms()) {
+                    alarmManager.setExactAndAllowWhileIdle(
+                        AlarmManager.RTC_WAKEUP,
+                        calendar.timeInMillis,
+                        pendingIntent
+                    )
+                } else {
+                    alarmManager.setAndAllowWhileIdle(
+                        AlarmManager.RTC_WAKEUP,
+                        calendar.timeInMillis,
+                        pendingIntent
+                    )
+                }
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    calendar.timeInMillis,
+                    pendingIntent
+                )
+            } else {
+                alarmManager.setExact(
+                    AlarmManager.RTC_WAKEUP,
+                    calendar.timeInMillis,
+                    pendingIntent
+                )
+            }
+        } catch (_: SecurityException) {
+            alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+        }
+    }
+
+    fun cancelHabitAlarm(habitId: String) {
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(context, HabitAlarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            habitId.hashCode(),
+            intent,
+            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+        )
+        if (pendingIntent != null) {
+            alarmManager.cancel(pendingIntent)
+            pendingIntent.cancel()
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿package com.forma.app.ui.analytics.components
+package com.forma.app.ui.analytics.components
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -13,14 +13,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material.icons.rounded.Share
+import androidx.compose.material.icons.rounded.IosShare
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -30,6 +29,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -57,27 +58,27 @@ fun ShareMilestoneDialog(
         Box(
             modifier = Modifier
                 .fillMaxWidth(0.92f)
-                .clip(RoundedCornerShape(26.dp))
+                .clip(RoundedCornerShape(24.dp))
                 .background(colors.surface)
-                .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(26.dp))
+                .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(24.dp))
                 .padding(24.dp)
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Top close button
+                // Header row
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "CELEBRATE MILESTONE",
+                        text = "SHARE MILESTONE",
                         style = FormaTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
-                        color = colors.accent,
-                        letterSpacing = 1.2.sp,
-                        fontSize = 11.sp
+                        color = colors.textTertiary,
+                        letterSpacing = 1.4.sp,
+                        fontSize = 10.sp
                     )
                     IconButton(
                         onClick = onDismiss,
@@ -86,76 +87,107 @@ fun ShareMilestoneDialog(
                         Icon(
                             imageVector = Icons.Rounded.Close,
                             contentDescription = "Close",
-                            tint = colors.textSecondary,
+                            tint = colors.textTertiary,
                             modifier = Modifier.size(16.dp)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(18.dp))
-
-                // Aesthetic Mini Preview
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(colors.background)
-                        .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(20.dp))
-                        .padding(vertical = 28.dp, horizontal = 20.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        // Mini Ensō Ring
-                        Box(
-                            modifier = Modifier
-                                .size(90.dp)
-                                .clip(CircleShape)
-                                .background(colors.accentSoft)
-                                .border(3.dp, colors.accent, CircleShape),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = streakDays.toString(),
-                                style = FormaTheme.typography.headlineLarge,
-                                fontWeight = FontWeight.Bold,
-                                color = colors.accent,
-                                fontSize = 34.sp
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        Text(
-                            text = habitTitle,
-                            style = FormaTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = colors.textPrimary,
-                            fontSize = 18.sp,
-                            textAlign = TextAlign.Center
-                        )
-
-                        Text(
-                            text = "$streakDays Days of Consistent Flow",
-                            style = FormaTheme.typography.bodySmall,
-                            color = colors.textSecondary,
-                            fontSize = 12.sp,
-                            textAlign = TextAlign.Center
                         )
                     }
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // Share Button
+                // ── Card Preview (mini version of the exported card) ──
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(18.dp))
+                        .background(colors.background)
+                        .border(1.dp, colors.border.copy(alpha = 0.4f), RoundedCornerShape(18.dp))
+                        .padding(vertical = 32.dp, horizontal = 20.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        // Forma wordmark
+                        Text(
+                            text = "FORMA",
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = colors.accent,
+                            letterSpacing = 3.sp
+                        )
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        // Giant streak number
+                        Text(
+                            text = streakDays.toString(),
+                            fontFamily = FontFamily.Serif,
+                            fontWeight = FontWeight.Bold,
+                            color = colors.textPrimary,
+                            fontSize = 72.sp,
+                            lineHeight = 72.sp
+                        )
+
+                        // "DAYS" label
+                        Text(
+                            text = "DAYS",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = colors.accent,
+                            letterSpacing = 4.sp
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // Habit title
+                        Text(
+                            text = habitTitle,
+                            fontFamily = FontFamily.Serif,
+                            fontWeight = FontWeight.Bold,
+                            color = colors.textPrimary,
+                            fontSize = 18.sp,
+                            textAlign = TextAlign.Center,
+                            lineHeight = 24.sp,
+                            maxLines = 2
+                        )
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        // Divider
+                        HorizontalDivider(
+                            modifier = Modifier
+                                .width(120.dp)
+                                .padding(vertical = 4.dp),
+                            thickness = 0.8.dp,
+                            color = colors.accent.copy(alpha = 0.3f)
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        // Quote
+                        Text(
+                            text = "\u201CThe rhythm matters more\nthan the speed.\u201D",
+                            fontFamily = FontFamily.Serif,
+                            fontStyle = FontStyle.Italic,
+                            color = colors.textSecondary,
+                            fontSize = 11.sp,
+                            textAlign = TextAlign.Center,
+                            lineHeight = 16.sp
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                // ── Share Button ──
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp)
-                        .clip(RoundedCornerShape(18.dp))
+                        .clip(RoundedCornerShape(16.dp))
                         .background(colors.accent)
-                        .formaPressEffect(targetScale = 0.95f) {
+                        .formaPressEffect(targetScale = 0.96f) {
                             scope.launch {
                                 val result = MilestoneCardExporter.generateAndShareMilestone(
                                     context = context,
@@ -167,7 +199,7 @@ fun ShareMilestoneDialog(
                                     context.startActivity(intent)
                                     onDismiss()
                                 }.onFailure { error ->
-                                    Toast.makeText(context, "Could not export card: ${error.message}", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "Could not export: ${error.message}", Toast.LENGTH_SHORT).show()
                                 }
                             }
                         },
@@ -175,14 +207,14 @@ fun ShareMilestoneDialog(
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            imageVector = Icons.Rounded.Share,
+                            imageVector = Icons.Rounded.IosShare,
                             contentDescription = "Share",
                             tint = colors.onAccent,
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Export & Share Story Card",
+                            text = "Export & Share",
                             style = FormaTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = colors.onAccent,
@@ -190,6 +222,16 @@ fun ShareMilestoneDialog(
                         )
                     }
                 }
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                // Subtitle hint
+                Text(
+                    text = "Generates an Instagram-ready story card",
+                    style = FormaTheme.typography.bodySmall,
+                    color = colors.textTertiary,
+                    fontSize = 11.sp
+                )
             }
         }
     }

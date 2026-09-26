@@ -274,7 +274,7 @@ fun ProPaywallBottomSheet(
                     SubscriptionTier.MONTHLY_PRO -> {
                         ProFeatureBullet("Everything in Free, plus unlimited daily rituals")
                         ProFeatureBullet("Gemini 1.5 Flash AI Day Studio schedule synthesis")
-                        ProFeatureBullet("Circadian Energy Wave chronotype alignment")
+                        ProFeatureBullet("Smart day routine & energy-level flow")
                         ProFeatureBullet("Biometric Sanctuary Lock & App Switcher privacy masking")
                         ProFeatureBullet("Procedural acoustic soundscapes (432Hz bowl, rain, alpha waves)")
                         ProFeatureBullet("Cross-device sync powered by Clerk authentication")
@@ -334,7 +334,7 @@ fun ProPaywallBottomSheet(
                 ) {
                     ComparisonRow("Active Habits", "5 max", "Unlimited", "Unlimited")
                     ComparisonRow("Gemini AI Studio", "—", "✓ Included", "✓ Priority")
-                    ComparisonRow("Circadian Wave", "—", "✓ Included", "✓ Included")
+                    ComparisonRow("Smart Energy Flow", "—", "✓ Included", "✓ Included")
                     ComparisonRow("Biometric Lock", "—", "✓ Included", "✓ Included")
                     ComparisonRow("Acoustic Audio", "Basic", "All 5+ stems", "All 5+ stems")
                     ComparisonRow("Clerk Cloud Sync", "—", "✓ Included", "✓ Included")

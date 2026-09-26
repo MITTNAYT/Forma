@@ -1,4 +1,4 @@
-﻿package com.forma.app.ui.habits.components
+package com.forma.app.ui.habits.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -78,12 +78,15 @@ fun HabitCard(
 
                     Spacer(modifier = Modifier.width(12.dp))
 
-                    Column {
+                    Column(modifier = Modifier.weight(1f)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 text = habit.name,
                                 style = FormaTheme.typography.titleMedium,
-                                color = colors.textPrimary
+                                color = colors.textPrimary,
+                                maxLines = 2,
+                                lineHeight = 20.sp,
+                                modifier = Modifier.weight(1f, fill = false)
                             )
                             if (habit.isWintering) {
                                 Spacer(modifier = Modifier.width(6.dp))
@@ -123,18 +126,31 @@ fun HabitCard(
                                 color = colors.textSecondary
                             )
 
-                            Spacer(modifier = Modifier.width(6.dp))
-                            EnergyIndicator(energyLevel = habit.energyLevel)
-
                             if (habit.reminderTimeMinutes != null) {
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Icon(
-                                    imageVector = Icons.Rounded.Notifications,
-                                    contentDescription = "Reminder enabled",
-                                    tint = colors.textTertiary,
-                                    modifier = Modifier.size(12.dp)
+                                val h = habit.reminderTimeMinutes / 60
+                                val m = habit.reminderTimeMinutes % 60
+                                val amPm = if (h < 12) "AM" else "PM"
+                                val h12 = if (h % 12 == 0) 12 else h % 12
+                                val timeStr = String.format("%d:%02d %s", h12, m, amPm)
+                                Text(
+                                    text = " • $timeStr",
+                                    style = FormaTheme.typography.labelSmall,
+                                    color = colors.textTertiary,
+                                    fontSize = 11.sp
                                 )
                             }
+
+                            if (habit.subtasks.isNotEmpty()) {
+                                Text(
+                                    text = " • ${habit.subtasks.size} steps",
+                                    style = FormaTheme.typography.labelSmall,
+                                    color = colors.accent,
+                                    fontSize = 11.sp
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.width(6.dp))
+                            EnergyIndicator(energyLevel = habit.energyLevel)
                         }
                     }
                 }

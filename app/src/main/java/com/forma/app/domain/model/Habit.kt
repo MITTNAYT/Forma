@@ -1,4 +1,4 @@
-﻿package com.forma.app.domain.model
+package com.forma.app.domain.model
 
 import androidx.compose.runtime.Immutable
 import com.forma.app.core.util.SyncStatus
@@ -23,7 +23,8 @@ data class Habit(
     val isWintering: Boolean = false, // Guilt-free seasonal pause/hibernation
     val startDate: String? = null, // e.g. "2026-09-13"
     val endDate: String? = null, // e.g. "2026-12-31"
-    val isIndefinite: Boolean = true // Infinity ongoing or fixed duration
+    val isIndefinite: Boolean = true, // Infinity ongoing or fixed duration
+    val subtasks: List<Subtask> = emptyList()
 )
 
 

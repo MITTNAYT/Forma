@@ -1,4 +1,4 @@
-﻿package com.forma.app.domain.usecase
+package com.forma.app.domain.usecase
 
 import com.forma.app.domain.model.DailyReflection
 import com.forma.app.domain.model.EnergyLevel
@@ -50,6 +50,15 @@ class ExportDataUseCase @Inject constructor(
                 put("startDate", h.startDate)
                 put("endDate", h.endDate)
                 put("isIndefinite", h.isIndefinite)
+                val subtasksArray = JSONArray()
+                for (s in h.subtasks) {
+                    subtasksArray.put(JSONObject().apply {
+                        put("id", s.id)
+                        put("title", s.title)
+                        put("completed", s.completed)
+                    })
+                }
+                put("subtasks", subtasksArray)
             }
             habitsArray.put(hObj)
         }
@@ -171,7 +180,22 @@ class ImportDataUseCase @Inject constructor(
                         isWintering = hObj.optBoolean("isWintering", false),
                         startDate = if (hObj.isNull("startDate")) null else hObj.optString("startDate"),
                         endDate = if (hObj.isNull("endDate")) null else hObj.optString("endDate"),
-                        isIndefinite = hObj.optBoolean("isIndefinite", true)
+                        isIndefinite = hObj.optBoolean("isIndefinite", true),
+                        subtasks = if (hObj.has("subtasks")) {
+                            val sArr = hObj.getJSONArray("subtasks")
+                            val sList = mutableListOf<com.forma.app.domain.model.Subtask>()
+                            for (k in 0 until sArr.length()) {
+                                val sObj = sArr.getJSONObject(k)
+                                sList.add(
+                                    com.forma.app.domain.model.Subtask(
+                                        id = sObj.optString("id", java.util.UUID.randomUUID().toString()),
+                                        title = sObj.optString("title", ""),
+                                        completed = sObj.optBoolean("completed", false)
+                                    )
+                                )
+                            }
+                            sList
+                        } else emptyList()
                     )
                     habitRepository.insertHabit(habit)
                     itemsRestored++

@@ -1,4 +1,4 @@
-﻿package com.forma.app.ui.auth
+package com.forma.app.ui.auth
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
@@ -47,12 +47,18 @@ class AuthViewModel @Inject constructor(
 
     fun launchGoogleSignIn(activityContext: Context, webClientId: String = "") {
         viewModelScope.launch {
-            if (webClientId.isBlank()) {
-                _uiMessage.value = "Google Sign-In requires Web Client ID configuration in google-services.json."
-                return@launch
+            val resolvedClientId = webClientId.ifBlank {
+                try {
+                    val resId = activityContext.resources.getIdentifier("default_web_client_id", "string", activityContext.packageName)
+                    if (resId != 0) activityContext.getString(resId)
+                    else "777276382325-rlc5aoh5c54ss2q8am9v3msd1m37v29r.apps.googleusercontent.com"
+                } catch (_: Exception) {
+                    "777276382325-rlc5aoh5c54ss2q8am9v3msd1m37v29r.apps.googleusercontent.com"
+                }
             }
+
             _isLoading.value = true
-            val tokenResult = googleAuthHelper.getGoogleIdToken(activityContext, webClientId)
+            val tokenResult = googleAuthHelper.getGoogleIdToken(activityContext, resolvedClientId)
             tokenResult.onSuccess { idToken ->
                 val authResult = signInWithGoogleUseCase(idToken)
                 authResult.onSuccess {

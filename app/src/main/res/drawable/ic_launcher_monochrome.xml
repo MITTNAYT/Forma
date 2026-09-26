@@ -5,41 +5,33 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Outer Elevated Base Disc -->
+    <!-- Elevated Base Disc -->
     <path
         android:fillColor="#000000"
-        android:fillAlpha="0.08"
+        android:fillAlpha="0.10"
         android:strokeColor="#000000"
-        android:strokeWidth="0.8"
-        android:strokeAlpha="0.3"
-        android:pathData="M 54,25 A 29,29 0 1,1 53.99,25 Z" />
+        android:strokeWidth="1.0"
+        android:strokeAlpha="0.30"
+        android:pathData="M 54,25.5 A 28.5,28.5 0 1,1 53.99,25.5 Z" />
 
-    <!-- Outer Sculptural Arc -->
+    <!-- Architectural "F" & Infinite Daily Loop -->
     <path
         android:strokeColor="#000000"
-        android:strokeWidth="6.8"
+        android:strokeWidth="6.0"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
-        android:pathData="M 60.2,30.8 A 23.8,23.8 0 1,0 74.6,65.9" />
+        android:pathData="M 38,39 L 66,39 C 73,39 73,53 64,56 L 44,63 C 36,66 36,73 44,73 C 54,73 68,64 70,55" />
 
-    <!-- Middle Raised Disc -->
-    <path
-        android:fillColor="#000000"
-        android:fillAlpha="0.12"
-        android:strokeColor="#000000"
-        android:strokeWidth="0.8"
-        android:strokeAlpha="0.3"
-        android:pathData="M 54,37 A 17,17 0 1,1 53.99,37 Z" />
-
-    <!-- Middle Concentric Ring -->
+    <!-- Architectural "F" Cross-Bar -->
     <path
         android:strokeColor="#000000"
-        android:strokeWidth="3.8"
-        android:pathData="M 54,43.5 A 10.5,10.5 0 1,1 53.99,43.5 Z" />
+        android:strokeWidth="4.5"
+        android:strokeLineCap="round"
+        android:pathData="M 38,49 L 55,49" />
 
-    <!-- Center Core Dot -->
+    <!-- Focal Dot -->
     <path
         android:fillColor="#000000"
-        android:pathData="M 54,49.8 A 4.2,4.2 0 1,1 53.99,49.8 Z" />
+        android:pathData="M 54,53 A 3.2,3.2 0 1,1 53.99,53 Z" />
 
 </vector>

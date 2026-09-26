@@ -44,6 +44,7 @@ interface UserPreferencesRepository {
     val chronotype: Flow<com.forma.app.domain.model.Chronotype>
     val isBiometricLockEnabled: Flow<Boolean>
     val isPrivacyMaskingEnabled: Flow<Boolean>
+    val hasConsentedToDataAndCookies: Flow<Boolean>
 
     suspend fun setUserName(name: String)
     suspend fun setUserHeadline(headline: String)
@@ -57,5 +58,6 @@ interface UserPreferencesRepository {
     suspend fun setChronotype(chronotype: com.forma.app.domain.model.Chronotype)
     suspend fun setBiometricLockEnabled(enabled: Boolean)
     suspend fun setPrivacyMaskingEnabled(enabled: Boolean)
+    suspend fun setConsentToDataAndCookies(consented: Boolean)
 }
 

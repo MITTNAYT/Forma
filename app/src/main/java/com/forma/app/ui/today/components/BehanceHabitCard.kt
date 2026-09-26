@@ -1,4 +1,4 @@
-﻿package com.forma.app.ui.today.components
+package com.forma.app.ui.today.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
@@ -45,6 +45,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.style.TextDecoration
 import com.forma.app.core.designsystem.FormaTheme
 import com.forma.app.core.designsystem.motion.FormaMotion
 import com.forma.app.core.designsystem.motion.formaPressEffect
@@ -65,7 +66,8 @@ fun BehanceHabitCard(
     onToggle: () -> Unit,
     onClick: () -> Unit,
     onStartFocus: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    index: Int = 0
 ) {
     val colors = FormaTheme.colors
     val haptic = LocalHapticFeedback.current
@@ -76,18 +78,21 @@ fun BehanceHabitCard(
         is TodayScheduleItem.HabitItem -> {
             val habit = item.habit
             val defaultTime = when (habit.timeOfDay) {
-                com.forma.app.domain.model.TimeOfDay.MORNING -> "7:00 AM • 15 min"
-                com.forma.app.domain.model.TimeOfDay.AFTERNOON -> "1:00 PM • 25 min"
-                com.forma.app.domain.model.TimeOfDay.EVENING -> "6:00 PM • 20 min"
-                com.forma.app.domain.model.TimeOfDay.ANYTIME -> "Anytime today • 20 min"
+                com.forma.app.domain.model.TimeOfDay.MORNING -> "Morning • 15 min"
+                com.forma.app.domain.model.TimeOfDay.AFTERNOON -> "Afternoon • 25 min"
+                com.forma.app.domain.model.TimeOfDay.EVENING -> "Evening • 20 min"
+                com.forma.app.domain.model.TimeOfDay.ANYTIME -> "Anytime today"
             }
             val timeFormatted = habit.reminderTimeMinutes?.let { minutes ->
                 val h = minutes / 60
                 val m = minutes % 60
                 val amPm = if (h < 12) "AM" else "PM"
                 val h12 = if (h % 12 == 0) 12 else h % 12
-                String.format("%d:%02d %s", h12, m, amPm)
+                String.format("%d:%02d %s • %s", h12, m, amPm, habit.timeOfDay.displayName)
             } ?: defaultTime
+
+            val doneCount = habit.subtasks.count { it.completed }
+            val totalCount = habit.subtasks.size
 
             val isPeach = habit.name.contains("water", ignoreCase = true) || habit.name.contains("read", ignoreCase = true)
 
@@ -99,12 +104,16 @@ fun BehanceHabitCard(
                 isDone = item.isDoneToday,
                 isPeachTile = isPeach,
                 cueText = habit.stackedCueText,
-                isWintering = habit.isWintering
+                isWintering = habit.isWintering,
+                totalSubtasks = totalCount,
+                doneSubtasks = doneCount
             )
         }
         is TodayScheduleItem.TimelineBlock -> {
             val task = item.item
             val timing = formatBehanceTiming(task.startTime, task.endTime)
+            val doneCount = task.subtasks.count { it.completed }
+            val totalCount = task.subtasks.size
             val isPeach = task.title.contains("water", ignoreCase = true) || task.title.contains("read", ignoreCase = true)
 
             BehanceCardData(
@@ -115,7 +124,9 @@ fun BehanceHabitCard(
                 isDone = task.completed,
                 isPeachTile = isPeach,
                 cueText = null,
-                isWintering = false
+                isWintering = false,
+                totalSubtasks = totalCount,
+                doneSubtasks = doneCount
             )
         }
     }
@@ -162,6 +173,9 @@ fun BehanceHabitCard(
         onToggle()
     }
 
+    val formattedIndex = String.format("%02d", index + 1)
+    val isHero = (index == 0 && !isDone)
+
     // Warm Clean Card with GPU-accelerated press and scale
     Box(
         modifier = modifier
@@ -173,7 +187,11 @@ fun BehanceHabitCard(
             .padding(horizontal = 20.dp, vertical = 6.dp)
             .clip(RoundedCornerShape(22.dp))
             .background(colors.surface)
-            .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(22.dp))
+            .border(
+                width = if (isHero) 1.2.dp else 1.dp,
+                color = if (isHero) colors.accent.copy(alpha = 0.55f) else colors.border.copy(alpha = 0.6f),
+                shape = RoundedCornerShape(22.dp)
+            )
             .formaPressEffect(targetScale = 0.975f) { onClick() }
             .padding(horizontal = 16.dp, vertical = 14.dp)
     ) {
@@ -204,20 +222,37 @@ fun BehanceHabitCard(
 
                 Spacer(modifier = Modifier.width(14.dp))
 
-                // Title and Subtitle
+                // Title and Subtitle with Editorial Hierarchy
                 Column(modifier = Modifier.weight(1f)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    // Editorial Index & Badge
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(bottom = 2.dp)
+                    ) {
                         Text(
-                            text = title,
-                            style = FormaTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = if (isDone || cardData.isWintering) colors.textSecondary else colors.textPrimary,
-                            fontSize = 16.sp,
-                            letterSpacing = (-0.2).sp,
-                            maxLines = 1,
-                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-                            modifier = Modifier.weight(1f, fill = false)
+                            text = formattedIndex,
+                            style = FormaTheme.typography.labelSmall,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = if (isHero) colors.accent else colors.textTertiary,
+                            fontSize = 11.sp,
+                            letterSpacing = 0.8.sp
                         )
+
+                        if (isHero) {
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "HERO FLOW",
+                                style = FormaTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = colors.accent,
+                                fontSize = 9.sp,
+                                letterSpacing = 0.8.sp,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(colors.accentSoft)
+                                    .padding(horizontal = 5.dp, vertical = 1.dp)
+                            )
+                        }
 
                         if (cardData.isWintering) {
                             Spacer(modifier = Modifier.width(6.dp))
@@ -234,6 +269,19 @@ fun BehanceHabitCard(
                         }
                     }
 
+                    Text(
+                        text = title,
+                        style = FormaTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = if (isDone || cardData.isWintering) colors.textSecondary else colors.textPrimary,
+                        fontSize = 15.sp,
+                        lineHeight = 20.sp,
+                        letterSpacing = (-0.2).sp,
+                        textDecoration = if (isDone) TextDecoration.LineThrough else TextDecoration.None,
+                        maxLines = 2,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                    )
+
                     Spacer(modifier = Modifier.height(3.dp))
 
                     Text(
@@ -244,6 +292,38 @@ fun BehanceHabitCard(
                         maxLines = 1,
                         overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                     )
+
+                    if (cardData.totalSubtasks > 0) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(3.dp)
+                                    .clip(CircleShape)
+                                    .background(colors.surfaceVariant)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth(fraction = cardData.subtasksProgress)
+                                        .height(3.dp)
+                                        .clip(CircleShape)
+                                        .background(colors.accent)
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "${cardData.doneSubtasks}/${cardData.totalSubtasks}",
+                                style = FormaTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = colors.textTertiary,
+                                fontSize = 10.sp
+                            )
+                        }
+                    }
 
                     if (!cardData.cueText.isNullOrBlank()) {
                         Spacer(modifier = Modifier.height(2.dp))
@@ -365,8 +445,13 @@ private data class BehanceCardData(
     val isDone: Boolean,
     val isPeachTile: Boolean,
     val cueText: String? = null,
-    val isWintering: Boolean = false
-)
+    val isWintering: Boolean = false,
+    val totalSubtasks: Int = 0,
+    val doneSubtasks: Int = 0
+) {
+    val subtasksProgress: Float
+        get() = if (totalSubtasks > 0) doneSubtasks.toFloat() / totalSubtasks.toFloat() else 0f
+}
 
 private fun formatBehanceTiming(startTimeStr: String?, endTimeStr: String?): String {
     if (startTimeStr == null) return "Anytime today"

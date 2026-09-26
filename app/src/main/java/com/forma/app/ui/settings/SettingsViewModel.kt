@@ -66,6 +66,9 @@ class SettingsViewModel @Inject constructor(
     val isPrivacyMaskingEnabled: StateFlow<Boolean> = preferencesRepository.isPrivacyMaskingEnabled
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
+    val hasConsentedToDataAndCookies: StateFlow<Boolean> = preferencesRepository.hasConsentedToDataAndCookies
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
     val isPro: StateFlow<Boolean> = billingRepository.isPro
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
@@ -87,6 +90,18 @@ class SettingsViewModel @Inject constructor(
     fun setPrivacyMaskingEnabled(enabled: Boolean) {
         viewModelScope.launch {
             preferencesRepository.setPrivacyMaskingEnabled(enabled)
+        }
+    }
+
+    fun setConsentToDataAndCookies(consented: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.setConsentToDataAndCookies(consented)
+        }
+    }
+
+    fun restartAppTour() {
+        viewModelScope.launch {
+            preferencesRepository.setHasSeenTodayCoachMarks(false)
         }
     }
 

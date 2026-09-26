@@ -49,6 +49,19 @@ class FormaWidgetProvider : AppWidgetProvider() {
     }
 
     companion object {
+        fun requestWidgetUpdate(context: Context) {
+            val appWidgetManager = AppWidgetManager.getInstance(context)
+            val componentName = android.content.ComponentName(context, FormaWidgetProvider::class.java)
+            val ids = appWidgetManager.getAppWidgetIds(componentName)
+            if (ids.isNotEmpty()) {
+                val intent = Intent(context, FormaWidgetProvider::class.java).apply {
+                    action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
+                }
+                context.sendBroadcast(intent)
+            }
+        }
+
         fun updateAppWidget(
             context: Context,
             appWidgetManager: AppWidgetManager,
@@ -97,17 +110,16 @@ class FormaWidgetProvider : AppWidgetProvider() {
                     val total = scheduledHabits.size
                     val done = scheduledHabits.count { completedIds.contains(it.id) }
 
-                    if (zone != null) {
-                        val zoneTag = zone.displayName.uppercase()
-                        statusTitle = "$zoneTag • ${chronotype.displayName.substringBefore(" (")}"
-                        statusSubtitle = if (total > 0) {
-                            "$done/$total rituals completed • ${zone.subtitle}"
-                        } else {
-                            zone.subtitle
-                        }
-                    } else if (total > 0) {
+                    if (total > 0) {
                         statusTitle = "Daily Flow ($done/$total)"
-                        statusSubtitle = "$done of $total rituals finished today."
+                        statusSubtitle = if (done == total) {
+                            "All rituals completed today. Enjoy your peace."
+                        } else {
+                            "$done of $total rituals completed."
+                        }
+                    } else {
+                        statusTitle = "Daily Flow"
+                        statusSubtitle = "Focus on your highest-leverage ritual today."
                     }
                 }
             } catch (_: Exception) {}

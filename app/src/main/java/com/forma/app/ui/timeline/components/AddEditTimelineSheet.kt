@@ -1,4 +1,4 @@
-﻿package com.forma.app.ui.timeline.components
+package com.forma.app.ui.timeline.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -1092,120 +1092,126 @@ fun AddEditTimelineSheet(
                     }
                 }
             }
+        }
 
-            Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
-            // B. Subtasks Checklist Builder
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(22.dp))
-                    .background(colors.surface)
-                    .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(22.dp))
-                    .padding(16.dp)
-            ) {
-                Column {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "MILESTONES & SUBTASKS",
-                            style = FormaTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = colors.textTertiary,
-                            letterSpacing = 1.2.sp,
-                            fontSize = 10.5.sp
-                        )
+        // 4b. Shared Micro-Steps & Subtasks Checklist Builder
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(22.dp))
+                .background(colors.surface)
+                .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(22.dp))
+                .padding(16.dp)
+        ) {
+            Column {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = if (uiState.creationType == CreationType.HABIT) "HABIT MICRO-STEPS & CHECKLIST" else "MILESTONES & SUBTASKS",
+                        style = FormaTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = colors.textTertiary,
+                        letterSpacing = 1.2.sp,
+                        fontSize = 10.5.sp
+                    )
 
-                        Text(
-                            text = "+ Add Step",
-                            style = FormaTheme.typography.labelSmall,
-                            color = parsedColor,
-                            fontWeight = FontWeight.Bold,
+                    Text(
+                        text = if (uiState.creationType == CreationType.HABIT) "+ Add Micro-Step" else "+ Add Step",
+                        style = FormaTheme.typography.labelSmall,
+                        color = parsedColor,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable { showAddSubtaskField = true }
+                            .padding(horizontal = 6.dp, vertical = 2.dp),
+                        fontSize = 11.sp
+                    )
+                }
+
+                if (uiState.subtasks.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    uiState.subtasks.forEach { subtask ->
+                        Row(
                             modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .clickable { showAddSubtaskField = true }
-                                .padding(horizontal = 6.dp, vertical = 2.dp),
-                            fontSize = 11.sp
-                        )
-                    }
-
-                    if (uiState.subtasks.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(10.dp))
-                        uiState.subtasks.forEach { subtask ->
-                            Row(
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 4.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                                    .size(20.dp)
+                                    .clip(CircleShape)
+                                    .background(if (subtask.completed) parsedColor else colors.surfaceVariant)
+                                    .border(1.dp, if (subtask.completed) parsedColor else colors.border, CircleShape)
+                                    .clickable { viewModel.toggleSubtask(subtask.id) },
+                                contentAlignment = Alignment.Center
                             ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(20.dp)
-                                        .clip(CircleShape)
-                                        .background(if (subtask.completed) parsedColor else colors.surfaceVariant)
-                                        .border(1.dp, if (subtask.completed) parsedColor else colors.border, CircleShape)
-                                        .clickable { viewModel.toggleSubtask(subtask.id) },
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    if (subtask.completed) {
-                                        Icon(Icons.Rounded.Check, null, tint = Color.White, modifier = Modifier.size(12.dp))
-                                    }
+                                if (subtask.completed) {
+                                    Icon(Icons.Rounded.Check, null, tint = Color.White, modifier = Modifier.size(12.dp))
                                 }
+                            }
 
-                                Spacer(modifier = Modifier.width(10.dp))
+                            Spacer(modifier = Modifier.width(10.dp))
 
-                                Text(
-                                    text = subtask.title,
-                                    style = FormaTheme.typography.bodyMedium,
-                                    color = if (subtask.completed) colors.textTertiary else colors.textPrimary,
-                                    modifier = Modifier.weight(1f),
-                                    fontSize = 13.5.sp
-                                )
+                            Text(
+                                text = subtask.title,
+                                style = FormaTheme.typography.bodyMedium,
+                                color = if (subtask.completed) colors.textTertiary else colors.textPrimary,
+                                modifier = Modifier.weight(1f),
+                                fontSize = 13.5.sp
+                            )
 
-                                IconButton(
-                                    onClick = { viewModel.removeSubtask(subtask.id) },
-                                    modifier = Modifier.size(24.dp)
-                                ) {
-                                    Icon(Icons.Rounded.Close, null, tint = colors.textTertiary, modifier = Modifier.size(14.dp))
-                                }
+                            IconButton(
+                                onClick = { viewModel.removeSubtask(subtask.id) },
+                                modifier = Modifier.size(24.dp)
+                            ) {
+                                Icon(Icons.Rounded.Close, null, tint = colors.textTertiary, modifier = Modifier.size(14.dp))
                             }
                         }
                     }
+                }
 
-                    if (showAddSubtaskField) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            OutlinedTextField(
-                                value = newSubtaskText,
-                                onValueChange = { newSubtaskText = it },
-                                placeholder = { Text("Enter milestone step...", fontSize = 12.sp, color = colors.textTertiary) },
-                                singleLine = true,
-                                shape = RoundedCornerShape(12.dp),
-                                modifier = Modifier.weight(1f),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = parsedColor,
-                                    unfocusedBorderColor = colors.border.copy(alpha = 0.6f)
+                if (showAddSubtaskField) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        OutlinedTextField(
+                            value = newSubtaskText,
+                            onValueChange = { newSubtaskText = it },
+                            placeholder = {
+                                Text(
+                                    if (uiState.creationType == CreationType.HABIT) "Enter micro-step (e.g. Fill water bottle)..." else "Enter milestone step...",
+                                    fontSize = 12.sp,
+                                    color = colors.textTertiary
                                 )
+                            },
+                            singleLine = true,
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier.weight(1f),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = parsedColor,
+                                unfocusedBorderColor = colors.border.copy(alpha = 0.6f)
                             )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            FormaButton(
-                                text = "Add",
-                                onClick = {
-                                    if (newSubtaskText.isNotBlank()) {
-                                        viewModel.addSubtask(newSubtaskText)
-                                        newSubtaskText = ""
-                                        showAddSubtaskField = false
-                                    }
-                                },
-                                style = FormaButtonStyle.SOFT_PILL
-                            )
-                        }
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        FormaButton(
+                            text = "Add",
+                            onClick = {
+                                if (newSubtaskText.isNotBlank()) {
+                                    viewModel.addSubtask(newSubtaskText)
+                                    newSubtaskText = ""
+                                    showAddSubtaskField = false
+                                }
+                            },
+                            style = FormaButtonStyle.SOFT_PILL
+                        )
                     }
                 }
             }

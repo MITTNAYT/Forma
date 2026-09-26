@@ -1,6 +1,5 @@
 package com.forma.app.ui.today
 
-import com.forma.app.domain.model.Chronotype
 import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
@@ -122,7 +121,6 @@ fun TodayScreen(
     val selectedDate by viewModel.selectedDate.collectAsState()
     val daySchedule by viewModel.daySchedule.collectAsState()
     val userName by viewModel.userName.collectAsState()
-    val chronotype by viewModel.chronotype.collectAsState()
     val hasSeenTodayCoachMarks by viewModel.hasSeenTodayCoachMarks.collectAsState()
 
     var weekStripBounds by remember { mutableStateOf<Rect?>(null) }
@@ -138,7 +136,6 @@ fun TodayScreen(
     var showBreathingSheet by remember { mutableStateOf(false) }
     var showGuidedRoutineSheet by remember { mutableStateOf(false) }
     var showJournalSheet by remember { mutableStateOf(false) }
-    var showChronotypeSheet by remember { mutableStateOf(false) }
     var showAiStudioSheet by remember { mutableStateOf(false) }
     var selectedDetailItem by remember { mutableStateOf<TodayScheduleItem?>(null) }
     var editingHabitId by remember { mutableStateOf<String?>(null) }
@@ -209,7 +206,7 @@ fun TodayScreen(
                     .imePadding()
             ) {
                 val scheduleItems = daySchedule?.items ?: emptyList()
-                val displayedItems = remember(scheduleItems, selectedTimeFilter, chronotype) {
+                val displayedItems = remember(scheduleItems, selectedTimeFilter) {
                     if (selectedTimeFilter == null) {
                         scheduleItems
                     } else {
@@ -221,21 +218,9 @@ fun TodayScreen(
                                         item.item.startTime?.let { LocalTime.parse(it).hour } ?: 12
                                     } catch (_: Exception) { 12 }
                                     when (selectedTimeFilter) {
-                                        TimeOfDay.MORNING -> if (chronotype == Chronotype.BIMODAL_NOCTURNAL) {
-                                            hour in 22..24 || hour in 0..3
-                                        } else {
-                                            hour in 4..11
-                                        }
-                                        TimeOfDay.AFTERNOON -> if (chronotype == Chronotype.BIMODAL_NOCTURNAL) {
-                                            hour in 11..15
-                                        } else {
-                                            hour in 12..16
-                                        }
-                                        TimeOfDay.EVENING -> if (chronotype == Chronotype.BIMODAL_NOCTURNAL) {
-                                            hour in 15..22
-                                        } else {
-                                            hour in 17..23
-                                        }
+                                        TimeOfDay.MORNING -> hour in 4..11
+                                        TimeOfDay.AFTERNOON -> hour in 12..16
+                                        TimeOfDay.EVENING -> hour in 17..23
                                         TimeOfDay.ANYTIME -> true
                                         null -> true
                                     }
@@ -261,18 +246,22 @@ fun TodayScreen(
                                 .fillMaxWidth()
                                 .padding(start = 24.dp, end = 24.dp, top = 20.dp, bottom = 4.dp)
                         ) {
-                            // Row 1: Date label + primary action only (Morning/Evening ritual)
+                            // Row 1: Date & Week metadata on left + sleek AI Studio & Calendar Picker on right
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
+                                val weekOfYear = try {
+                                    selectedDate.get(java.time.temporal.IsoFields.WEEK_OF_WEEK_BASED_YEAR)
+                                } catch (_: Exception) { 1 }
+                                val dateShortFormatted = selectedDate.format(DateTimeFormatter.ofPattern("d MMM", Locale.getDefault())).uppercase()
                                 Text(
-                                    text = dateFormatted.uppercase(),
+                                    text = "$dateShortFormatted · WEEK $weekOfYear",
                                     style = FormaTheme.typography.labelSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = colors.accent,
-                                    letterSpacing = 1.2.sp,
+                                    letterSpacing = 1.4.sp,
                                     fontSize = 11.sp
                                 )
 
@@ -280,36 +269,32 @@ fun TodayScreen(
                                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    // Single primary ritual pill (Morning Clarity / Evening Rest)
-                                    val currentHour = LocalTime.now().hour
-                                    val isEvening = currentHour >= 18 || currentHour < 4
-                                    val ritualTitle = if (isEvening) "Evening Rest" else "Morning Clarity"
-                                    val ritualIcon = if (isEvening) Icons.Rounded.Spa else Icons.Rounded.AutoAwesome
-
+                                    // AI Studio pill
                                     Box(
                                         modifier = Modifier
                                             .onGloballyPositioned { coordinates ->
-                                                ritualPillBounds = coordinates.boundsInRoot()
+                                                aiPlanBounds = coordinates.boundsInRoot()
                                             }
                                             .clip(RoundedCornerShape(12.dp))
                                             .background(colors.accentSoft)
                                             .border(1.dp, colors.accent.copy(alpha = 0.35f), RoundedCornerShape(12.dp))
-                                            .formaPressEffect(targetScale = 0.92f) {
+                                            .formaPressEffect(targetScale = 0.93f) {
                                                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                                if (isEvening) showEveningSheet = true else showMorningSheet = true
+                                                showAiStudioSheet = true
                                             }
-                                            .padding(horizontal = 10.dp, vertical = 6.dp)
+                                            .padding(horizontal = 10.dp, vertical = 6.dp),
+                                        contentAlignment = Alignment.Center
                                     ) {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
                                             Icon(
-                                                imageVector = ritualIcon,
-                                                contentDescription = ritualTitle,
+                                                imageVector = Icons.Rounded.AutoAwesome,
+                                                contentDescription = "AI Studio",
                                                 tint = colors.accent,
                                                 modifier = Modifier.size(13.dp)
                                             )
-                                            Spacer(modifier = Modifier.width(5.dp))
+                                            Spacer(modifier = Modifier.width(4.dp))
                                             Text(
-                                                text = ritualTitle,
+                                                text = "AI Studio",
                                                 style = FormaTheme.typography.labelSmall,
                                                 fontWeight = FontWeight.Bold,
                                                 color = colors.accent,
@@ -317,157 +302,79 @@ fun TodayScreen(
                                             )
                                         }
                                     }
+
+                                    // Calendar icon button
+                                    Box(
+                                        modifier = Modifier
+                                            .size(32.dp)
+                                            .clip(RoundedCornerShape(10.dp))
+                                            .background(colors.surfaceVariant)
+                                            .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(10.dp))
+                                            .formaPressEffect(targetScale = 0.90f) {
+                                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                                showDatePickerDialog = true
+                                            },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.CalendarMonth,
+                                            contentDescription = "Pick Date",
+                                            tint = colors.textSecondary,
+                                            modifier = Modifier.size(15.dp)
+                                        )
+                                    }
                                 }
                             }
 
-                            Spacer(modifier = Modifier.height(6.dp))
+                            Spacer(modifier = Modifier.height(10.dp))
 
-                            // Row 2: Greeting headline & microcopy
-                            Text(
-                                text = "$greeting $userName",
-                                style = FormaTheme.typography.displayMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = colors.textPrimary,
-                                letterSpacing = (-0.6).sp
-                            )
-                            Spacer(modifier = Modifier.height(2.dp))
-                            Text(
-                                text = "Start gently. What does today need from you?",
-                                style = FormaTheme.typography.bodySmall,
-                                color = colors.textSecondary,
-                                fontSize = 12.sp
-                            )
-
-                            Spacer(modifier = Modifier.height(12.dp))
-
-                            // Row 3: Secondary action pills — compact, equal weight
+                            // Row 2: Swiss Editorial "TODAY" headline + Refined Progress Badge
+                            val completedCount = scheduleItems.count { it.isCompleted }
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                // AI Studio pill
-                                Box(
-                                    modifier = Modifier
-                                        .weight(1.2f)
-                                        .onGloballyPositioned { coordinates ->
-                                            aiPlanBounds = coordinates.boundsInRoot()
-                                        }
-                                        .clip(RoundedCornerShape(12.dp))
-                                        .background(colors.surfaceVariant)
-                                        .border(1.dp, colors.accent.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
-                                        .formaPressEffect(targetScale = 0.93f) {
-                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                            showAiStudioSheet = true
-                                        }
-                                        .padding(vertical = 9.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(
-                                            imageVector = Icons.Rounded.AutoAwesome,
-                                            contentDescription = "AI Studio",
-                                            tint = colors.accent,
-                                            modifier = Modifier.size(13.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(5.dp))
-                                        Text(
-                                            text = "AI Studio",
-                                            style = FormaTheme.typography.labelSmall,
-                                            fontWeight = FontWeight.Bold,
-                                            color = colors.textPrimary,
-                                            fontSize = 12.sp
-                                        )
-                                    }
-                                }
-
-                                // Zen Rebalance pill
-                                Box(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .clip(RoundedCornerShape(12.dp))
-                                        .background(colors.surfaceVariant)
-                                        .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
-                                        .formaPressEffect(targetScale = 0.93f) {
-                                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                            viewModel.rebalanceDayTimeline()
-                                        }
-                                        .padding(vertical = 9.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(
-                                            imageVector = Icons.Rounded.Spa,
-                                            contentDescription = "Rebalance",
-                                            tint = colors.textSecondary,
-                                            modifier = Modifier.size(13.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(5.dp))
-                                        Text(
-                                            text = "Rebalance",
-                                            style = FormaTheme.typography.labelSmall,
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = colors.textSecondary,
-                                            fontSize = 12.sp
-                                        )
-                                    }
-                                }
-
-                                // Mindful Reflect pill
-                                Box(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .clip(RoundedCornerShape(12.dp))
-                                        .background(colors.surfaceVariant)
-                                        .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
-                                        .formaPressEffect(targetScale = 0.93f) {
-                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                            showMorningSheet = true
-                                        }
-                                        .padding(vertical = 9.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(
-                                            imageVector = Icons.Rounded.WbSunny,
-                                            contentDescription = "Reflect",
-                                            tint = colors.textSecondary,
-                                            modifier = Modifier.size(13.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(5.dp))
-                                        Text(
-                                            text = "Reflect",
-                                            style = FormaTheme.typography.labelSmall,
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = colors.textSecondary,
-                                            fontSize = 12.sp
-                                        )
-                                    }
-                                }
-
-                            // Calendar icon button (stays as compact icon only)
-                            Box(
-                                modifier = Modifier
-                                    .size(38.dp)
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(colors.surfaceVariant)
-                                    .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
-                                    .formaPressEffect(targetScale = 0.90f) {
-                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                        showDatePickerDialog = true
-                                    },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Rounded.CalendarMonth,
-                                    contentDescription = "Pick Date",
-                                    tint = colors.textSecondary,
-                                    modifier = Modifier.size(16.dp)
+                                Text(
+                                    text = "TODAY",
+                                    style = FormaTheme.typography.displayLarge.copy(
+                                        fontWeight = FontWeight.ExtraBold,
+                                        fontSize = 32.sp,
+                                        letterSpacing = (-1.2).sp
+                                    ),
+                                    color = colors.textPrimary
                                 )
+
+                                if (scheduleItems.isNotEmpty()) {
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(colors.accentSoft)
+                                            .border(1.dp, colors.accent.copy(alpha = 0.35f), RoundedCornerShape(8.dp))
+                                            .padding(horizontal = 9.dp, vertical = 4.dp)
+                                    ) {
+                                        Text(
+                                            text = "$completedCount OF ${scheduleItems.size} DONE",
+                                            fontWeight = FontWeight.Bold,
+                                            color = colors.accent,
+                                            fontSize = 10.sp,
+                                            letterSpacing = 0.6.sp
+                                        )
+                                    }
+                                }
                             }
+
+                            Spacer(modifier = Modifier.height(3.dp))
+
+                            // Greeting subtext
+                            Text(
+                                text = if (userName.isNotBlank()) "$greeting $userName" else greeting,
+                                style = FormaTheme.typography.bodySmall,
+                                color = colors.textSecondary,
+                                fontSize = 13.sp
+                            )
                         }
                     }
-                }
 
                 // 2. Responsive 7-Day Week Buttons (Fits Whole Screen - Zero Scrolling)
                 item {
@@ -557,20 +464,7 @@ fun TodayScreen(
                     }
                 }
 
-                item { Spacer(modifier = Modifier.height(10.dp)) }
-
-                // 2.5 Circadian Diurnal Energy Curve Wave
-                item {
-                    com.forma.app.ui.chronotype.components.CircadianEnergyWaveCard(
-                        chronotype = chronotype,
-                        onCardClick = {
-                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            showChronotypeSheet = true
-                        }
-                    )
-                }
-
-                item { Spacer(modifier = Modifier.height(10.dp)) }
+                item { Spacer(modifier = Modifier.height(12.dp)) }
 
                 // 3. Hero Progress Card Banner
                 val completedCount = scheduleItems.count { it.isCompleted }
@@ -624,6 +518,43 @@ fun TodayScreen(
                                 }
                             }
 
+                            // Daily Reflection Pill (Morning / Evening)
+                            val currentHour = LocalTime.now().hour
+                            val isEvening = currentHour >= 18 || currentHour < 4
+                            val reflectTitle = if (isEvening) "Evening" else "Reflect"
+                            val reflectIcon = if (isEvening) Icons.Rounded.Spa else Icons.Rounded.WbSunny
+
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(14.dp))
+                                    .background(colors.surface)
+                                    .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(14.dp))
+                                    .formaPressEffect(targetScale = 0.95f) {
+                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                        if (isEvening) showEveningSheet = true else showMorningSheet = true
+                                    }
+                                    .padding(vertical = 10.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = reflectIcon,
+                                        contentDescription = reflectTitle,
+                                        tint = colors.accent,
+                                        modifier = Modifier.size(15.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(5.dp))
+                                    Text(
+                                        text = reflectTitle,
+                                        style = FormaTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = colors.textPrimary,
+                                        fontSize = 12.sp
+                                    )
+                                }
+                            }
+
                             // Journal Archive Pill
                             Box(
                                 modifier = Modifier
@@ -639,8 +570,8 @@ fun TodayScreen(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Spa,
+                                    FormaIcon(
+                                        iconKey = "journal",
                                         contentDescription = "Journal",
                                         tint = colors.accent,
                                         modifier = Modifier.size(15.dp)
@@ -665,62 +596,84 @@ fun TodayScreen(
                                         .clip(RoundedCornerShape(14.dp))
                                         .background(colors.accentSoft)
                                         .border(1.dp, colors.accent.copy(alpha = 0.4f), RoundedCornerShape(14.dp))
-                                        .formaPressEffect(targetScale = 0.95f) {
-                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                            showGuidedRoutineSheet = true
-                                        }
-                                        .padding(vertical = 10.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(
-                                            imageVector = Icons.Rounded.AutoAwesome,
-                                            contentDescription = "Flow Mode",
-                                            tint = colors.accent,
-                                            modifier = Modifier.size(15.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(5.dp))
-                                        Text(
-                                            text = "Flow",
-                                            style = FormaTheme.typography.labelSmall,
-                                            fontWeight = FontWeight.Bold,
-                                            color = colors.accent,
-                                            fontSize = 12.sp
-                                        )
+                                    .formaPressEffect(targetScale = 0.95f) {
+                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                        showGuidedRoutineSheet = true
                                     }
+                                    .padding(vertical = 10.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.AutoAwesome,
+                                        contentDescription = "Flow Mode",
+                                        tint = colors.accent,
+                                        modifier = Modifier.size(15.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(5.dp))
+                                    Text(
+                                        text = "Flow",
+                                        style = FormaTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = colors.accent,
+                                        fontSize = 12.sp
+                                    )
                                 }
                             }
                         }
                     }
                 }
-
-                item { Spacer(modifier = Modifier.height(20.dp)) }
+            }
 
                 item { Spacer(modifier = Modifier.height(16.dp)) }
 
-                // 4. Section Header with "TODAY'S FLOW" + Quick "Templates" action
+                // 4. Section Header with "TODAY'S FLOW" + Progress Badge + Quick "Templates" action
                 item {
+                    val completedCount = scheduleItems.count { it.isCompleted }
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 24.dp, vertical = 4.dp),
+                            .padding(horizontal = 24.dp, vertical = 6.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = "TODAY'S FLOW",
-                            style = FormaTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = colors.textTertiary,
-                            letterSpacing = 1.2.sp,
-                            fontSize = 11.sp
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "TODAY'S FLOW",
+                                style = FormaTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = colors.textTertiary,
+                                letterSpacing = 1.3.sp,
+                                fontSize = 11.sp
+                            )
+                            if (scheduleItems.isNotEmpty()) {
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(6.dp))
+                                        .background(colors.accentSoft)
+                                        .padding(horizontal = 7.dp, vertical = 2.dp)
+                                ) {
+                                    Text(
+                                        text = "$completedCount/${scheduleItems.size} DONE",
+                                        fontWeight = FontWeight.Bold,
+                                        color = colors.accent,
+                                        fontSize = 9.5.sp,
+                                        letterSpacing = 0.5.sp
+                                    )
+                                }
+                            }
+                        }
                         Box(
                             modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
+                                .clip(RoundedCornerShape(10.dp))
                                 .background(colors.surfaceVariant)
-                                .clickable { showTemplatesSheet = true }
-                                .padding(horizontal = 10.dp, vertical = 4.dp)
+                                .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(10.dp))
+                                .formaPressEffect(targetScale = 0.92f) {
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    showTemplatesSheet = true
+                                }
+                                .padding(horizontal = 11.dp, vertical = 5.dp)
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 FormaIcon(
@@ -729,7 +682,7 @@ fun TodayScreen(
                                     tint = colors.accent,
                                     modifier = Modifier.size(13.dp)
                                 )
-                                Spacer(modifier = Modifier.width(4.dp))
+                                Spacer(modifier = Modifier.width(5.dp))
                                 Text(
                                     text = "Templates",
                                     style = FormaTheme.typography.labelSmall,
@@ -742,7 +695,7 @@ fun TodayScreen(
                     }
                 }
 
-                // 5. Minimalist Filter Chips Bar
+                // 5. Minimalist Filter Chips Bar with Smooth Transitions
                 item {
                     Row(
                         modifier = Modifier
@@ -752,40 +705,24 @@ fun TodayScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         TodayFilterChip(
-                            text = "All (${scheduleItems.size})",
+                            text = "All",
+                            badgeCount = scheduleItems.size,
                             isSelected = selectedTimeFilter == null,
                             onClick = { selectedTimeFilter = null }
                         )
 
-                        if (chronotype == Chronotype.BIMODAL_NOCTURNAL) {
-                            TodayFilterChip(
-                                text = "Midday (11–15)",
-                                isSelected = selectedTimeFilter == TimeOfDay.AFTERNOON,
-                                onClick = { selectedTimeFilter = TimeOfDay.AFTERNOON }
-                            )
-                            TodayFilterChip(
-                                text = "Evening (15–22)",
-                                isSelected = selectedTimeFilter == TimeOfDay.EVENING,
-                                onClick = { selectedTimeFilter = TimeOfDay.EVENING }
-                            )
-                            TodayFilterChip(
-                                text = "Nocturnal (22–03)",
-                                isSelected = selectedTimeFilter == TimeOfDay.MORNING,
-                                onClick = { selectedTimeFilter = TimeOfDay.MORNING }
-                            )
-                            TodayFilterChip(
-                                text = "Anytime",
-                                isSelected = selectedTimeFilter == TimeOfDay.ANYTIME,
-                                onClick = { selectedTimeFilter = TimeOfDay.ANYTIME }
-                            )
-                        } else {
-                            TimeOfDay.entries.forEach { tod ->
-                                TodayFilterChip(
-                                    text = tod.displayName,
-                                    isSelected = selectedTimeFilter == tod,
-                                    onClick = { selectedTimeFilter = tod }
-                                )
+                        TimeOfDay.entries.forEach { tod ->
+                            val countForTod = scheduleItems.count { item ->
+                                when (item) {
+                                    is TodayScheduleItem.HabitItem -> item.habit.timeOfDay == tod
+                                    is TodayScheduleItem.TimelineBlock -> true
+                                }
                             }
+                            TodayFilterChip(
+                                text = tod.displayName,
+                                isSelected = selectedTimeFilter == tod,
+                                onClick = { selectedTimeFilter = tod }
+                            )
                         }
                     }
                 }
@@ -808,6 +745,7 @@ fun TodayScreen(
                         ) { index, scheduleItem ->
                             BehanceHabitCard(
                                 item = scheduleItem,
+                                index = index,
                                 modifier = Modifier.formaStaggeredEntrance(index),
                                 onToggle = {
                                     when (scheduleItem) {
@@ -856,7 +794,6 @@ fun TodayScreen(
                     }
                 }
             }
-        }
 
             // Top Floating Dynamic Streak Island
             DynamicStreakIsland(
@@ -868,6 +805,7 @@ fun TodayScreen(
             )
         }
     }
+}
 
     // Detail Bottom Sheet Modal
     selectedDetailItem?.let { item ->
@@ -926,39 +864,28 @@ fun TodayScreen(
                 }
             },
             onToggleSubtask = { subtaskId ->
-                if (item is TodayScheduleItem.TimelineBlock) {
-                    viewModel.toggleSubtask(item.item, subtaskId)
+                when (item) {
+                    is TodayScheduleItem.TimelineBlock -> viewModel.toggleSubtask(item.item, subtaskId)
+                    is TodayScheduleItem.HabitItem -> viewModel.toggleHabitSubtask(item.habit, subtaskId)
+                }
+            },
+            onTogglePause = {
+                if (item is TodayScheduleItem.HabitItem) {
+                    viewModel.toggleHabitPause(item.habit)
                 }
             }
         )
     }
 
-    // Calendar Date Picker Modal
+    // Bespoke Forma Sanctuary Calendar Modal Sheet
     if (showDatePickerDialog) {
-        val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = selectedDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-        )
-        DatePickerDialog(
-            onDismissRequest = { showDatePickerDialog = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    datePickerState.selectedDateMillis?.let { millis ->
-                        val picked = Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDate()
-                        viewModel.selectDate(picked)
-                    }
-                    showDatePickerDialog = false
-                }) {
-                    Text("OK", color = colors.accent, fontWeight = FontWeight.Bold)
-                }
+        com.forma.app.ui.today.components.FormaCalendarSheet(
+            selectedDate = selectedDate,
+            onDateSelected = { pickedDate ->
+                viewModel.selectDate(pickedDate)
             },
-            dismissButton = {
-                TextButton(onClick = { showDatePickerDialog = false }) {
-                    Text("Cancel", color = colors.textSecondary)
-                }
-            }
-        ) {
-            DatePicker(state = datePickerState)
-        }
+            onDismiss = { showDatePickerDialog = false }
+        )
     }
 
     if (showPaywall) {
@@ -1020,18 +947,6 @@ fun TodayScreen(
         )
     }
 
-    if (showChronotypeSheet) {
-        com.forma.app.ui.chronotype.ChronotypeSelectorSheet(
-            currentChronotype = chronotype,
-            alignmentReport = null,
-            onSelectChronotype = { newChrono ->
-                viewModel.setChronotype(newChrono)
-                showChronotypeSheet = false
-            },
-            onDismiss = { showChronotypeSheet = false }
-        )
-    }
-
     editingHabitId?.let { habitId ->
         com.forma.app.ui.timeline.components.AddEditTimelineSheet(
             itemId = habitId,
@@ -1061,3 +976,4 @@ fun TodayScreen(
         )
     }
 }
+
