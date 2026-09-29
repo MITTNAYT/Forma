@@ -105,6 +105,10 @@ import androidx.compose.ui.geometry.Rect
 import com.forma.app.ui.today.components.TodayCoachMarksOverlay
 import com.forma.app.ui.today.components.EmptyPeacefulState
 import com.forma.app.ui.today.components.TodayFilterChip
+import com.forma.app.ui.today.components.RitualStackDeck
+import androidx.compose.material.icons.rounded.Layers
+import androidx.compose.material.icons.rounded.FormatListBulleted
+import androidx.compose.runtime.saveable.rememberSaveable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -141,6 +145,7 @@ fun TodayScreen(
     var selectedTimeFilter by remember { mutableStateOf<TimeOfDay?>(null) }
     var showTemplatesSheet by remember { mutableStateOf(false) }
     var celebrationInfo by remember { mutableStateOf<Pair<String, Int>?>(null) }
+    var isStackViewMode by rememberSaveable { mutableStateOf(false) }
     val haptic = LocalHapticFeedback.current
 
     // Silky Smooth Staggered Entrance Animation
@@ -604,32 +609,72 @@ fun TodayScreen(
                                 }
                             }
                         }
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(colors.surfaceVariant)
-                                .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(10.dp))
-                                .formaPressEffect(targetScale = 0.92f) {
-                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                    showTemplatesSheet = true
-                                }
-                                .padding(horizontal = 11.dp, vertical = 5.dp)
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                FormaIcon(
-                                    iconKey = "sparkles",
-                                    contentDescription = null,
-                                    tint = colors.accent,
-                                    modifier = Modifier.size(13.dp)
-                                )
-                                Spacer(modifier = Modifier.width(5.dp))
-                                Text(
-                                    text = "Templates",
-                                    style = FormaTheme.typography.labelSmall,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = colors.textPrimary,
-                                    fontSize = 11.sp
-                                )
+                            // View Mode Toggle (List vs Stack Deck)
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(if (isStackViewMode) colors.accentSoft else colors.surfaceVariant)
+                                    .border(
+                                        1.dp,
+                                        if (isStackViewMode) colors.accent.copy(alpha = 0.5f) else colors.border.copy(alpha = 0.5f),
+                                        RoundedCornerShape(10.dp)
+                                    )
+                                    .formaPressEffect(targetScale = 0.92f) {
+                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                        isStackViewMode = !isStackViewMode
+                                    }
+                                    .padding(horizontal = 10.dp, vertical = 5.dp)
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = if (isStackViewMode) Icons.Rounded.FormatListBulleted else Icons.Rounded.Layers,
+                                        contentDescription = if (isStackViewMode) "List View" else "Stack View",
+                                        tint = if (isStackViewMode) colors.accent else colors.textPrimary,
+                                        modifier = Modifier.size(13.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(5.dp))
+                                    Text(
+                                        text = if (isStackViewMode) "List" else "Stack",
+                                        style = FormaTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = if (isStackViewMode) colors.accent else colors.textPrimary,
+                                        fontSize = 11.sp
+                                    )
+                                }
+                            }
+
+                            // Templates shortcut
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(colors.surfaceVariant)
+                                    .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(10.dp))
+                                    .formaPressEffect(targetScale = 0.92f) {
+                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                        showTemplatesSheet = true
+                                    }
+                                    .padding(horizontal = 11.dp, vertical = 5.dp)
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    FormaIcon(
+                                        iconKey = "sparkles",
+                                        contentDescription = null,
+                                        tint = colors.accent,
+                                        modifier = Modifier.size(13.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(5.dp))
+                                    Text(
+                                        text = "Templates",
+                                        style = FormaTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = colors.textPrimary,
+                                        fontSize = 11.sp
+                                    )
+                                }
                             }
                         }
                     }
@@ -758,11 +803,71 @@ fun TodayScreen(
                 item { Spacer(modifier = Modifier.height(6.dp)) }
 
                 // 6. Mindful Habits & Tasks List (Filtered)
-                if (daySchedule != null) {
-                    if (displayedItems.isEmpty()) {
+                if (daySchedule != null) {                    if (displayedItems.isEmpty()) {
                         item {
                             EmptyPeacefulState(
                                 onAddTask = { onNavigateToAddTask(DateUtils.formatDateIso(selectedDate)) }
+                            )
+                        }
+                    } else if (isStackViewMode) {
+                        item {
+                            RitualStackDeck(
+                                items = displayedItems,
+                                onToggle = { scheduleItem ->
+                                    when (scheduleItem) {
+                                        is TodayScheduleItem.HabitItem -> {
+                                            if (!scheduleItem.isDoneToday) {
+                                                celebrationInfo = Pair(scheduleItem.habit.name, scheduleItem.currentStreak + 1)
+                                            }
+                                            viewModel.toggleHabit(scheduleItem)
+                                        }
+                                        is TodayScheduleItem.TimelineBlock -> {
+                                            if (!scheduleItem.item.completed) {
+                                                celebrationInfo = Pair(scheduleItem.item.title, 1)
+                                            }
+                                            viewModel.toggleTask(scheduleItem)
+                                        }
+                                    }
+                                },
+                                onClick = { scheduleItem ->
+                                    selectedDetailItem = scheduleItem
+                                },
+                                onStartFocus = { scheduleItem ->
+                                    when (scheduleItem) {
+                                        is TodayScheduleItem.HabitItem -> {
+                                            val habit = scheduleItem.habit
+                                            val duration = when (habit.timeOfDay) {
+                                                TimeOfDay.MORNING -> 15
+                                                TimeOfDay.AFTERNOON -> 25
+                                                TimeOfDay.EVENING -> 20
+                                                TimeOfDay.ANYTIME -> 20
+                                            }
+                                            onNavigateToFocusTimer(habit.id, habit.name, duration, true)
+                                        }
+                                        is TodayScheduleItem.TimelineBlock -> {
+                                            val task = scheduleItem.item
+                                            val startParsed = try { task.startTime?.let { LocalTime.parse(it) } } catch (_: Exception) { null }
+                                            val endParsed = try { task.endTime?.let { LocalTime.parse(it) } } catch (_: Exception) { null }
+                                            val duration = if (startParsed != null && endParsed != null) {
+                                                ChronoUnit.MINUTES.between(startParsed, endParsed).toInt().coerceAtLeast(5)
+                                            } else 25
+                                            onNavigateToFocusTimer(task.id, task.title, duration, false)
+                                        }
+                                    }
+                                },
+                                onSkip = { scheduleItem ->
+                                    if (scheduleItem is TodayScheduleItem.HabitItem) {
+                                        viewModel.skipHabit(scheduleItem.habit.id, scheduleItem.habit.name)
+                                    }
+                                },
+                                onUnskip = { scheduleItem ->
+                                    if (scheduleItem is TodayScheduleItem.HabitItem) {
+                                        viewModel.unskipHabit(scheduleItem.habit.id)
+                                    }
+                                },
+                                onSwitchToListMode = {
+                                    isStackViewMode = false
+                                }
                             )
                         }
                     } else {
@@ -843,7 +948,6 @@ fun TodayScreen(
             )
         }
     }
-}
 
     // Detail Bottom Sheet Modal
     selectedDetailItem?.let { item ->
@@ -1012,5 +1116,6 @@ fun TodayScreen(
             onDismiss = { viewModel.dismissCoachMarks() }
         )
     }
+}
 }
 
