@@ -1,7 +1,11 @@
 package com.forma.app.domain.model
 
 import androidx.compose.runtime.Immutable
+import com.forma.app.core.util.DateUtils
 import com.forma.app.core.util.SyncStatus
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.UUID
 
 @Immutable
@@ -25,6 +29,32 @@ data class Habit(
     val endDate: String? = null, // e.g. "2026-12-31"
     val isIndefinite: Boolean = true, // Infinity ongoing or fixed duration
     val subtasks: List<Subtask> = emptyList()
-)
+) {
+    /**
+     * Resolves the exact local start date from startDate string, or falls back to createdAt epoch.
+     */
+    val effectiveStartLocalDate: LocalDate
+        get() = try {
+            startDate?.let { LocalDate.parse(it) }
+        } catch (_: Exception) { null } ?: run {
+            Instant.ofEpochMilli(createdAt).atZone(ZoneId.systemDefault()).toLocalDate()
+        }
+
+    /**
+     * Determines whether this habit is scheduled to be active on a given date.
+     * Habits only start appearing and tracking from the day the user sets them.
+     */
+    fun isScheduledOnDate(date: LocalDate): Boolean {
+        if (archived) return false
+        val start = effectiveStartLocalDate
+        if (date.isBefore(start)) return false
+        if (endDate != null) {
+            val end = try { LocalDate.parse(endDate) } catch (_: Exception) { null }
+            if (end != null && date.isAfter(end)) return false
+        }
+        val dayOfWeek = DateUtils.getDayOfWeekInt(date)
+        return repeatDays.isEmpty() || repeatDays.contains(dayOfWeek)
+    }
+}
 
 

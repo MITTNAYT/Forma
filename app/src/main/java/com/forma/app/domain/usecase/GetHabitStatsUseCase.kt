@@ -1,4 +1,4 @@
-﻿package com.forma.app.domain.usecase
+package com.forma.app.domain.usecase
 
 import com.forma.app.core.util.DateUtils
 import com.forma.app.domain.model.DayCompletionRate
@@ -39,7 +39,7 @@ class GetHabitStatsUseCase @Inject constructor(
 
                 // How many habits were scheduled on this date?
                 val scheduledForDate = habits.filter {
-                    it.repeatDays.isEmpty() || it.repeatDays.contains(dayOfWeek)
+                    it.isScheduledOnDate(date)
                 }
 
                 val completedOnDate = completionsByDate[dateIso]?.size ?: 0
@@ -77,7 +77,7 @@ class GetHabitStatsUseCase @Inject constructor(
                 val dayOfWeek = DateUtils.getDayOfWeekInt(date)
 
                 val scheduledForDate = habits.filter {
-                    it.repeatDays.isEmpty() || it.repeatDays.contains(dayOfWeek)
+                    it.isScheduledOnDate(date)
                 }
 
                 val completedOnDate = completionsByDate[dateIso]?.size ?: 0

@@ -1,4 +1,4 @@
-﻿package com.forma.app.domain.usecase
+package com.forma.app.domain.usecase
 
 import androidx.compose.runtime.Immutable
 import com.forma.app.core.util.DateUtils
@@ -84,7 +84,12 @@ class GenerateWeeklyRetroUseCase @Inject constructor() {
             }
         }
 
-        val totalExpected = (activeHabits.size * 7).coerceAtLeast(1)
+        val totalExpected = activeHabits.sumOf { habit ->
+            weekDates.count { dateStr ->
+                val date = LocalDate.parse(dateStr)
+                habit.isScheduledOnDate(date)
+            }
+        }.coerceAtLeast(1)
         val consistencyScore = ((totalHabitsDone.toDouble() / totalExpected.toDouble()) * 100).roundToInt().coerceIn(15, 100)
 
         val startDateStr = referenceDate.minusDays(6).let { "${it.month.name.take(3)} ${it.dayOfMonth}" }

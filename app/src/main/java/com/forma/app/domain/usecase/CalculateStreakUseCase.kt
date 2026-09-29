@@ -1,4 +1,4 @@
-﻿package com.forma.app.domain.usecase
+package com.forma.app.domain.usecase
 
 import com.forma.app.core.util.DateUtils
 import com.forma.app.domain.model.Habit
@@ -35,12 +35,11 @@ class CalculateStreakUseCase @Inject constructor() {
             checkDate = checkDate.minusDays(1)
         }
 
-        val createdEpochDay = habit.createdAt / (1000L * 60 * 60 * 24)
-        val createdDate = LocalDate.ofEpochDay(createdEpochDay.coerceAtLeast(0L))
+        val habitStartDate = habit.effectiveStartLocalDate
         var daysBack = 0
         val maxLookback = 365
 
-        while (daysBack < maxLookback && !checkDate.isBefore(createdDate)) {
+        while (daysBack < maxLookback && !checkDate.isBefore(habitStartDate)) {
             val dayOfWeek = DateUtils.getDayOfWeekInt(checkDate)
             val isScheduled = scheduledRepeatDays.contains(dayOfWeek)
 
@@ -73,20 +72,18 @@ class CalculateStreakUseCase @Inject constructor() {
         val scheduledRepeatDays = if (habit.repeatDays.isEmpty()) setOf(1, 2, 3, 4, 5, 6, 7) else habit.repeatDays
         val currentStreak = calculateCurrentStreak(habit, completedDatesSet, referenceDate)
 
-        val createdEpochDay = habit.createdAt / (1000L * 60 * 60 * 24)
-        val createdDate = LocalDate.ofEpochDay(createdEpochDay.coerceAtLeast(0L))
+        val habitStartDate = habit.effectiveStartLocalDate
 
         // Calculate Longest Streak & Total completions
         var longestStreak = currentStreak
         var runningStreak = 0
 
-        // Iterate through all days from createdAt up to referenceDate
-        var scanDate = createdDate
+        // Iterate through all days from habitStartDate up to referenceDate
+        var scanDate = habitStartDate
         var totalScheduledDays = 0
 
         while (!scanDate.isAfter(referenceDate)) {
-            val dayOfWeek = DateUtils.getDayOfWeekInt(scanDate)
-            val isScheduled = scheduledRepeatDays.contains(dayOfWeek)
+            val isScheduled = habit.isScheduledOnDate(scanDate)
 
             if (isScheduled) {
                 totalScheduledDays++

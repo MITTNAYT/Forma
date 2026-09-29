@@ -34,9 +34,9 @@ class GetTodayTimelineUseCase @Inject constructor(
             val completedHabitIds = completionsForDate.map { it.habitId }.toSet()
             val completionsMap = completionsForDate.associateBy { it.habitId }
 
-            // Filter habits that repeat on this day of week
+            // Filter habits that repeat on this day of week and start on or before this date
             val scheduledHabits = habits.filter { habit ->
-                habit.repeatDays.isEmpty() || habit.repeatDays.contains(dayOfWeekInt)
+                habit.isScheduledOnDate(date)
             }
 
             // Create habit schedule items with fast streak info
