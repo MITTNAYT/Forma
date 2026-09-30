@@ -20,7 +20,7 @@ class HabitTemplateTest {
         for (template in HabitTemplate.CURATED_TEMPLATES) {
             assertTrue("Template ${template.id} title should not be blank", template.title.isNotBlank())
             assertTrue("Template ${template.id} description should not be blank", template.description.isNotBlank())
-            assertTrue("Template ${template.id} scienceNote should not be blank", template.scienceNote.isNotBlank())
+            assertTrue("Template ${template.id} simpleBenefit should not be blank", template.simpleBenefit.isNotBlank())
             assertTrue("Template ${template.id} icon should not be blank", template.icon.isNotBlank())
             assertTrue("Template ${template.id} duration should be positive", template.durationMinutes > 0)
         }
@@ -28,20 +28,20 @@ class HabitTemplateTest {
 
     @Test
     fun toHabit_createsValidHabitWithExpectedProperties() {
-        val template = HabitTemplate.CURATED_TEMPLATES.first { it.id == "mindful_sunlight_water" }
+        val template = HabitTemplate.CURATED_TEMPLATES.first { it.id == "essentials_morning_water" }
         val habit = template.toHabit()
 
         assertNotNull(habit.id)
-        assertEquals("Morning Sunlight & Hydration", habit.name)
-        assertEquals("spa", habit.icon)
-        assertEquals("#D4AF37", habit.colorTag)
+        assertEquals("Morning Hydration (500ml)", habit.name)
+        assertEquals("water", habit.icon)
+        assertEquals("#4A7C59", habit.colorTag)
         assertEquals(TimeOfDay.MORNING, habit.timeOfDay)
         assertEquals(EnergyLevel.LOW, habit.energyLevel)
         assertEquals(setOf(1, 2, 3, 4, 5, 6, 7), habit.repeatDays)
         assertFalse(habit.archived)
         assertTrue(habit.isIndefinite)
-        assertEquals("Immediately after stepping out of bed", habit.stackedCueText)
-        assertEquals(7 * 60, habit.reminderTimeMinutes)
+        assertEquals("Right after stepping out of bed", habit.stackedCueText)
+        assertEquals(7 * 60 + 30, habit.reminderTimeMinutes)
         assertEquals(2, habit.subtasks.size)
     }
 
