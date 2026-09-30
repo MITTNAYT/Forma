@@ -77,23 +77,12 @@ fun FormaEmblem(
         ),
         label = "auraAlpha"
     )
-    val focalDotPulse by infiniteTransition.animateFloat(
-        initialValue = 0.96f,
-        targetValue = 1.04f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 2800, easing = CubicBezierEasing(0.4f, 0f, 0.6f, 1f)),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "focalPulse"
-    )
-
-    // ── Bauhaus Architectural Assembly Sequence ─────────────────────
+    // ── Mindful Keystone Assembly Sequence ─────────────────────────
     val discScale = remember { Animatable(if (animated) 0.82f else 1f) }
     val discAlpha = remember { Animatable(if (animated) 0f else 1f) }
     val columnProgress = remember { Animatable(if (animated) 0f else 1f) }
     val topBeamProgress = remember { Animatable(if (animated) 0f else 1f) }
     val midBeamProgress = remember { Animatable(if (animated) 0f else 1f) }
-    val focalDotScale = remember { Animatable(if (animated) 0f else 1f) }
     val specularAlpha = remember { Animatable(if (animated) 0f else 0.8f) }
     val rippleRadius = remember { Animatable(0f) }
     val rippleAlpha = remember { Animatable(0f) }
@@ -113,7 +102,7 @@ fun FormaEmblem(
                 )
             }
 
-            // 2. Vertical Architectural Column erects from foundation
+            // 2. Foundation Cairn Stone rises from ceramic base
             delay(100)
             launch {
                 columnProgress.animateTo(
@@ -125,19 +114,7 @@ fun FormaEmblem(
                 )
             }
 
-            // 3. Top Cantilever Beam glides in horizontally
-            delay(180)
-            launch {
-                topBeamProgress.animateTo(
-                    targetValue = 1f,
-                    animationSpec = spring(
-                        dampingRatio = 0.68f,
-                        stiffness = Spring.StiffnessLow
-                    )
-                )
-            }
-
-            // 4. Mid Horizontal Beam slides in (staggered)
+            // 3. Middle Cantilever Stone glides into equilibrium
             delay(120)
             launch {
                 midBeamProgress.animateTo(
@@ -149,19 +126,19 @@ fun FormaEmblem(
                 )
             }
 
-            // 5. Focal Balance Pebble blossoms
-            delay(140)
+            // 4. Top Keystone settles onto the cairn stack
+            delay(160)
             launch {
-                focalDotScale.animateTo(
+                topBeamProgress.animateTo(
                     targetValue = 1f,
                     animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessMediumLow
+                        dampingRatio = 0.68f,
+                        stiffness = Spring.StiffnessLow
                     )
                 )
             }
 
-            // 6. Specular Glaze Highlight & Architectural Micro-Ripple
+            // 5. Specular Glaze Highlight & Architectural Micro-Ripple
             delay(160)
             launch {
                 specularAlpha.animateTo(1f, tween(200))
@@ -271,137 +248,102 @@ fun FormaEmblem(
                     style = Stroke(width = 1.2f)
                 )
 
-                // ── 4. Bauhaus Architectural "F" Coordinates ───────────
-                // Scaled to 108-unit grid
-                val colLeft = 38f * unit
-                val colRight = 51f * unit
-                val colTop = 35f * unit
-                val colBottom = 73f * unit
-                val colWidth = colRight - colLeft
-                val colHeight = colBottom - colTop
-                val cornerR = 3f * unit
+                // ── 4. Concept C: Mindful Keystone ("F" Zen Cairn Stones) ───────
+                // 108-unit grid, optically balanced cairn stack
+                // Stone 1 (Top Keystone): 44 x 13, R 6.5
+                val s1Left = 31.5f * unit
+                val s1Right = 75.5f * unit
+                val s1Top = 28.0f * unit
+                val s1Bottom = 41.0f * unit
+                val s1Width = s1Right - s1Left
+                val s1Height = s1Bottom - s1Top
+                val s1Radius = 6.5f * unit
 
-                val topBeamLeft = 38f * unit
-                val topBeamRight = 72f * unit
-                val topBeamTop = 35f * unit
-                val topBeamBottom = 45f * unit
+                // Stone 2 (Middle Cantilever Stone): 34 x 12, R 6.0
+                val s2Left = 31.5f * unit
+                val s2Right = 65.5f * unit
+                val s2Top = 46.0f * unit
+                val s2Bottom = 58.0f * unit
+                val s2Width = s2Right - s2Left
+                val s2Height = s2Bottom - s2Top
+                val s2Radius = 6.0f * unit
 
-                val midBeamLeft = 38f * unit
-                val midBeamRight = 64f * unit
-                val midBeamTop = 50f * unit
-                val midBeamBottom = 59f * unit
+                // Stone 3 (Foundation Cairn Stone): 13 x 15, R 6.5
+                val s3Left = 32.5f * unit
+                val s3Right = 45.5f * unit
+                val s3Top = 63.0f * unit
+                val s3Bottom = 78.0f * unit
+                val s3Width = s3Right - s3Left
+                val s3Height = s3Bottom - s3Top
+                val s3Radius = 6.5f * unit
 
-                val focalCenterX = 61f * unit
-                val focalCenterY = 68f * unit
-                val focalRadius = 2.0f * unit
-
-                // Cast Shadow of Bauhaus "F" onto Disc
+                // Unified Cast Shadow of all 3 Cairn Stones onto Disc
                 val shadowOffset = Offset(1.5f * unit, 2.5f * unit)
-                val fullFPath = Path().apply {
+                val fullCairnPath = Path().apply {
                     addRoundRect(
                         RoundRect(
-                            rect = Rect(colLeft, colTop, colRight, colBottom),
-                            topLeft = CornerRadius(cornerR, cornerR),
-                            topRight = CornerRadius(0f, 0f),
-                            bottomRight = CornerRadius(cornerR, cornerR),
-                            bottomLeft = CornerRadius(cornerR, cornerR)
+                            rect = Rect(s1Left, s1Top, s1Right, s1Bottom),
+                            cornerRadius = CornerRadius(s1Radius, s1Radius)
                         )
                     )
                     addRoundRect(
                         RoundRect(
-                            rect = Rect(colLeft, topBeamTop, topBeamRight, topBeamBottom),
-                            topLeft = CornerRadius(cornerR, cornerR),
-                            topRight = CornerRadius(cornerR, cornerR),
-                            bottomRight = CornerRadius(cornerR, cornerR),
-                            bottomLeft = CornerRadius(0f, 0f)
+                            rect = Rect(s2Left, s2Top, s2Right, s2Bottom),
+                            cornerRadius = CornerRadius(s2Radius, s2Radius)
                         )
                     )
                     addRoundRect(
                         RoundRect(
-                            rect = Rect(colLeft, midBeamTop, midBeamRight, midBeamBottom),
-                            topLeft = CornerRadius(0f, 0f),
-                            topRight = CornerRadius(cornerR, cornerR),
-                            bottomRight = CornerRadius(cornerR, cornerR),
-                            bottomLeft = CornerRadius(0f, 0f)
+                            rect = Rect(s3Left, s3Top, s3Right, s3Bottom),
+                            cornerRadius = CornerRadius(s3Radius, s3Radius)
                         )
                     )
                 }
 
-                // Draw Cast Shadow
+                // Draw Cairn Cast Shadow
                 withTransform({
                     translate(shadowOffset.x, shadowOffset.y)
                 }) {
                     drawPath(
-                        path = fullFPath,
-                        color = Color.Black.copy(alpha = 0.10f * globalAlpha * columnProgress.value)
+                        path = fullCairnPath,
+                        color = Color.Black.copy(alpha = 0.12f * globalAlpha * columnProgress.value)
                     )
                 }
 
-                // ── 5. Vertical Architectural Column (Habit Spine) ─────
-                val currentColHeight = colHeight * columnProgress.value
-                if (currentColHeight > 0f) {
-                    val clipCol = Path().apply {
+                // ── 5. Foundation Cairn Stone (Rising Habit Anchor) ──────
+                val currentS3Height = s3Height * columnProgress.value
+                if (currentS3Height > 0f) {
+                    val clipS3 = Path().apply {
                         addRect(
                             Rect(
-                                left = colLeft - 1f,
-                                top = colBottom - currentColHeight,
-                                right = colRight + 1f,
-                                bottom = colBottom + 1f
+                                left = s3Left - 1f,
+                                top = s3Bottom - currentS3Height,
+                                right = s3Right + 1f,
+                                bottom = s3Bottom + 1f
                             )
                         )
                     }
-                    clipPath(clipCol) {
-                        // Deep foundation bevel layer
+                    clipPath(clipS3) {
+                        // Deep foundation shadow
                         drawRoundRect(
                             color = Color.Black.copy(alpha = 0.18f * globalAlpha),
-                            topLeft = Offset(colLeft, colTop + 0.8f * unit),
-                            size = Size(colWidth, colHeight),
-                            cornerRadius = CornerRadius(cornerR, cornerR)
+                            topLeft = Offset(s3Left, s3Top + 0.8f * unit),
+                            size = Size(s3Width, s3Height),
+                            cornerRadius = CornerRadius(s3Radius, s3Radius)
                         )
-                        // Column body
+                        // Foundation Stone Body
                         drawRoundRect(
                             color = glyphColor.copy(alpha = globalAlpha),
-                            topLeft = Offset(colLeft, colTop),
-                            size = Size(colWidth, colHeight),
-                            cornerRadius = CornerRadius(cornerR, cornerR)
+                            topLeft = Offset(s3Left, s3Top),
+                            size = Size(s3Width, s3Height),
+                            cornerRadius = CornerRadius(s3Radius, s3Radius)
                         )
-                    }
-                }
-
-                // ── 6. Top Cantilever Beam ─────────────────────────────
-                val currentTopBeamWidth = (topBeamRight - colLeft) * topBeamProgress.value
-                if (currentTopBeamWidth > 0f) {
-                    val topClip = Path().apply {
-                        addRect(
-                            Rect(
-                                left = colLeft,
-                                top = topBeamTop - 1f,
-                                right = colLeft + currentTopBeamWidth + 1f,
-                                bottom = topBeamBottom + 1f
-                            )
-                        )
-                    }
-                    clipPath(topClip) {
-                        // Top beam foundation shadow
-                        drawRoundRect(
-                            color = Color.Black.copy(alpha = 0.16f * globalAlpha),
-                            topLeft = Offset(colLeft, topBeamTop + 0.8f * unit),
-                            size = Size(topBeamRight - colLeft, topBeamBottom - topBeamTop),
-                            cornerRadius = CornerRadius(cornerR, cornerR)
-                        )
-                        // Top beam body
-                        drawRoundRect(
-                            color = glyphColor.copy(alpha = globalAlpha),
-                            topLeft = Offset(colLeft, topBeamTop),
-                            size = Size(topBeamRight - colLeft, topBeamBottom - topBeamTop),
-                            cornerRadius = CornerRadius(cornerR, cornerR)
-                        )
-                        // Specular glazed edge highlight
+                        // Specular Crest Highlight
                         if (specularAlpha.value > 0f) {
                             drawLine(
-                                color = pearlColor.copy(alpha = 0.40f * specularAlpha.value * globalAlpha),
-                                start = Offset(colLeft + 2f * unit, topBeamTop + 1.2f * unit),
-                                end = Offset(topBeamRight - 3f * unit, topBeamTop + 1.2f * unit),
+                                color = pearlColor.copy(alpha = 0.45f * specularAlpha.value * globalAlpha),
+                                start = Offset(36f * unit, 64f * unit),
+                                end = Offset(41f * unit, 64f * unit),
                                 strokeWidth = 1.0f * unit,
                                 cap = StrokeCap.Round
                             )
@@ -409,58 +351,86 @@ fun FormaEmblem(
                     }
                 }
 
-                // ── 7. Middle Cantilever Beam ──────────────────────────
-                val currentMidBeamWidth = (midBeamRight - colLeft) * midBeamProgress.value
-                if (currentMidBeamWidth > 0f) {
-                    val midClip = Path().apply {
+                // ── 6. Middle Cantilever Stone (Floating Balance) ─────────
+                val currentS2Width = s2Width * midBeamProgress.value
+                if (currentS2Width > 0f) {
+                    val clipS2 = Path().apply {
                         addRect(
                             Rect(
-                                left = colLeft,
-                                top = midBeamTop - 1f,
-                                right = colLeft + currentMidBeamWidth + 1f,
-                                bottom = midBeamBottom + 1f
+                                left = s2Left - 1f,
+                                top = s2Top - 1f,
+                                right = s2Left + currentS2Width + 1f,
+                                bottom = s2Bottom + 1f
                             )
                         )
                     }
-                    clipPath(midClip) {
-                        // Mid beam foundation shadow
+                    clipPath(clipS2) {
+                        // Shadow bevel
                         drawRoundRect(
                             color = Color.Black.copy(alpha = 0.16f * globalAlpha),
-                            topLeft = Offset(colLeft, midBeamTop + 0.8f * unit),
-                            size = Size(midBeamRight - colLeft, midBeamBottom - midBeamTop),
-                            cornerRadius = CornerRadius(cornerR, cornerR)
+                            topLeft = Offset(s2Left, s2Top + 0.8f * unit),
+                            size = Size(s2Width, s2Height),
+                            cornerRadius = CornerRadius(s2Radius, s2Radius)
                         )
-                        // Mid beam body
+                        // Stone Body
                         drawRoundRect(
                             color = glyphColor.copy(alpha = globalAlpha),
-                            topLeft = Offset(colLeft, midBeamTop),
-                            size = Size(midBeamRight - colLeft, midBeamBottom - midBeamTop),
-                            cornerRadius = CornerRadius(cornerR, cornerR)
+                            topLeft = Offset(s2Left, s2Top),
+                            size = Size(s2Width, s2Height),
+                            cornerRadius = CornerRadius(s2Radius, s2Radius)
                         )
+                        // Specular Crest Highlight
+                        if (specularAlpha.value > 0f) {
+                            drawLine(
+                                color = pearlColor.copy(alpha = 0.45f * specularAlpha.value * globalAlpha),
+                                start = Offset(38f * unit, 47f * unit),
+                                end = Offset(58f * unit, 47f * unit),
+                                strokeWidth = 1.0f * unit,
+                                cap = StrokeCap.Round
+                            )
+                        }
                     }
                 }
 
-                // ── 8. Golden Ratio Focal Balance Pebble ───────────────
-                val currentFocalR = focalRadius * focalDotScale.value * focalDotPulse
-                if (currentFocalR > 0f) {
-                    // Pebble shadow
-                    drawCircle(
-                        color = Color.Black.copy(alpha = 0.20f * globalAlpha),
-                        radius = currentFocalR * 1.15f,
-                        center = Offset(focalCenterX + 0.4f * unit, focalCenterY + 0.6f * unit)
-                    )
-                    // Pebble body
-                    drawCircle(
-                        color = glyphColor.copy(alpha = globalAlpha),
-                        radius = currentFocalR,
-                        center = Offset(focalCenterX, focalCenterY)
-                    )
-                    // Pebble jewel specular highlight
-                    drawCircle(
-                        color = pearlColor.copy(alpha = 0.65f * globalAlpha),
-                        radius = currentFocalR * 0.38f,
-                        center = Offset(focalCenterX - currentFocalR * 0.28f, focalCenterY - currentFocalR * 0.28f)
-                    )
+                // ── 7. Top Keystone (Broad Resting Capstone) ─────────────
+                val currentS1Width = s1Width * topBeamProgress.value
+                if (currentS1Width > 0f) {
+                    val clipS1 = Path().apply {
+                        addRect(
+                            Rect(
+                                left = s1Left - 1f,
+                                top = s1Top - 1f,
+                                right = s1Left + currentS1Width + 1f,
+                                bottom = s1Bottom + 1f
+                            )
+                        )
+                    }
+                    clipPath(clipS1) {
+                        // Top keystone foundation shadow
+                        drawRoundRect(
+                            color = Color.Black.copy(alpha = 0.16f * globalAlpha),
+                            topLeft = Offset(s1Left, s1Top + 0.8f * unit),
+                            size = Size(s1Width, s1Height),
+                            cornerRadius = CornerRadius(s1Radius, s1Radius)
+                        )
+                        // Top keystone body
+                        drawRoundRect(
+                            color = glyphColor.copy(alpha = globalAlpha),
+                            topLeft = Offset(s1Left, s1Top),
+                            size = Size(s1Width, s1Height),
+                            cornerRadius = CornerRadius(s1Radius, s1Radius)
+                        )
+                        // Specular crest highlight
+                        if (specularAlpha.value > 0f) {
+                            drawLine(
+                                color = pearlColor.copy(alpha = 0.45f * specularAlpha.value * globalAlpha),
+                                start = Offset(38f * unit, 29f * unit),
+                                end = Offset(68f * unit, 29f * unit),
+                                strokeWidth = 1.2f * unit,
+                                cap = StrokeCap.Round
+                            )
+                        }
+                    }
                 }
             }
         }
