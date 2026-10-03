@@ -31,7 +31,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.AutoGraph
 import androidx.compose.material.icons.rounded.CheckCircle
-import com.forma.app.ui.analytics.components.MindfulInsightsSheet
 import androidx.compose.material.icons.rounded.ChevronLeft
 import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.NorthEast
@@ -68,13 +67,10 @@ import com.forma.app.domain.model.DayCompletionRate
 import com.forma.app.domain.model.HabitStreakInfo
 import com.forma.app.domain.model.OverallHabitStats
 import com.forma.app.domain.repository.FocusItemSummary
-import com.forma.app.ui.analytics.components.MindfulInsightsSheet
-import com.forma.app.ui.mindfulness.BinauralBreathworkSheet
 import com.forma.app.ui.settings.components.ProPaywallBottomSheet
 import com.forma.app.ui.stats.components.CommitmentDetailSheet
 import com.forma.app.ui.stats.components.HabitMomentumDetailSheet
 import com.forma.app.ui.stats.components.RhythmDayDetailSheet
-import com.forma.app.ui.stats.components.WeeklyZenRetroSheet
 
 enum class FocusTimeTab(val label: String) {
     WEEK("This Week"),
@@ -106,9 +102,6 @@ fun StatsScreen(
 
     var selectedTimeTab by remember { mutableStateOf(FocusTimeTab.WEEK) }
     var showPaywall by remember { mutableStateOf(false) }
-    var showInsightsSheet by remember { mutableStateOf(false) }
-    var showWeeklyRetroSheet by remember { mutableStateOf(false) }
-    var showBreathworkSheet by remember { mutableStateOf(false) }
 
     val userInitial = userName.trim().take(1).uppercase().ifBlank { "F" }
 
@@ -887,215 +880,6 @@ fun StatsScreen(
                         }
                     }
                 }
-
-                item { Spacer(modifier = Modifier.height(20.dp)) }
-
-                // 6. Section: Mindful Reflection & Zen Insights
-                item {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 20.dp)
-                    ) {
-                        Text(
-                            text = "MINDFUL REFLECTION & ZEN TOOLS",
-                            style = FormaTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = colors.textTertiary,
-                            letterSpacing = 1.2.sp,
-                            fontSize = 11.sp,
-                            modifier = Modifier.padding(bottom = 12.dp)
-                        )
-
-                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                            // Weekly Zen Retro Card
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(20.dp))
-                                    .background(colors.surface)
-                                    .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(20.dp))
-                                    .formaPressEffect(targetScale = 0.98f) {
-                                        showWeeklyRetroSheet = true
-                                    }
-                                    .padding(16.dp)
-                            ) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        modifier = Modifier.weight(1f)
-                                    ) {
-                                        Box(
-                                            modifier = Modifier
-                                                .size(42.dp)
-                                                .clip(RoundedCornerShape(12.dp))
-                                                .background(colors.accentSoft),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Rounded.AutoAwesome,
-                                                contentDescription = null,
-                                                tint = colors.accent,
-                                                modifier = Modifier.size(20.dp)
-                                            )
-                                        }
-                                        Spacer(modifier = Modifier.width(14.dp))
-                                        Column {
-                                            Text(
-                                                text = "Weekly Zen Retrospective",
-                                                style = FormaTheme.typography.titleMedium,
-                                                fontWeight = FontWeight.Bold,
-                                                color = colors.textPrimary,
-                                                fontSize = 14.sp
-                                            )
-                                            Spacer(modifier = Modifier.height(2.dp))
-                                            Text(
-                                                text = "Synthesize weekly progress, wins & balance",
-                                                style = FormaTheme.typography.bodySmall,
-                                                color = colors.textSecondary,
-                                                fontSize = 11.5.sp
-                                            )
-                                        }
-                                    }
-                                    Icon(
-                                        imageVector = Icons.Rounded.NorthEast,
-                                        contentDescription = null,
-                                        tint = colors.textTertiary,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                }
-                            }
-
-                            // Mindful Insights Card
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(20.dp))
-                                    .background(colors.surface)
-                                    .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(20.dp))
-                                    .formaPressEffect(targetScale = 0.98f) {
-                                        showInsightsSheet = true
-                                    }
-                                    .padding(16.dp)
-                            ) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        modifier = Modifier.weight(1f)
-                                    ) {
-                                        Box(
-                                            modifier = Modifier
-                                                .size(42.dp)
-                                                .clip(RoundedCornerShape(12.dp))
-                                                .background(colors.accentSoft),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Rounded.Spa,
-                                                contentDescription = null,
-                                                tint = colors.accent,
-                                                modifier = Modifier.size(20.dp)
-                                            )
-                                        }
-                                        Spacer(modifier = Modifier.width(14.dp))
-                                        Column {
-                                            Text(
-                                                text = "Habit & Mood Correlations",
-                                                style = FormaTheme.typography.titleMedium,
-                                                fontWeight = FontWeight.Bold,
-                                                color = colors.textPrimary,
-                                                fontSize = 14.sp
-                                            )
-                                            Spacer(modifier = Modifier.height(2.dp))
-                                            Text(
-                                                text = "Discover how rituals influence daily energy",
-                                                style = FormaTheme.typography.bodySmall,
-                                                color = colors.textSecondary,
-                                                fontSize = 11.5.sp
-                                            )
-                                        }
-                                    }
-                                    Icon(
-                                        imageVector = Icons.Rounded.NorthEast,
-                                        contentDescription = null,
-                                        tint = colors.textTertiary,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                }
-                            }
-
-                            // Binaural Breathwork Card
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(20.dp))
-                                    .background(colors.surface)
-                                    .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(20.dp))
-                                    .formaPressEffect(targetScale = 0.98f) {
-                                        showBreathworkSheet = true
-                                    }
-                                    .padding(16.dp)
-                            ) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        modifier = Modifier.weight(1f)
-                                    ) {
-                                        Box(
-                                            modifier = Modifier
-                                                .size(42.dp)
-                                                .clip(RoundedCornerShape(12.dp))
-                                                .background(colors.accentSoft),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Rounded.Timer,
-                                                contentDescription = null,
-                                                tint = colors.accent,
-                                                modifier = Modifier.size(20.dp)
-                                            )
-                                        }
-                                        Spacer(modifier = Modifier.width(14.dp))
-                                        Column {
-                                            Text(
-                                                text = "Binaural Box Breathwork",
-                                                style = FormaTheme.typography.titleMedium,
-                                                fontWeight = FontWeight.Bold,
-                                                color = colors.textPrimary,
-                                                fontSize = 14.sp
-                                            )
-                                            Spacer(modifier = Modifier.height(2.dp))
-                                            Text(
-                                                text = "4-7-8 and box breathing pacing",
-                                                style = FormaTheme.typography.bodySmall,
-                                                color = colors.textSecondary,
-                                                fontSize = 11.5.sp
-                                            )
-                                        }
-                                    }
-                                    Icon(
-                                        imageVector = Icons.Rounded.NorthEast,
-                                        contentDescription = null,
-                                        tint = colors.textTertiary,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
         }
     }
 
@@ -1123,45 +907,6 @@ fun StatsScreen(
         HabitMomentumDetailSheet(
             streakInfo = habitStreak,
             onDismiss = { viewModel.closeHabitStreakDetail() }
-        )
-    }
-
-    if (showInsightsSheet) {
-        val report = mindfulInsights ?: com.forma.app.domain.usecase.MindfulInsightsReport(
-            keystoneHabitName = null,
-            keystoneCompletionRateIncrease = 0,
-            bestDayOfWeek = "Today",
-            bestTimeOfDay = com.forma.app.domain.model.TimeOfDay.MORNING,
-            overallMindfulnessAvg = 5.0f,
-            insightsList = emptyList()
-        )
-        MindfulInsightsSheet(
-            report = report,
-            onDismiss = { showInsightsSheet = false }
-        )
-    }
-
-    if (showWeeklyRetroSheet) {
-        val retro = weeklyRetro ?: com.forma.app.domain.usecase.WeeklyZenRetro(
-            weekDateRange = "This Week",
-            totalHabitsCompleted = 0,
-            totalFocusMinutes = 0,
-            averagePeaceRating = 5.0f,
-            topPerformingHabit = null,
-            frictionHabit = null,
-            frictionRecommendation = null,
-            consistencyScore = 100,
-            zenAffirmation = "Every single moment is a fresh beginning. Start small."
-        )
-        WeeklyZenRetroSheet(
-            retro = retro,
-            onDismiss = { showWeeklyRetroSheet = false }
-        )
-    }
-
-    if (showBreathworkSheet) {
-        BinauralBreathworkSheet(
-            onDismiss = { showBreathworkSheet = false }
         )
     }
 }

@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Archive
+import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Spa
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -92,14 +93,28 @@ fun HabitsScreen(
                     Spacer(modifier = Modifier.width(6.dp))
                     if (uiState.activeHabits.isNotEmpty() && !uiState.showArchived) {
                         FormaButton(
-                            text = "▶ Flow",
+                            text = "Flow",
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Rounded.PlayArrow,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                            },
                             onClick = { showStackSequencerSheet = true },
                             style = FormaButtonStyle.OUTLINE
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                     }
                     FormaButton(
-                        text = "+ Habit",
+                        text = "Habit",
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Rounded.Add,
+                                contentDescription = null,
+                                modifier = Modifier.size(14.dp)
+                            )
+                        },
                         onClick = {
                             editingHabit = null
                             showAddEditDialog = true

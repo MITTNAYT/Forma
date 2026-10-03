@@ -1,4 +1,4 @@
-﻿package com.forma.app.core.widget
+package com.forma.app.core.widget
 
 import android.content.Context
 import android.content.Intent
@@ -105,7 +105,10 @@ class HabitListRemoteViewsFactory(
         val views = RemoteViews(context.packageName, R.layout.widget_habit_list_item)
         views.setTextViewText(R.id.widget_item_title, item.habit.name)
         views.setTextViewText(R.id.widget_item_subtitle, item.subtitle)
-        views.setTextViewText(R.id.widget_item_icon, if (item.isCompleted) "✓" else "○")
+        views.setImageViewResource(
+            R.id.widget_item_checkbox,
+            if (item.isCompleted) R.drawable.ic_widget_check else R.drawable.ic_widget_circle
+        )
 
         // Fill-in Intent for clicking the row (Action to toggle completion)
         val fillInIntent = Intent().apply {

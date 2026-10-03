@@ -94,8 +94,8 @@ class NotificationHelper @Inject constructor(
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
-            .addAction(R.drawable.ic_stat_leaf, "✓ Done", completePendingIntent)
-            .addAction(R.drawable.ic_stat_leaf, "+ 15m Snooze", snoozePendingIntent)
+            .addAction(R.drawable.ic_stat_leaf, "Done", completePendingIntent)
+            .addAction(R.drawable.ic_stat_leaf, "Snooze 15m", snoozePendingIntent)
             .build()
 
         try {

@@ -42,11 +42,14 @@ import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.NotificationsActive
 import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material.icons.rounded.Psychology
 import androidx.compose.material.icons.rounded.Schedule
+import androidx.compose.material.icons.rounded.SelfImprovement
 import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material.icons.rounded.Spa
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.Timer
+import androidx.compose.material.icons.rounded.WaterDrop
 import androidx.compose.material.icons.rounded.WbSunny
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -529,22 +532,19 @@ private fun WelcomeWithTestimonialsChapter(accent: Color) {
 
         // Testimonial Cards
         listOf(
-            Triple(
+            Pair(
                 "Maya R. • Mindful Architect",
-                "Forma eliminated the anxiety of traditional streak apps. Wintering mode saved my sanity during travel.",
-                "★★★★★"
+                "Forma eliminated the anxiety of traditional streak apps. Wintering mode saved my sanity during travel."
             ),
-            Triple(
+            Pair(
                 "Julian K. • Systems Engineer",
-                "Local-first, encrypted offline vault with zero trackers. The best Android app I have installed in years.",
-                "★★★★★"
+                "Local-first, encrypted offline vault with zero trackers. The best Android app I have installed in years."
             ),
-            Triple(
+            Pair(
                 "Elena S. • Author & Meditator",
-                "Habit stacking cues and micro-steps helped me write 50,000 words without a single day of burnout.",
-                "★★★★★"
+                "Habit stacking cues and micro-steps helped me write 50,000 words without a single day of burnout."
             )
-        ).forEach { (author, quote, stars) ->
+        ).forEach { (author, quote) ->
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -565,12 +565,16 @@ private fun WelcomeWithTestimonialsChapter(accent: Color) {
                             color = colors.textPrimary,
                             fontSize = 12.sp
                         )
-                        Text(
-                            text = stars,
-                            color = Color(0xFFD4AF37),
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Row(horizontalArrangement = Arrangement.spacedBy(1.dp)) {
+                            repeat(5) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Star,
+                                    contentDescription = null,
+                                    tint = Color(0xFFD4AF37),
+                                    modifier = Modifier.size(12.dp)
+                                )
+                            }
+                        }
                     }
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
@@ -1023,12 +1027,12 @@ private fun LoggingMoodChapter(accent: Color) {
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             listOf(
-                Triple("Radiant", "☀️", Color(0xFFE9C46A)),
-                Triple("Calm", "🌿", Color(0xFF4A7C59)),
-                Triple("Grounded", "⛰️", Color(0xFF8D5B4C)),
-                Triple("Heavy", "🌧️", Color(0xFF3D5A80)),
-                Triple("Foggy", "🌫️", Color(0xFF7F7F7F))
-            ).forEach { (mood, emoji, moodColor) ->
+                Triple("Radiant", Icons.Rounded.WbSunny, Color(0xFFE9C46A)),
+                Triple("Calm", Icons.Rounded.Spa, Color(0xFF4A7C59)),
+                Triple("Grounded", Icons.Rounded.SelfImprovement, Color(0xFF8D5B4C)),
+                Triple("Heavy", Icons.Rounded.WaterDrop, Color(0xFF3D5A80)),
+                Triple("Foggy", Icons.Rounded.Psychology, Color(0xFF7F7F7F))
+            ).forEach { (mood, icon, moodColor) ->
                 val isSelected = selectedMood == mood
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -1046,7 +1050,12 @@ private fun LoggingMoodChapter(accent: Color) {
                             ),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(text = emoji, fontSize = 20.sp)
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = mood,
+                            tint = if (isSelected) moodColor else colors.textSecondary,
+                            modifier = Modifier.size(22.dp)
+                        )
                     }
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
@@ -1117,7 +1126,29 @@ private fun CreatingHabitChapter(accent: Color) {
                 Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(colors.border.copy(alpha = 0.4f)))
 
                 Text(text = "MICRO-STEPS CHECKLIST", style = FormaTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = accent, fontSize = 10.sp)
-                Text(text = "✓ Pour hot water into cup\n✓ Put phone in another room\n✓ Take 10 mindful breaths", color = colors.textSecondary, fontSize = 11.5.sp, lineHeight = 16.sp)
+                listOf(
+                    "Pour hot water into cup",
+                    "Put phone in another room",
+                    "Take 10 mindful breaths"
+                ).forEach { step ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(vertical = 1.5.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.CheckCircle,
+                            contentDescription = null,
+                            tint = accent.copy(alpha = 0.85f),
+                            modifier = Modifier.size(13.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = step,
+                            color = colors.textSecondary,
+                            fontSize = 11.5.sp
+                        )
+                    }
+                }
             }
         }
     }
@@ -1349,12 +1380,26 @@ private fun JoiningChallengeChapter(accent: Color) {
                         .clickable { isJoined = !isJoined },
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = if (isJoined) "Joined ✓" else "Join Challenge",
-                        fontWeight = FontWeight.Bold,
-                        color = if (isJoined) accent else Color.White,
-                        fontSize = 12.sp
-                    )
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (isJoined) {
+                            Icon(
+                                imageVector = Icons.Rounded.Check,
+                                contentDescription = null,
+                                tint = accent,
+                                modifier = Modifier.size(14.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                        }
+                        Text(
+                            text = if (isJoined) "Joined" else "Join Challenge",
+                            fontWeight = FontWeight.Bold,
+                            color = if (isJoined) accent else Color.White,
+                            fontSize = 12.sp
+                        )
+                    }
                 }
             }
         }

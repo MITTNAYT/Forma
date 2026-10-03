@@ -1,4 +1,4 @@
-﻿package com.forma.app
+package com.forma.app
 
 import com.forma.app.core.util.SyncStatus
 import com.forma.app.data.local.entity.TimelineItemEntity
@@ -18,7 +18,7 @@ class TimelineItemEntityMappingTest {
             date = "2026-09-02",
             startTime = "10:00",
             endTime = "11:30",
-            icon = "📌",
+            icon = "pin",
             colorTag = "#EB5757",
             notes = "Clean MVVM with Room offline first",
             subtasks = listOf(
