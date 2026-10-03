@@ -132,7 +132,7 @@ fun SettingsScreen(
     var morningReminderEnabled by remember { mutableStateOf(true) }
     var eveningReminderEnabled by remember { mutableStateOf(true) }
 
-    val userInitial = userName.trim().take(1).uppercase().ifBlank { "A" }
+    val userInitial = userName.trim().take(1).uppercase().ifBlank { "F" }
     val haptic = LocalHapticFeedback.current
 
     Scaffold(containerColor = colors.background) { paddingValues ->

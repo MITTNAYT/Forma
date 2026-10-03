@@ -63,10 +63,10 @@ fun HabitCard(
             .fillMaxWidth()
             .then(
                 if (!habit.colorTag.isNullOrBlank()) {
-                    Modifier.border(1.dp, habitAccent.copy(alpha = 0.30f), FormaTheme.shapes.small)
+                    Modifier.border(1.dp, habitAccent.copy(alpha = 0.35f), RoundedCornerShape(20.dp))
                 } else Modifier
             ),
-        shape = FormaTheme.shapes.small,
+        shape = RoundedCornerShape(20.dp),
         onClick = onEdit
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
@@ -81,8 +81,8 @@ fun HabitCard(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(38.dp)
-                            .clip(FormaTheme.shapes.extraSmall)
+                            .size(42.dp)
+                            .clip(RoundedCornerShape(12.dp))
                             .background(
                                 if (habit.isWintering) colors.accentSoft 
                                 else habitAccent.copy(alpha = 0.14f)
@@ -90,7 +90,7 @@ fun HabitCard(
                             .border(
                                 1.dp,
                                 habitAccent.copy(alpha = 0.30f),
-                                FormaTheme.shapes.extraSmall
+                                RoundedCornerShape(12.dp)
                             ),
                         contentAlignment = Alignment.Center
                     ) {
@@ -227,15 +227,15 @@ fun HabitCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(5.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     for (i in 1..7) {
                         val isScheduled = habit.repeatDays.isEmpty() || habit.repeatDays.contains(i)
                         Box(
                             modifier = Modifier
-                                .size(20.dp)
-                                .clip(FormaTheme.shapes.extraSmall)
+                                .size(22.dp)
+                                .clip(RoundedCornerShape(6.dp))
                                 .background(
                                     if (isScheduled) {
                                         if (!habit.colorTag.isNullOrBlank()) habitAccent else colors.textPrimary
@@ -246,10 +246,11 @@ fun HabitCard(
                             Text(
                                 text = dayNames[i - 1],
                                 style = FormaTheme.typography.labelSmall,
+                                fontWeight = if (isScheduled) androidx.compose.ui.text.font.FontWeight.Bold else androidx.compose.ui.text.font.FontWeight.Normal,
                                 color = if (isScheduled) {
                                     if (!habit.colorTag.isNullOrBlank()) colors.onAccent else colors.surface
                                 } else colors.textTertiary,
-                                fontSize = 9.sp
+                                fontSize = 10.sp
                             )
                         }
                     }

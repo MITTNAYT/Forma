@@ -110,7 +110,8 @@ fun OnboardingScreen(
                             habits = starterHabits,
                             onToggleHabit = { viewModel.toggleStarterHabit(it) },
                             onBack = { viewModel.goToPreviousStep() },
-                            onContinue = { viewModel.submitHabits() }
+                            onContinue = { viewModel.submitHabits() },
+                            onSkip = { viewModel.skipStarterHabits() }
                         )
                     }
 
@@ -257,7 +258,8 @@ private fun StarterHabitsStep(
     habits: List<StarterHabitItem>,
     onToggleHabit: (Int) -> Unit,
     onBack: () -> Unit,
-    onContinue: () -> Unit
+    onContinue: () -> Unit,
+    onSkip: () -> Unit
 ) {
     val colors = FormaTheme.colors
     val haptic = LocalHapticFeedback.current
@@ -359,6 +361,28 @@ private fun StarterHabitsStep(
             },
             modifier = Modifier.fillMaxWidth()
         )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .clickable {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    onSkip()
+                }
+                .padding(vertical = 10.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Skip and start completely from zero",
+                style = FormaTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                color = colors.textTertiary,
+                fontSize = 14.sp
+            )
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
     }

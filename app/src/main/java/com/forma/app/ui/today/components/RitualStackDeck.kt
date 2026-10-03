@@ -37,6 +37,7 @@ import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.FastForward
 import androidx.compose.material.icons.rounded.FormatListBulleted
 import androidx.compose.material.icons.rounded.Link
+import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Redo
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.SkipNext
@@ -107,6 +108,8 @@ fun RitualStackDeck(
     onSkip: (TodayScheduleItem) -> Unit,
     onUnskip: (TodayScheduleItem) -> Unit,
     onSwitchToListMode: () -> Unit,
+    isReadOnly: Boolean = false,
+    onReadOnlyAttempt: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val colors = FormaTheme.colors
@@ -115,10 +118,10 @@ fun RitualStackDeck(
     val density = LocalDensity.current
 
     // Maintain local deck ordering so cards can be skipped to the back or completed
-    var deckItems by remember(items) {
-        mutableStateOf(items.filter { !it.isCompleted && !it.isSkipped })
+    var deckItems by remember(items, isReadOnly) {
+        mutableStateOf(if (isReadOnly) items else items.filter { !it.isCompleted && !it.isSkipped })
     }
-    val allCompletedOrSkipped = items.isNotEmpty() && deckItems.isEmpty()
+    val allCompletedOrSkipped = items.isNotEmpty() && deckItems.isEmpty() && !isReadOnly
 
     // History stack for undo capability
     val historyStack = remember { mutableStateListOf<TodayScheduleItem>() }
@@ -328,6 +331,19 @@ fun RitualStackDeck(
                                     onDragEnd = {
                                         isDragging = false
                                         val currentX = dragOffsetX.value
+                                        if (isReadOnly) {
+                                            if (kotlin.math.abs(currentX) > swipeThresholdPx * 0.4f) {
+                                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                                onReadOnlyAttempt()
+                                            }
+                                            scope.launch {
+                                                dragOffsetX.animateTo(0f, spring(dampingRatio = 0.76f, stiffness = Spring.StiffnessMediumLow))
+                                            }
+                                            scope.launch {
+                                                dragOffsetY.animateTo(0f, spring(dampingRatio = 0.76f, stiffness = Spring.StiffnessMediumLow))
+                                            }
+                                            return@detectDragGestures
+                                        }
                                         if (currentX > swipeThresholdPx) {
                                             // Swipe Right -> COMPLETE
                                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -396,34 +412,51 @@ fun RitualStackDeck(
                         DeckItemCard(
                             item = topItem,
                             isTopCard = true,
+                            isReadOnly = isReadOnly,
+                            onReadOnlyAttempt = onReadOnlyAttempt,
                             onClick = { onClick(topItem) },
-                            onStartFocus = { onStartFocus(topItem) },
+                            onStartFocus = {
+                                if (isReadOnly) {
+                                    onReadOnlyAttempt()
+                                } else {
+                                    onStartFocus(topItem)
+                                }
+                            },
                             onComplete = {
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                scope.launch {
-                                    dragOffsetX.animateTo(
-                                        targetValue = screenWidthPx * 1.2f,
-                                        animationSpec = tween(180)
-                                    )
-                                    historyStack.add(topItem)
-                                    deckItems = deckItems.drop(1)
-                                    onToggle(topItem)
-                                    dragOffsetX.snapTo(0f)
-                                    dragOffsetY.snapTo(0f)
+                                if (isReadOnly) {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    onReadOnlyAttempt()
+                                } else {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    scope.launch {
+                                        dragOffsetX.animateTo(
+                                            targetValue = screenWidthPx * 1.2f,
+                                            animationSpec = tween(180)
+                                        )
+                                        historyStack.add(topItem)
+                                        deckItems = deckItems.drop(1)
+                                        onToggle(topItem)
+                                        dragOffsetX.snapTo(0f)
+                                        dragOffsetY.snapTo(0f)
+                                    }
                                 }
                             },
                             onSkip = {
-                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                scope.launch {
-                                    dragOffsetX.animateTo(
-                                        targetValue = -screenWidthPx * 1.2f,
-                                        animationSpec = tween(180)
-                                    )
-                                    historyStack.add(topItem)
-                                    deckItems = deckItems.drop(1) + topItem
-                                    onSkip(topItem)
-                                    dragOffsetX.snapTo(0f)
-                                    dragOffsetY.snapTo(0f)
+                                if (isReadOnly) {
+                                    onReadOnlyAttempt()
+                                } else {
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    scope.launch {
+                                        dragOffsetX.animateTo(
+                                            targetValue = -screenWidthPx * 1.2f,
+                                            animationSpec = tween(180)
+                                        )
+                                        historyStack.add(topItem)
+                                        deckItems = deckItems.drop(1) + topItem
+                                        onSkip(topItem)
+                                        dragOffsetX.snapTo(0f)
+                                        dragOffsetY.snapTo(0f)
+                                    }
                                 }
                             },
                             dragProgress = dragOffsetX.value / swipeThresholdPx
@@ -436,41 +469,67 @@ fun RitualStackDeck(
         Spacer(modifier = Modifier.height(10.dp))
 
         // Gesture Guidance Footer
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+        if (isReadOnly) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(colors.surfaceVariant.copy(alpha = 0.6f))
+                    .padding(horizontal = 14.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Icon(
-                    imageVector = Icons.Rounded.SkipNext,
+                    imageVector = Icons.Rounded.Lock,
                     contentDescription = null,
                     tint = colors.textTertiary,
                     modifier = Modifier.size(13.dp)
                 )
-                Spacer(modifier = Modifier.width(4.dp))
+                Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = "Swipe Left to Skip",
+                    text = "Past day is locked to preserve honest progress",
                     style = FormaTheme.typography.bodySmall,
                     color = colors.textTertiary,
-                    fontSize = 11.sp
+                    fontSize = 11.5.sp
                 )
             }
+        } else {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Rounded.SkipNext,
+                        contentDescription = null,
+                        tint = colors.textTertiary,
+                        modifier = Modifier.size(13.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "Swipe Left to Skip",
+                        style = FormaTheme.typography.bodySmall,
+                        color = colors.textTertiary,
+                        fontSize = 11.sp
+                    )
+                }
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "Swipe Right to Complete",
-                    style = FormaTheme.typography.bodySmall,
-                    color = colors.textTertiary,
-                    fontSize = 11.sp
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Icon(
-                    imageVector = Icons.Rounded.CheckCircle,
-                    contentDescription = null,
-                    tint = colors.accent,
-                    modifier = Modifier.size(13.dp)
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "Swipe Right to Complete",
+                        style = FormaTheme.typography.bodySmall,
+                        color = colors.textTertiary,
+                        fontSize = 11.sp
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Icon(
+                        imageVector = Icons.Rounded.CheckCircle,
+                        contentDescription = null,
+                        tint = colors.accent,
+                        modifier = Modifier.size(13.dp)
+                    )
+                }
             }
         }
     }
@@ -484,6 +543,8 @@ private fun DeckItemCard(
     item: TodayScheduleItem,
     modifier: Modifier = Modifier,
     isTopCard: Boolean = false,
+    isReadOnly: Boolean = false,
+    onReadOnlyAttempt: () -> Unit = {},
     onClick: () -> Unit = {},
     onStartFocus: () -> Unit = {},
     onComplete: () -> Unit = {},
@@ -658,29 +719,57 @@ private fun DeckItemCard(
                 }
 
                 if (isTopCard) {
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(habitAccent.copy(alpha = 0.12f))
-                            .border(1.dp, habitAccent.copy(alpha = 0.35f), RoundedCornerShape(10.dp))
-                            .formaPressEffect(targetScale = 0.92f) { onStartFocus() }
-                            .padding(horizontal = 10.dp, vertical = 6.dp)
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Rounded.Timer,
-                                contentDescription = "Focus",
-                                tint = habitAccent,
-                                modifier = Modifier.size(13.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "Focus Sprint",
-                                style = FormaTheme.typography.labelSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = habitAccent,
-                                fontSize = 11.sp
-                            )
+                    if (isReadOnly) {
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(colors.surfaceVariant.copy(alpha = 0.7f))
+                                .border(1.dp, colors.border.copy(alpha = 0.4f), RoundedCornerShape(10.dp))
+                                .clickable { onReadOnlyAttempt() }
+                                .padding(horizontal = 9.dp, vertical = 5.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Lock,
+                                    contentDescription = "Locked",
+                                    tint = colors.textTertiary,
+                                    modifier = Modifier.size(11.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = if (item.isCompleted) "COMPLETED" else "PAST RECORD",
+                                    style = FormaTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (item.isCompleted) habitAccent else colors.textTertiary,
+                                    fontSize = 10.sp
+                                )
+                            }
+                        }
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(habitAccent.copy(alpha = 0.12f))
+                                .border(1.dp, habitAccent.copy(alpha = 0.35f), RoundedCornerShape(10.dp))
+                                .formaPressEffect(targetScale = 0.92f) { onStartFocus() }
+                                .padding(horizontal = 10.dp, vertical = 6.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Timer,
+                                    contentDescription = "Focus",
+                                    tint = habitAccent,
+                                    modifier = Modifier.size(13.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = "Focus Sprint",
+                                    style = FormaTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = habitAccent,
+                                    fontSize = 11.sp
+                                )
+                            }
                         }
                     }
                 }
@@ -781,11 +870,40 @@ private fun DeckItemCard(
 
             // Section 3: Bottom 1-Tap Manual Controls
             if (isTopCard) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                if (isReadOnly) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(colors.surfaceVariant)
+                            .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(16.dp))
+                            .clickable { onReadOnlyAttempt() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Rounded.Lock,
+                                contentDescription = null,
+                                tint = colors.textTertiary,
+                                modifier = Modifier.size(15.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = if (item.isCompleted) "Completed on this day · Locked" else "Past Day Record · Locked",
+                                style = FormaTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = if (item.isCompleted) habitAccent else colors.textTertiary,
+                                fontSize = 13.sp
+                            )
+                        }
+                    }
+                } else {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                     // Skip button
                     Box(
                         modifier = Modifier
@@ -843,11 +961,12 @@ private fun DeckItemCard(
                         }
                     }
                 }
-            } else {
-                Spacer(modifier = Modifier.height(10.dp))
             }
+        } else {
+            Spacer(modifier = Modifier.height(10.dp))
         }
     }
+}
 }
 
 /**

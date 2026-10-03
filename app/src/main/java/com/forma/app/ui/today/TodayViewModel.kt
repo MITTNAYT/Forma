@@ -56,7 +56,7 @@ class TodayViewModel @Inject constructor(
     val selectedDate: StateFlow<LocalDate> = _selectedDate.asStateFlow()
 
     val userName: StateFlow<String> = preferencesRepository.userName
-        .stateIn(viewModelScope, SharingStarted.Eagerly, "Alex")
+        .stateIn(viewModelScope, SharingStarted.Eagerly, "")
 
     private val _isAiPlanning = MutableStateFlow(false)
     val isAiPlanning: StateFlow<Boolean> = _isAiPlanning.asStateFlow()

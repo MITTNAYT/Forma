@@ -143,25 +143,12 @@ fun TodayScreen(
     var celebrationInfo by remember { mutableStateOf<Pair<String, Int>?>(null) }
     var isStackViewMode by rememberSaveable { mutableStateOf(false) }
     val haptic = LocalHapticFeedback.current
+    val today = remember { LocalDate.now() }
+    val isPast = remember(selectedDate, today) { selectedDate.isBefore(today) }
 
-    // Silky Smooth Staggered Entrance Animation
-    val contentAlpha = remember { Animatable(0f) }
-    val contentOffsetY = remember { Animatable(18f) }
-
-    LaunchedEffect(Unit) {
-        contentAlpha.animateTo(
-            targetValue = 1f,
-            animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
-        )
-    }
-    LaunchedEffect(Unit) {
-        contentOffsetY.animateTo(
-            targetValue = 0f,
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioLowBouncy,
-                stiffness = Spring.StiffnessMediumLow
-            )
-        )
+    val notifyPastLocked = {
+        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+        Toast.makeText(context, "Past days are locked to maintain honest momentum.", Toast.LENGTH_SHORT).show()
     }
 
     LaunchedEffect(Unit) {
@@ -211,8 +198,12 @@ fun TodayScreen(
                         .clip(CircleShape)
                         .background(colors.accent)
                         .formaPressEffect(targetScale = 0.92f) {
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            onNavigateToAddTask(selectedDate.toString())
+                            if (isPast) {
+                                notifyPastLocked()
+                            } else {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                onNavigateToAddTask(selectedDate.toString())
+                            }
                         },
                     contentAlignment = Alignment.Center
                 ) {
@@ -257,12 +248,7 @@ fun TodayScreen(
                 }
 
                 LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .graphicsLayer {
-                            alpha = contentAlpha.value
-                            translationY = contentOffsetY.value.dp.toPx()
-                        },
+                    modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(bottom = 96.dp)
                 ) {
                     // 1. Personalized Header
@@ -282,14 +268,35 @@ fun TodayScreen(
                                     selectedDate.get(java.time.temporal.IsoFields.WEEK_OF_WEEK_BASED_YEAR)
                                 } catch (_: Exception) { 1 }
                                 val dateShortFormatted = selectedDate.format(DateTimeFormatter.ofPattern("d MMM", Locale.getDefault())).uppercase()
-                                Text(
-                                    text = "$dateShortFormatted · WEEK $weekOfYear",
-                                    style = FormaTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
-                                    fontWeight = FontWeight.Bold,
-                                    color = colors.accent,
-                                    letterSpacing = 1.4.sp,
-                                    fontSize = 11.sp
-                                )
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        text = "$dateShortFormatted · WEEK $weekOfYear",
+                                        style = FormaTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (isPast) colors.textTertiary else colors.accent,
+                                        letterSpacing = 1.4.sp,
+                                        fontSize = 11.sp
+                                    )
+                                    if (isPast) {
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Box(
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(6.dp))
+                                                .background(colors.surfaceVariant)
+                                                .border(1.dp, colors.border.copy(alpha = 0.4f), RoundedCornerShape(6.dp))
+                                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                                        ) {
+                                            Text(
+                                                text = "ARCHIVED",
+                                                style = FormaTheme.typography.labelSmall,
+                                                fontWeight = FontWeight.Bold,
+                                                color = colors.textTertiary,
+                                                fontSize = 9.sp,
+                                                letterSpacing = 0.5.sp
+                                            )
+                                        }
+                                    }
+                                }
 
                                 Row(
                                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -770,7 +777,13 @@ fun TodayScreen(
                         item {
                             RitualStackDeck(
                                 items = displayedItems,
+                                isReadOnly = isPast,
+                                onReadOnlyAttempt = notifyPastLocked,
                                 onToggle = { scheduleItem ->
+                                    if (isPast) {
+                                        notifyPastLocked()
+                                        return@RitualStackDeck
+                                    }
                                     when (scheduleItem) {
                                         is TodayScheduleItem.HabitItem -> {
                                             if (!scheduleItem.isDoneToday) {
@@ -790,6 +803,10 @@ fun TodayScreen(
                                     selectedDetailItem = scheduleItem
                                 },
                                 onStartFocus = { scheduleItem ->
+                                    if (isPast) {
+                                        notifyPastLocked()
+                                        return@RitualStackDeck
+                                    }
                                     when (scheduleItem) {
                                         is TodayScheduleItem.HabitItem -> {
                                             val habit = scheduleItem.habit
@@ -813,11 +830,19 @@ fun TodayScreen(
                                     }
                                 },
                                 onSkip = { scheduleItem ->
+                                    if (isPast) {
+                                        notifyPastLocked()
+                                        return@RitualStackDeck
+                                    }
                                     if (scheduleItem is TodayScheduleItem.HabitItem) {
                                         viewModel.skipHabit(scheduleItem.habit.id, scheduleItem.habit.name)
                                     }
                                 },
                                 onUnskip = { scheduleItem ->
+                                    if (isPast) {
+                                        notifyPastLocked()
+                                        return@RitualStackDeck
+                                    }
                                     if (scheduleItem is TodayScheduleItem.HabitItem) {
                                         viewModel.unskipHabit(scheduleItem.habit.id)
                                     }
@@ -837,7 +862,13 @@ fun TodayScreen(
                                 item = scheduleItem,
                                 index = index,
                                 modifier = Modifier,
+                                isReadOnly = isPast,
+                                onReadOnlyAttempt = notifyPastLocked,
                                 onToggle = {
+                                    if (isPast) {
+                                        notifyPastLocked()
+                                        return@BehanceHabitCard
+                                    }
                                     when (scheduleItem) {
                                         is TodayScheduleItem.HabitItem -> {
                                             if (!scheduleItem.isDoneToday) {
@@ -857,6 +888,10 @@ fun TodayScreen(
                                     selectedDetailItem = scheduleItem
                                 },
                                 onStartFocus = {
+                                    if (isPast) {
+                                        notifyPastLocked()
+                                        return@BehanceHabitCard
+                                    }
                                     when (scheduleItem) {
                                         is TodayScheduleItem.HabitItem -> {
                                             val habit = scheduleItem.habit
@@ -880,11 +915,19 @@ fun TodayScreen(
                                     }
                                 },
                                 onSkip = {
+                                    if (isPast) {
+                                        notifyPastLocked()
+                                        return@BehanceHabitCard
+                                    }
                                     if (scheduleItem is TodayScheduleItem.HabitItem) {
                                         viewModel.skipHabit(scheduleItem.habit.id, scheduleItem.habit.name)
                                     }
                                 },
                                 onUnskip = {
+                                    if (isPast) {
+                                        notifyPastLocked()
+                                        return@BehanceHabitCard
+                                    }
                                     if (scheduleItem is TodayScheduleItem.HabitItem) {
                                         viewModel.unskipHabit(scheduleItem.habit.id)
                                     }
@@ -910,6 +953,7 @@ fun TodayScreen(
     selectedDetailItem?.let { item ->
         HabitTaskDetailBottomSheet(
             item = item,
+            isReadOnly = isPast,
             onDismiss = { selectedDetailItem = null },
             onToggleComplete = {
                 when (item) {

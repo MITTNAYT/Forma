@@ -124,6 +124,11 @@ class OnboardingViewModel @Inject constructor(
         _step.value = OnboardingStep.READY
     }
 
+    fun skipStarterHabits() {
+        _starterHabits.value = _starterHabits.value.map { it.copy(isSelected = false) }
+        _step.value = OnboardingStep.READY
+    }
+
     fun completeOnboarding(onFinish: () -> Unit) {
         viewModelScope.launch {
             val finalName = _name.value.trim().ifBlank { "Friend" }

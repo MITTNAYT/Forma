@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Schedule
@@ -424,16 +425,35 @@ fun HabitTemplatesSheet(
                                 }
                             }
 
-                            // Simple benefit pill
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = "Why it works: ${template.simpleBenefit}",
-                                style = FormaTheme.typography.labelSmall.copy(
-                                    platformStyle = PlatformTextStyle(includeFontPadding = false)
-                                ),
-                                color = colors.textTertiary,
-                                fontSize = 11.sp
-                            )
+                            // Refined Why it works badge
+                            Spacer(modifier = Modifier.height(10.dp))
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(parsedAccent.copy(alpha = 0.08f))
+                                    .border(0.5.dp, parsedAccent.copy(alpha = 0.22f), RoundedCornerShape(10.dp))
+                                    .padding(horizontal = 10.dp, vertical = 7.dp)
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.AutoAwesome,
+                                        contentDescription = null,
+                                        tint = parsedAccent,
+                                        modifier = Modifier.size(13.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(7.dp))
+                                    Text(
+                                        text = template.simpleBenefit,
+                                        style = FormaTheme.typography.labelSmall.copy(
+                                            platformStyle = PlatformTextStyle(includeFontPadding = false)
+                                        ),
+                                        color = colors.textSecondary,
+                                        fontSize = 11.sp,
+                                        lineHeight = 15.sp
+                                    )
+                                }
+                            }
                         }
                     }
                 }

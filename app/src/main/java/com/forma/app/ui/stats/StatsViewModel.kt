@@ -1,4 +1,4 @@
-﻿package com.forma.app.ui.stats
+package com.forma.app.ui.stats
 
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
@@ -96,7 +96,7 @@ class StatsViewModel @Inject constructor(
 ) : ViewModel() {
 
     val userName: StateFlow<String> = preferencesRepository.userName
-        .stateIn(viewModelScope, SharingStarted.Eagerly, "Alex")
+        .stateIn(viewModelScope, SharingStarted.Eagerly, "")
 
     val mindfulInsights: StateFlow<MindfulInsightsReport?> = calculateInsightsUseCase()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)

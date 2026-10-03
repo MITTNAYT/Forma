@@ -26,6 +26,7 @@ import androidx.compose.material.icons.rounded.AcUnit
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.FastForward
 import androidx.compose.material.icons.rounded.Link
+import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Redo
 import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material.icons.rounded.SkipNext
@@ -73,6 +74,8 @@ fun BehanceHabitCard(
     onStartFocus: () -> Unit,
     onSkip: () -> Unit = {},
     onUnskip: () -> Unit = {},
+    isReadOnly: Boolean = false,
+    onReadOnlyAttempt: () -> Unit = {},
     modifier: Modifier = Modifier,
     index: Int = 0
 ) {
@@ -174,12 +177,6 @@ fun BehanceHabitCard(
         else -> habitAccent
     }
 
-    val cardScale by animateFloatAsState(
-        targetValue = if (localIsDone || isSkipped) 0.985f else 1f,
-        animationSpec = FormaMotion.snappyFloat,
-        label = "card_scale"
-    )
-
     // Checkbox bounce animation & spark burst
     val checkScale = remember { Animatable(1f) }
     val sparkProgress = remember { Animatable(0f) }
@@ -217,10 +214,6 @@ fun BehanceHabitCard(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .graphicsLayer {
-                scaleX = cardScale
-                scaleY = cardScale
-            }
             .padding(horizontal = 20.dp, vertical = 6.dp)
             .clip(RoundedCornerShape(22.dp))
             .background(
@@ -279,12 +272,45 @@ fun BehanceHabitCard(
                     }
                 }
 
-                // Right Actions: Skip & Focus Buttons
+                // Right Actions: Skip & Focus Buttons or Locked Indicator
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    if (isSkipped) {
+                    if (isReadOnly) {
+                        Box(
+                            modifier = Modifier
+                                .height(26.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(colors.surfaceVariant.copy(alpha = 0.7f))
+                                .border(1.dp, colors.border.copy(alpha = 0.4f), RoundedCornerShape(8.dp))
+                                .clickable {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    onReadOnlyAttempt()
+                                }
+                                .padding(horizontal = 8.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Lock,
+                                    contentDescription = "Locked past day",
+                                    tint = colors.textTertiary,
+                                    modifier = Modifier.size(11.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = if (localIsDone) "COMPLETED" else "PAST RECORD",
+                                    style = FormaTheme.typography.labelSmall.copy(
+                                        platformStyle = PlatformTextStyle(includeFontPadding = false)
+                                    ),
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (localIsDone) habitAccent else colors.textTertiary,
+                                    fontSize = 9.5.sp
+                                )
+                            }
+                        }
+                    } else if (isSkipped) {
                         // Undo Skip Action
                         Box(
                             modifier = Modifier
@@ -595,13 +621,20 @@ fun BehanceHabitCard(
                                 }
                                 .size(28.dp)
                                 .clip(CircleShape)
-                                .background(if (localIsDone) habitAccent else Color.Transparent)
+                                .background(if (localIsDone) habitAccent.copy(alpha = if (isReadOnly) 0.6f else 1f) else Color.Transparent)
                                 .border(
                                     1.5.dp,
-                                    if (localIsDone) habitAccent else colors.border,
+                                    if (localIsDone) habitAccent.copy(alpha = if (isReadOnly) 0.6f else 1f) else colors.border.copy(alpha = if (isReadOnly) 0.5f else 1f),
                                     CircleShape
                                 )
-                                .clickable { handleToggleWithBurst() },
+                                .clickable {
+                                    if (isReadOnly) {
+                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        onReadOnlyAttempt()
+                                    } else {
+                                        handleToggleWithBurst()
+                                    }
+                                },
                             contentAlignment = Alignment.Center
                         ) {
                             if (localIsDone) {

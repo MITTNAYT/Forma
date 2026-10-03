@@ -40,7 +40,7 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
 
     val userName: StateFlow<String> = preferencesRepository.userName
-        .stateIn(viewModelScope, SharingStarted.Eagerly, "Alex")
+        .stateIn(viewModelScope, SharingStarted.Eagerly, "")
 
     val userHeadline: StateFlow<String> = preferencesRepository.userHeadline
         .stateIn(viewModelScope, SharingStarted.Eagerly, "Architect of Daily Flow")

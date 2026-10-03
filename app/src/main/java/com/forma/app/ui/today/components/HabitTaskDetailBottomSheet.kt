@@ -77,7 +77,8 @@ fun HabitTaskDetailBottomSheet(
     onStartFocus: () -> Unit,
     onToggleSubtask: (subtaskId: String) -> Unit = {},
     onTogglePause: () -> Unit = {},
-    onSkipHabit: () -> Unit = {}
+    onSkipHabit: () -> Unit = {},
+    isReadOnly: Boolean = false
 ) {
     val colors = FormaTheme.colors
     val context = LocalContext.current
@@ -247,10 +248,15 @@ fun HabitTaskDetailBottomSheet(
                         .clip(CircleShape)
                         .background(if (localIsDone) colors.accent else if (details.isWintering) colors.accentSoft else colors.surfaceVariant)
                         .border(1.5.dp, if (localIsDone || details.isWintering) colors.accent else colors.border.copy(alpha = 0.6f), CircleShape)
-                        .formaPressEffect(targetScale = 0.88f) {
-                            localIsDone = !localIsDone
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            onToggleComplete()
+                        .formaPressEffect(targetScale = if (isReadOnly) 1f else 0.88f) {
+                            if (isReadOnly) {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                android.widget.Toast.makeText(context, "Past days are locked to maintain honest momentum.", android.widget.Toast.LENGTH_SHORT).show()
+                            } else {
+                                localIsDone = !localIsDone
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                onToggleComplete()
+                            }
                         },
                     contentAlignment = Alignment.Center
                 ) {
@@ -443,7 +449,7 @@ fun HabitTaskDetailBottomSheet(
             }
 
             // ── 4. Wintering Mode Sanctuary Rest ─────────────────────────
-            if (details.canPause) {
+            if (details.canPause && !isReadOnly) {
                 Spacer(modifier = Modifier.height(10.dp))
                 Box(
                     modifier = Modifier
@@ -579,13 +585,18 @@ fun HabitTaskDetailBottomSheet(
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(colors.surfaceVariant.copy(alpha = 0.4f))
                                 .border(1.dp, colors.border.copy(alpha = 0.25f), RoundedCornerShape(12.dp))
-                                .formaPressEffect(targetScale = 0.97f) {
-                                    // Immediate in-memory flip (0ms latency)
-                                    localSubtasks = localSubtasks.map {
-                                        if (it.id == subtask.id) it.copy(completed = !it.completed) else it
+                                .formaPressEffect(targetScale = if (isReadOnly) 1f else 0.97f) {
+                                    if (isReadOnly) {
+                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        android.widget.Toast.makeText(context, "Past days are locked to maintain honest momentum.", android.widget.Toast.LENGTH_SHORT).show()
+                                    } else {
+                                        // Immediate in-memory flip (0ms latency)
+                                        localSubtasks = localSubtasks.map {
+                                            if (it.id == subtask.id) it.copy(completed = !it.completed) else it
+                                        }
+                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                        onToggleSubtask(subtask.id)
                                     }
-                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                    onToggleSubtask(subtask.id)
                                 }
                                 .padding(horizontal = 12.dp, vertical = 10.dp),
                             verticalAlignment = Alignment.CenterVertically
@@ -653,7 +664,7 @@ fun HabitTaskDetailBottomSheet(
             Spacer(modifier = Modifier.height(20.dp))
 
             // ── 7. Skip Habit Action (Guilt-Free Streak Protection) ───────
-            if (details.isHabit && !localIsDone) {
+            if (details.isHabit && !localIsDone && !isReadOnly) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -688,71 +699,96 @@ fun HabitTaskDetailBottomSheet(
                 Spacer(modifier = Modifier.height(12.dp))
             }
 
-            // ── 8. Action Buttons (Focus & Edit) ──────────────────────────
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                // Edit Button
+            // ── 8. Action Buttons (Focus & Edit or Locked Record) ──────────
+            if (isReadOnly) {
                 Box(
                     modifier = Modifier
-                        .weight(1f)
+                        .fillMaxWidth()
                         .height(48.dp)
                         .clip(RoundedCornerShape(20.dp))
                         .background(colors.surfaceVariant)
-                        .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(20.dp))
-                        .formaPressEffect(targetScale = 0.94f) {
-                            onDismiss()
-                            onEdit()
+                        .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(20.dp))
+                        .clickable {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            android.widget.Toast.makeText(context, "Past days are locked to maintain honest momentum.", android.widget.Toast.LENGTH_SHORT).show()
                         },
                     contentAlignment = Alignment.Center
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Rounded.Edit,
-                            contentDescription = "Edit",
-                            tint = colors.textPrimary,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = "Edit",
-                            style = FormaTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = colors.textPrimary,
-                            fontSize = 14.sp
-                        )
-                    }
+                    Text(
+                        text = if (localIsDone) "COMPLETED ON THIS DAY · ARCHIVED" else "PAST RECORD · READ ONLY",
+                        style = FormaTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = if (localIsDone) colors.accent else colors.textTertiary,
+                        fontSize = 13.sp,
+                        letterSpacing = 0.4.sp
+                    )
                 }
-
-                // Start Pomodoro Focus
-                Box(
-                    modifier = Modifier
-                        .weight(1.5f)
-                        .height(48.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(colors.accent)
-                        .formaPressEffect(targetScale = 0.95f) {
-                            onDismiss()
-                            onStartFocus()
-                        },
-                    contentAlignment = Alignment.Center
+            } else {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Rounded.Timer,
-                            contentDescription = "Start Focus",
-                            tint = colors.onAccent,
-                            modifier = Modifier.size(17.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = "Start Focus",
-                            style = FormaTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = colors.onAccent,
-                            fontSize = 14.sp
-                        )
+                    // Edit Button
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp)
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(colors.surfaceVariant)
+                            .border(1.dp, colors.border.copy(alpha = 0.6f), RoundedCornerShape(20.dp))
+                            .formaPressEffect(targetScale = 0.94f) {
+                                onDismiss()
+                                onEdit()
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Rounded.Edit,
+                                contentDescription = "Edit",
+                                tint = colors.textPrimary,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "Edit",
+                                style = FormaTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = colors.textPrimary,
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
+
+                    // Start Pomodoro Focus
+                    Box(
+                        modifier = Modifier
+                            .weight(1.5f)
+                            .height(48.dp)
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(colors.accent)
+                            .formaPressEffect(targetScale = 0.95f) {
+                                onDismiss()
+                                onStartFocus()
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Rounded.Timer,
+                                contentDescription = "Start Focus",
+                                tint = colors.onAccent,
+                                modifier = Modifier.size(17.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "Start Focus",
+                                style = FormaTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = colors.onAccent,
+                                fontSize = 14.sp
+                            )
+                        }
                     }
                 }
             }
