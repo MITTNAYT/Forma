@@ -31,13 +31,17 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.shadow
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.BarChart
 import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Nature
 import androidx.compose.material.icons.rounded.School
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Spa
 import androidx.compose.material.icons.rounded.WbSunny
 import androidx.compose.material3.DatePicker
@@ -99,10 +103,6 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import java.util.Locale
-import androidx.compose.ui.layout.boundsInRoot
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.geometry.Rect
-import com.forma.app.ui.today.components.TodayCoachMarksOverlay
 import com.forma.app.ui.today.components.EmptyPeacefulState
 import com.forma.app.ui.today.components.TodayFilterChip
 import com.forma.app.ui.today.components.RitualStackDeck
@@ -117,6 +117,8 @@ fun TodayScreen(
     onNavigateToEditTask: (itemId: String) -> Unit,
     onNavigateToHabits: () -> Unit,
     onNavigateToFocusTimer: (itemId: String, title: String, durationMinutes: Int, isHabit: Boolean) -> Unit,
+    onNavigateToSettings: (() -> Unit)? = null,
+    onNavigateToAnalysis: (() -> Unit)? = null,
     viewModel: TodayViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -125,12 +127,6 @@ fun TodayScreen(
     val selectedDate by viewModel.selectedDate.collectAsState()
     val daySchedule by viewModel.daySchedule.collectAsState()
     val userName by viewModel.userName.collectAsState()
-    val hasSeenTodayCoachMarks by viewModel.hasSeenTodayCoachMarks.collectAsState()
-
-    var weekStripBounds by remember { mutableStateOf<Rect?>(null) }
-    var ritualPillBounds by remember { mutableStateOf<Rect?>(null) }
-    var aiPlanBounds by remember { mutableStateOf<Rect?>(null) }
-    var addButtonBounds by remember { mutableStateOf<Rect?>(null) }
 
     var showPaywall by remember { mutableStateOf(false) }
     var showDatePickerDialog by remember { mutableStateOf(false) }
@@ -201,7 +197,33 @@ fun TodayScreen(
                         focusManager.clearFocus()
                     })
                 },
-            containerColor = colors.background
+            containerColor = colors.background,
+            floatingActionButton = {
+                Box(
+                    modifier = Modifier
+                        .size(56.dp)
+                        .shadow(
+                            elevation = 8.dp,
+                            shape = CircleShape,
+                            ambientColor = colors.accent.copy(alpha = 0.25f),
+                            spotColor = colors.accent.copy(alpha = 0.40f)
+                        )
+                        .clip(CircleShape)
+                        .background(colors.accent)
+                        .formaPressEffect(targetScale = 0.92f) {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onNavigateToAddTask(selectedDate.toString())
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Add,
+                        contentDescription = "Add Habit",
+                        tint = colors.onAccent,
+                        modifier = Modifier.size(26.dp)
+                    )
+                }
+            }
         ) { paddingValues ->
             Box(
                 modifier = Modifier
@@ -293,6 +315,52 @@ fun TodayScreen(
                                             modifier = Modifier.size(17.dp)
                                         )
                                     }
+
+                                    // Analytics / Consistency Grid Button
+                                    if (onNavigateToAnalysis != null) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(36.dp)
+                                                .clip(RoundedCornerShape(12.dp))
+                                                .background(colors.surfaceVariant)
+                                                .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                                                .formaPressEffect(targetScale = 0.90f) {
+                                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                                    onNavigateToAnalysis()
+                                                },
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Rounded.BarChart,
+                                                contentDescription = "Consistency & Streaks",
+                                                tint = colors.textSecondary,
+                                                modifier = Modifier.size(18.dp)
+                                            )
+                                        }
+                                    }
+
+                                    // Settings Button
+                                    if (onNavigateToSettings != null) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(36.dp)
+                                                .clip(RoundedCornerShape(12.dp))
+                                                .background(colors.surfaceVariant)
+                                                .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                                                .formaPressEffect(targetScale = 0.90f) {
+                                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                                    onNavigateToSettings()
+                                                },
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Rounded.Settings,
+                                                contentDescription = "Settings",
+                                                tint = colors.textSecondary,
+                                                modifier = Modifier.size(18.dp)
+                                            )
+                                        }
+                                    }
                                 }
                             }
 
@@ -355,9 +423,6 @@ fun TodayScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .onGloballyPositioned { coordinates ->
-                                weekStripBounds = coordinates.boundsInRoot()
-                            }
                             .padding(horizontal = 20.dp, vertical = 6.dp),
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
                         verticalAlignment = Alignment.CenterVertically
@@ -450,117 +515,9 @@ fun TodayScreen(
                             totalCount = scheduleItems.size
                         )
                     }
-
-                    // Zen Flow Quick Action Bar
-                    item {
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 20.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            // Micro-Breathing Pill
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .clip(RoundedCornerShape(14.dp))
-                                    .background(colors.surface)
-                                    .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(14.dp))
-                                    .formaPressEffect(targetScale = 0.95f) {
-                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                        showBreathingSheet = true
-                                    }
-                                    .padding(vertical = 10.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Spa,
-                                        contentDescription = "Breathe",
-                                        tint = colors.accent,
-                                        modifier = Modifier.size(15.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Text(
-                                        text = "Breathe",
-                                        style = FormaTheme.typography.labelSmall,
-                                        fontWeight = FontWeight.Bold,
-                                        color = colors.textPrimary,
-                                        fontSize = 12.sp
-                                    )
-                                }
-                            }
-
-                            // Journal Archive Pill
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .clip(RoundedCornerShape(14.dp))
-                                    .background(colors.surface)
-                                    .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(14.dp))
-                                    .formaPressEffect(targetScale = 0.95f) {
-                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                        showJournalSheet = true
-                                    }
-                                    .padding(vertical = 10.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    FormaIcon(
-                                        iconKey = "journal",
-                                        contentDescription = "Journal",
-                                        tint = colors.accent,
-                                        modifier = Modifier.size(15.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(5.dp))
-                                    Text(
-                                        text = "Journal",
-                                        style = FormaTheme.typography.labelSmall,
-                                        fontWeight = FontWeight.Bold,
-                                        color = colors.textPrimary,
-                                        fontSize = 12.sp
-                                    )
-                                }
-                            }
-
-                            // Flow Sequencer Pill
-                            val habitItems = scheduleItems.filterIsInstance<TodayScheduleItem.HabitItem>()
-                            if (habitItems.isNotEmpty()) {
-                                Box(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .clip(RoundedCornerShape(14.dp))
-                                        .background(colors.accentSoft)
-                                        .border(1.dp, colors.accent.copy(alpha = 0.4f), RoundedCornerShape(14.dp))
-                                    .formaPressEffect(targetScale = 0.95f) {
-                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                        showGuidedRoutineSheet = true
-                                    }
-                                    .padding(vertical = 10.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.AutoAwesome,
-                                        contentDescription = "Flow Mode",
-                                        tint = colors.accent,
-                                        modifier = Modifier.size(15.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(5.dp))
-                                    Text(
-                                        text = "Flow",
-                                        style = FormaTheme.typography.labelSmall,
-                                        fontWeight = FontWeight.Bold,
-                                        color = colors.accent,
-                                        fontSize = 12.sp
-                                    )
-                                }
-                            }
-                        }
-                    }
                 }
-            }
+
+
 
                 item { Spacer(modifier = Modifier.height(16.dp)) }
 
@@ -1106,16 +1063,7 @@ fun TodayScreen(
         )
     }
 
-    // First-Launch Feature Spotlight / Coach Marks Tour
-    if (!hasSeenTodayCoachMarks) {
-        TodayCoachMarksOverlay(
-            weekStripBounds = weekStripBounds,
-            ritualPillBounds = ritualPillBounds,
-            aiPlanBounds = aiPlanBounds,
-            addButtonBounds = addButtonBounds,
-            onDismiss = { viewModel.dismissCoachMarks() }
-        )
-    }
+
 }
 }
 

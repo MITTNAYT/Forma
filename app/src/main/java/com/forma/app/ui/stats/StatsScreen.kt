@@ -27,6 +27,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AutoAwesome
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.AutoGraph
 import androidx.compose.material.icons.rounded.CheckCircle
 import com.forma.app.ui.analytics.components.MindfulInsightsSheet
@@ -83,6 +85,7 @@ enum class FocusTimeTab(val label: String) {
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 fun StatsScreen(
+    onNavigateBack: (() -> Unit)? = null,
     viewModel: StatsViewModel = hiltViewModel()
 ) {
     val colors = FormaTheme.colors
@@ -136,27 +139,50 @@ fun StatsScreen(
         ) {
             // ── Clean Header ─────────────────────────────────────────────
             item {
-                Column(
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 14.dp)
+                        .padding(start = 20.dp, end = 24.dp, top = 8.dp, bottom = 14.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(14.dp)
                 ) {
-                    Text(
-                        text = "ANALYTICS",
-                        style = FormaTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = colors.textTertiary,
-                        letterSpacing = 1.5.sp,
-                        fontSize = 11.sp
-                    )
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text(
-                        text = "Rhythm & Focus",
-                        fontWeight = FontWeight.Bold,
-                        color = colors.textPrimary,
-                        fontSize = 28.sp,
-                        letterSpacing = (-0.8).sp
-                    )
+                    if (onNavigateBack != null) {
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .background(colors.surfaceVariant.copy(alpha = 0.85f))
+                                .clickable {
+                                    onNavigateBack()
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                                contentDescription = "Back",
+                                tint = colors.textPrimary,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    }
+                    Column {
+                        Text(
+                            text = "ANALYTICS",
+                            style = FormaTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = colors.textTertiary,
+                            letterSpacing = 1.5.sp,
+                            fontSize = 11.sp
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = "Rhythm & Focus",
+                            fontWeight = FontWeight.Bold,
+                            color = colors.textPrimary,
+                            fontSize = 28.sp,
+                            letterSpacing = (-0.8).sp
+                        )
+                    }
                 }
             }
 

@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.forma.app.core.designsystem.FormaTheme
 import com.forma.app.core.designsystem.splash.PremiumSplashScreen
-import com.forma.app.ui.navigation.FormaBottomBar
 import com.forma.app.ui.navigation.FormaNavGraph
 
 import androidx.compose.runtime.collectAsState
@@ -72,19 +71,6 @@ fun FormaApp(
                     modifier = Modifier.fillMaxSize()
                 )
 
-                // Floating Navigation Dock (pinned gracefully at the bottom)
-                Box(
-                    modifier = Modifier.align(Alignment.BottomCenter)
-                ) {
-                    FormaBottomBar(
-                        navController = navController,
-                        onAddClick = {
-                            activeEditItemId = null
-                            activeSelectedDate = null
-                            showAddEditSheet = true
-                        }
-                    )
-                }
 
                 // In-Place Floating Add/Edit Bottom Sheet (glides over current page without blanking/white background)
                 if (showAddEditSheet) {

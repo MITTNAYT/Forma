@@ -40,7 +40,6 @@ interface UserPreferencesRepository {
     val notificationsEnabled: Flow<Boolean>
     val dailySummaryTimeMinutes: Flow<Int>
     val isOnboardingCompleted: Flow<Boolean>
-    val hasSeenTodayCoachMarks: Flow<Boolean>
     val chronotype: Flow<com.forma.app.domain.model.Chronotype>
     val isBiometricLockEnabled: Flow<Boolean>
     val isPrivacyMaskingEnabled: Flow<Boolean>
@@ -54,7 +53,6 @@ interface UserPreferencesRepository {
     suspend fun setNotificationsEnabled(enabled: Boolean)
     suspend fun setDailySummaryTimeMinutes(minutes: Int)
     suspend fun setOnboardingCompleted(completed: Boolean)
-    suspend fun setHasSeenTodayCoachMarks(seen: Boolean)
     suspend fun setChronotype(chronotype: com.forma.app.domain.model.Chronotype)
     suspend fun setBiometricLockEnabled(enabled: Boolean)
     suspend fun setPrivacyMaskingEnabled(enabled: Boolean)

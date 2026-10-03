@@ -35,7 +35,6 @@ class UserPreferencesRepositoryImpl @Inject constructor(
         val NOTIFICATIONS_ENABLED = booleanPreferencesKey("notifications_enabled")
         val DAILY_SUMMARY_TIME = intPreferencesKey("daily_summary_time")
         val IS_ONBOARDING_COMPLETED = booleanPreferencesKey("is_onboarding_completed")
-        val HAS_SEEN_TODAY_COACH_MARKS = booleanPreferencesKey("has_seen_today_coach_marks")
         val CHRONOTYPE = stringPreferencesKey("chronotype")
         val IS_BIOMETRIC_LOCK_ENABLED = booleanPreferencesKey("is_biometric_lock_enabled")
         val IS_PRIVACY_MASKING_ENABLED = booleanPreferencesKey("is_privacy_masking_enabled")
@@ -65,10 +64,6 @@ class UserPreferencesRepositoryImpl @Inject constructor(
 
     override val isOnboardingCompleted: Flow<Boolean> = context.dataStore.data.map { preferences ->
         preferences[PreferencesKeys.IS_ONBOARDING_COMPLETED] ?: false
-    }
-
-    override val hasSeenTodayCoachMarks: Flow<Boolean> = context.dataStore.data.map { preferences ->
-        preferences[PreferencesKeys.HAS_SEEN_TODAY_COACH_MARKS] ?: false
     }
 
     override val userName: Flow<String> = context.dataStore.data.map { preferences ->
@@ -159,12 +154,6 @@ class UserPreferencesRepositoryImpl @Inject constructor(
     override suspend fun setOnboardingCompleted(completed: Boolean) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.IS_ONBOARDING_COMPLETED] = completed
-        }
-    }
-
-    override suspend fun setHasSeenTodayCoachMarks(seen: Boolean) {
-        context.dataStore.edit { preferences ->
-            preferences[PreferencesKeys.HAS_SEEN_TODAY_COACH_MARKS] = seen
         }
     }
 

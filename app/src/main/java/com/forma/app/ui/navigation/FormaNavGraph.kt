@@ -84,13 +84,23 @@ fun FormaNavGraph(
                 },
                 onNavigateToFocusTimer = { itemId, title, durationMinutes, isHabit ->
                     navController.navigate(Screen.FocusTimer.createRoute(itemId, title, durationMinutes, isHabit))
+                },
+                onNavigateToSettings = {
+                    navController.navigate(Screen.Settings.route)
+                },
+                onNavigateToAnalysis = {
+                    navController.navigate(Screen.Analysis.route)
                 }
             )
         }
 
         // Tab 2: Habits (Dedicated Recurring Rituals Library)
         composable(Screen.Habits.route) {
-            HabitsScreen()
+            HabitsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
         }
 
         // Pomodoro (Dedicated Mindful Focus & Flow Clock Section)
@@ -100,7 +110,11 @@ fun FormaNavGraph(
 
         // Tab 4: Analysis / Stats (Streaks & Monthly Consistency Grid)
         composable(Screen.Analysis.route) {
-            StatsScreen()
+            StatsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
         }
 
         // Tab 3: Add Item (Creation Modal)
@@ -134,6 +148,9 @@ fun FormaNavGraph(
                 },
                 onNavigateToStats = {
                     navController.navigate(Screen.Analysis.route)
+                },
+                onNavigateBack = {
+                    navController.popBackStack()
                 }
             )
         }

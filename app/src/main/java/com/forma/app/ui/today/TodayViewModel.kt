@@ -73,9 +73,6 @@ class TodayViewModel @Inject constructor(
     val chronotype: StateFlow<com.forma.app.domain.model.Chronotype> = preferencesRepository.chronotype
         .stateIn(viewModelScope, SharingStarted.Eagerly, com.forma.app.domain.model.Chronotype.BEAR)
 
-    val hasSeenTodayCoachMarks: StateFlow<Boolean> = preferencesRepository.hasSeenTodayCoachMarks
-        .stateIn(viewModelScope, SharingStarted.Eagerly, true)
-
     @OptIn(ExperimentalCoroutinesApi::class)
     val daySchedule: StateFlow<DaySchedule?> = _selectedDate
         .flatMapLatest { date -> getTodayTimelineUseCase(date) }
@@ -84,18 +81,6 @@ class TodayViewModel @Inject constructor(
     fun setChronotype(chronotype: com.forma.app.domain.model.Chronotype) {
         viewModelScope.launch {
             preferencesRepository.setChronotype(chronotype)
-        }
-    }
-
-    fun dismissCoachMarks() {
-        viewModelScope.launch {
-            preferencesRepository.setHasSeenTodayCoachMarks(true)
-        }
-    }
-
-    fun restartCoachMarks() {
-        viewModelScope.launch {
-            preferencesRepository.setHasSeenTodayCoachMarks(false)
         }
     }
 

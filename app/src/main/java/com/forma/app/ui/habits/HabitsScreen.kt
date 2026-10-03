@@ -65,6 +65,7 @@ import com.forma.app.ui.today.components.InlineQuickEntryBar
 @androidx.compose.material3.ExperimentalMaterial3Api
 @Composable
 fun HabitsScreen(
+    onNavigateBack: (() -> Unit)? = null,
     viewModel: HabitsViewModel = hiltViewModel()
 ) {
     val colors = FormaTheme.colors
@@ -81,6 +82,7 @@ fun HabitsScreen(
             FormaTopAppBar(
                 title = "Habits",
                 subtitle = "Unlimited recurring habits & streaks",
+                onBackClick = onNavigateBack,
                 actions = {
                     FormaButton(
                         text = "Templates",

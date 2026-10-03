@@ -99,12 +99,6 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun restartAppTour() {
-        viewModelScope.launch {
-            preferencesRepository.setHasSeenTodayCoachMarks(false)
-        }
-    }
-
     fun sendTestNotification() {
         notificationHelper.showHabitNotification(
             habitId = "test_mindful_ritual",
@@ -278,13 +272,6 @@ class SettingsViewModel @Inject constructor(
         scheduleEveningReminder(context, enabled)
     }
 
-    fun playBackgroundSound(context: Context, sound: com.forma.app.core.audio.AmbientSound, timerMinutes: Int) {
-        com.forma.app.core.audio.AmbientSoundService.start(context, sound, timerMinutes)
-    }
-
-    fun stopBackgroundSound(context: Context) {
-        com.forma.app.core.audio.AmbientSoundService.stop(context)
-    }
 
     fun purchaseMonthlyPro() {
         viewModelScope.launch {
