@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -77,6 +78,35 @@ class TodayViewModel @Inject constructor(
     val daySchedule: StateFlow<DaySchedule?> = _selectedDate
         .flatMapLatest { date -> getTodayTimelineUseCase(date) }
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
+    val isWinteringActive: StateFlow<Boolean> = habitRepository.getAllHabits()
+        .map { habits ->
+            val active = habits.filter { !it.archived }
+            active.isNotEmpty() && active.all { it.isWintering }
+        }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+    fun onDeckCompleted() {
+        zenFeedback.onMilestoneReached()
+    }
+
+    fun toggleAllWintering(enableWintering: Boolean) {
+        viewModelScope.launch {
+            val habits = habitRepository.getAllHabits().first().filter { !it.archived }
+            habits.forEach { habit ->
+                if (habit.isWintering != enableWintering) {
+                    habitRepository.updateHabit(habit.copy(isWintering = enableWintering))
+                }
+            }
+            zenFeedback.onTaskToggled()
+            _eventFlow.emit(
+                TodayUiEvent.ShowToast(
+                    if (enableWintering) "Wintering Sanctuary enabled. All habits on guilt-free rest."
+                    else "Wintering Sanctuary disabled. Welcome back to your rituals!"
+                )
+            )
+        }
+    }
 
     fun setChronotype(chronotype: com.forma.app.domain.model.Chronotype) {
         viewModelScope.launch {

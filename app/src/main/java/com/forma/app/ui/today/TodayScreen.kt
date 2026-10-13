@@ -33,6 +33,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.shadow
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AcUnit
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.BarChart
 import androidx.compose.material.icons.rounded.CalendarMonth
@@ -93,6 +94,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import com.forma.app.ui.today.components.BehanceHabitCard
 import com.forma.app.ui.today.components.BehanceHeroBanner
 import com.forma.app.ui.today.components.DynamicStreakIsland
+import com.forma.app.ui.today.components.HabitContextMenuSheet
 import com.forma.app.ui.today.components.HabitTaskDetailBottomSheet
 import java.time.DayOfWeek
 import java.time.Instant
@@ -127,6 +129,7 @@ fun TodayScreen(
     val selectedDate by viewModel.selectedDate.collectAsState()
     val daySchedule by viewModel.daySchedule.collectAsState()
     val userName by viewModel.userName.collectAsState()
+    val isWinteringActive by viewModel.isWinteringActive.collectAsState()
 
     var showPaywall by remember { mutableStateOf(false) }
     var showDatePickerDialog by remember { mutableStateOf(false) }
@@ -137,6 +140,7 @@ fun TodayScreen(
     var showGuidedRoutineSheet by remember { mutableStateOf(false) }
     var showJournalSheet by remember { mutableStateOf(false) }
     var selectedDetailItem by remember { mutableStateOf<TodayScheduleItem?>(null) }
+    var selectedContextMenuHabit by remember { mutableStateOf<TodayScheduleItem?>(null) }
     var editingHabitId by remember { mutableStateOf<String?>(null) }
     var selectedTimeFilter by remember { mutableStateOf<TimeOfDay?>(null) }
     var showTemplatesSheet by remember { mutableStateOf(false) }
@@ -524,6 +528,80 @@ fun TodayScreen(
                     }
                 }
 
+                if (isWinteringActive) {
+                    item {
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 20.dp)
+                                .clip(RoundedCornerShape(20.dp))
+                                .background(colors.accentSoft.copy(alpha = 0.75f))
+                                .border(1.dp, colors.accent.copy(alpha = 0.45f), RoundedCornerShape(20.dp))
+                                .padding(horizontal = 16.dp, vertical = 12.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(38.dp)
+                                            .clip(CircleShape)
+                                            .background(colors.accent.copy(alpha = 0.16f)),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.AcUnit,
+                                            contentDescription = "Wintering Sanctuary",
+                                            tint = colors.accent,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Column {
+                                        Text(
+                                            text = "Wintering Sanctuary Active",
+                                            style = FormaTheme.typography.titleSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = colors.textPrimary,
+                                            fontSize = 13.5.sp
+                                        )
+                                        Text(
+                                            text = "Rituals resting • Streaks preserved",
+                                            style = FormaTheme.typography.bodySmall,
+                                            color = colors.textSecondary,
+                                            fontSize = 11.sp
+                                        )
+                                    }
+                                }
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(10.dp))
+                                        .background(colors.accent)
+                                        .formaPressEffect(targetScale = 0.94f) {
+                                            viewModel.toggleAllWintering(false)
+                                        }
+                                        .padding(horizontal = 12.dp, vertical = 6.dp)
+                                ) {
+                                    Text(
+                                        text = "Resume",
+                                        style = FormaTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = colors.onAccent,
+                                        fontSize = 11.sp
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
 
 
                 item { Spacer(modifier = Modifier.height(16.dp)) }
@@ -849,6 +927,12 @@ fun TodayScreen(
                                 },
                                 onSwitchToListMode = {
                                     isStackViewMode = false
+                                },
+                                onDeckCompleted = {
+                                    viewModel.onDeckCompleted()
+                                },
+                                onLongClick = { scheduleItem ->
+                                    selectedContextMenuHabit = scheduleItem
                                 }
                             )
                         }
@@ -864,6 +948,9 @@ fun TodayScreen(
                                 modifier = Modifier,
                                 isReadOnly = isPast,
                                 onReadOnlyAttempt = notifyPastLocked,
+                                onLongClick = {
+                                    selectedContextMenuHabit = scheduleItem
+                                },
                                 onToggle = {
                                     if (isPast) {
                                         notifyPastLocked()
@@ -1021,6 +1108,76 @@ fun TodayScreen(
                 if (item is TodayScheduleItem.HabitItem) {
                     viewModel.skipHabit(item.habit.id, item.habit.name)
                 }
+            }
+        )
+    }
+
+    // Apple HIG Context Action / Haptic Touch Menu
+    selectedContextMenuHabit?.let { item ->
+        HabitContextMenuSheet(
+            item = item,
+            isReadOnly = isPast,
+            onDismiss = { selectedContextMenuHabit = null },
+            onStartFocus = { targetItem ->
+                selectedContextMenuHabit = null
+                when (targetItem) {
+                    is TodayScheduleItem.HabitItem -> {
+                        val habit = targetItem.habit
+                        val duration = when (habit.timeOfDay) {
+                            TimeOfDay.MORNING -> 15
+                            TimeOfDay.AFTERNOON -> 25
+                            TimeOfDay.EVENING -> 20
+                            TimeOfDay.ANYTIME -> 20
+                        }
+                        onNavigateToFocusTimer(habit.id, habit.name, duration, true)
+                    }
+                    is TodayScheduleItem.TimelineBlock -> {
+                        val task = targetItem.item
+                        val startParsed = try { task.startTime?.let { LocalTime.parse(it) } } catch (_: Exception) { null }
+                        val endParsed = try { task.endTime?.let { LocalTime.parse(it) } } catch (_: Exception) { null }
+                        val duration = if (startParsed != null && endParsed != null) {
+                            ChronoUnit.MINUTES.between(startParsed, endParsed).toInt().coerceAtLeast(5)
+                        } else 25
+                        onNavigateToFocusTimer(task.id, task.title, duration, false)
+                    }
+                }
+            },
+            onToggleCompletion = { targetItem ->
+                selectedContextMenuHabit = null
+                when (targetItem) {
+                    is TodayScheduleItem.HabitItem -> {
+                        if (!targetItem.isDoneToday) {
+                            celebrationInfo = Pair(targetItem.habit.name, targetItem.currentStreak + 1)
+                        }
+                        viewModel.toggleHabit(targetItem)
+                    }
+                    is TodayScheduleItem.TimelineBlock -> {
+                        if (!targetItem.item.completed) {
+                            celebrationInfo = Pair(targetItem.item.title, 1)
+                        }
+                        viewModel.toggleTask(targetItem)
+                    }
+                }
+            },
+            onToggleSkip = { targetItem ->
+                selectedContextMenuHabit = null
+                if (targetItem is TodayScheduleItem.HabitItem) {
+                    if (targetItem.isSkippedToday) {
+                        viewModel.unskipHabit(targetItem.habit.id)
+                    } else {
+                        viewModel.skipHabit(targetItem.habit.id, targetItem.habit.name)
+                    }
+                }
+            },
+            onToggleWintering = { targetItem ->
+                selectedContextMenuHabit = null
+                if (targetItem is TodayScheduleItem.HabitItem) {
+                    viewModel.toggleHabitPause(targetItem.habit)
+                }
+            },
+            onEditHabit = { targetItem ->
+                selectedContextMenuHabit = null
+                selectedDetailItem = targetItem
             }
         )
     }

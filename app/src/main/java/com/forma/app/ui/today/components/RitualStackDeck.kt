@@ -48,6 +48,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -63,6 +64,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -82,6 +84,7 @@ import com.forma.app.core.designsystem.component.FormaEmblem
 import com.forma.app.core.designsystem.icon.FormaIcon
 import com.forma.app.core.designsystem.motion.FormaMotion
 import com.forma.app.core.designsystem.motion.formaPressEffect
+import com.forma.app.core.designsystem.motion.rubberBand
 import com.forma.app.domain.model.TimeOfDay
 import com.forma.app.domain.model.TodayScheduleItem
 import kotlinx.coroutines.launch
@@ -110,6 +113,8 @@ fun RitualStackDeck(
     onSwitchToListMode: () -> Unit,
     isReadOnly: Boolean = false,
     onReadOnlyAttempt: () -> Unit = {},
+    onDeckCompleted: () -> Unit = {},
+    onLongClick: (TodayScheduleItem) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val colors = FormaTheme.colors
@@ -123,13 +128,21 @@ fun RitualStackDeck(
     }
     val allCompletedOrSkipped = items.isNotEmpty() && deckItems.isEmpty() && !isReadOnly
 
+    androidx.compose.runtime.LaunchedEffect(allCompletedOrSkipped) {
+        if (allCompletedOrSkipped) {
+            onDeckCompleted()
+        }
+    }
+
     // History stack for undo capability
     val historyStack = remember { mutableStateListOf<TodayScheduleItem>() }
 
-    // Swipe gesture animatables
+    // Swipe gesture animatables with physical velocity tracking
     val dragOffsetX = remember { Animatable(0f) }
     val dragOffsetY = remember { Animatable(0f) }
+    var rawDragOffsetY by remember { mutableFloatStateOf(0f) }
     var isDragging by remember { mutableStateOf(false) }
+    val velocityTracker = remember { VelocityTracker() }
 
     val swipeThresholdPx = with(density) { 110.dp.toPx() }
     val screenWidthPx = with(density) {
@@ -327,9 +340,15 @@ fun RitualStackDeck(
                             }
                             .pointerInput(topItem.id) {
                                 detectDragGestures(
-                                    onDragStart = { isDragging = true },
+                                    onDragStart = { offset ->
+                                        velocityTracker.resetTracking()
+                                        velocityTracker.addPosition(0L, offset)
+                                        isDragging = true
+                                        rawDragOffsetY = 0f
+                                    },
                                     onDragEnd = {
                                         isDragging = false
+                                        val releaseVelocityX = velocityTracker.calculateVelocity().x
                                         val currentX = dragOffsetX.value
                                         if (isReadOnly) {
                                             if (kotlin.math.abs(currentX) > swipeThresholdPx * 0.4f) {
@@ -342,42 +361,60 @@ fun RitualStackDeck(
                                             scope.launch {
                                                 dragOffsetY.animateTo(0f, spring(dampingRatio = 0.76f, stiffness = Spring.StiffnessMediumLow))
                                             }
+                                            rawDragOffsetY = 0f
                                             return@detectDragGestures
                                         }
-                                        if (currentX > swipeThresholdPx) {
-                                            // Swipe Right -> COMPLETE
+
+                                        // Momentum projection (Apple Fluid Interfaces WWDC):
+                                        // endpoint = current + (v / 1000) * d / (1 - d)
+                                        val projectedX = currentX + (releaseVelocityX * 0.35f)
+                                        val shouldComplete = currentX > swipeThresholdPx || projectedX > swipeThresholdPx
+                                        val shouldSkip = currentX < -swipeThresholdPx || projectedX < -swipeThresholdPx
+
+                                        if (shouldComplete) {
+                                            // Swipe Right -> COMPLETE with immediate state commit & velocity handoff
                                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                            historyStack.add(topItem)
+                                            deckItems = deckItems.drop(1)
+                                            onToggle(topItem)
                                             scope.launch {
                                                 dragOffsetX.animateTo(
-                                                    targetValue = screenWidthPx * 1.2f,
-                                                    animationSpec = tween(180, easing = FastOutSlowInEasing)
+                                                    targetValue = screenWidthPx * 1.3f,
+                                                    initialVelocity = releaseVelocityX.coerceIn(0f, 4000f),
+                                                    animationSpec = spring(
+                                                        dampingRatio = 0.82f,
+                                                        stiffness = Spring.StiffnessMedium
+                                                    )
                                                 )
-                                                historyStack.add(topItem)
-                                                deckItems = deckItems.drop(1)
-                                                onToggle(topItem)
                                                 dragOffsetX.snapTo(0f)
                                                 dragOffsetY.snapTo(0f)
+                                                rawDragOffsetY = 0f
                                             }
-                                        } else if (currentX < -swipeThresholdPx) {
-                                            // Swipe Left -> SKIP / DEFER TO BACK
+                                        } else if (shouldSkip) {
+                                            // Swipe Left -> SKIP / DEFER with velocity handoff
                                             haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                            historyStack.add(topItem)
+                                            deckItems = deckItems.drop(1) + topItem
+                                            onSkip(topItem)
                                             scope.launch {
                                                 dragOffsetX.animateTo(
-                                                    targetValue = -screenWidthPx * 1.2f,
-                                                    animationSpec = tween(180, easing = FastOutSlowInEasing)
+                                                    targetValue = -screenWidthPx * 1.3f,
+                                                    initialVelocity = releaseVelocityX.coerceIn(-4000f, 0f),
+                                                    animationSpec = spring(
+                                                        dampingRatio = 0.82f,
+                                                        stiffness = Spring.StiffnessMedium
+                                                    )
                                                 )
-                                                // Cycle card to the end of deck
-                                                historyStack.add(topItem)
-                                                deckItems = deckItems.drop(1) + topItem
-                                                onSkip(topItem)
                                                 dragOffsetX.snapTo(0f)
                                                 dragOffsetY.snapTo(0f)
+                                                rawDragOffsetY = 0f
                                             }
                                         } else {
-                                            // Spring back to resting center
+                                            // Spring back to resting center carrying velocity
                                             scope.launch {
                                                 dragOffsetX.animateTo(
                                                     targetValue = 0f,
+                                                    initialVelocity = releaseVelocityX,
                                                     animationSpec = spring(
                                                         dampingRatio = 0.76f,
                                                         stiffness = Spring.StiffnessMediumLow
@@ -393,17 +430,22 @@ fun RitualStackDeck(
                                                     )
                                                 )
                                             }
+                                            rawDragOffsetY = 0f
                                         }
                                     },
                                     onDragCancel = {
                                         isDragging = false
+                                        rawDragOffsetY = 0f
                                         scope.launch { dragOffsetX.snapTo(0f); dragOffsetY.snapTo(0f) }
                                     },
                                     onDrag = { change, dragAmount ->
                                         change.consume()
+                                        velocityTracker.addPosition(change.uptimeMillis, change.position)
+                                        rawDragOffsetY += dragAmount.y
+                                        val rbY = rubberBand(rawDragOffsetY, dimension = 200f)
                                         scope.launch {
                                             dragOffsetX.snapTo(dragOffsetX.value + dragAmount.x)
-                                            dragOffsetY.snapTo(dragOffsetY.value + dragAmount.y * 0.35f)
+                                            dragOffsetY.snapTo(rbY)
                                         }
                                     }
                                 )
@@ -415,6 +457,7 @@ fun RitualStackDeck(
                             isReadOnly = isReadOnly,
                             onReadOnlyAttempt = onReadOnlyAttempt,
                             onClick = { onClick(topItem) },
+                            onLongClick = { onLongClick(topItem) },
                             onStartFocus = {
                                 if (isReadOnly) {
                                     onReadOnlyAttempt()
@@ -428,16 +471,20 @@ fun RitualStackDeck(
                                     onReadOnlyAttempt()
                                 } else {
                                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    historyStack.add(topItem)
+                                    deckItems = deckItems.drop(1)
+                                    onToggle(topItem)
                                     scope.launch {
                                         dragOffsetX.animateTo(
-                                            targetValue = screenWidthPx * 1.2f,
-                                            animationSpec = tween(180)
+                                            targetValue = screenWidthPx * 1.3f,
+                                            animationSpec = spring(
+                                                dampingRatio = 0.82f,
+                                                stiffness = Spring.StiffnessMedium
+                                            )
                                         )
-                                        historyStack.add(topItem)
-                                        deckItems = deckItems.drop(1)
-                                        onToggle(topItem)
                                         dragOffsetX.snapTo(0f)
                                         dragOffsetY.snapTo(0f)
+                                        rawDragOffsetY = 0f
                                     }
                                 }
                             },
@@ -446,16 +493,20 @@ fun RitualStackDeck(
                                     onReadOnlyAttempt()
                                 } else {
                                     haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    historyStack.add(topItem)
+                                    deckItems = deckItems.drop(1) + topItem
+                                    onSkip(topItem)
                                     scope.launch {
                                         dragOffsetX.animateTo(
-                                            targetValue = -screenWidthPx * 1.2f,
-                                            animationSpec = tween(180)
+                                            targetValue = -screenWidthPx * 1.3f,
+                                            animationSpec = spring(
+                                                dampingRatio = 0.82f,
+                                                stiffness = Spring.StiffnessMedium
+                                            )
                                         )
-                                        historyStack.add(topItem)
-                                        deckItems = deckItems.drop(1) + topItem
-                                        onSkip(topItem)
                                         dragOffsetX.snapTo(0f)
                                         dragOffsetY.snapTo(0f)
+                                        rawDragOffsetY = 0f
                                     }
                                 }
                             },
@@ -546,6 +597,7 @@ private fun DeckItemCard(
     isReadOnly: Boolean = false,
     onReadOnlyAttempt: () -> Unit = {},
     onClick: () -> Unit = {},
+    onLongClick: () -> Unit = {},
     onStartFocus: () -> Unit = {},
     onComplete: () -> Unit = {},
     onSkip: () -> Unit = {},
@@ -779,7 +831,7 @@ private fun DeckItemCard(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable(enabled = isTopCard) { onClick() }
+                    .formaPressEffect(targetScale = 0.98f, enabled = isTopCard, onLongClick = onLongClick) { onClick() }
             ) {
                 Box(
                     modifier = Modifier

@@ -74,6 +74,7 @@ fun BehanceHabitCard(
     onStartFocus: () -> Unit,
     onSkip: () -> Unit = {},
     onUnskip: () -> Unit = {},
+    onLongClick: () -> Unit = {},
     isReadOnly: Boolean = false,
     onReadOnlyAttempt: () -> Unit = {},
     modifier: Modifier = Modifier,
@@ -231,7 +232,7 @@ fun BehanceHabitCard(
                 },
                 shape = RoundedCornerShape(22.dp)
             )
-            .formaPressEffect(targetScale = 0.985f) { onClick() }
+            .formaPressEffect(targetScale = 0.985f, onLongClick = { onLongClick() }) { onClick() }
             .padding(horizontal = 16.dp, vertical = 14.dp)
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {

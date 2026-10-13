@@ -1,4 +1,4 @@
-﻿package com.forma.app.core.designsystem.motion
+package com.forma.app.core.designsystem.motion
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.CubicBezierEasing
@@ -8,6 +8,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.runtime.Composable
@@ -84,13 +85,26 @@ object FormaMotion {
 val FormaSprings = FormaMotion
 
 /**
- * Instant touch-down press feedback modifier.
+ * Apple Design & Emil Kowalski asymptotic boundary resistance formula.
+ * The further past the boundary, the more resistance is applied:
+ * f(x) = (x * dimension * constant) / (dimension + constant * |x|)
+ */
+fun rubberBand(value: Float, dimension: Float = 220f, constant: Float = 0.55f): Float {
+    val sign = if (value < 0f) -1f else 1f
+    val absVal = kotlin.math.abs(value)
+    return sign * ((absVal * dimension * constant) / (dimension + constant * absVal))
+}
+
+/**
+ * Instant touch-down press feedback modifier with optional long-click support.
  * Runs completely in the GPU graphicsLayer pass without triggering layout recalculations.
  */
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun Modifier.formaPressEffect(
     targetScale: Float = 0.96f,
     enabled: Boolean = true,
+    onLongClick: (() -> Unit)? = null,
     onClick: (() -> Unit)? = null
 ): Modifier {
     val interactionSource = remember { MutableInteractionSource() }
@@ -108,14 +122,14 @@ fun Modifier.formaPressEffect(
             scaleY = scale
         }
         .then(
-            if (onClick != null) {
-                Modifier.clickable(
+            if (onClick != null || onLongClick != null) {
+                Modifier.combinedClickable(
                     interactionSource = interactionSource,
                     indication = null,
-                    enabled = enabled
-                ) {
-                    onClick()
-                }
+                    enabled = enabled,
+                    onClick = { onClick?.invoke() },
+                    onLongClick = onLongClick
+                )
             } else {
                 Modifier
             }
