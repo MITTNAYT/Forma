@@ -31,7 +31,7 @@ app/build/
 .env
 secrets.properties
 
-.kotlin/
-*.log
-*.png
 
+builds/
+iosApp/build/
+*.ipa
