@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		AA0100012C10000100000001 /* HabitFlowApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0200012C10000100000001 /* HabitFlowApp.swift */; };
+		AA0100012C10000100000001 /* FormaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0200012C10000100000001 /* FormaApp.swift */; };
 		AA0100022C10000100000001 /* Habit.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0200022C10000100000001 /* Habit.swift */; };
 		AA0100032C10000100000001 /* HabitCompletion.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0200032C10000100000001 /* HabitCompletion.swift */; };
 		AA0100042C10000100000001 /* HabitStreakInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0200042C10000100000001 /* HabitStreakInfo.swift */; };
@@ -30,9 +30,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		AA0000012C10000100000001 /* HabitFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HabitFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA0000012C10000100000001 /* Forma.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Forma.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA0000022C10000100000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		AA0200012C10000100000001 /* HabitFlowApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitFlowApp.swift; sourceTree = "<group>"; };
+		AA0200012C10000100000001 /* FormaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormaApp.swift; sourceTree = "<group>"; };
 		AA0200022C10000100000001 /* Habit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Habit.swift; sourceTree = "<group>"; };
 		AA0200032C10000100000001 /* HabitCompletion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitCompletion.swift; sourceTree = "<group>"; };
 		AA0200042C10000100000001 /* HabitStreakInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitStreakInfo.swift; sourceTree = "<group>"; };
@@ -51,6 +51,7 @@
 		AA0200112C10000100000001 /* NotionHeatmapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotionHeatmapView.swift; sourceTree = "<group>"; };
 		AA0200122C10000100000001 /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
 		AA0200132C10000100000001 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		AA0200142C10000100000001 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0200142C10000100000001 /* MainTabView.swift */; };
 		AA0200142C10000100000001 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -68,12 +69,12 @@
 		AA0000202C10000100000001 = {
 			isa = PBXGroup;
 			children = (
-				AA0000302C10000100000001 /* HabitFlow */,
+				AA0000302C10000100000001 /* Forma */,
 				AA0000402C10000100000001 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		AA0000302C10000100000001 /* HabitFlow */ = {
+		AA0000302C10000100000001 /* Forma */ = {
 			isa = PBXGroup;
 			children = (
 				AA0000312C10000100000001 /* App */,
@@ -84,13 +85,13 @@
 				AA0000362C10000100000001 /* Views */,
 				AA0000022C10000100000001 /* Info.plist */,
 			);
-			path = HabitFlow;
+			path = Forma;
 			sourceTree = "<group>";
 		};
 		AA0000312C10000100000001 /* App */ = {
 			isa = PBXGroup;
 			children = (
-				AA0200012C10000100000001 /* HabitFlowApp.swift */,
+				AA0200012C10000100000001 /* FormaApp.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -192,7 +193,7 @@
 		AA0000402C10000100000001 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				AA0000012C10000100000001 /* HabitFlow.app */,
+				AA0000012C10000100000001 /* Forma.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -200,9 +201,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		AA0000502C10000100000001 /* HabitFlow */ = {
+		AA0000502C10000100000001 /* Forma */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = AA0000602C10000100000001 /* Build configuration list for PBXNativeTarget "HabitFlow" */;
+			buildConfigurationList = AA0000602C10000100000001 /* Build configuration list for PBXNativeTarget "Forma" */;
 			buildPhases = (
 				AA0000702C10000100000001 /* Sources */,
 				AA0000102C10000100000001 /* Frameworks */,
@@ -212,9 +213,9 @@
 			);
 			dependencies = (
 			);
-			name = HabitFlow;
-			productName = HabitFlow;
-			productReference = AA0000012C10000100000001 /* HabitFlow.app */;
+			name = Forma;
+			productName = Forma;
+			productReference = AA0000012C10000100000001 /* Forma.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -231,7 +232,7 @@
 					};
 				};
 			};
-			buildConfigurationList = AA0000A02C10000100000001 /* Build configuration list for PBXProject "HabitFlow" */;
+			buildConfigurationList = AA0000A02C10000100000001 /* Build configuration list for PBXProject "Forma" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -244,7 +245,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				AA0000502C10000100000001 /* HabitFlow */,
+				AA0000502C10000100000001 /* Forma */,
 			);
 		};
 /* End PBXProject section */
@@ -264,7 +265,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AA0100012C10000100000001 /* HabitFlowApp.swift in Sources */,
+				AA0100012C10000100000001 /* FormaApp.swift in Sources */,
 				AA0100022C10000100000001 /* Habit.swift in Sources */,
 				AA0100032C10000100000001 /* HabitCompletion.swift in Sources */,
 				AA0100042C10000100000001 /* HabitStreakInfo.swift in Sources */,
@@ -355,7 +356,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = HabitFlow/Info.plist;
+				INFOPLIST_FILE = Forma/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -380,7 +381,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = HabitFlow/Info.plist;
+				INFOPLIST_FILE = Forma/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -398,7 +399,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		AA0000602C10000100000001 /* Build configuration list for PBXNativeTarget "HabitFlow" */ = {
+		AA0000602C10000100000001 /* Build configuration list for PBXNativeTarget "Forma" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AA0000C12C10000100000001 /* Debug */,
@@ -407,7 +408,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		AA0000A02C10000100000001 /* Build configuration list for PBXProject "HabitFlow" */ = {
+		AA0000A02C10000100000001 /* Build configuration list for PBXProject "Forma" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AA0000B12C10000100000001 /* Debug */,

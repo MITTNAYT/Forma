@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct HabitFlowApp: App {
+struct FormaApp: App {
     @StateObject private var habitsViewModel = HabitsViewModel()
 
     var body: some Scene {

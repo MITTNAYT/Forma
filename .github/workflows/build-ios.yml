@@ -28,11 +28,11 @@ jobs:
       - name: Build and Archive iOS App
         run: |
           xcodebuild \
-            -project iosApp/HabitFlow.xcodeproj \
-            -scheme HabitFlow \
+            -project iosApp/Forma.xcodeproj \
+            -scheme Forma \
             -configuration Release \
             -destination 'generic/platform=iOS' \
-            -archivePath build/HabitFlow.xcarchive \
+            -archivePath build/Forma.xcarchive \
             archive \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
@@ -41,13 +41,13 @@ jobs:
       - name: Package Payload to IPA
         run: |
           mkdir -p build/Payload
-          cp -r build/HabitFlow.xcarchive/Products/Applications/HabitFlow.app build/Payload/
-          cd build && zip -r HabitFlow.ipa Payload/
-          ls -lh HabitFlow.ipa
+          cp -r build/Forma.xcarchive/Products/Applications/Forma.app build/Payload/
+          cd build && zip -r Forma.ipa Payload/
+          ls -lh Forma.ipa
 
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: HabitFlow-iOS-iPhone6sPlus
-          path: build/HabitFlow.ipa
+          name: Forma-iOS-iPhone6sPlus
+          path: build/Forma.ipa
           retention-days: 14

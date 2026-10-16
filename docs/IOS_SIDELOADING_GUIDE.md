@@ -1,4 +1,4 @@
-# HabitFlow v2 on iPhone 6s Plus: Zero-Mac Sideloading Guide
+# Forma v2 on iPhone 6s Plus: Zero-Mac Sideloading Guide
 
 This guide walks you through compiling the iOS build on GitHub's free cloud Mac runners and installing it onto your physical **iPhone 6s Plus** from your Windows PC.
 
@@ -9,17 +9,17 @@ This guide walks you through compiling the iOS build on GitHub's free cloud Mac 
 1. Commit and push your changes to your GitHub repository:
    ```bash
    git add .
-   git commit -m "feat(ios): add HabitFlow iOS 15 app for iPhone 6s Plus"
+   git commit -m "feat(ios): update Forma iOS 15 app for iPhone 6s Plus"
    git push origin main
    ```
 2. Open your repository on [GitHub.com](https://github.com).
 3. Click on the **Actions** tab at the top.
 4. In the left sidebar, click on **Build iOS (iPhone 6s Plus)**.
 5. Click the **Run workflow** dropdown on the right and click the green **Run workflow** button.
-6. Wait ~3–4 minutes for the macOS runner to complete.
+6. Wait ~30–45 seconds for the macOS runner to complete.
 7. Click on the completed workflow run, scroll down to **Artifacts**, and download:
-   * **`HabitFlow-iOS-iPhone6sPlus`** (contains `HabitFlow.ipa`).
-8. Extract the downloaded `.zip` file on your Windows PC so you have `HabitFlow.ipa`.
+   * **`Forma-iOS-iPhone6sPlus`** (contains `Forma.ipa`).
+8. Extract the downloaded `.zip` file on your Windows PC so you have `Forma.ipa`.
 
 ---
 
@@ -37,7 +37,7 @@ This guide walks you through compiling the iOS build on GitHub's free cloud Mac 
 2. If prompted on your iPhone screen, tap **Trust This Computer** and enter your passcode.
 3. Open **Sideloadly** on Windows.
 4. Sideloadly will detect your iPhone in the device dropdown (e.g. `iPhone 6s Plus`).
-5. **Drag and drop** `HabitFlow.ipa` onto the large IPA icon box in Sideloadly.
+5. **Drag and drop** `Forma.ipa` onto the large IPA icon box in Sideloadly.
 6. In the **Apple ID** field, type your regular free personal Apple ID email address.
 7. Click **Start**.
 8. If prompted, enter your Apple ID password (this is sent directly to Apple's servers to generate a 7-day personal developer certificate).

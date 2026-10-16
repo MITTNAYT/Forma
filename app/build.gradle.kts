@@ -63,7 +63,6 @@ android {
         rootProject.file(path).takeIf { it.exists() } ?: file(path).takeIf { it.exists() }
     } ?: System.getenv("KEYSTORE_PATH")?.let { file(it) }
       ?: rootProject.file("forma-release.jks").takeIf { it.exists() }
-      ?: rootProject.file("habitflow-release.jks").takeIf { it.exists() }
     val isReleaseSigningAvailable = releaseStoreFile != null && releaseStoreFile.exists()
 
     signingConfigs {
