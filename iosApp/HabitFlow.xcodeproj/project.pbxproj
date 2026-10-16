@@ -1,0 +1,422 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 54;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AA0100012C10000100000001 /* HabitFlowApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0200012C10000100000001 /* HabitFlowApp.swift */; };
+		AA0100022C10000100000001 /* Habit.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0200022C10000100000001 /* Habit.swift */; };
+		AA0100032C10000100000001 /* HabitCompletion.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0200032C10000100000001 /* HabitCompletion.swift */; };
+		AA0100042C10000100000001 /* HabitStreakInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0200042C10000100000001 /* HabitStreakInfo.swift */; };
+		AA0100052C10000100000001 /* DateUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0200052C10000100000001 /* DateUtils.swift */; };
+		AA0100062C10000100000001 /* StreakEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0200062C10000100000001 /* StreakEngine.swift */; };
+		AA0100072C10000100000001 /* ZenHaptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0200072C10000100000001 /* ZenHaptics.swift */; };
+		AA0100082C10000100000001 /* FormaTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0200082C10000100000001 /* FormaTheme.swift */; };
+		AA0100092C10000100000001 /* HabitStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0200092C10000100000001 /* HabitStorageService.swift */; };
+		AA01000A2C10000100000001 /* HabitsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA02000A2C10000100000001 /* HabitsViewModel.swift */; };
+		AA01000B2C10000100000001 /* NotionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA02000B2C10000100000001 /* NotionCard.swift */; };
+		AA01000C2C10000100000001 /* DynamicStreakRing.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA02000C2C10000100000001 /* DynamicStreakRing.swift */; };
+		AA01000D2C10000100000001 /* HabitCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA02000D2C10000100000001 /* HabitCardView.swift */; };
+		AA01000E2C10000100000001 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA02000E2C10000100000001 /* TodayView.swift */; };
+		AA01000F2C10000100000001 /* AddEditHabitSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA02000F2C10000100000001 /* AddEditHabitSheet.swift */; };
+		AA0100102C10000100000001 /* HabitsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0200102C10000100000001 /* HabitsListView.swift */; };
+		AA0100112C10000100000001 /* NotionHeatmapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0200112C10000100000001 /* NotionHeatmapView.swift */; };
+		AA0100122C10000100000001 /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0200122C10000100000001 /* StatsView.swift */; };
+		AA0100132C10000100000001 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0200132C10000100000001 /* SettingsView.swift */; };
+		AA0100142C10000100000001 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0200142C10000100000001 /* MainTabView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		AA0000012C10000100000001 /* HabitFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HabitFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA0000022C10000100000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AA0200012C10000100000001 /* HabitFlowApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitFlowApp.swift; sourceTree = "<group>"; };
+		AA0200022C10000100000001 /* Habit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Habit.swift; sourceTree = "<group>"; };
+		AA0200032C10000100000001 /* HabitCompletion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitCompletion.swift; sourceTree = "<group>"; };
+		AA0200042C10000100000001 /* HabitStreakInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitStreakInfo.swift; sourceTree = "<group>"; };
+		AA0200052C10000100000001 /* DateUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateUtils.swift; sourceTree = "<group>"; };
+		AA0200062C10000100000001 /* StreakEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakEngine.swift; sourceTree = "<group>"; };
+		AA0200072C10000100000001 /* ZenHaptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZenHaptics.swift; sourceTree = "<group>"; };
+		AA0200082C10000100000001 /* FormaTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormaTheme.swift; sourceTree = "<group>"; };
+		AA0200092C10000100000001 /* HabitStorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitStorageService.swift; sourceTree = "<group>"; };
+		AA02000A2C10000100000001 /* HabitsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitsViewModel.swift; sourceTree = "<group>"; };
+		AA02000B2C10000100000001 /* NotionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotionCard.swift; sourceTree = "<group>"; };
+		AA02000C2C10000100000001 /* DynamicStreakRing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicStreakRing.swift; sourceTree = "<group>"; };
+		AA02000D2C10000100000001 /* HabitCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitCardView.swift; sourceTree = "<group>"; };
+		AA02000E2C10000100000001 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
+		AA02000F2C10000100000001 /* AddEditHabitSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditHabitSheet.swift; sourceTree = "<group>"; };
+		AA0200102C10000100000001 /* HabitsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitsListView.swift; sourceTree = "<group>"; };
+		AA0200112C10000100000001 /* NotionHeatmapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotionHeatmapView.swift; sourceTree = "<group>"; };
+		AA0200122C10000100000001 /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
+		AA0200132C10000100000001 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		AA0200142C10000100000001 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		AA0000102C10000100000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		AA0000202C10000100000001 = {
+			isa = PBXGroup;
+			children = (
+				AA0000302C10000100000001 /* HabitFlow */,
+				AA0000402C10000100000001 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		AA0000302C10000100000001 /* HabitFlow */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000312C10000100000001 /* App */,
+				AA0000322C10000100000001 /* Models */,
+				AA0000332C10000100000001 /* Core */,
+				AA0000342C10000100000001 /* Services */,
+				AA0000352C10000100000001 /* ViewModels */,
+				AA0000362C10000100000001 /* Views */,
+				AA0000022C10000100000001 /* Info.plist */,
+			);
+			path = HabitFlow;
+			sourceTree = "<group>";
+		};
+		AA0000312C10000100000001 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				AA0200012C10000100000001 /* HabitFlowApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		AA0000322C10000100000001 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				AA0200022C10000100000001 /* Habit.swift */,
+				AA0200032C10000100000001 /* HabitCompletion.swift */,
+				AA0200042C10000100000001 /* HabitStreakInfo.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		AA0000332C10000100000001 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				AA0200052C10000100000001 /* DateUtils.swift */,
+				AA0200062C10000100000001 /* StreakEngine.swift */,
+				AA0200072C10000100000001 /* ZenHaptics.swift */,
+				AA0200082C10000100000001 /* FormaTheme.swift */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		AA0000342C10000100000001 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				AA0200092C10000100000001 /* HabitStorageService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		AA0000352C10000100000001 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				AA02000A2C10000100000001 /* HabitsViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		AA0000362C10000100000001 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000372C10000100000001 /* Components */,
+				AA0000382C10000100000001 /* Today */,
+				AA0000392C10000100000001 /* Habits */,
+				AA00003A2C10000100000001 /* Stats */,
+				AA00003B2C10000100000001 /* Settings */,
+				AA0200142C10000100000001 /* MainTabView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		AA0000372C10000100000001 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				AA02000B2C10000100000001 /* NotionCard.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		AA0000382C10000100000001 /* Today */ = {
+			isa = PBXGroup;
+			children = (
+				AA02000C2C10000100000001 /* DynamicStreakRing.swift */,
+				AA02000D2C10000100000001 /* HabitCardView.swift */,
+				AA02000E2C10000100000001 /* TodayView.swift */,
+			);
+			path = Today;
+			sourceTree = "<group>";
+		};
+		AA0000392C10000100000001 /* Habits */ = {
+			isa = PBXGroup;
+			children = (
+				AA02000F2C10000100000001 /* AddEditHabitSheet.swift */,
+				AA0200102C10000100000001 /* HabitsListView.swift */,
+			);
+			path = Habits;
+			sourceTree = "<group>";
+		};
+		AA00003A2C10000100000001 /* Stats */ = {
+			isa = PBXGroup;
+			children = (
+				AA0200112C10000100000001 /* NotionHeatmapView.swift */,
+				AA0200122C10000100000001 /* StatsView.swift */,
+			);
+			path = Stats;
+			sourceTree = "<group>";
+		};
+		AA00003B2C10000100000001 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				AA0200132C10000100000001 /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		AA0000402C10000100000001 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000012C10000100000001 /* HabitFlow.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		AA0000502C10000100000001 /* HabitFlow */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA0000602C10000100000001 /* Build configuration list for PBXNativeTarget "HabitFlow" */;
+			buildPhases = (
+				AA0000702C10000100000001 /* Sources */,
+				AA0000102C10000100000001 /* Frameworks */,
+				AA0000802C10000100000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = HabitFlow;
+			productName = HabitFlow;
+			productReference = AA0000012C10000100000001 /* HabitFlow.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AA0000902C10000100000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1540;
+				TargetAttributes = {
+					AA0000502C10000100000001 = {
+						CreatedOnToolsVersion = 15.4;
+					};
+				};
+			};
+			buildConfigurationList = AA0000A02C10000100000001 /* Build configuration list for PBXProject "HabitFlow" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = AA0000202C10000100000001;
+			productRefGroup = AA0000402C10000100000001 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AA0000502C10000100000001 /* HabitFlow */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		AA0000802C10000100000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		AA0000702C10000100000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA0100012C10000100000001 /* HabitFlowApp.swift in Sources */,
+				AA0100022C10000100000001 /* Habit.swift in Sources */,
+				AA0100032C10000100000001 /* HabitCompletion.swift in Sources */,
+				AA0100042C10000100000001 /* HabitStreakInfo.swift in Sources */,
+				AA0100052C10000100000001 /* DateUtils.swift in Sources */,
+				AA0100062C10000100000001 /* StreakEngine.swift in Sources */,
+				AA0100072C10000100000001 /* ZenHaptics.swift in Sources */,
+				AA0100082C10000100000001 /* FormaTheme.swift in Sources */,
+				AA0100092C10000100000001 /* HabitStorageService.swift in Sources */,
+				AA01000A2C10000100000001 /* HabitsViewModel.swift in Sources */,
+				AA01000B2C10000100000001 /* NotionCard.swift in Sources */,
+				AA01000C2C10000100000001 /* DynamicStreakRing.swift in Sources */,
+				AA01000D2C10000100000001 /* HabitCardView.swift in Sources */,
+				AA01000E2C10000100000001 /* TodayView.swift in Sources */,
+				AA01000F2C10000100000001 /* AddEditHabitSheet.swift in Sources */,
+				AA0100102C10000100000001 /* HabitsListView.swift in Sources */,
+				AA0100112C10000100000001 /* NotionHeatmapView.swift in Sources */,
+				AA0100122C10000100000001 /* StatsView.swift in Sources */,
+				AA0100132C10000100000001 /* SettingsView.swift in Sources */,
+				AA0100142C10000100000001 /* MainTabView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		AA0000B12C10000100000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		AA0000B22C10000100000001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		AA0000C12C10000100000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_IDENTITY = "";
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = HabitFlow/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 2.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.forma.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		AA0000C22C10000100000001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_IDENTITY = "";
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = HabitFlow/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 2.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.forma.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AA0000602C10000100000001 /* Build configuration list for PBXNativeTarget "HabitFlow" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA0000C12C10000100000001 /* Debug */,
+				AA0000C22C10000100000001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA0000A02C10000100000001 /* Build configuration list for PBXProject "HabitFlow" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA0000B12C10000100000001 /* Debug */,
+				AA0000B22C10000100000001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = AA0000902C10000100000001 /* Project object */;
+}
