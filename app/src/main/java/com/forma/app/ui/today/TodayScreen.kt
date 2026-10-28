@@ -149,12 +149,20 @@ fun TodayScreen(
     var isStackViewMode by rememberSaveable { mutableStateOf(false) }
     val haptic = LocalHapticFeedback.current
     val today = remember { LocalDate.now() }
-    val isPast = remember(selectedDate, today) { selectedDate.isBefore(today) }
+    val isFuture = remember(selectedDate, today) { selectedDate.isAfter(today) }
+    val isLockedPast = remember(selectedDate, today) { selectedDate.isBefore(today.minusDays(1)) }
+    val isDateLocked = isFuture || isLockedPast
+    val isPast = isDateLocked
 
-    val notifyPastLocked = {
+    val notifyDateLocked = {
         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-        Toast.makeText(context, "Past days are locked to maintain honest momentum.", Toast.LENGTH_SHORT).show()
+        if (isFuture) {
+            Toast.makeText(context, "Future rituals are view-only to prevent fake streaks.", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(context, "Dates older than yesterday are archived to maintain honest momentum.", Toast.LENGTH_SHORT).show()
+        }
     }
+    val notifyPastLocked = notifyDateLocked
 
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collect { event ->
@@ -207,8 +215,8 @@ fun TodayScreen(
                         .clip(CircleShape)
                         .background(colors.accent)
                         .formaPressEffect(targetScale = 0.92f) {
-                            if (isPast) {
-                                notifyPastLocked()
+                            if (isLockedPast) {
+                                notifyDateLocked()
                             } else {
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                 onNavigateToAddTask(selectedDate.toString())
@@ -860,11 +868,11 @@ fun TodayScreen(
                         item {
                             RitualStackDeck(
                                 items = displayedItems,
-                                isReadOnly = isPast,
-                                onReadOnlyAttempt = notifyPastLocked,
+                                isReadOnly = isDateLocked,
+                                onReadOnlyAttempt = notifyDateLocked,
                                 onToggle = { scheduleItem ->
-                                    if (isPast) {
-                                        notifyPastLocked()
+                                    if (isDateLocked) {
+                                        notifyDateLocked()
                                         return@RitualStackDeck
                                     }
                                     when (scheduleItem) {
@@ -886,8 +894,8 @@ fun TodayScreen(
                                     selectedDetailItem = scheduleItem
                                 },
                                 onStartFocus = { scheduleItem ->
-                                    if (isPast) {
-                                        notifyPastLocked()
+                                    if (isDateLocked) {
+                                        notifyDateLocked()
                                         return@RitualStackDeck
                                     }
                                     when (scheduleItem) {
@@ -951,14 +959,14 @@ fun TodayScreen(
                                 item = scheduleItem,
                                 index = index,
                                 modifier = Modifier,
-                                isReadOnly = isPast,
-                                onReadOnlyAttempt = notifyPastLocked,
+                                isReadOnly = isDateLocked,
+                                onReadOnlyAttempt = notifyDateLocked,
                                 onLongClick = {
                                     selectedContextMenuHabit = scheduleItem
                                 },
                                 onToggle = {
-                                    if (isPast) {
-                                        notifyPastLocked()
+                                    if (isDateLocked) {
+                                        notifyDateLocked()
                                         return@BehanceHabitCard
                                     }
                                     when (scheduleItem) {
@@ -980,8 +988,8 @@ fun TodayScreen(
                                     selectedDetailItem = scheduleItem
                                 },
                                 onStartFocus = {
-                                    if (isPast) {
-                                        notifyPastLocked()
+                                    if (isDateLocked) {
+                                        notifyDateLocked()
                                         return@BehanceHabitCard
                                     }
                                     when (scheduleItem) {

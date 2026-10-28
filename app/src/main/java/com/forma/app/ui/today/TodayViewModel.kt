@@ -118,8 +118,24 @@ class TodayViewModel @Inject constructor(
         _selectedDate.value = date
     }
 
+    private suspend fun validateDateAction(isTask: Boolean = false): Boolean {
+        val today = LocalDate.now()
+        val selected = _selectedDate.value
+        if (selected.isAfter(today)) {
+            val noun = if (isTask) "tasks" else "rituals"
+            _eventFlow.emit(TodayUiEvent.ShowToast("Cannot complete $noun in advance."))
+            return false
+        }
+        if (selected.isBefore(today.minusDays(1))) {
+            _eventFlow.emit(TodayUiEvent.ShowToast("Dates older than yesterday are archived."))
+            return false
+        }
+        return true
+    }
+
     fun toggleHabit(item: TodayScheduleItem.HabitItem) {
         viewModelScope.launch {
+            if (!validateDateAction(isTask = false)) return@launch
             val dateIso = DateUtils.formatDateIso(_selectedDate.value)
             val isNowCompleted = !item.isDoneToday
             if (isNowCompleted) {
@@ -137,6 +153,7 @@ class TodayViewModel @Inject constructor(
 
     fun completeHabitById(habitId: String) {
         viewModelScope.launch {
+            if (!validateDateAction(isTask = false)) return@launch
             val dateIso = DateUtils.formatDateIso(_selectedDate.value)
             zenFeedback.onHabitCompleted()
             toggleHabitCompletionUseCase(
@@ -149,6 +166,7 @@ class TodayViewModel @Inject constructor(
 
     fun skipHabit(habitId: String, habitName: String = "Habit") {
         viewModelScope.launch {
+            if (!validateDateAction(isTask = false)) return@launch
             zenFeedback.onTaskToggled()
             val dateIso = DateUtils.formatDateIso(_selectedDate.value)
             preferencesRepository.skipHabit(dateIso, habitId)
@@ -158,6 +176,7 @@ class TodayViewModel @Inject constructor(
 
     fun unskipHabit(habitId: String) {
         viewModelScope.launch {
+            if (!validateDateAction(isTask = false)) return@launch
             zenFeedback.onTaskToggled()
             val dateIso = DateUtils.formatDateIso(_selectedDate.value)
             preferencesRepository.unskipHabit(dateIso, habitId)
@@ -179,6 +198,7 @@ class TodayViewModel @Inject constructor(
 
     fun toggleTask(item: TodayScheduleItem.TimelineBlock) {
         viewModelScope.launch {
+            if (!validateDateAction(isTask = true)) return@launch
             val isNowCompleted = !item.item.completed
             if (isNowCompleted) {
                 zenFeedback.onHabitCompleted()
