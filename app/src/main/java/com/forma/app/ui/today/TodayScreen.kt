@@ -45,6 +45,7 @@ import androidx.compose.material.icons.rounded.School
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Spa
 import androidx.compose.material.icons.rounded.WbSunny
+import androidx.compose.material.icons.rounded.TaskAlt
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -109,7 +110,7 @@ import com.forma.app.ui.today.components.EmptyPeacefulState
 import com.forma.app.ui.today.components.TodayFilterChip
 import com.forma.app.ui.today.components.RitualStackDeck
 import androidx.compose.material.icons.rounded.Layers
-import androidx.compose.material.icons.rounded.FormatListBulleted
+import androidx.compose.material.icons.automirrored.rounded.FormatListBulleted
 import androidx.compose.runtime.saveable.rememberSaveable
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -322,6 +323,27 @@ fun TodayScreen(
                                         Icon(
                                             imageVector = Icons.Rounded.CalendarMonth,
                                             contentDescription = "Pick Date",
+                                            tint = colors.textSecondary,
+                                            modifier = Modifier.size(17.dp)
+                                        )
+                                    }
+
+                                    // Habits & Rituals Library Button
+                                    Box(
+                                        modifier = Modifier
+                                            .size(36.dp)
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .background(colors.surfaceVariant)
+                                            .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                                            .formaPressEffect(targetScale = 0.90f) {
+                                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                                onNavigateToHabits()
+                                            },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.TaskAlt,
+                                            contentDescription = "Habits Library",
                                             tint = colors.textSecondary,
                                             modifier = Modifier.size(17.dp)
                                         )
@@ -673,7 +695,7 @@ fun TodayScreen(
                             ) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(
-                                        imageVector = if (isStackViewMode) Icons.Rounded.FormatListBulleted else Icons.Rounded.Layers,
+                                        imageVector = if (isStackViewMode) Icons.AutoMirrored.Rounded.FormatListBulleted else Icons.Rounded.Layers,
                                         contentDescription = if (isStackViewMode) "List View" else "Stack View",
                                         tint = if (isStackViewMode) colors.accent else colors.textPrimary,
                                         modifier = Modifier.size(13.dp)

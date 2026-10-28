@@ -35,7 +35,7 @@ import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.FastForward
-import androidx.compose.material.icons.rounded.FormatListBulleted
+import androidx.compose.material.icons.automirrored.rounded.FormatListBulleted
 import androidx.compose.material.icons.rounded.Link
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Redo
@@ -247,7 +247,7 @@ fun RitualStackDeck(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        imageVector = Icons.Rounded.FormatListBulleted,
+                        imageVector = Icons.AutoMirrored.Rounded.FormatListBulleted,
                         contentDescription = "List View",
                         tint = colors.textPrimary,
                         modifier = Modifier.size(13.dp)
@@ -1133,7 +1133,7 @@ private fun ZenDeckCompletedCard(
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            imageVector = Icons.Rounded.FormatListBulleted,
+                            imageVector = Icons.AutoMirrored.Rounded.FormatListBulleted,
                             contentDescription = "List View",
                             tint = colors.onAccent,
                             modifier = Modifier.size(14.dp)

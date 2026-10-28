@@ -50,16 +50,40 @@ fun FormaNavGraph(
         startDestination = Screen.Home.route,
         modifier = modifier,
         enterTransition = {
-            fadeIn(animationSpec = tween(durationMillis = 140, easing = LinearOutSlowInEasing))
+            slideInHorizontally(
+                initialOffsetX = { fullWidth -> (fullWidth * 0.22f).toInt() },
+                animationSpec = spring(
+                    dampingRatio = 0.88f,
+                    stiffness = Spring.StiffnessMediumLow
+                )
+            ) + fadeIn(animationSpec = tween(durationMillis = 240, easing = LinearOutSlowInEasing))
         },
         exitTransition = {
-            fadeOut(animationSpec = tween(durationMillis = 110, easing = FastOutSlowInEasing))
+            slideOutHorizontally(
+                targetOffsetX = { fullWidth -> -(fullWidth * 0.18f).toInt() },
+                animationSpec = spring(
+                    dampingRatio = 0.88f,
+                    stiffness = Spring.StiffnessMediumLow
+                )
+            ) + fadeOut(animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing))
         },
         popEnterTransition = {
-            fadeIn(animationSpec = tween(durationMillis = 140, easing = LinearOutSlowInEasing))
+            slideInHorizontally(
+                initialOffsetX = { fullWidth -> -(fullWidth * 0.18f).toInt() },
+                animationSpec = spring(
+                    dampingRatio = 0.88f,
+                    stiffness = Spring.StiffnessMediumLow
+                )
+            ) + fadeIn(animationSpec = tween(durationMillis = 240, easing = LinearOutSlowInEasing))
         },
         popExitTransition = {
-            fadeOut(animationSpec = tween(durationMillis = 110, easing = FastOutSlowInEasing))
+            slideOutHorizontally(
+                targetOffsetX = { fullWidth -> (fullWidth * 0.22f).toInt() },
+                animationSpec = spring(
+                    dampingRatio = 0.88f,
+                    stiffness = Spring.StiffnessMediumLow
+                )
+            ) + fadeOut(animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing))
         }
     ) {
         // Tab 1: Home (Forma Minimal Dashboard)
@@ -122,15 +146,34 @@ fun FormaNavGraph(
             route = Screen.AddItem.route,
             enterTransition = {
                 slideInVertically(
-                    initialOffsetY = { it / 8 },
-                    animationSpec = tween(220, easing = FastOutSlowInEasing)
-                ) + fadeIn(animationSpec = tween(180, easing = LinearOutSlowInEasing))
+                    initialOffsetY = { (it * 0.14f).toInt() },
+                    animationSpec = spring(dampingRatio = 0.86f, stiffness = Spring.StiffnessMediumLow)
+                ) + scaleIn(
+                    initialScale = 0.95f,
+                    animationSpec = spring(dampingRatio = 0.86f, stiffness = Spring.StiffnessMediumLow)
+                ) + fadeIn(animationSpec = tween(220, easing = LinearOutSlowInEasing))
             },
             exitTransition = {
                 slideOutVertically(
-                    targetOffsetY = { it / 8 },
-                    animationSpec = tween(180, easing = FastOutSlowInEasing)
-                ) + fadeOut(animationSpec = tween(150, easing = FastOutSlowInEasing))
+                    targetOffsetY = { (it * 0.14f).toInt() },
+                    animationSpec = spring(dampingRatio = 0.86f, stiffness = Spring.StiffnessMediumLow)
+                ) + scaleOut(
+                    targetScale = 0.95f,
+                    animationSpec = spring(dampingRatio = 0.86f, stiffness = Spring.StiffnessMediumLow)
+                ) + fadeOut(animationSpec = tween(180, easing = FastOutSlowInEasing))
+            },
+            popEnterTransition = {
+                fadeIn(animationSpec = tween(220, easing = LinearOutSlowInEasing)) +
+                scaleIn(initialScale = 0.95f, animationSpec = spring(dampingRatio = 0.86f, stiffness = Spring.StiffnessMediumLow))
+            },
+            popExitTransition = {
+                slideOutVertically(
+                    targetOffsetY = { (it * 0.14f).toInt() },
+                    animationSpec = spring(dampingRatio = 0.86f, stiffness = Spring.StiffnessMediumLow)
+                ) + scaleOut(
+                    targetScale = 0.95f,
+                    animationSpec = spring(dampingRatio = 0.86f, stiffness = Spring.StiffnessMediumLow)
+                ) + fadeOut(animationSpec = tween(180, easing = FastOutSlowInEasing))
             }
         ) {
             AddEditTimelineItemScreen(
@@ -176,15 +219,34 @@ fun FormaNavGraph(
             ),
             enterTransition = {
                 slideInVertically(
-                    initialOffsetY = { it / 8 },
-                    animationSpec = tween(220, easing = FastOutSlowInEasing)
-                ) + fadeIn(animationSpec = tween(180, easing = LinearOutSlowInEasing))
+                    initialOffsetY = { (it * 0.14f).toInt() },
+                    animationSpec = spring(dampingRatio = 0.86f, stiffness = Spring.StiffnessMediumLow)
+                ) + scaleIn(
+                    initialScale = 0.95f,
+                    animationSpec = spring(dampingRatio = 0.86f, stiffness = Spring.StiffnessMediumLow)
+                ) + fadeIn(animationSpec = tween(220, easing = LinearOutSlowInEasing))
             },
             exitTransition = {
                 slideOutVertically(
-                    targetOffsetY = { it / 8 },
-                    animationSpec = tween(180, easing = FastOutSlowInEasing)
-                ) + fadeOut(animationSpec = tween(150, easing = FastOutSlowInEasing))
+                    targetOffsetY = { (it * 0.14f).toInt() },
+                    animationSpec = spring(dampingRatio = 0.86f, stiffness = Spring.StiffnessMediumLow)
+                ) + scaleOut(
+                    targetScale = 0.95f,
+                    animationSpec = spring(dampingRatio = 0.86f, stiffness = Spring.StiffnessMediumLow)
+                ) + fadeOut(animationSpec = tween(180, easing = FastOutSlowInEasing))
+            },
+            popEnterTransition = {
+                fadeIn(animationSpec = tween(220, easing = LinearOutSlowInEasing)) +
+                scaleIn(initialScale = 0.95f, animationSpec = spring(dampingRatio = 0.86f, stiffness = Spring.StiffnessMediumLow))
+            },
+            popExitTransition = {
+                slideOutVertically(
+                    targetOffsetY = { (it * 0.14f).toInt() },
+                    animationSpec = spring(dampingRatio = 0.86f, stiffness = Spring.StiffnessMediumLow)
+                ) + scaleOut(
+                    targetScale = 0.95f,
+                    animationSpec = spring(dampingRatio = 0.86f, stiffness = Spring.StiffnessMediumLow)
+                ) + fadeOut(animationSpec = tween(180, easing = FastOutSlowInEasing))
             }
         ) {
             AddEditTimelineItemScreen(
@@ -213,12 +275,35 @@ fun FormaNavGraph(
                 }
             ),
             enterTransition = {
-                fadeIn(animationSpec = tween(240, easing = LinearOutSlowInEasing)) +
-                scaleIn(initialScale = 0.96f, animationSpec = tween(240, easing = FastOutSlowInEasing))
+                slideInVertically(
+                    initialOffsetY = { (it * 0.12f).toInt() },
+                    animationSpec = spring(dampingRatio = 0.86f, stiffness = Spring.StiffnessMediumLow)
+                ) + scaleIn(
+                    initialScale = 0.94f,
+                    animationSpec = spring(dampingRatio = 0.86f, stiffness = Spring.StiffnessMediumLow)
+                ) + fadeIn(animationSpec = tween(240, easing = LinearOutSlowInEasing))
             },
             exitTransition = {
-                fadeOut(animationSpec = tween(180, easing = FastOutSlowInEasing)) +
-                scaleOut(targetScale = 0.96f, animationSpec = tween(180, easing = FastOutSlowInEasing))
+                slideOutVertically(
+                    targetOffsetY = { (it * 0.12f).toInt() },
+                    animationSpec = spring(dampingRatio = 0.86f, stiffness = Spring.StiffnessMediumLow)
+                ) + scaleOut(
+                    targetScale = 0.94f,
+                    animationSpec = spring(dampingRatio = 0.86f, stiffness = Spring.StiffnessMediumLow)
+                ) + fadeOut(animationSpec = tween(180, easing = FastOutSlowInEasing))
+            },
+            popEnterTransition = {
+                fadeIn(animationSpec = tween(240, easing = LinearOutSlowInEasing)) +
+                scaleIn(initialScale = 0.94f, animationSpec = spring(dampingRatio = 0.86f, stiffness = Spring.StiffnessMediumLow))
+            },
+            popExitTransition = {
+                slideOutVertically(
+                    targetOffsetY = { (it * 0.12f).toInt() },
+                    animationSpec = spring(dampingRatio = 0.86f, stiffness = Spring.StiffnessMediumLow)
+                ) + scaleOut(
+                    targetScale = 0.94f,
+                    animationSpec = spring(dampingRatio = 0.86f, stiffness = Spring.StiffnessMediumLow)
+                ) + fadeOut(animationSpec = tween(180, easing = FastOutSlowInEasing))
             }
         ) {
             FocusTimerScreen(

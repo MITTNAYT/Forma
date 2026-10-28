@@ -1,4 +1,4 @@
-﻿package com.forma.app.ui.pomodoro
+package com.forma.app.ui.pomodoro
 
 import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
@@ -42,7 +42,7 @@ import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Spa
 import androidx.compose.material.icons.rounded.Timer
-import androidx.compose.material.icons.rounded.VolumeOff
+import androidx.compose.material.icons.automirrored.rounded.VolumeOff
 import androidx.compose.material.icons.rounded.WaterDrop
 import androidx.compose.material.icons.rounded.Waves
 import androidx.compose.material3.CircularProgressIndicator
@@ -828,7 +828,7 @@ private fun SoundscapeEqualizer(tint: Color) {
 
 private fun getSoundscapeIcon(sound: AmbientSound): ImageVector {
     return when (sound) {
-        AmbientSound.OFF -> Icons.Rounded.VolumeOff
+        AmbientSound.OFF -> Icons.AutoMirrored.Rounded.VolumeOff
         AmbientSound.RAIN -> Icons.Rounded.WaterDrop
         AmbientSound.KYOTO_BELL -> Icons.Rounded.NotificationsActive
         AmbientSound.ZEN_DRONE -> Icons.Rounded.Spa
