@@ -79,6 +79,9 @@ fun HabitsScreen(
     var showTemplatesSheet by remember { mutableStateOf(false) }
 
     Scaffold(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colors.background),
         topBar = {
             FormaTopAppBar(
                 title = "Habits",

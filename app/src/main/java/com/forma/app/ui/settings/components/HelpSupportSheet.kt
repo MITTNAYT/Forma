@@ -35,9 +35,13 @@ import androidx.compose.material.icons.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.QuestionAnswer
-import androidx.compose.material.icons.rounded.Send
+import androidx.compose.material.icons.rounded.Bedtime
+import androidx.compose.material.icons.rounded.FilterList
+import androidx.compose.material.icons.rounded.Layers
+import androidx.compose.material.icons.rounded.PanTool
 import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material.icons.rounded.TouchApp
+import androidx.compose.material.icons.rounded.Visibility
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -451,8 +455,8 @@ fun HelpSupportSheet(
                 }
             }
 
-            // ── Section 4: Gesture Guide ────────────────────────────────
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            // ── Section 4: Visual Gesture Guide ──────────────────────────
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(
                     text = "SANCTUARY GESTURES",
                     fontWeight = FontWeight.Bold,
@@ -462,35 +466,56 @@ fun HelpSupportSheet(
                 )
 
                 listOf(
-                    "Tap circle icon" to "Mark habit complete with tactile haptic spring",
-                    "Tap habit card body" to "Inspect details & check off micro-steps",
-                    "Long press habit" to "Reorder or quick edit ritual",
-                    "Filter chips" to "Filter between All, Morning, Afternoon & Evening",
-                    "Evening Sanctuary" to "Reflect and rollover unfinished tasks gracefully"
-                ).forEach { (gesture, description) ->
-                    Row(
+                    Triple(Icons.Rounded.TouchApp, "Tap Completion Circle", "Mark habit complete with a fluid haptic spring and dynamic progress burst"),
+                    Triple(Icons.Rounded.Visibility, "Tap Habit Card Body", "Inspect atomic cues, environmental anchors, and check off micro-steps"),
+                    Triple(Icons.Rounded.PanTool, "Long-Press Habit Card", "Open quick action menu to pause in Wintering Sanctuary, reorder, or edit"),
+                    Triple(Icons.Rounded.Layers, "Stack View Toggle", "Switch between the full chronological list and distraction-free single-card deck"),
+                    Triple(Icons.Rounded.FilterList, "Circadian Filter Chips", "Filter between All, Morning (Dawn), Afternoon (Zenith), and Evening (Dusk)"),
+                    Triple(Icons.Rounded.Bedtime, "Evening Sanctuary", "Open the night sanctuary at day\'s end to reflect and rollover unfinished tasks")
+                ).forEach { (icon, gesture, description) ->
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 3.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(colors.surfaceVariant)
+                            .border(1.dp, colors.border.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
+                            .padding(horizontal = 12.dp, vertical = 10.dp)
                     ) {
-                        Text(
-                            text = "•",
-                            color = colors.accent,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(end = 8.dp)
-                        )
-                        Text(
-                            text = "$gesture: ",
-                            fontWeight = FontWeight.SemiBold,
-                            color = colors.textPrimary,
-                            fontSize = 12.sp
-                        )
-                        Text(
-                            text = description,
-                            color = colors.textSecondary,
-                            fontSize = 12.sp
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(34.dp)
+                                    .clip(RoundedCornerShape(9.dp))
+                                    .background(colors.accent.copy(alpha = 0.12f)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = icon,
+                                    contentDescription = null,
+                                    tint = colors.accent,
+                                    modifier = Modifier.size(17.dp)
+                                )
+                            }
+
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = gesture,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = colors.textPrimary,
+                                    fontSize = 12.5.sp
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = description,
+                                    color = colors.textSecondary,
+                                    fontSize = 11.sp,
+                                    lineHeight = 15.sp
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -505,7 +530,7 @@ private fun launchEmailSupport(context: Context) {
             putExtra(Intent.EXTRA_SUBJECT, "Forma Support Request [Android ${Build.VERSION.RELEASE}]")
             putExtra(
                 Intent.EXTRA_TEXT,
-                "\n\n---\nApp Version: Forma v2.0\nDevice: ${Build.MANUFACTURER} ${Build.MODEL}\nAndroid OS: ${Build.VERSION.RELEASE}\n"
+                "\n\n---\nApp Version: Forma v1.0\nDevice: ${Build.MANUFACTURER} ${Build.MODEL}\nAndroid OS: ${Build.VERSION.RELEASE}\n"
             )
         }
         context.startActivity(intent)

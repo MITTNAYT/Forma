@@ -141,7 +141,7 @@ fun SettingsScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .statusBarsPadding(),
-            contentPadding = PaddingValues(bottom = 120.dp),
+            contentPadding = PaddingValues(bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(0.dp)
         ) {
 
@@ -685,9 +685,16 @@ fun SettingsScreen(
                     )
                     SettingsDivider()
                     SettingsTapRow(
+                        icon = Icons.Rounded.Spa,
+                        title = "Sanctuary Interactive Tour",
+                        subtitle = "Guided visual tour through Forma rituals",
+                        onClick = { showSanctuaryTour = true }
+                    )
+                    SettingsDivider()
+                    SettingsTapRow(
                         icon = Icons.AutoMirrored.Rounded.HelpOutline,
                         title = "Help & Support",
-                        subtitle = "FAQ, tour replay, community",
+                        subtitle = "FAQ, gesture guide, contact",
                         onClick = { showHelpSupportSheet = true }
                     )
                 }
@@ -703,7 +710,7 @@ fun SettingsScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Forma v2.0",
+                        text = "Forma v1.0",
                         color = colors.textTertiary,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Medium,

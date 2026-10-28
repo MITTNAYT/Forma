@@ -180,7 +180,11 @@ fun TodayScreen(
 
     val focusManager = LocalFocusManager.current
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colors.background)
+    ) {
         Scaffold(
             modifier = Modifier
                 .fillMaxSize()
@@ -323,27 +327,6 @@ fun TodayScreen(
                                         Icon(
                                             imageVector = Icons.Rounded.CalendarMonth,
                                             contentDescription = "Pick Date",
-                                            tint = colors.textSecondary,
-                                            modifier = Modifier.size(17.dp)
-                                        )
-                                    }
-
-                                    // Habits & Rituals Library Button
-                                    Box(
-                                        modifier = Modifier
-                                            .size(36.dp)
-                                            .clip(RoundedCornerShape(12.dp))
-                                            .background(colors.surfaceVariant)
-                                            .border(1.dp, colors.border.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
-                                            .formaPressEffect(targetScale = 0.90f) {
-                                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                                onNavigateToHabits()
-                                            },
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Rounded.TaskAlt,
-                                            contentDescription = "Habits Library",
                                             tint = colors.textSecondary,
                                             modifier = Modifier.size(17.dp)
                                         )
