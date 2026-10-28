@@ -85,7 +85,7 @@ data class DayDetailInfo(
 class StatsViewModel @Inject constructor(
     getHabitStatsUseCase: GetHabitStatsUseCase,
     billingRepository: BillingRepository,
-    preferencesRepository: UserPreferencesRepository,
+    private val preferencesRepository: UserPreferencesRepository,
     private val focusTrackerRepository: FocusTrackerRepository,
     private val habitRepository: HabitRepository,
     private val dailyReflectionRepository: DailyReflectionRepository,
@@ -110,10 +110,14 @@ class StatsViewModel @Inject constructor(
     val isPro: StateFlow<Boolean> = billingRepository.isPro
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
-    // 365-Day Parchment Heatmap Data
+    // 365-Day Parchment Heatmap Data (Strict Anti-Cheat: Reject future completions)
     val yearlyCompletions: StateFlow<Map<String, Int>> = habitRepository.getAllCompletions()
         .combine(MutableStateFlow(Unit)) { completions, _ ->
-            completions.groupBy { it.date }.mapValues { it.value.size }
+            val todayIso = DateUtils.formatDateIso(DateUtils.today())
+            completions
+                .filter { it.date <= todayIso }
+                .groupBy { it.date }
+                .mapValues { it.value.size }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyMap())
 
     // Habit Correlation Insights
@@ -230,13 +234,14 @@ class StatsViewModel @Inject constructor(
             val formattedDate = parsedDate.format(formatter)
             val dayOfWeek = DateUtils.getDayOfWeekInt(parsedDate)
 
-            // Query habits, completions, timeline tasks, and focus time
+            // Query habits, completions, timeline tasks, focus time, and skipped habits
             combine(
                 habitRepository.getAllHabits(includeArchived = false),
                 habitRepository.getCompletionsForDate(dateIso),
                 timelineRepository.getTimelineItemsForDate(dateIso),
-                focusTrackerRepository.getTotalFocusTimeForDate(dateIso)
-            ) { habits, completions, timelineItems, focusSecs ->
+                focusTrackerRepository.getTotalFocusTimeForDate(dateIso),
+                preferencesRepository.getSkippedHabitIds(dateIso)
+            ) { habits, completions, timelineItems, focusSecs, skippedHabitIds ->
                 val scheduledHabits = habits.filter {
                     (it.repeatDays.isEmpty() || it.repeatDays.contains(dayOfWeek)) && !it.isWintering
                 }
@@ -244,8 +249,10 @@ class StatsViewModel @Inject constructor(
 
                 val habitDetails = scheduledHabits.map { habit ->
                     val isDone = completedHabitIds.contains(habit.id)
+                    val isSkipped = skippedHabitIds.contains(habit.id)
                     val status = when {
                         isDone -> AnalysisItemStatus.COMPLETED
+                        isSkipped -> AnalysisItemStatus.SKIPPED
                         isPast -> AnalysisItemStatus.MISSED
                         else -> AnalysisItemStatus.PENDING
                     }

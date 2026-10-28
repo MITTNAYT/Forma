@@ -35,7 +35,10 @@ data class HabitEntity(
     val startDate: String? = null,
     val endDate: String? = null,
     val isIndefinite: Boolean = true,
-    val subtasksRaw: String = ""
+    val subtasksRaw: String = "",
+    val isNegative: Boolean = false,
+    val quitTimestamp: Long? = null,
+    val urgesDeflected: Int = 0
 ) {
     fun toDomain(): Habit {
         val days = if (repeatDays.isBlank()) emptySet() else repeatDays.split(",").mapNotNull { it.trim().toIntOrNull() }.toSet()
@@ -72,7 +75,10 @@ data class HabitEntity(
             startDate = startDate,
             endDate = endDate,
             isIndefinite = isIndefinite,
-            subtasks = subtasksList
+            subtasks = subtasksList,
+            isNegative = isNegative,
+            quitTimestamp = quitTimestamp,
+            urgesDeflected = urgesDeflected
         )
     }
 
@@ -100,7 +106,10 @@ data class HabitEntity(
                 startDate = habit.startDate,
                 endDate = habit.endDate,
                 isIndefinite = habit.isIndefinite,
-                subtasksRaw = encodedSubtasks
+                subtasksRaw = encodedSubtasks,
+                isNegative = habit.isNegative,
+                quitTimestamp = habit.quitTimestamp,
+                urgesDeflected = habit.urgesDeflected
             )
         }
     }

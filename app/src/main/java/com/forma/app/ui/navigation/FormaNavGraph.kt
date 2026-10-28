@@ -51,16 +51,16 @@ fun FormaNavGraph(
         modifier = modifier,
         enterTransition = {
             slideInHorizontally(
-                initialOffsetX = { fullWidth -> (fullWidth * 0.22f).toInt() },
+                initialOffsetX = { fullWidth -> fullWidth },
                 animationSpec = spring(
                     dampingRatio = 0.88f,
                     stiffness = Spring.StiffnessMediumLow
                 )
-            ) + fadeIn(animationSpec = tween(durationMillis = 240, easing = LinearOutSlowInEasing))
+            ) + fadeIn(animationSpec = tween(durationMillis = 220, easing = LinearOutSlowInEasing))
         },
         exitTransition = {
             slideOutHorizontally(
-                targetOffsetX = { fullWidth -> -(fullWidth * 0.18f).toInt() },
+                targetOffsetX = { fullWidth -> -(fullWidth * 0.25f).toInt() },
                 animationSpec = spring(
                     dampingRatio = 0.88f,
                     stiffness = Spring.StiffnessMediumLow
@@ -69,16 +69,16 @@ fun FormaNavGraph(
         },
         popEnterTransition = {
             slideInHorizontally(
-                initialOffsetX = { fullWidth -> -(fullWidth * 0.18f).toInt() },
+                initialOffsetX = { fullWidth -> -(fullWidth * 0.25f).toInt() },
                 animationSpec = spring(
                     dampingRatio = 0.88f,
                     stiffness = Spring.StiffnessMediumLow
                 )
-            ) + fadeIn(animationSpec = tween(durationMillis = 240, easing = LinearOutSlowInEasing))
+            ) + fadeIn(animationSpec = tween(durationMillis = 220, easing = LinearOutSlowInEasing))
         },
         popExitTransition = {
             slideOutHorizontally(
-                targetOffsetX = { fullWidth -> (fullWidth * 0.22f).toInt() },
+                targetOffsetX = { fullWidth -> fullWidth },
                 animationSpec = spring(
                     dampingRatio = 0.88f,
                     stiffness = Spring.StiffnessMediumLow

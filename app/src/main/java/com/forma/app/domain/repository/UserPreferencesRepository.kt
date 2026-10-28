@@ -59,6 +59,7 @@ interface UserPreferencesRepository {
     suspend fun setConsentToDataAndCookies(consented: Boolean)
 
     fun getSkippedHabitIds(date: String): Flow<Set<String>>
+    fun getAllSkippedHabits(): Flow<Map<String, Set<String>>>
     suspend fun skipHabit(date: String, habitId: String)
     suspend fun unskipHabit(date: String, habitId: String)
 }

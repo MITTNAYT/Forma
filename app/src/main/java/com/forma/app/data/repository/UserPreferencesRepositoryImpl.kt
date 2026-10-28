@@ -186,6 +186,16 @@ class UserPreferencesRepositoryImpl @Inject constructor(
         preferences[key] ?: emptySet()
     }
 
+    override fun getAllSkippedHabits(): Flow<Map<String, Set<String>>> = context.dataStore.data.map { preferences ->
+        preferences.asMap().entries
+            .filter { it.key.name.startsWith("skipped_habits_") && it.value is Set<*> }
+            .associate { (key, value) ->
+                val date = key.name.removePrefix("skipped_habits_")
+                @Suppress("UNCHECKED_CAST")
+                date to (value as Set<String>)
+            }
+    }
+
     override suspend fun skipHabit(date: String, habitId: String) {
         val key = androidx.datastore.preferences.core.stringSetPreferencesKey("skipped_habits_$date")
         context.dataStore.edit { preferences ->

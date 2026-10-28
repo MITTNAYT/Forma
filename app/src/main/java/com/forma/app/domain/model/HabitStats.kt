@@ -1,4 +1,4 @@
-﻿package com.forma.app.domain.model
+package com.forma.app.domain.model
 
 import androidx.compose.runtime.Immutable
 
@@ -41,5 +41,8 @@ data class OverallHabitStats(
     val monthName: String = "",
     val daysInMonth: Int = 30,
     val monthHeatmapDays: List<DayCompletionRate> = emptyList(),
-    val firstDayOfWeekOffset: Int = 0 // 0 = Mon, 1 = Tue, ..., 6 = Sun
+    val firstDayOfWeekOffset: Int = 0, // 0 = Mon, 1 = Tue, ..., 6 = Sun
+    val totalNegativeHabits: Int = 0,
+    val bestCleanStreak: Int = 0,
+    val totalUrgesDeflected: Int = 0
 )

@@ -24,8 +24,9 @@ class GetTodayTimelineUseCase @Inject constructor(
             habitRepository.getAllHabits(includeArchived = false),
             habitRepository.getAllCompletions(),
             timelineRepository.getTimelineItemsForDate(dateIso),
-            preferencesRepository.getSkippedHabitIds(dateIso)
-        ) { habits, allCompletions, timelineItems, skippedHabitIds ->
+            preferencesRepository.getSkippedHabitIds(dateIso),
+            preferencesRepository.getAllSkippedHabits()
+        ) { habits, allCompletions, timelineItems, skippedHabitIds, allSkippedMap ->
 
             val completionsByHabit = allCompletions.groupBy { it.habitId }
             val completedDatesByHabit = completionsByHabit.mapValues { (_, list) -> list.map { it.date }.toSet() }
@@ -42,7 +43,12 @@ class GetTodayTimelineUseCase @Inject constructor(
             // Create habit schedule items with fast streak info
             val habitScheduleItems: List<TodayScheduleItem.HabitItem> = scheduledHabits.map { habit ->
                 val completedDates = completedDatesByHabit[habit.id] ?: emptySet()
-                val currentStreak = calculateStreakUseCase.calculateCurrentStreak(habit, completedDates, date)
+                val skippedDatesForHabit = allSkippedMap
+                    .filter { (_, habitSet) -> habitSet.contains(habit.id) }
+                    .keys
+                    .toSet()
+
+                val currentStreak = calculateStreakUseCase.calculateCurrentStreak(habit, completedDates, date, skippedDatesForHabit)
                 val isDone = completedHabitIds.contains(habit.id)
                 val isSkipped = skippedHabitIds.contains(habit.id)
 

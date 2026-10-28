@@ -19,7 +19,7 @@ import com.forma.app.data.local.entity.TimelineItemEntity
         TimelineItemEntity::class,
         DailyReflectionEntity::class
     ],
-    version = 5,
+    version = 6,
     exportSchema = true
 )
 @TypeConverters(Converters::class)

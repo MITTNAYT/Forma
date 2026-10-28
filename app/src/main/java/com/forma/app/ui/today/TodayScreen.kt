@@ -145,6 +145,7 @@ fun TodayScreen(
     var editingHabitId by remember { mutableStateOf<String?>(null) }
     var selectedTimeFilter by remember { mutableStateOf<TimeOfDay?>(null) }
     var showTemplatesSheet by remember { mutableStateOf(false) }
+    var urgeSurferTargetHabit by remember { mutableStateOf<com.forma.app.domain.model.Habit?>(null) }
     var celebrationInfo by remember { mutableStateOf<Pair<String, Int>?>(null) }
     var isStackViewMode by rememberSaveable { mutableStateOf(false) }
     val haptic = LocalHapticFeedback.current
@@ -946,6 +947,11 @@ fun TodayScreen(
                                 },
                                 onLongClick = { scheduleItem ->
                                     selectedContextMenuHabit = scheduleItem
+                                },
+                                onRideUrge = { scheduleItem ->
+                                    if (scheduleItem is TodayScheduleItem.HabitItem) {
+                                        urgeSurferTargetHabit = scheduleItem.habit
+                                    }
                                 }
                             )
                         }
@@ -963,6 +969,11 @@ fun TodayScreen(
                                 onReadOnlyAttempt = notifyDateLocked,
                                 onLongClick = {
                                     selectedContextMenuHabit = scheduleItem
+                                },
+                                onRideUrge = {
+                                    if (scheduleItem is TodayScheduleItem.HabitItem) {
+                                        urgeSurferTargetHabit = scheduleItem.habit
+                                    }
                                 },
                                 onToggle = {
                                     if (isDateLocked) {
@@ -1121,6 +1132,17 @@ fun TodayScreen(
                 if (item is TodayScheduleItem.HabitItem) {
                     viewModel.skipHabit(item.habit.id, item.habit.name)
                 }
+            },
+            onRideUrge = {
+                if (item is TodayScheduleItem.HabitItem) {
+                    selectedDetailItem = null
+                    urgeSurferTargetHabit = item.habit
+                }
+            },
+            onResetCleanStreak = {
+                if (item is TodayScheduleItem.HabitItem) {
+                    viewModel.resetCleanStreak(item.habit.id)
+                }
             }
         )
     }
@@ -1277,7 +1299,18 @@ fun TodayScreen(
         )
     }
 
-
+    urgeSurferTargetHabit?.let { targetHabit ->
+        com.forma.app.ui.today.components.UrgeSurferSheet(
+            habitName = targetHabit.name,
+            onDeflect = {
+                viewModel.rideUrge(targetHabit.id)
+                urgeSurferTargetHabit = null
+            },
+            onDismiss = {
+                urgeSurferTargetHabit = null
+            }
+        )
+    }
 }
 }
 

@@ -161,6 +161,15 @@ fun AddEditTimelineSheet(
         Pair("Evening Reflection", "journal")
     )
 
+    val badHabitSuggestions = listOf(
+        Pair("Zero Sugar", "shield"),
+        Pair("Quit Smoking", "spa"),
+        Pair("Zero Alcohol", "shield"),
+        Pair("No Doomscrolling", "timer"),
+        Pair("No Late Snacking", "bedtime"),
+        Pair("No Caffeine Past 2PM", "coffee")
+    )
+
     val taskSuggestions = listOf(
         Pair("Project Milestone", "work"),
         Pair("Grocery & Nutrition", "food"),
@@ -171,11 +180,17 @@ fun AddEditTimelineSheet(
     FormaBottomSheet(
         onDismissRequest = onDismiss,
         title = if (uiState.isEditMode) {
-            if (uiState.creationType == CreationType.HABIT) "Edit Habit" else "Edit Intention"
+            if (uiState.creationType == CreationType.HABIT) {
+                if (uiState.isNegative) "Edit Clean Streak" else "Edit Ritual"
+            } else "Edit Intention"
         } else {
-            if (uiState.creationType == CreationType.HABIT) "New Habit" else "New Intention"
+            if (uiState.creationType == CreationType.HABIT) {
+                if (uiState.isNegative) "Break Bad Habit" else "New Ritual"
+            } else "New Intention"
         },
-        subtitle = if (uiState.creationType == CreationType.HABIT) "Unlimited recurring habit & streak tracking" else "Focused single-day intention",
+        subtitle = if (uiState.creationType == CreationType.HABIT) {
+            if (uiState.isNegative) "Clean streak tracking & urge deflection" else "Unlimited recurring habit & streak tracking"
+        } else "Focused single-day intention",
         trailingAction = null
     ) {
         // 1. Top Mode Switcher (Habit vs Task)
@@ -226,6 +241,61 @@ fun AddEditTimelineSheet(
                             color = textColor,
                             fontSize = 12.sp
                         )
+                    }
+                }
+            }
+        }
+
+        if (uiState.creationType == CreationType.HABIT) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(colors.surfaceVariant.copy(alpha = 0.45f))
+                    .border(1.dp, colors.border.copy(alpha = 0.4f), RoundedCornerShape(14.dp))
+                    .padding(2.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    listOf(
+                        Pair(false, "Build Ritual"),
+                        Pair(true, "Break Habit (Clean Streak)")
+                    ).forEach { (isNeg, label) ->
+                        val isSelected = uiState.isNegative == isNeg
+                        val bg by animateColorAsState(
+                            targetValue = if (isSelected) parsedColor.copy(alpha = 0.18f) else Color.Transparent,
+                            animationSpec = tween(durationMillis = 200),
+                            label = "sub_habit_bg"
+                        )
+                        val textColor by animateColorAsState(
+                            targetValue = if (isSelected) parsedColor else colors.textSecondary,
+                            animationSpec = tween(durationMillis = 200),
+                            label = "sub_habit_text"
+                        )
+
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(32.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(bg)
+                                .formaPressEffect(targetScale = 0.95f) {
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    viewModel.setIsNegative(isNeg)
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = label,
+                                style = FormaTheme.typography.labelSmall,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                color = textColor,
+                                fontSize = 11.5.sp
+                            )
+                        }
                     }
                 }
             }
@@ -316,7 +386,9 @@ fun AddEditTimelineSheet(
                                 ) {
                                     if (uiState.title.isEmpty()) {
                                         Text(
-                                            text = if (uiState.creationType == CreationType.HABIT) "Name your daily habit..." else "What is the intention?",
+                                            text = if (uiState.creationType == CreationType.HABIT) {
+                                                if (uiState.isNegative) "e.g. Zero Sugar, Quit Smoking..." else "Name your daily habit..."
+                                            } else "What is the intention?",
                                             style = FormaTheme.typography.titleMedium.copy(
                                                 fontWeight = FontWeight.Bold,
                                                 fontSize = 16.sp,
@@ -418,7 +490,9 @@ fun AddEditTimelineSheet(
         Spacer(modifier = Modifier.height(10.dp))
 
         // Quick Suggestions Horizontal Row
-        val activeSuggestions = if (uiState.creationType == CreationType.HABIT) habitSuggestions else taskSuggestions
+        val activeSuggestions = if (uiState.creationType == CreationType.HABIT) {
+            if (uiState.isNegative) badHabitSuggestions else habitSuggestions
+        } else taskSuggestions
         Row(
             modifier = Modifier
                 .fillMaxWidth()

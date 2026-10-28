@@ -26,17 +26,20 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AutoAwesome
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Air
+import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.AutoGraph
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.ChevronLeft
 import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.NorthEast
+import androidx.compose.material.icons.rounded.PauseCircle
+import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material.icons.rounded.Spa
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.Timer
+import androidx.compose.material.icons.rounded.VerifiedUser
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -71,6 +74,7 @@ import com.forma.app.ui.settings.components.ProPaywallBottomSheet
 import com.forma.app.ui.stats.components.CommitmentDetailSheet
 import com.forma.app.ui.stats.components.HabitMomentumDetailSheet
 import com.forma.app.ui.stats.components.RhythmDayDetailSheet
+import com.forma.app.ui.stats.components.YearlyParchmentHeatmap
 
 enum class FocusTimeTab(val label: String) {
     WEEK("This Week"),
@@ -328,6 +332,232 @@ fun StatsScreen(
                                     fontWeight = FontWeight.Bold,
                                     color = colors.textPrimary,
                                     fontSize = 13.sp
+                                )
+                            }
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(Icons.Rounded.PauseCircle, contentDescription = null, tint = Color(0xFFE0A96D), modifier = Modifier.size(16.dp))
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(text = "Rested (Skipped)", style = FormaTheme.typography.bodySmall, color = colors.textSecondary, fontSize = 12.sp)
+                                }
+                                Text(
+                                    text = "${currentStats.totalSkippedCount}",
+                                    style = FormaTheme.typography.bodyMedium.copy(fontFeatureSettings = "tnum"),
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFFE0A96D),
+                                    fontSize = 13.sp
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Streak Integrity Assurance Footnote
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.VerifiedUser,
+                        contentDescription = null,
+                        tint = colors.accent,
+                        modifier = Modifier.size(13.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "Streak Integrity Active · Skips preserve streaks · Future edits blocked",
+                        style = FormaTheme.typography.labelSmall,
+                        color = colors.textTertiary,
+                        fontSize = 10.5.sp
+                    )
+                }
+            }
+
+            // Dedicated Clean Streaks & Vice Freedom Bento Card
+            if (currentStats.totalNegativeHabits > 0) {
+                item { Spacer(modifier = Modifier.height(10.dp)) }
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp)
+                            .clip(RoundedCornerShape(26.dp))
+                            .background(colors.surface)
+                            .border(1.dp, Color(0xFFE27D60).copy(alpha = 0.35f), RoundedCornerShape(26.dp))
+                            .padding(20.dp)
+                    ) {
+                        Column {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(36.dp)
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .background(Color(0xFFE27D60).copy(alpha = 0.15f)),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.Shield,
+                                            contentDescription = null,
+                                            tint = Color(0xFFE27D60),
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Column {
+                                        Text(
+                                            text = "CLEAN STREAKS & FREEDOM",
+                                            style = FormaTheme.typography.labelSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color(0xFFE27D60),
+                                            letterSpacing = 1.2.sp,
+                                            fontSize = 10.5.sp
+                                        )
+                                        Text(
+                                            text = "Conquering Bad Habits",
+                                            style = FormaTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = colors.textPrimary,
+                                            fontSize = 15.sp
+                                        )
+                                    }
+                                }
+
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(Color(0xFFE27D60).copy(alpha = 0.12f))
+                                        .padding(horizontal = 9.dp, vertical = 4.dp)
+                                ) {
+                                    Text(
+                                        text = "${currentStats.totalNegativeHabits} Breaking",
+                                        style = FormaTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFFE27D60),
+                                        fontSize = 11.sp
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(18.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                // Clean Days Metric Card
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .background(colors.surfaceVariant.copy(alpha = 0.5f))
+                                        .border(1.dp, colors.border.copy(alpha = 0.4f), RoundedCornerShape(16.dp))
+                                        .padding(14.dp)
+                                ) {
+                                    Column {
+                                        Text(
+                                            text = "BEST CLEAN RUN",
+                                            style = FormaTheme.typography.labelSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = colors.textTertiary,
+                                            fontSize = 9.5.sp,
+                                            letterSpacing = 0.8.sp
+                                        )
+                                        Spacer(modifier = Modifier.height(6.dp))
+                                        Row(verticalAlignment = Alignment.Bottom) {
+                                            Text(
+                                                text = "${currentStats.bestCleanStreak}",
+                                                style = FormaTheme.typography.headlineMedium.copy(fontFeatureSettings = "tnum"),
+                                                fontWeight = FontWeight.Bold,
+                                                color = colors.textPrimary,
+                                                fontSize = 26.sp
+                                            )
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                            Text(
+                                                text = "days",
+                                                style = FormaTheme.typography.bodySmall,
+                                                color = Color(0xFFE27D60),
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 12.sp,
+                                                modifier = Modifier.padding(bottom = 3.dp)
+                                            )
+                                        }
+                                    }
+                                }
+
+                                // Urges Surfed Metric Card
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .background(colors.surfaceVariant.copy(alpha = 0.5f))
+                                        .border(1.dp, colors.border.copy(alpha = 0.4f), RoundedCornerShape(16.dp))
+                                        .padding(14.dp)
+                                ) {
+                                    Column {
+                                        Text(
+                                            text = "URGES SURFED (90s)",
+                                            style = FormaTheme.typography.labelSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = colors.textTertiary,
+                                            fontSize = 9.5.sp,
+                                            letterSpacing = 0.8.sp
+                                        )
+                                        Spacer(modifier = Modifier.height(6.dp))
+                                        Row(verticalAlignment = Alignment.Bottom) {
+                                            Text(
+                                                text = "${currentStats.totalUrgesDeflected}",
+                                                style = FormaTheme.typography.headlineMedium.copy(fontFeatureSettings = "tnum"),
+                                                fontWeight = FontWeight.Bold,
+                                                color = colors.textPrimary,
+                                                fontSize = 26.sp
+                                            )
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                            Text(
+                                                text = "deflected",
+                                                style = FormaTheme.typography.bodySmall,
+                                                color = colors.accent,
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 12.sp,
+                                                modifier = Modifier.padding(bottom = 3.dp)
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(horizontal = 4.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Air,
+                                    contentDescription = null,
+                                    tint = Color(0xFFE27D60),
+                                    modifier = Modifier.size(13.dp)
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = "Urges peak within 90 seconds. Breathwork rewires impulse circuits.",
+                                    style = FormaTheme.typography.bodySmall,
+                                    color = colors.textTertiary,
+                                    fontSize = 11.sp
                                 )
                             }
                         }
@@ -787,10 +1017,22 @@ fun StatsScreen(
                                                 ) {
                                                     if (dayRate != null) {
                                                         val intensity = dayRate.intensity.coerceIn(0f, 1f)
-                                                        val cellBg = if (dayRate.completedCount > 0) {
-                                                            colors.accent.copy(alpha = intensity.coerceAtLeast(0.28f))
-                                                        } else {
-                                                            colors.surfaceVariant
+                                                        val isSkippedOnly = dayRate.skippedCount > 0 && dayRate.completedCount == 0
+                                                        val isCompleted = dayRate.completedCount > 0
+                                                        val isMissed = dayRate.missedCount > 0 && dayRate.completedCount == 0 && !isSkippedOnly
+
+                                                        val cellBg = when {
+                                                            isCompleted -> colors.accent.copy(alpha = intensity.coerceAtLeast(0.28f))
+                                                            isSkippedOnly -> colors.surfaceVariant.copy(alpha = 0.85f)
+                                                            isMissed -> colors.surfaceVariant.copy(alpha = 0.4f)
+                                                            else -> colors.surfaceVariant
+                                                        }
+
+                                                        val cellBorder = when {
+                                                            isSkippedOnly -> Color(0xFFE0A96D).copy(alpha = 0.8f)
+                                                            isCompleted -> colors.background.copy(alpha = 0.2f)
+                                                            isMissed -> colors.border.copy(alpha = 0.25f)
+                                                            else -> colors.background.copy(alpha = 0.2f)
                                                         }
 
                                                         Box(
@@ -798,19 +1040,41 @@ fun StatsScreen(
                                                                 .size(34.dp)
                                                                 .clip(RoundedCornerShape(10.dp))
                                                                 .background(cellBg)
-                                                                .border(1.dp, colors.background.copy(alpha = 0.2f), RoundedCornerShape(10.dp))
+                                                                .border(
+                                                                    width = if (isSkippedOnly) 1.5.dp else 1.dp,
+                                                                    color = cellBorder,
+                                                                    shape = RoundedCornerShape(10.dp)
+                                                                )
                                                                 .formaPressEffect(targetScale = 0.88f) {
                                                                     viewModel.inspectMatrixDay(dayRate.date)
                                                                 },
                                                             contentAlignment = Alignment.Center
                                                         ) {
-                                                            Text(
-                                                                text = "${dayRate.dayOfMonth}",
-                                                                style = FormaTheme.typography.labelSmall,
-                                                                fontWeight = FontWeight.Bold,
-                                                                color = if (dayRate.completedCount > 0 && intensity >= 0.5f) colors.onAccent else colors.textPrimary,
-                                                                fontSize = 11.sp
-                                                            )
+                                                            Column(
+                                                                horizontalAlignment = Alignment.CenterHorizontally,
+                                                                verticalArrangement = Arrangement.Center
+                                                            ) {
+                                                                Text(
+                                                                    text = "${dayRate.dayOfMonth}",
+                                                                    style = FormaTheme.typography.labelSmall,
+                                                                    fontWeight = FontWeight.Bold,
+                                                                    color = when {
+                                                                        isCompleted && intensity >= 0.5f -> colors.onAccent
+                                                                        isSkippedOnly -> Color(0xFFE0A96D)
+                                                                        else -> colors.textPrimary
+                                                                    },
+                                                                    fontSize = 11.sp
+                                                                )
+                                                                if (isSkippedOnly) {
+                                                                    Box(
+                                                                        modifier = Modifier
+                                                                            .padding(top = 1.dp)
+                                                                            .size(3.dp)
+                                                                            .clip(CircleShape)
+                                                                            .background(Color(0xFFE0A96D))
+                                                                    )
+                                                                }
+                                                            }
                                                         }
                                                     } else {
                                                         Box(modifier = Modifier.size(34.dp))
@@ -834,39 +1098,64 @@ fun StatsScreen(
 
                                 Spacer(modifier = Modifier.height(14.dp))
 
-                                // Matrix Legend & Tap hint
+                                // Matrix Legend & Integrity Key
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(
-                                        text = "Less Active",
-                                        style = FormaTheme.typography.labelSmall,
-                                        color = colors.textTertiary,
-                                        fontSize = 10.sp
-                                    )
-
-                                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                                        listOf(0.15f, 0.40f, 0.70f, 1.0f).forEach { alpha ->
-                                            Box(
-                                                modifier = Modifier
-                                                    .size(12.dp)
-                                                    .clip(RoundedCornerShape(3.dp))
-                                                    .background(colors.accent.copy(alpha = alpha))
-                                            )
-                                        }
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(10.dp)
+                                                .clip(RoundedCornerShape(3.dp))
+                                                .background(colors.accent)
+                                        )
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(
+                                            text = "Completed",
+                                            style = FormaTheme.typography.labelSmall,
+                                            color = colors.textTertiary,
+                                            fontSize = 10.sp
+                                        )
                                     }
 
-                                    Text(
-                                        text = "Mastery",
-                                        style = FormaTheme.typography.labelSmall,
-                                        color = colors.textTertiary,
-                                        fontSize = 10.sp
-                                    )
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(10.dp)
+                                                .clip(RoundedCornerShape(3.dp))
+                                                .background(colors.surfaceVariant)
+                                                .border(1.dp, Color(0xFFE0A96D), RoundedCornerShape(3.dp))
+                                        )
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(
+                                            text = "Rested (Streak Kept)",
+                                            style = FormaTheme.typography.labelSmall,
+                                            color = Color(0xFFE0A96D),
+                                            fontSize = 10.sp
+                                        )
+                                    }
+
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(10.dp)
+                                                .clip(RoundedCornerShape(3.dp))
+                                                .background(colors.surfaceVariant.copy(alpha = 0.4f))
+                                                .border(1.dp, colors.border.copy(alpha = 0.4f), RoundedCornerShape(3.dp))
+                                        )
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(
+                                            text = "Missed",
+                                            style = FormaTheme.typography.labelSmall,
+                                            color = colors.textTertiary,
+                                            fontSize = 10.sp
+                                        )
+                                    }
                                 }
 
-                                Spacer(modifier = Modifier.height(6.dp))
+                                Spacer(modifier = Modifier.height(10.dp))
 
                                 Text(
                                     text = "Tap any day to inspect completed rituals & focus duration",
@@ -878,6 +1167,21 @@ fun StatsScreen(
                                 )
                             }
                         }
+                    }
+                }
+
+                item { Spacer(modifier = Modifier.height(20.dp)) }
+
+                // 6. Section: 365-Day Consistency Heatmap Parchment
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp)
+                    ) {
+                        YearlyParchmentHeatmap(
+                            completionsByDate = yearlyCompletions
+                        )
                     }
                 }
         }

@@ -10,13 +10,25 @@ import javax.inject.Inject
 class CalculateStreakUseCase @Inject constructor() {
 
     /**
-     * Ultra-fast calculation of current streak without scanning entire history.
+     * Ultra-fast calculation of current streak with anti-cheat and skip preservation.
+     * Skips preserve momentum (+0 count) without breaking the streak.
+     * Completions in future dates are strictly rejected.
      */
     fun calculateCurrentStreak(
         habit: Habit,
         completedDatesSet: Set<String>,
-        referenceDate: LocalDate = DateUtils.today()
+        referenceDate: LocalDate = DateUtils.today(),
+        skippedDatesSet: Set<String> = emptySet()
     ): Int {
+        if (habit.isNegative) {
+            return habit.cleanDaysCount
+        }
+
+        // Anti-Cheat: strictly ignore future date completions
+        val validCompletedDates = completedDatesSet.filter { dateStr ->
+            try { !LocalDate.parse(dateStr).isAfter(referenceDate) } catch (_: Exception) { false }
+        }.toSet()
+
         val scheduledRepeatDays = if (habit.repeatDays.isEmpty()) setOf(1, 2, 3, 4, 5, 6, 7) else habit.repeatDays
 
         var currentStreak = 0
@@ -24,14 +36,13 @@ class CalculateStreakUseCase @Inject constructor() {
 
         val todayStr = DateUtils.formatDateIso(referenceDate)
         val isTodayScheduled = scheduledRepeatDays.contains(DateUtils.getDayOfWeekInt(referenceDate))
-        val isTodayCompleted = completedDatesSet.contains(todayStr)
+        val isTodayCompleted = validCompletedDates.contains(todayStr)
 
         if (isTodayCompleted) {
             currentStreak++
             checkDate = checkDate.minusDays(1)
-        } else if (!isTodayScheduled) {
-            checkDate = checkDate.minusDays(1)
         } else {
+            // If today is skipped or pending, streak from previous days is preserved
             checkDate = checkDate.minusDays(1)
         }
 
@@ -45,8 +56,10 @@ class CalculateStreakUseCase @Inject constructor() {
 
             if (isScheduled) {
                 val dateStr = DateUtils.formatDateIso(checkDate)
-                if (completedDatesSet.contains(dateStr)) {
+                if (validCompletedDates.contains(dateStr)) {
                     currentStreak++
+                } else if (skippedDatesSet.contains(dateStr)) {
+                    // Skip preserves streak (+0). Does not break it!
                 } else {
                     break
                 }
@@ -60,25 +73,43 @@ class CalculateStreakUseCase @Inject constructor() {
 
     /**
      * Calculates the current streak, longest streak, and completion statistics for a habit.
-     * Takes into account the habit's scheduled repeat days (e.g. if a habit repeats only Mon-Fri,
-     * weekends do not break the streak).
+     * Anti-cheat enforcement: strictly rejects future dates and calculates accurate skips.
      */
     operator fun invoke(
         habit: Habit,
         completions: List<HabitCompletion>,
-        referenceDate: LocalDate = DateUtils.today()
+        referenceDate: LocalDate = DateUtils.today(),
+        skippedDatesSet: Set<String> = emptySet()
     ): HabitStreakInfo {
-        val completedDatesSet = completions.map { it.date }.toSet()
-        val scheduledRepeatDays = if (habit.repeatDays.isEmpty()) setOf(1, 2, 3, 4, 5, 6, 7) else habit.repeatDays
-        val currentStreak = calculateCurrentStreak(habit, completedDatesSet, referenceDate)
+        if (habit.isNegative) {
+            val cleanDays = habit.cleanDaysCount
+            return HabitStreakInfo(
+                habitId = habit.id,
+                habitName = habit.name,
+                habitIcon = habit.icon,
+                habitColor = habit.colorTag,
+                currentStreak = cleanDays,
+                longestStreak = cleanDays,
+                totalCompletions = cleanDays,
+                completionRatePercentage = if (cleanDays > 0) 100 else 0,
+                skippedCount = 0,
+                missedCount = 0
+            )
+        }
 
+        // Anti-Cheat: only consider completions on or before referenceDate
+        val validCompletedDates = completions
+            .map { it.date }
+            .filter { dateStr ->
+                try { !LocalDate.parse(dateStr).isAfter(referenceDate) } catch (_: Exception) { false }
+            }.toSet()
+
+        val currentStreak = calculateCurrentStreak(habit, validCompletedDates, referenceDate, skippedDatesSet)
         val habitStartDate = habit.effectiveStartLocalDate
 
-        // Calculate Longest Streak & Total completions
         var longestStreak = currentStreak
         var runningStreak = 0
 
-        // Iterate through all days from habitStartDate up to referenceDate
         var scanDate = habitStartDate
         var totalScheduledDays = 0
 
@@ -88,13 +119,14 @@ class CalculateStreakUseCase @Inject constructor() {
             if (isScheduled) {
                 totalScheduledDays++
                 val dateStr = DateUtils.formatDateIso(scanDate)
-                if (completedDatesSet.contains(dateStr)) {
+                if (validCompletedDates.contains(dateStr)) {
                     runningStreak++
                     if (runningStreak > longestStreak) {
                         longestStreak = runningStreak
                     }
+                } else if (skippedDatesSet.contains(dateStr)) {
+                    // Skip preserves runningStreak (+0), does not reset to 0
                 } else {
-                    // Only break running streak if scanDate is before today
                     if (scanDate.isBefore(referenceDate)) {
                         runningStreak = 0
                     }
@@ -103,8 +135,14 @@ class CalculateStreakUseCase @Inject constructor() {
             scanDate = scanDate.plusDays(1)
         }
 
-        val totalCompletions = completedDatesSet.size
-        val missedCount = (totalScheduledDays - totalCompletions).coerceAtLeast(0)
+        val totalCompletions = validCompletedDates.size
+        val totalSkipped = skippedDatesSet.count { dateStr ->
+            try {
+                val d = LocalDate.parse(dateStr)
+                !d.isBefore(habitStartDate) && !d.isAfter(referenceDate) && habit.isScheduledOnDate(d)
+            } catch (_: Exception) { false }
+        }
+        val missedCount = (totalScheduledDays - totalCompletions - totalSkipped).coerceAtLeast(0)
         val completionRate = if (totalScheduledDays > 0) {
             ((totalCompletions.toFloat() / totalScheduledDays.toFloat()) * 100).toInt().coerceIn(0, 100)
         } else {
@@ -120,7 +158,7 @@ class CalculateStreakUseCase @Inject constructor() {
             longestStreak = longestStreak.coerceAtLeast(currentStreak),
             totalCompletions = totalCompletions,
             completionRatePercentage = completionRate,
-            skippedCount = 0,
+            skippedCount = totalSkipped,
             missedCount = missedCount
         )
     }

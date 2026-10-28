@@ -74,6 +74,7 @@ fun BehanceHabitCard(
     onStartFocus: () -> Unit,
     onSkip: () -> Unit = {},
     onUnskip: () -> Unit = {},
+    onRideUrge: () -> Unit = {},
     onLongClick: () -> Unit = {},
     isReadOnly: Boolean = false,
     onReadOnlyAttempt: () -> Unit = {},
@@ -102,6 +103,13 @@ fun BehanceHabitCard(
                 String.format("%d:%02d %s • %s", h12, m, amPm, habit.timeOfDay.displayName)
             } ?: defaultTime
 
+            val cleanTimeFormatted = if (habit.cleanDaysCount > 0) {
+                "${habit.cleanDaysCount}D CLEAN • ${habit.urgesDeflected} URGES DEFLECTED"
+            } else {
+                "${habit.cleanHoursCount}H CLEAN • FRESH START"
+            }
+            val finalSubtitle = if (habit.isNegative) cleanTimeFormatted else timeFormatted
+
             val doneCount = habit.subtasks.count { it.completed }
             val totalCount = habit.subtasks.size
             val isPeach = habit.name.contains("water", ignoreCase = true) || habit.name.contains("read", ignoreCase = true)
@@ -110,13 +118,14 @@ fun BehanceHabitCard(
                 title = habit.name,
                 iconKey = habit.icon,
                 colorTagHex = habit.colorTag,
-                subtitle = timeFormatted,
+                subtitle = finalSubtitle,
                 isDone = item.isDoneToday,
                 isPeachTile = isPeach,
                 cueText = habit.stackedCueText,
                 isWintering = habit.isWintering,
                 isSkipped = item.isSkippedToday,
                 isHabit = true,
+                isNegative = habit.isNegative,
                 totalSubtasks = totalCount,
                 doneSubtasks = doneCount
             )
@@ -346,8 +355,41 @@ fun BehanceHabitCard(
                             }
                         }
                     } else if (!localIsDone && !isWintering) {
-                        // Skip Button
-                        if (cardData.isHabit) {
+                        if (cardData.isNegative) {
+                            Box(
+                                modifier = Modifier
+                                    .height(26.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(habitAccent.copy(alpha = 0.14f))
+                                    .border(1.dp, habitAccent.copy(alpha = 0.45f), RoundedCornerShape(8.dp))
+                                    .formaPressEffect(targetScale = 0.90f) {
+                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                        onRideUrge()
+                                    }
+                                    .padding(horizontal = 8.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Shield,
+                                        contentDescription = "Ride Urge",
+                                        tint = habitAccent,
+                                        modifier = Modifier.size(11.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = "Ride Urge",
+                                        style = FormaTheme.typography.labelSmall.copy(
+                                            platformStyle = PlatformTextStyle(includeFontPadding = false)
+                                        ),
+                                        fontWeight = FontWeight.Bold,
+                                        color = habitAccent,
+                                        fontSize = 10.sp
+                                    )
+                                }
+                            }
+                        } else if (cardData.isHabit) {
+                            // Skip Button
                             Box(
                                 modifier = Modifier
                                     .height(26.dp)
@@ -665,6 +707,7 @@ private data class BehanceCardData(
     val isWintering: Boolean = false,
     val isSkipped: Boolean = false,
     val isHabit: Boolean = false,
+    val isNegative: Boolean = false,
     val totalSubtasks: Int = 0,
     val doneSubtasks: Int = 0
 ) {

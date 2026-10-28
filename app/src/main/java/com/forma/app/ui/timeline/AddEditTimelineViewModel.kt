@@ -61,7 +61,8 @@ data class AddEditTimelineUiState(
     val reminderMinutesBefore: Int? = 15,
     val completed: Boolean = false,
     val isEditMode: Boolean = false,
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val isNegative: Boolean = false
 )
 
 sealed interface AddEditTimelineEvent {
@@ -169,11 +170,19 @@ class AddEditTimelineViewModel @Inject constructor(
                         recurrenceType = "DAILY",
                         subtasks = habit.subtasks,
                         isEditMode = true,
-                        isLoading = false
+                        isLoading = false,
+                        isNegative = habit.isNegative
                     )
                 }
             }
         }
+    }
+
+    fun setIsNegative(negative: Boolean) {
+        _uiState.value = _uiState.value.copy(
+            isNegative = negative,
+            icon = if (negative && _uiState.value.icon == "target") "shield" else _uiState.value.icon
+        )
     }
 
     fun setCreationType(type: CreationType) {
@@ -309,6 +318,8 @@ class AddEditTimelineViewModel @Inject constructor(
                     state.reminderHour * 60 + state.reminderMinute
                 } else null
 
+                val existingHabit = if (state.isEditMode) habitRepository.getHabitById(state.id).first() else null
+
                 val habit = Habit(
                     id = state.id,
                     name = state.title.trim(),
@@ -324,7 +335,10 @@ class AddEditTimelineViewModel @Inject constructor(
                     stackedCueText = state.stackedCueText.trim().ifEmpty { null },
                     isWintering = state.isWintering,
                     updatedAt = System.currentTimeMillis(),
-                    subtasks = state.subtasks
+                    subtasks = state.subtasks,
+                    isNegative = state.isNegative,
+                    quitTimestamp = if (state.isNegative) (existingHabit?.quitTimestamp ?: System.currentTimeMillis()) else null,
+                    urgesDeflected = existingHabit?.urgesDeflected ?: 0
                 )
                 if (state.isEditMode) {
                     habitRepository.updateHabit(habit)

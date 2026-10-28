@@ -183,6 +183,36 @@ class TodayViewModel @Inject constructor(
         }
     }
 
+    fun rideUrge(habitId: String) {
+        viewModelScope.launch {
+            val habit = habitRepository.getHabitById(habitId).first()
+            if (habit != null && habit.isNegative) {
+                val updated = habit.copy(
+                    urgesDeflected = habit.urgesDeflected + 1,
+                    updatedAt = System.currentTimeMillis()
+                )
+                habitRepository.updateHabit(updated)
+                zenFeedback.onMilestoneReached()
+                _eventFlow.emit(TodayUiEvent.ShowToast("Urge deflected! Your clean streak holds strong."))
+            }
+        }
+    }
+
+    fun resetCleanStreak(habitId: String) {
+        viewModelScope.launch {
+            val habit = habitRepository.getHabitById(habitId).first()
+            if (habit != null && habit.isNegative) {
+                val updated = habit.copy(
+                    quitTimestamp = System.currentTimeMillis(),
+                    updatedAt = System.currentTimeMillis()
+                )
+                habitRepository.updateHabit(updated)
+                zenFeedback.onTaskToggled()
+                _eventFlow.emit(TodayUiEvent.ShowToast("Clean streak reset. Fresh start begun."))
+            }
+        }
+    }
+
     fun addHabit(habit: Habit) {
         viewModelScope.launch {
             val isProActive = billingRepository.isPro.first()

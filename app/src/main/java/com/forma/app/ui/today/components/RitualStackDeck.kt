@@ -31,6 +31,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Undo
+import androidx.compose.material.icons.rounded.Air
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.CheckCircle
@@ -115,6 +116,7 @@ fun RitualStackDeck(
     onReadOnlyAttempt: () -> Unit = {},
     onDeckCompleted: () -> Unit = {},
     onLongClick: (TodayScheduleItem) -> Unit = {},
+    onRideUrge: ((TodayScheduleItem) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val colors = FormaTheme.colors
@@ -458,6 +460,7 @@ fun RitualStackDeck(
                             onReadOnlyAttempt = onReadOnlyAttempt,
                             onClick = { onClick(topItem) },
                             onLongClick = { onLongClick(topItem) },
+                            onRideUrge = { onRideUrge?.invoke(topItem) },
                             onStartFocus = {
                                 if (isReadOnly) {
                                     onReadOnlyAttempt()
@@ -598,6 +601,7 @@ private fun DeckItemCard(
     onReadOnlyAttempt: () -> Unit = {},
     onClick: () -> Unit = {},
     onLongClick: () -> Unit = {},
+    onRideUrge: (() -> Unit)? = null,
     onStartFocus: () -> Unit = {},
     onComplete: () -> Unit = {},
     onSkip: () -> Unit = {},
@@ -622,13 +626,17 @@ private fun DeckItemCard(
             colorTagHex = habit.colorTag
             totalSubtasks = habit.subtasks.size
             doneSubtasks = habit.subtasks.count { it.completed }
-            subtitle = habit.reminderTimeMinutes?.let { minutes ->
-                val h = minutes / 60
-                val m = minutes % 60
-                val amPm = if (h < 12) "AM" else "PM"
-                val h12 = if (h % 12 == 0) 12 else h % 12
-                String.format("%d:%02d %s • %s", h12, m, amPm, habit.timeOfDay.displayName)
-            } ?: habit.timeOfDay.displayName
+            subtitle = if (habit.isNegative) {
+                "${habit.cleanDaysCount} Days Free • Defended ${habit.urgesDeflected} Urges"
+            } else {
+                habit.reminderTimeMinutes?.let { minutes ->
+                    val h = minutes / 60
+                    val m = minutes % 60
+                    val amPm = if (h < 12) "AM" else "PM"
+                    val h12 = if (h % 12 == 0) 12 else h % 12
+                    String.format("%d:%02d %s • %s", h12, m, amPm, habit.timeOfDay.displayName)
+                } ?: habit.timeOfDay.displayName
+            }
         }
         is TodayScheduleItem.TimelineBlock -> {
             val task = item.item
@@ -798,29 +806,58 @@ private fun DeckItemCard(
                             }
                         }
                     } else {
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(habitAccent.copy(alpha = 0.12f))
-                                .border(1.dp, habitAccent.copy(alpha = 0.35f), RoundedCornerShape(10.dp))
-                                .formaPressEffect(targetScale = 0.92f) { onStartFocus() }
-                                .padding(horizontal = 10.dp, vertical = 6.dp)
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.Rounded.Timer,
-                                    contentDescription = "Focus",
-                                    tint = habitAccent,
-                                    modifier = Modifier.size(13.dp)
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = "Focus Sprint",
-                                    style = FormaTheme.typography.labelSmall,
-                                    fontWeight = FontWeight.Bold,
-                                    color = habitAccent,
-                                    fontSize = 11.sp
-                                )
+                        val isNegativeHabit = item is TodayScheduleItem.HabitItem && item.habit.isNegative
+                        if (isNegativeHabit) {
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(Color(0xFFE27D60).copy(alpha = 0.14f))
+                                    .border(1.dp, Color(0xFFE27D60).copy(alpha = 0.4f), RoundedCornerShape(10.dp))
+                                    .formaPressEffect(targetScale = 0.92f) { onRideUrge?.invoke() }
+                                    .padding(horizontal = 10.dp, vertical = 6.dp)
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Air,
+                                        contentDescription = "Ride Urge",
+                                        tint = Color(0xFFE27D60),
+                                        modifier = Modifier.size(13.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = "Ride Urge",
+                                        style = FormaTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFFE27D60),
+                                        fontSize = 11.sp
+                                    )
+                                }
+                            }
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(habitAccent.copy(alpha = 0.12f))
+                                    .border(1.dp, habitAccent.copy(alpha = 0.35f), RoundedCornerShape(10.dp))
+                                    .formaPressEffect(targetScale = 0.92f) { onStartFocus() }
+                                    .padding(horizontal = 10.dp, vertical = 6.dp)
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Timer,
+                                        contentDescription = "Focus",
+                                        tint = habitAccent,
+                                        modifier = Modifier.size(13.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = "Focus Sprint",
+                                        style = FormaTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = habitAccent,
+                                        fontSize = 11.sp
+                                    )
+                                }
                             }
                         }
                     }
@@ -1004,7 +1041,7 @@ private fun DeckItemCard(
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
-                                text = "Complete Ritual",
+                                text = if (item is TodayScheduleItem.HabitItem && item.habit.isNegative) "Stayed Clean" else "Complete Ritual",
                                 style = FormaTheme.typography.labelMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = colors.onAccent,

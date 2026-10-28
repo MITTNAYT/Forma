@@ -28,8 +28,26 @@ data class Habit(
     val startDate: String? = null, // e.g. "2026-09-13"
     val endDate: String? = null, // e.g. "2026-12-31"
     val isIndefinite: Boolean = true, // Infinity ongoing or fixed duration
-    val subtasks: List<Subtask> = emptyList()
+    val subtasks: List<Subtask> = emptyList(),
+    // Breaking Bad Habits / Clean Streak support:
+    val isNegative: Boolean = false,
+    val quitTimestamp: Long? = null, // Epoch millis when clean streak started (resets on slip)
+    val urgesDeflected: Int = 0 // Count of cravings resisted via Urge Surfer
 ) {
+    /**
+     * Elapsed clean milliseconds for negative habits.
+     */
+    val cleanElapsedMillis: Long
+        get() = (System.currentTimeMillis() - (quitTimestamp ?: createdAt)).coerceAtLeast(0L)
+
+    /**
+     * Clean days count for negative habits.
+     */
+    val cleanDaysCount: Int
+        get() = (cleanElapsedMillis / (1000L * 60 * 60 * 24)).toInt()
+
+    val cleanHoursCount: Int
+        get() = (cleanElapsedMillis / (1000L * 60 * 60)).toInt()
     /**
      * Resolves the exact local start date from startDate string, or falls back to createdAt epoch.
      */

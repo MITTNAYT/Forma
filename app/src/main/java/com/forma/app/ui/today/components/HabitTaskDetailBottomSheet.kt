@@ -31,8 +31,10 @@ import androidx.compose.material.icons.rounded.Repeat
 import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material.icons.rounded.Sensors
 import androidx.compose.material.icons.rounded.Share
+import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material.icons.rounded.SkipNext
 import androidx.compose.material.icons.rounded.Timer
+import androidx.compose.material.icons.rounded.Undo
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
@@ -78,6 +80,8 @@ fun HabitTaskDetailBottomSheet(
     onToggleSubtask: (subtaskId: String) -> Unit = {},
     onTogglePause: () -> Unit = {},
     onSkipHabit: () -> Unit = {},
+    onRideUrge: () -> Unit = {},
+    onResetCleanStreak: () -> Unit = {},
     isReadOnly: Boolean = false
 ) {
     val colors = FormaTheme.colors
@@ -104,25 +108,36 @@ fun HabitTaskDetailBottomSheet(
             } ?: defaultTime
 
             val daysMap = mapOf(1 to "Mon", 2 to "Tue", 3 to "Wed", 4 to "Thu", 5 to "Fri", 6 to "Sat", 7 to "Sun")
-            val repeatStr = if (habit.repeatDays.size == 7) {
+            val repeatStr = if (habit.isNegative) {
+                "Continuous Clean Tracking"
+            } else if (habit.repeatDays.size == 7) {
                 "Every Day (7x / week)"
             } else {
                 "${habit.repeatDays.size}x / week (${habit.repeatDays.sorted().mapNotNull { daysMap[it] }.joinToString(", ")})"
             }
 
+            val subtitleFormatted = if (habit.isNegative) {
+                if (habit.cleanDaysCount > 0) "${habit.cleanDaysCount} Days Clean • ${habit.urgesDeflected} Urges Deflected"
+                else "${habit.cleanHoursCount} Hours Clean • Fresh Start"
+            } else timeFormatted
+
             HabitTaskDetails(
                 title = habit.name,
                 iconKey = habit.icon,
-                subtitle = timeFormatted,
+                subtitle = subtitleFormatted,
                 isDone = item.isDoneToday,
                 repeatLabel = repeatStr,
                 subtasks = habit.subtasks,
                 notes = habit.stackedCueText ?: "",
-                streakCount = item.currentStreak,
+                streakCount = if (habit.isNegative) habit.cleanDaysCount else item.currentStreak,
                 isWintering = habit.isWintering,
                 canPause = true,
                 isHabit = true,
-                isSkipped = item.isSkippedToday
+                isSkipped = item.isSkippedToday,
+                isNegative = habit.isNegative,
+                cleanDays = habit.cleanDaysCount,
+                cleanHours = habit.cleanHoursCount,
+                urgesDeflected = habit.urgesDeflected
             )
         }
         is TodayScheduleItem.TimelineBlock -> {
@@ -663,8 +678,80 @@ fun HabitTaskDetailBottomSheet(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // ── 7. Skip Habit Action (Guilt-Free Streak Protection) ───────
-            if (details.isHabit && !localIsDone && !isReadOnly) {
+            // ── 7. Clean Streak Actions or Skip Habit Action ───────
+            if (details.isNegative && !isReadOnly) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    // Ride Urge Button
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(44.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(colors.accentSoft)
+                            .border(1.dp, colors.accent.copy(alpha = 0.5f), RoundedCornerShape(16.dp))
+                            .formaPressEffect(targetScale = 0.97f) {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                onDismiss()
+                                onRideUrge()
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Rounded.Shield,
+                                contentDescription = "Ride Urge",
+                                tint = colors.accent,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "Ride Urge",
+                                style = FormaTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = colors.accent,
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
+
+                    // Reset Timer (I Slipped) Button
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(44.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(colors.surfaceVariant.copy(alpha = 0.6f))
+                            .border(1.dp, colors.border.copy(alpha = 0.4f), RoundedCornerShape(16.dp))
+                            .formaPressEffect(targetScale = 0.97f) {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                onDismiss()
+                                onResetCleanStreak()
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Rounded.Undo,
+                                contentDescription = "Record Slip",
+                                tint = colors.textSecondary,
+                                modifier = Modifier.size(14.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "Record Slip",
+                                style = FormaTheme.typography.labelSmall,
+                                fontWeight = FontWeight.SemiBold,
+                                color = colors.textSecondary,
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+            } else if (details.isHabit && !localIsDone && !isReadOnly) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -810,7 +897,11 @@ private data class HabitTaskDetails(
     val isWintering: Boolean = false,
     val canPause: Boolean = false,
     val isHabit: Boolean = false,
-    val isSkipped: Boolean = false
+    val isSkipped: Boolean = false,
+    val isNegative: Boolean = false,
+    val cleanDays: Int = 0,
+    val cleanHours: Int = 0,
+    val urgesDeflected: Int = 0
 )
 
 private fun formatDetailTiming(startTimeStr: String?, endTimeStr: String?): String {
